@@ -1,0 +1,8 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include
+
+Name: scopi
+Description: scopi is a C++ library to...
+Version: @scopi_VERSION@
+Cflags: -I${includedir}

@@ -1,0 +1,5 @@
+#pragma once
+
+#define SCOPI_VERSION_MAJOR 0
+#define SCOPI_VERSION_MINOR 1
+#define SCOPI_VERSION_PATCH 0
