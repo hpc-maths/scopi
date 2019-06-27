@@ -23,14 +23,23 @@ message(STATUS "Building scopi v${${PROJECT_NAME}_VERSION}")
 find_package(xtensor REQUIRED)
 
 set(SCOPI_HEADERS
+    ${SCOPI_INCLUDE_DIR}/scopi/nanoflann.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/scopi_config.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/soa.hpp
 )
 
+#find_package(HDF5)
+#if(HDF5_FOUND)
+#    message("HDF5_C_LIBRARY_hdf5 : ${HDF5_C_LIBRARY_hdf5}")
+#    ##include_directories(${HDF5_INCLUDE_DIR})
+#    ##set(_hdf5_libs hdf5 hdf5_cpp)
+#endif(HDF5_FOUND)
+
+
 add_library(scopi INTERFACE)
 target_include_directories(scopi INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
                                           $<INSTALL_INTERFACE:include>)
-target_link_libraries(scopi INTERFACE xtensor)
+target_link_libraries(scopi INTERFACE xtensor ${HDF5_C_LIBRARY_hdf5})
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 
