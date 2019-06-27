@@ -3,3 +3,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(test_soa test_soa.cpp ${SCOPI_HEADERS})
 target_link_libraries(test_soa scopi)
+
+add_executable(test_soa_xtensor test_soa_xtensor.cpp ${SCOPI_HEADERS})
+target_link_libraries(test_soa_xtensor scopi)
+
+add_executable(test_nanoflann test_nanoflann.cpp ${SCOPI_HEADERS})
+target_link_libraries(test_nanoflann scopi)
