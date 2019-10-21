@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "scopi/soa.hpp"
-#include "scopi/nanoflann.hpp"
+#include "nanoflann/nanoflann_sf.hpp"
 
 struct particle
 {
@@ -69,12 +69,12 @@ int main()
     // std::for_each(particles.rbegin(), particles.rend(), print);
     //
 
-    int Np = 2000000;
+    int Np = 1000000;
     soa::vector<particle> particles;
     particles.resize(Np);
-    double max_range = 100;
-    double rmin = 0.;
-    double rmax = 0.;
+    double max_range = 10;
+    double rmin = 0.1;
+    double rmax = 0.1;
     for (int i = 0; i < Np; i++){
       particles[i].x = max_range * (rand() % 1000) / 1000.0;
       particles[i].y = max_range * (rand() % 1000) / 1000.0;
@@ -100,8 +100,9 @@ int main()
     soa::vector<contact> contacts;
     for (int i = 0; i < Np; i++){
       double query_pt[4] = {particles[i].x,particles[i].y,particles[i].z,particles[i].r};
+      //double query_pt[4] = {particles.x[i],particles.y[i],particles.z[i],particles.r[i]};
       //const double radius = sqrt(0.01);
-      const double radius = 0.5;
+      const double radius = 0.02;
       std::vector<std::pair<int, double> > indices_dists;
       nanoflann::RadiusResultSet<double,int> resultSet(radius, indices_dists);
       //const int nMatches = index.findNeighbors(resultSet, query_pt, nanoflann::SearchParams());

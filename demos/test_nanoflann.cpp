@@ -111,7 +111,7 @@ int main()
         const int nMatches = index.radiusSearch(query_pt, radius, ret_matches,
                                                 nanoflann::SearchParams());
 
-        // std::cout << "nMatches = " << nMatches << std::endl;
+        //std::cout << "pt " << i << " nMatches = " << nMatches << std::endl;
 
         // index.findNeighbors(resultSet, query_pt,
         // nanoflann::SearchParams());

@@ -7,6 +7,8 @@
 #include <type_traits>
 #include <utility>
 #include <xtensor/xtensor.hpp>
+//#include <xtensor/xarray.hpp>
+
 
 namespace soa
 {
@@ -472,6 +474,10 @@ namespace soa
         reference_type back() noexcept;
         const_reference_type back() const noexcept;
 
+        // modifiers:
+        void push_back(T const &value);
+        void push_back(T &&value);
+
       private:
         friend iterator;
         friend const_iterator;
@@ -753,6 +759,7 @@ namespace soa
 
 #define SOA_PP_MEMBER(nb, type, name)                                          \
     vector_span<xt::xtensor<decltype(std::declval<type>().name), 1>> name;
+//vector_span<xt::xarray<decltype(std::declval<type>().name)>> name;
 
 #define SOA_PP_REF(nb, type, name) decltype(std::declval<type>().name) &name;
 
@@ -819,6 +826,15 @@ namespace soa
 //         }
 //     };
 // }
+
+
+// template<>                                                             \
+// struct members<::type>                                                 \
+// {                                                                      \
+//     using container_base = xt::xarray<char>;                       \
+//     SOA_PP_MAP(SOA_PP_MEMBER, ::type, __VA_ARGS__)                     \
+// };
+
 #define SOA_DEFINE_TYPE(type, ...)                                             \
     namespace soa                                                              \
     {                                                                          \
