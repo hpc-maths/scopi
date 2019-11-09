@@ -12,7 +12,7 @@ import pyvista as pv ## pip3 install pyvista imageio-ffmpeg
 sys.path.append('build/')
 import scopi
 
-n = 100
+n = 20
 
 rmin = 0.1
 rmax = 0.2
@@ -22,50 +22,75 @@ yc = 0
 zc = 7
 rball = 6
 p = scopi.Particles("sand in ball");
+
 p.add_particles_in_ball(n, rmin, rmax, xc, yc, zc, rball)
-# xmin = 0
-# xmax = 10
-# ymin = 1
-# ymax = 11
-# zmin = 2
-# zmax = 12
-#p = scopi.Particles("sand in box");
+#p.add_particles_in_ball(n, rmin, rmax, xc, yc, zc, rball)
+
+xmin = xc-2
+xmax = xc+2
+ymin = yc-2
+ymax = yc+2
+zmin = zc-2
+zmax = zc+2
+p.add_particles_in_box(n,rmin,rmax,xmin,xmax,ymin,ymax,zmin,zmax)
 #p.add_particles_in_box(n,rmin,rmax,xmin,xmax,ymin,ymax,zmin,zmax)
 
-#p.print()
+p.print()
 
-xyzr = p.xyzr()
-print("(init) xyzr.data = ",xyzr.data)
+#part_data = p.get_data()
+#print(part_data)
 
-vap = np.zeros((xyzr.shape[0],3))
-#vap[:,2] = -1
-vap[:,0] = xyzr[:,0]-xc
-vap[:,1] = xyzr[:,1]-yc
-vap[:,2] = xyzr[:,2]-zc
-vap_norm = npl.norm(vap, axis=1)
-vap[:,0] = -vap[:,0]/vap_norm
-vap[:,1] = -vap[:,1]/vap_norm
-vap[:,2] = -vap[:,2]/vap_norm
+# xyzr = p.xyzr()
+# print("xyzr = ",xyzr)
+# print("xyzr.data = ",xyzr.data)
+# xyzr[:,0] = 0
+# print("xyzr = ",xyzr)
+#
+# xyzr2 = p.xyzr()
+# print("xyzr2 = ",xyzr2)
+# print("xyzr2.data = ",xyzr2.data)
+
+# x = p.get_x()
+# print("x = ",x)
+# print("x.data = ",x.data)
+# x[1] = 1
+# x2 = p.get_x()
+# print("x2 = ",x2)
+# print("x2.data = ",x2.data)
+#
+#
+# sys.exit()
+
+#
+# vap = np.zeros((xyzr.shape[0],3))
+# #vap[:,2] = -1
+# vap[:,0] = xyzr[:,0]-xc
+# vap[:,1] = xyzr[:,1]-yc
+# vap[:,2] = xyzr[:,2]-zc
+# vap_norm = npl.norm(vap, axis=1)
+# vap[:,0] = -vap[:,0]/vap_norm
+# vap[:,1] = -vap[:,1]/vap_norm
+# vap[:,2] = -vap[:,2]/vap_norm
 
 #save_movie = False
 
-p = pv.Plotter()
-sphere = pv.Sphere(theta_resolution=12,phi_resolution=12)
-mesh = pv.PolyData(xyzr[:,:3])
-mesh["r"] = xyzr[:,3]
-spheres = mesh.glyph(scale="r", factor=2, geom=sphere)
-spheres_actor = p.add_mesh(spheres,name="spheres")
-# arrow = pv.Arrow()
-# mesh['vap'] = vap
-# arrows = mesh.glyph(orient="vap", scale=False, factor=0.5, geom=arrow)
-# p.add_mesh(arrows)
-# # hourglass  = pv.PolyData('empty_hourglass_subdivide3.obj') ## BUG VTK pour lire le fichier (1ere colonne caractere 'v')
-# # hourglass  = pv.PolyData('empty_hourglass_subdivide3.stl')
-# hourglass  = pv.PolyData('empty_hourglass_subdivide1.stl')
-# print("hourglass bounds : ",hourglass.bounds)
-# print("hourglass.points.shape = ",hourglass.points.shape," hourglass.faces.shape = ",hourglass.faces.shape)
-# p.add_mesh(hourglass, name="hourglass", opacity=0.5, color=True)
-cpos = p.show(auto_close=False)
+# pl = pv.Plotter()
+# sphere = pv.Sphere(theta_resolution=12,phi_resolution=12)
+# mesh = pv.PolyData(xyzr[:,:3])
+# mesh["r"] = xyzr[:,3]
+# spheres = mesh.glyph(scale="r", factor=2, geom=sphere)
+# spheres_actor = pl.add_mesh(spheres,name="spheres")
+# # arrow = pv.Arrow()
+# # mesh['vap'] = vap
+# # arrows = mesh.glyph(orient="vap", scale=False, factor=0.5, geom=arrow)
+# # p.add_mesh(arrows)
+# # # hourglass  = pv.PolyData('empty_hourglass_subdivide3.obj') ## BUG VTK pour lire le fichier (1ere colonne caractere 'v')
+# # # hourglass  = pv.PolyData('empty_hourglass_subdivide3.stl')
+# # hourglass  = pv.PolyData('empty_hourglass_subdivide1.stl')
+# # print("hourglass bounds : ",hourglass.bounds)
+# # print("hourglass.points.shape = ",hourglass.points.shape," hourglass.faces.shape = ",hourglass.faces.shape)
+# # p.add_mesh(hourglass, name="hourglass", opacity=0.5, color=True)
+# cpos = pl.show(auto_close=False)
 
 
 maxiter = 100000000
@@ -76,8 +101,17 @@ tol = 1.0e-2
 t = 0
 tf = 5
 
-c = scopi.Contacts()
 dxc = 1.2*rmax # rmax + deplacement maximal pendant un dt
+c = scopi.Contacts(dxc)
+c.compute_contacts(p)
+c.print()
+#cont_data = c.get_data()
+#print(cont_data)
+
+proj = scopi.Projection(maxiter, rho, dmin, tol, dt) 
+
+sys.exit()
+
 
 invMass = 1/np.ones( (vap.shape[1]*vap.shape[0],) )
 
@@ -116,10 +150,10 @@ while (t<tf-0.5*dt):
     new_mesh = pv.PolyData(xyzr[:,:3])
     new_mesh["r"] = xyzr[:,3]
     new_spheres = new_mesh.glyph(scale="r", factor=2, geom=new_sphere)
-    p.add_mesh(new_spheres,name="spheres")
+    pl.add_mesh(new_spheres,name="spheres")
     # p.mesh.points = new_spheres.points
     # p.mesh.faces = new_spheres.faces  ##
-    p.render()
+    pl.render()
 
     vap[:,0] = xyzr[:,0]-xc
     vap[:,1] = xyzr[:,1]-yc

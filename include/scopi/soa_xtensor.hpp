@@ -44,24 +44,28 @@ namespace soa
     class vector;
 
     template<class container_type>
-    class vector_span : private container_type {
+    // class vector_span : private container_type { // Pas ideal... pour recuperer data.x,...
+    class vector_span : public container_type {
         template<class>
         friend class vector;
 
       public:
         using container = container_type;
-        using container::begin;
-        using container::cbegin;
-        using container::cend;
-        using container::crbegin;
-        using container::crend;
-        using container::end;
-        using container::fill;
-        using container::rbegin;
-        using container::rend;
-        using container::size;
-        using container::operator[];
+        // using container::begin;
+        // using container::cbegin;
+        // using container::cend;
+        // using container::crbegin;
+        // using container::crend;
+        // using container::end;
+        // using container::fill;
+        // using container::rbegin;
+        // using container::rend;
+        // using container::size;
+        // using container::operator[];
         using container::operator=;
+        // using container::data;
+        // container_type & operator()()
+        //   { return  (*this); }
 
       private:
         using container::resize;

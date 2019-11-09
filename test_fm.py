@@ -9,8 +9,8 @@ from time import time
 sys.path.append('build/')
 import fm
 
-mesh = pyvista.PolyData('empty_hourglass_subdivide3.obj')
-# mesh  = pyvista.PolyData('empty_hourglass_subdivide3.stl')
+#mesh = pyvista.PolyData('empty_hourglass_subdivide3.obj')
+mesh  = pyvista.PolyData('empty_hourglass_subdivide3.stl')
 print(mesh)
 print("bounds : ",mesh.bounds)
 print("points : ",mesh.points)

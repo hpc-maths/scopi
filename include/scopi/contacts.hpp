@@ -1,18 +1,9 @@
 #ifndef DEF_Contacts
 #define DEF_Contacts
 
-#include <iostream>
-#include <vector>
-#include <typeinfo>
-
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xio.hpp>
-#include <xtensor/xrandom.hpp>
-#include <xtensor/xdynamic_view.hpp>
-#include <xtensor/xarray.hpp>
-#include <xtensor-python/pyarray.hpp>
+#include "scopi/particles.hpp"
 #include "nanoflann/nanoflann.hpp"
-#include "scopi/soa_xtensor.hpp"
+
 
 struct contact
 {
@@ -25,22 +16,32 @@ SOA_DEFINE_TYPE(contact, i, j, d, ex, ey, ez, res, lam);
 
 class KdTree {
 
-  public:
-    KdTree(xt::pyarray<double> &xyzr ) : _xyzr{xyzr} {
-    }
-    inline std::size_t kdtree_get_point_count() const {
-      return _xyzr.shape()[0];
-    }
-    inline double kdtree_get_pt(std::size_t idx, const std::size_t dim) const {
-      return _xyzr(idx,dim);
-    }
-    template<class BBOX>
-    bool kdtree_get_bbox(BBOX & /* bb */) const {
-      return false;
-    }
+public:
 
-  private:
-    xt::pyarray<double> &_xyzr;
+  KdTree(soa::vector<particle> &p) : _p{p}{
+  }
+
+  inline std::size_t kdtree_get_point_count() const{
+    return _p.size();
+  }
+
+  inline double kdtree_get_pt(std::size_t idx, const std::size_t dim) const{
+    if (dim == 0)
+    return _p.x[idx];
+    else if (dim == 1)
+    return _p.y[idx];
+    else
+    return _p.z[idx];
+  }
+
+  template<class BBOX>
+  bool kdtree_get_bbox(BBOX & /* bb */) const{
+    return false;
+  }
+
+private:
+  soa::vector<particle> &_p;
+
 };
 
 /// @class Contacts
@@ -51,21 +52,24 @@ public:
 
   /// @brief Constructor
   /// Instantiate np contacts
-  Contacts();
+  Contacts(const double radius);
 
   /// @brief Destructor
   ~Contacts();
 
-  xt::pyarray<double> compute_contacts(xt::pyarray<double> &xyzr, const  double radius);
+  void compute_contacts(Particles& particles);
 
   /// @brief Print the contacts
   void print();
 
-  xt::pyarray<double> xyzr();  // A REVOIR : copies...
+  /// @brief Get contacts list : only for access from python
+  xt::xtensor<double, 2> get_data() const;
+
+  soa::vector<contact> data;
 
 private:
 
-  soa::vector<contact> _data;
+  const double _radius;
 
 };
 
