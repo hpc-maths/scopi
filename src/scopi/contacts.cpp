@@ -12,6 +12,8 @@ void Contacts::compute_contacts(Particles& particles) {
 
   // particles.print();
 
+  data.resize(0);
+
   constexpr std::size_t dim = 3;
 
   using my_kd_tree_t = typename nanoflann::KDTreeSingleIndexAdaptor<

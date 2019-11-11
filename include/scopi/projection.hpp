@@ -8,12 +8,8 @@
 #include "mkl_service.h"
 #include "mkl_spblas.h"
 
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xio.hpp>
-#include <xtensor/xrandom.hpp>
-#include <xtensor/xdynamic_view.hpp>
-#include <xtensor/xarray.hpp>
-#include <xtensor-python/pyarray.hpp>
+#include "scopi/particles.hpp"
+#include "scopi/contacts.hpp"
 
 
 /// @class Projection
@@ -38,19 +34,14 @@ public:
 
   // xt::pyarray<double> run(
   void run(
-      xt::pyarray<double> &xyzr,
-    xt::pyarray<double> &contacts,
-    xt::pyarray<double> &V,
-    xt::pyarray<double> &D,
-    xt::pyarray<double> &invM
+    Particles& particles,
+    Contacts& contacts
   );
 
   /// @brief Print the contacts
   void print();
 
 private:
-
-  std::size_t _nc; // number of contacts
 
   const std::size_t _maxiter;
   const double _rho;
