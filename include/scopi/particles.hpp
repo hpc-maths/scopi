@@ -3,10 +3,13 @@
 
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xrandom.hpp>
-#include <xtensor/xdynamic_view.hpp>
-#include <xtensor/xio.hpp>
+#include "xtensor/xmanipulation.hpp"
+
 #include "xtensor-python/pytensor.hpp"
+#include "xtensor-python/pyarray.hpp"
+
 #include "scopi/soa_xtensor.hpp"
+
 
 struct particle {
   std::size_t id;
@@ -57,6 +60,7 @@ public:
 
   /// @brief Set the a priori velocities : only from python
   void set_vap(xt::pytensor<double, 2> vap);
+  //void set_vap(xt::pyarray<double> vap);
 
   /// @brief Get coordinates and radius of particles : only for access from python
   xt::xtensor<double, 2> get_data() const;

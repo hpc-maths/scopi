@@ -48,7 +48,6 @@ if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
-add_subdirectory(demos)
 
 # Installation
 # ============
@@ -105,25 +104,64 @@ message(STATUS "Python3_INCLUDE_DIR=${Python3_INCLUDE_DIR}")
 message(STATUS "Python3_LIBRARY_RELEASE=${Python3_LIBRARY_RELEASE}")
 message(STATUS "Python3_INCLUDE_DIR=${Python3_INCLUDE_DIR}")
 message(STATUS "Python3_NumPy_INCLUDE_DIR=${Python3_NumPy_INCLUDE_DIR}")
-
+message(STATUS "==> Python3_INCLUDE_DIRS=${Python3_INCLUDE_DIRS}")
+message(STATUS "==> Python3_NumPy_INCLUDE_DIRS=${Python3_NumPy_INCLUDE_DIRS}")
 
 find_package(pybind11 REQUIRED)
 set(PYBIND11_INCLUDE_DIR ${pybind11_INCLUDE_DIRS})
+message(STATUS "PYBIND11_MODULE=${PYBIND11_MODULE}")
 message(STATUS "PYBIND11_INCLUDE_DIR=${PYBIND11_INCLUDE_DIR}")
+#message(STATUS "pybind11 module=${pybind11::module}")
 
 find_package(xtensor-python REQUIRED CONFIG)
 set(XTENSOR_PYTHON_INCLUDE_DIR ${xtensor-python_INCLUDE_DIRS})
 message(STATUS "XTENSOR_PYTHON_INCLUDE_DIR=${XTENSOR_PYTHON_INCLUDE_DIR}")
 
+### Gestion de VTK
+##OPTION(WITH_VTK "Set to OFF to build without VTK" ON )
+##IF (WITH_VTK)
+FIND_PACKAGE(VTK)
+IF (VTK_FOUND)
+  INCLUDE (${VTK_USE_FILE})
+  message(STATUS "VTK_USE_FILE=${VTK_USE_FILE}")
+  message(STATUS "VTK_LIBRARIES=${VTK_LIBRARIES}")
+ENDIF (VTK_FOUND)
+##ENDIF (WITH_VTK)
+
+
+
+SET(SCOPI_HEADERS  ${SCOPI_INCLUDE_DIR})
+message(STATUS "main ==> SCOPI_HEADERS = ${SCOPI_HEADERS}")
+
+
+SET(scopi_src
+src/fm/min_heap.cpp
+src/fm/fm.cpp
+src/scopi/particles.cpp
+src/scopi/contacts.cpp
+src/scopi/projection.cpp
+src/scopi/obstacle.cpp
+src/scopi/obstacles.cpp
+)
+ADD_LIBRARY(scopi_cpp_lib	STATIC ${scopi_src})
+target_include_directories(scopi_cpp_lib PUBLIC ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS} include/ ${XTENSOR_PYTHON_INCLUDE_DIR} ${MKL_INCLUDE_DIR} ${VTK_USE_FILE})
+
+add_subdirectory(demos)
+
+
 ### Module "fm"
-add_library(fm MODULE src/fm/min_heap.cpp src/fm/fm.cpp)
-target_include_directories(fm PUBLIC ${Python3_NumPy_INCLUDE_DIR} include/ ${XTENSOR_PYTHON_INCLUDE_DIR})
+add_library(fm MODULE src/fm/fm.cpp src/fm/min_heap.cpp)
+target_include_directories(fm PUBLIC ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS} include/ ${XTENSOR_PYTHON_INCLUDE_DIR})
 target_link_libraries(fm PRIVATE pybind11::module)
 set_target_properties(fm PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                     SUFFIX "${PYTHON_MODULE_EXTENSION}")
 ### Module "scopi"
-add_library(scopi MODULE src/scopi/particles.cpp src/scopi/contacts.cpp src/scopi/projection.cpp src/scopi/scopi.cpp)
-target_include_directories(scopi PUBLIC ${Python3_INCLUDE_DIR} ${Python3_NumPy_INCLUDE_DIR} include/ ${XTENSOR_PYTHON_INCLUDE_DIR} ${MKL_INCLUDE_DIR})
-target_link_libraries(scopi INTERFACE xtensor  PRIVATE MKL::MKL pybind11::module)
+add_library(scopi MODULE src/fm/min_heap.cpp src/fm/fm.cpp src/scopi/particles.cpp src/scopi/contacts.cpp src/scopi/projection.cpp src/scopi/scopi.cpp src/scopi/obstacle.cpp src/scopi/obstacles.cpp)
+target_include_directories(scopi PUBLIC ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS} include/ ${XTENSOR_PYTHON_INCLUDE_DIR} ${MKL_INCLUDE_DIR})
+target_link_libraries(scopi INTERFACE xtensor  PRIVATE MKL::MKL pybind11::module )
 set_target_properties(scopi PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
                                     SUFFIX "${PYTHON_MODULE_EXTENSION}")
+
+
+
+## make VERBOSE=1 pour voir les commandes à la compilation

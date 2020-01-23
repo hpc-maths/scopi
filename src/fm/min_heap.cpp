@@ -47,12 +47,14 @@ void Heap::print()
 
 void Heap::heapifyup(std::size_t index)
 {
+  // std::cout<<"     heapifyup : index = "<<index<<" parent(index) = "<<parent(index)<<std::endl;
   while ( (index != Infty) && ( index > 0 ) && ( parent(index) >= 0 ) && ( heap[parent(index)].dist > heap[index].dist ) )
   {
     addist tmp = heap[parent(index)];
     heap[parent(index)] = heap[index];
     heap[index] = tmp;
     index = parent(index);
+    // std::cout<<"     heapifyup : index = "<<index<<" parent(index) = "<<parent(index)<<std::endl;
   }
 }
 
@@ -60,12 +62,13 @@ void Heap::heapifydown(std::size_t index)
 {
   std::size_t child = left(index);
 
+  // std::cout<<"               heapifydown : index = "<<index<<" right(index) = "<<right(index)<<std::endl;
   if ( ( child > 0 ) && (index != Infty) && ( right(index) > 0 ) && ( heap[child].dist > heap[right(index)].dist ) )
   {
     child = right(index);
   }
-  //if ( child > 0 )
-  if ( (child >0) && (index < Infty))
+  // std::cout<<"               heapifydown :           child = "<<child<<std::endl;
+  if ( (child >0) && (child < Infty) && (index < Infty))
   {
     // On prend le fils qui a la valeur la plus grande et on permutte avec le pere
     addist tmp = heap[index];

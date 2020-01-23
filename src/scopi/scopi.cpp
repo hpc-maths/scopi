@@ -1,13 +1,17 @@
 #include <iostream>                        // Standard library import for std::accumulate
 #include <numeric>
 #include <typeinfo>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>           // Pybind11 import to define Python bindings
-#define FORCE_IMPORT_ARRAY                // numpy C api loading
+
+// #define FORCE_IMPORT_ARRAY                // numpy C api loading
+// #include "xtensor-python/pyarray.hpp"     // Numpy bindings
+// #include "xtensor-python/pytensor.hpp"    // Numpy bindings
 
 #include "scopi/particles.hpp"
+#include "scopi/obstacles.hpp"
 #include "scopi/contacts.hpp"
 #include "scopi/projection.hpp"
+
+
 
 PYBIND11_MODULE(scopi, m)
 {
@@ -20,7 +24,7 @@ PYBIND11_MODULE(scopi, m)
           .def("add_particles_in_ball", &Particles::add_particles_in_ball)
           .def("add_particles_in_box", &Particles::add_particles_in_box)
           .def("set_vap", &Particles::set_vap)
-          //.def("data", &Particles::data)
+          // .def("data", &Particles::data)
           .def("get_data", &Particles::get_data)
           .def("get_positions", &Particles::get_positions)
           .def("get_vap", &Particles::get_vap)
@@ -31,6 +35,17 @@ PYBIND11_MODULE(scopi, m)
           .def("get_r", &Particles::get_r)
           .def("move", &Particles::move)
           ;
+
+  pybind11::class_<Obstacle>(m, "Obstacle")
+                  .def(pybind11::init<const std::string, double, double>())
+                  .def("print", &Obstacle::print)
+                  ;
+  //
+  // pybind11::class_<Obstacles>(m, "Obstacles")
+  //                 .def(pybind11::init<>())
+  //                 .def("add_obstacle", &Obstacles::add_obstacle)
+  //                 .def("print", &Obstacles::print)
+  //                 ;
 
   pybind11::class_<Contacts>(m, "Contacts")
           .def(pybind11::init<const double>())

@@ -6,6 +6,8 @@ Particles::~Particles() {
 
 Particles::Particles(const std::string &name) : _name(name) {
   _idmax = 0;
+  std::cout<<"Create Particles object"<<std::endl;
+  std::cout<<"_name : "<<_name<<std::endl;
 }
 
 void Particles::add_particles_in_ball(
@@ -98,6 +100,7 @@ void Particles::add_particles_in_box(
 
 
 void Particles::set_vap(xt::pytensor<double, 2> vap) {
+// void Particles::set_vap(xt::pyarray<double> vap) {
   data.vapx = xt::view(vap, xt::all(), 0);
   data.vapy = xt::view(vap, xt::all(), 1);
   data.vapz = xt::view(vap, xt::all(), 2);
@@ -180,7 +183,7 @@ xt::xtensor<double,2> Particles::get_v() const{
 void Particles::move(double dt){
   data.x +=  dt*data.vx;
   data.y +=  dt*data.vy;
-  data.z +=  dt*data.vz;    
+  data.z +=  dt*data.vz;
 }
 
 void Particles::print() const{
