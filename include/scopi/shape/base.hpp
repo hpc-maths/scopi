@@ -215,7 +215,7 @@ namespace scopi
     template<std::size_t... I>
     auto shape_constructor<T, Args...>::lambda_constructor(std::index_sequence<I...>) const
     {
-        return [&](auto pos){return new shape_type(pos, std::get<I>(m_extra)...);};
+        return [&](const auto& pos){return new shape_type(pos, std::get<I>(m_extra)...);};
     }
 
     template<class T, class... Args>
