@@ -8,8 +8,7 @@
 
 #include <xtensor/xadapt.hpp>
 
-#include "shape/base.hpp"
-#include "shape/globule.hpp"
+#include "object/base.hpp"
 
 namespace scopi
 {
@@ -35,7 +34,7 @@ namespace scopi
 
     private:
 
-        std::map<std::size_t, std::shared_ptr<base_constructor>> m_shape_map;
+        std::map<std::size_t, std::shared_ptr<base_constructor<dim>>> m_shape_map;
         std::vector<std::array<double, dim>> m_positions;
         std::vector<std::array<double, dim>> m_forces;
         std::vector<std::size_t> m_shapes_id;

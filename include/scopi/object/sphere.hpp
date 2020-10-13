@@ -1,7 +1,6 @@
 #pragma once
 
-// #include "base.hpp"
-#include "globule.hpp"
+#include "base.hpp"
 
 namespace scopi
 {
@@ -27,7 +26,7 @@ namespace scopi
         sphere(const std::array<double, dim>& pos, double radius);
         sphere(std::array<double, dim>* pos, double radius);
 
-        virtual std::shared_ptr<base_constructor> construct() const override;
+        virtual std::shared_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
         virtual std::size_t hash() const override;
 
@@ -56,9 +55,9 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    std::shared_ptr<base_constructor> sphere<dim, owner>::construct() const
+    std::shared_ptr<base_constructor<dim>> sphere<dim, owner>::construct() const
     {
-        return make_object_constructor<sphere<dim, false>>(m_radius);
+        return make_object_constructor<dim, sphere<dim, false>>(m_radius);
     }
 
     template<std::size_t dim, bool owner>
