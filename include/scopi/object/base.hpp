@@ -154,7 +154,6 @@ namespace scopi
         static constexpr std::size_t dim = Dim;
         using base_type = object_container<dim, owner>;
         using position_type = typename base_type::position_type;
-        using ref_position_type = typename base_type::ref_position_type;
         using force_type = typename base_type::force_type;
 
         object() = default;
