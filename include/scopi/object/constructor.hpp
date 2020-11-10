@@ -1,4 +1,5 @@
-#pragma once
+#pragma once  // = le compilateur n’intègre le fichier qu’une seule fois
+
 
 #include <array>
 #include <memory>
@@ -22,9 +23,14 @@ namespace scopi
     template<>
     struct base_constructor<2>
     {
-        virtual std::shared_ptr<object<2, false>> operator()(std::array<double, 2>* pos) const = 0;
+        virtual std::shared_ptr<object<2, false>> operator()(
+          std::array<double, 2>* pos,
+          std::array<double, 2>* v,
+          std::array<double, 2>* vd,
+          std::array<double, 2>* f
+        ) const = 0;
     };
-    
+
     template<class T, class... Args>
     class object_constructor<2, T, Args...>: public base_constructor<2>
     {
@@ -36,12 +42,23 @@ namespace scopi
         template<class... CTA>
         object_constructor(CTA&&... args);
 
-        virtual std::shared_ptr<object<2, false>> operator()(std::array<double, 2>* pos) const override;
+        virtual std::shared_ptr<object<2, false>> operator()(
+          std::array<double, 2>* pos,
+          std::array<double, 2>* v,
+          std::array<double, 2>* vd,
+          std::array<double, 2>* f
+        ) const override;
 
     private:
 
         template<std::size_t... I>
-        auto constructor(std::array<double, 2>* pos, std::index_sequence<I...>) const;
+        auto constructor(
+          std::array<double, 2>* pos,
+          std::array<double, 2>* v,
+          std::array<double, 2>* vd,
+          std::array<double, 2>* f,
+          std::index_sequence<I...>
+        ) const;
 
         tuple_type m_extra;
     };
@@ -50,7 +67,12 @@ namespace scopi
     template<>
     struct base_constructor<3>
     {
-        virtual std::shared_ptr<object<3, false>> operator()(std::array<double, 3>* pos) const = 0;
+        virtual std::shared_ptr<object<3, false>> operator()(
+          std::array<double, 3>* pos,
+          std::array<double, 3>* v,
+          std::array<double, 3>* vd,
+          std::array<double, 3>* f
+        ) const = 0;
     };
 
     template<class T, class... Args>
@@ -64,12 +86,23 @@ namespace scopi
         template<class... CTA>
         object_constructor(CTA&&... args);
 
-        virtual std::shared_ptr<object<3, false>> operator()(std::array<double, 3>* pos) const override;
+        virtual std::shared_ptr<object<3, false>> operator()(
+          std::array<double, 3>* pos,
+          std::array<double, 3>* v,
+          std::array<double, 3>* vd,
+          std::array<double, 3>* f
+        ) const override;
 
     private:
 
         template<std::size_t... I>
-        auto constructor(std::array<double, 3>* pos, std::index_sequence<I...>) const;
+        auto constructor(
+          std::array<double, 3>* pos,
+          std::array<double, 3>* v,
+          std::array<double, 3>* vd,
+          std::array<double, 3>* f,
+          std::index_sequence<I...>
+        ) const;
 
         tuple_type m_extra;
     };
@@ -85,16 +118,27 @@ namespace scopi
     {}
 
     template<class T, class... Args>
-    typename std::shared_ptr<object<2, false>> object_constructor<2, T, Args...>::operator()(std::array<double, 2>* pos) const
+    typename std::shared_ptr<object<2, false>> object_constructor<2, T, Args...>::operator()(
+      std::array<double, 2>* pos,
+      std::array<double, 2>* v,
+      std::array<double, 2>* vd,
+      std::array<double, 2>* f
+    ) const
     {
-        return constructor(pos, std::make_index_sequence<sizeof...(Args)>{});
+        return constructor(pos, v, vd, f, std::make_index_sequence<sizeof...(Args)>{});
     }
 
     template<class T, class... Args>
     template<std::size_t... I>
-    auto object_constructor<2, T, Args...>::constructor(std::array<double, 2>* pos, std::index_sequence<I...>) const
+    auto object_constructor<2, T, Args...>::constructor(
+      std::array<double, 2>* pos,
+      std::array<double, 2>* v,
+      std::array<double, 2>* vd,
+      std::array<double, 2>* f,
+      std::index_sequence<I...>
+    ) const
     {
-        return std::make_shared<object_type>(pos, std::get<I>(m_extra)...);
+        return std::make_shared<object_type>(pos, v, vd, f, std::get<I>(m_extra)...);
     }
 
     // Dim = 3
@@ -105,16 +149,27 @@ namespace scopi
     {}
 
     template<class T, class... Args>
-    typename std::shared_ptr<object<3, false>> object_constructor<3, T, Args...>::operator()(std::array<double, 3>* pos) const
+    typename std::shared_ptr<object<3, false>> object_constructor<3, T, Args...>::operator()(
+      std::array<double, 3>* pos,
+      std::array<double, 3>* v,
+      std::array<double, 3>* vd,
+      std::array<double, 3>* f
+    ) const
     {
-        return constructor(pos, std::make_index_sequence<sizeof...(Args)>{});
+        return constructor( pos, v, vd, f, std::make_index_sequence<sizeof...(Args)>{});
     }
 
     template<class T, class... Args>
     template<std::size_t... I>
-    auto object_constructor<3, T, Args...>::constructor(std::array<double, 3>* pos, std::index_sequence<I...>) const
+    auto object_constructor<3, T, Args...>::constructor(
+      std::array<double, 3>* pos,
+      std::array<double, 3>* v,
+      std::array<double, 3>* vd,
+      std::array<double, 3>* f,
+      std::index_sequence<I...>
+    ) const
     {
-        return std::make_shared<object_type>(pos, std::get<I>(m_extra)...);
+        return std::make_shared<object_type>(pos, v, vd, f, std::get<I>(m_extra)...);
     }
 
     template<std::size_t dim, class T, class... Args>
@@ -122,6 +177,6 @@ namespace scopi
     {
         using constructor_type = object_constructor<dim, T, Args...>;
         return std::make_shared<constructor_type>(args...);
-    } 
+    }
 
 }

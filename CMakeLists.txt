@@ -4,6 +4,8 @@ project(scopi)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_STANDARD 17)
+message(STATUS "CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
+
 
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -134,17 +136,25 @@ SET(SCOPI_HEADERS  ${SCOPI_INCLUDE_DIR})
 message(STATUS "main ==> SCOPI_HEADERS = ${SCOPI_HEADERS}")
 
 
-SET(scopi_src
-src/fm/min_heap.cpp
-src/fm/fm.cpp
-src/scopi/particles.cpp
-src/scopi/contacts.cpp
-src/scopi/projection.cpp
-src/scopi/obstacle.cpp
-src/scopi/obstacles.cpp
-)
-# ADD_LIBRARY(scopi_cpp_lib	STATIC ${scopi_src})
-# target_include_directories(scopi_cpp_lib PUBLIC ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS} include/ ${XTENSOR_PYTHON_INCLUDE_DIR} ${MKL_INCLUDE_DIR} ${VTK_USE_FILE})
+#SET(scopi_src
+#src/fm/min_heap.cpp
+#src/fm/fm.cpp
+#src/scopi/particles.cpp
+#src/scopi/contacts.cpp
+#src/scopi/projection.cpp
+#src/scopi/obstacle.cpp
+#src/scopi/obstacles.cpp
+#)
+#ADD_LIBRARY(scopi_cpp_lib	STATIC ${scopi_src})
+#target_include_directories(scopi_cpp_lib PUBLIC ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS} include/ ${XTENSOR_PYTHON_INCLUDE_DIR} ${MKL_INCLUDE_DIR} ${VTK_USE_FILE})
+
+#SET(scopi_src
+#src/scopi/contacts.cpp
+#)
+#ADD_LIBRARY(scopi_cpp_lib	STATIC ${scopi_src} $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>)
+#target_include_directories(scopi_cpp_lib PUBLIC include/ xtensor ${MKL_INCLUDE_DIR} ${VTK_USE_FILE})
+
+
 
 add_subdirectory(demos)
 

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "constructor.hpp"
+#include <scopi/utils.hpp>
 
 namespace scopi
 {
@@ -51,6 +52,8 @@ namespace scopi
         {
             using default_type = typename std::vector<std::array<double, dim>>;
             using position_type = default_type;
+            using velocity_type = default_type;
+            using desired_velocity_type = default_type;
             using force_type = default_type;
         };
 
@@ -59,6 +62,8 @@ namespace scopi
         {
             using default_type = typename std::array<double, dim>*;
             using position_type = default_type;
+            using velocity_type = default_type;
+            using desired_velocity_type = default_type;
             using force_type = default_type;
         };
     }
@@ -73,24 +78,45 @@ namespace scopi
 
         using inner_types = detail::object_inner_type<dim, owner>;
         using position_type = typename inner_types::position_type;
+        using velocity_type = typename inner_types::velocity_type;
+        using desired_velocity_type = typename inner_types::desired_velocity_type;
         using force_type = typename inner_types::force_type;
 
-        object_container(position_type pos, std::size_t size);
+        object_container(
+          position_type pos,
+          velocity_type v,
+          desired_velocity_type vd,
+          force_type f,
+          std::size_t size);
 
         const auto pos() const;
         auto pos();
         const auto pos(std::size_t i) const;
         auto pos(std::size_t i);
 
-        auto force() const;
-        auto force();
+        const auto v() const;
+        auto v();
+        const auto v(std::size_t i) const;
+        auto v(std::size_t i);
+
+        const auto vd() const;
+        auto vd();
+        const auto vd(std::size_t i) const;
+        auto vd(std::size_t i);
+
+        const auto f() const;
+        auto f();
+        const auto f(std::size_t i) const;
+        auto f(std::size_t i);
 
         std::size_t size() const;
 
     private:
 
         position_type m_pos;
-        force_type m_force;
+        velocity_type m_v;
+        desired_velocity_type m_vd;
+        force_type m_f;
         std::size_t m_size;
     };
 
@@ -98,9 +124,17 @@ namespace scopi
     // object_container implementation //
     /////////////////////////////////////
     template<std::size_t dim, bool owner>
-    inline object_container<dim, owner>::object_container(position_type pos, std::size_t size)
-    : m_pos(pos), m_size(size)
+    inline object_container<dim, owner>::object_container(
+      position_type pos,
+      velocity_type v,
+      desired_velocity_type vd,
+      force_type f,
+      std::size_t size
+    )
+    : m_pos(pos), m_v(v), m_vd(vd), m_f(f), m_size(size)
     {}
+
+    // position
 
     template<std::size_t dim, bool owner>
     inline const auto object_container<dim, owner>::pos() const
@@ -126,23 +160,91 @@ namespace scopi
         return detail::get_value(m_pos, m_size, i);
     }
 
+    // velocity
+
     template<std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::force() const
+    inline const auto object_container<dim, owner>::v() const
     {
-        return detail::get_value(m_force, m_size);
+        return detail::get_value(m_v, m_size);
     }
 
     template<std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::force()
+    inline auto object_container<dim, owner>::v()
     {
-        return detail::get_value(m_force, m_size);
+        return detail::get_value(m_v, m_size);
     }
 
     template<std::size_t dim, bool owner>
-    inline std::size_t object_container<dim, owner>::size() const
+    inline const auto object_container<dim, owner>::v(std::size_t i) const
     {
-        return m_size;
+        return detail::get_value(m_v, m_size, i);
     }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::v(std::size_t i)
+    {
+        return detail::get_value(m_v, m_size, i);
+    }
+
+    // desired velocity
+
+    template<std::size_t dim, bool owner>
+    inline const auto object_container<dim, owner>::vd() const
+    {
+        return detail::get_value(m_vd, m_size);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::vd()
+    {
+        return detail::get_value(m_vd, m_size);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline const auto object_container<dim, owner>::vd(std::size_t i) const
+    {
+        return detail::get_value(m_vd, m_size, i);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::vd(std::size_t i)
+    {
+        return detail::get_value(m_vd, m_size, i);
+    }
+
+    // force
+
+    template<std::size_t dim, bool owner>
+    inline const auto object_container<dim, owner>::f() const
+    {
+        return detail::get_value(m_f, m_size);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::f()
+    {
+        return detail::get_value(m_f, m_size);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline const auto object_container<dim, owner>::f(std::size_t i) const
+    {
+        return detail::get_value(m_f, m_size, i);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::f(std::size_t i)
+    {
+        return detail::get_value(m_f, m_size, i);
+    }
+
+    // size
+
+    template<std::size_t dim, bool owner>
+        inline std::size_t object_container<dim, owner>::size() const
+        {
+            return m_size;
+        }
 
     ///////////////////////
     // object definition //
@@ -154,11 +256,23 @@ namespace scopi
         static constexpr std::size_t dim = Dim;
         using base_type = object_container<dim, owner>;
         using position_type = typename base_type::position_type;
+        using velocity_type = typename base_type::velocity_type;
+        using desired_velocity_type = typename base_type::desired_velocity_type;
         using force_type = typename base_type::force_type;
 
         object() = default;
-        object(std::array<double, dim>* pos, std::size_t size);
-        object(const std::vector<std::array<double, dim>>& pos);
+        object(
+          std::array<double, dim>* pos,
+          std::array<double, dim>* v,
+          std::array<double, dim>* vd,
+          std::array<double, dim>* f,
+          std::size_t size);
+        object(
+          const std::vector<std::array<double, dim>>& pos,
+          const std::vector<std::array<double, dim>>& v,
+          const std::vector<std::array<double, dim>>& vd,
+          const std::vector<std::array<double, dim>>& f
+        );
 
         virtual std::shared_ptr<base_constructor<dim>> construct() const = 0;
         virtual void print() const = 0;
@@ -170,14 +284,25 @@ namespace scopi
     // object implementation //
     ///////////////////////////
     template<std::size_t dim, bool owner>
-    object<dim, owner>::object(const std::vector<std::array<double, dim>>& pos)
-    : base_type(pos, pos.size())
+    object<dim, owner>::object(
+      const std::vector<std::array<double, dim>>& pos,
+      const std::vector<std::array<double, dim>>& v,
+      const std::vector<std::array<double, dim>>& vd,
+      const std::vector<std::array<double, dim>>& f
+    )
+    : base_type(pos, v, vd, f, pos.size())
     {
     }
 
     template<std::size_t dim, bool owner>
-    object<dim, owner>::object(std::array<double, dim>* pos, std::size_t size)
-    : base_type(pos, size)
+    object<dim, owner>::object(
+      std::array<double, dim>* pos,
+      std::array<double, dim>* v,
+      std::array<double, dim>* vd,
+      std::array<double, dim>* f,
+      std::size_t size
+    )
+    : base_type(pos, v, vd, f, size)
     {
     }
 
