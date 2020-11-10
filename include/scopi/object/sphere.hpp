@@ -62,7 +62,7 @@ namespace scopi
           double radius
         );
 
-        double radius() const;
+        virtual double radius() const;
         virtual std::shared_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
         virtual std::size_t hash() const override;
