@@ -26,14 +26,14 @@ namespace scopi
 
         using base_type = object<dim, owner>;
         using position_type = typename base_type::position_type;
-        using force_type = typename base_type::force_type;
 
-        globule(const std::array<double, dim>& pos, double radius);
-        globule(std::array<double, dim>* pos, double radius);
+        globule(position_type pos, double radius);
 
-        virtual std::shared_ptr<base_constructor<dim>> construct() const override;
+        virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
         virtual std::size_t hash() const override;
+
+        XTL_IMPLEMENT_INDEXABLE_CLASS()
 
     private:
 
@@ -47,23 +47,17 @@ namespace scopi
     // globule implementation //
     ////////////////////////////
     template<std::size_t dim, bool owner>
-    globule<dim, owner>::globule(const std::array<double, dim>& pos, double radius)
-    : base_type(globule_construction<position_type, dim>(pos)), m_radius(radius)
+    globule<dim, owner>::globule(position_type pos, double radius)
+    : base_type(pos, 6)
+    , m_radius(radius)
     {
         create_hash();
     }
 
     template<std::size_t dim, bool owner>
-    globule<dim, owner>::globule(std::array<double, dim>* pos, double radius)
-    : base_type(pos, 6), m_radius(radius)
+    std::unique_ptr<base_constructor<dim>> globule<dim, owner>::construct() const
     {
-        create_hash();
-    }
-
-    template<std::size_t dim, bool owner>
-    std::shared_ptr<base_constructor<dim>> globule<dim, owner>::construct() const
-    {
-        return make_object_constructor<dim, globule<dim, false>>(m_radius);
+        return make_object_constructor<globule<dim, false>>(m_radius);
     }
 
     template<std::size_t dim, bool owner>

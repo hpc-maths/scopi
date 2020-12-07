@@ -6,3 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(test_container test_container.cpp)
 target_link_libraries(test_container scopi_cpp)
+
+add_executable(test_dispatch test_dispatch.cpp)
+target_link_libraries(test_dispatch scopi_cpp)
+

@@ -21,9 +21,18 @@ namespace scopi
     {
     public:
 
-        auto operator[](std::size_t i);
+        using default_container_type = std::array<double, dim>;
+        using position_type = default_container_type;
+        using velocity_type = default_container_type;
+        using force_type = default_container_type;
+        using desired_velocity_type = default_container_type;
 
-        void push_back(object<dim>& s);
+        std::unique_ptr<object<dim, false>> operator[](std::size_t i);
+
+        void push_back(const object<dim>& s,
+                       const std::vector<velocity_type>& v,
+                       const std::vector<desired_velocity_type>& dv,
+                       const std::vector<force_type>& f);
 
         void reserve(std::size_t size);
 
@@ -43,7 +52,7 @@ namespace scopi
 
     private:
 
-        std::map<std::size_t, std::shared_ptr<base_constructor<dim>>> m_shape_map;
+        std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
         std::vector<std::array<double, dim>> m_positions;  //pos()
         std::vector<std::array<double, dim>> m_forces;  // f()
         std::vector<std::array<double, dim>> m_velocities;  // v()
@@ -53,17 +62,16 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    auto scopi_container<dim>::operator[](std::size_t i)
+    std::unique_ptr<object<dim, false>> scopi_container<dim>::operator[](std::size_t i)
     {
-        return (*m_shape_map[m_shapes_id[i]])(
-          &m_positions[m_offset[i]],
-          &m_velocities[m_offset[i]],
-          &m_desired_velocities[m_offset[i]],
-          &m_forces[m_offset[i]]);
+        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]]);
     }
 
     template<std::size_t dim>
-    void scopi_container<dim>::push_back(object<dim>& s)
+    void scopi_container<dim>::push_back(const object<dim>& s,
+                                         const std::vector<velocity_type>& v,
+                                         const std::vector<desired_velocity_type>& dv,
+                                         const std::vector<force_type>& f)
     {
         if (m_offset.empty())
         {
@@ -77,15 +85,15 @@ namespace scopi
         for(std::size_t i = 0; i< s.size(); ++i)
         {
             m_positions.push_back(s.pos(i));
-            m_velocities.push_back(s.v(i));
-            m_desired_velocities.push_back(s.vd(i));
-            m_forces.push_back(s.f(i));
+            m_velocities.push_back(v[i]);
+            m_desired_velocities.push_back(dv[i]);
+            m_forces.push_back(f[i]);
         }
 
         auto it = m_shape_map.find(s.hash());
         if (it == m_shape_map.end())
         {
-            m_shape_map.insert({s.hash(), s.construct()});
+            m_shape_map.insert(std::make_pair(s.hash(), std::move(s.construct())));
         }
 
         m_shapes_id.push_back(s.hash());
@@ -151,7 +159,7 @@ namespace scopi
     }
 
     // force
-     
+
     template<std::size_t dim>
     const auto scopi_container<dim>::f() const
     {

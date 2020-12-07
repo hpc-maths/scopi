@@ -61,23 +61,19 @@ int main()
     constexpr std::size_t size = 5000;
     particles.reserve(size);
 
-    // scopi::sphere<dim> s1({1, 2}, {4, 5}, {7, 8}, {10, 11}, 0.4);
-    scopi::sphere<dim> s1({1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}, 0.4);
+    // scopi::sphere<dim> s1({{1, 2}}, 0.4);
+    std::array<double, dim> dummy{{0, 0, 0}};
+    scopi::sphere<dim> s1({{1, 2, 3}}, 0.4);
     s1.print();
     std::cout << "s1.pos() : " << s1.pos() << std::endl;
-    std::cout << "s1.v() : " << s1.v() << std::endl;
-    std::cout << "s1.vd() : " << s1.vd() << std::endl;
-    std::cout << "s1.f() : " << s1.f() << std::endl;
     std::cout << "s1 type name : " << typeid(s1).name() << std::endl;
     std::cout << "s1.radius() : " << s1.radius() << std::endl;
 
-    particles.push_back(s1);
+    particles.push_back(s1, {dummy}, {dummy}, {dummy});
 
     std::cout << "particles[0]->pos() : " << particles[0]->pos() << std::endl;
-    std::cout << "particles[0]->v() : " << particles[0]->v() << std::endl;
-    std::cout << "particles[0]->vd() : " << particles[0]->vd() << std::endl;
-    std::cout << "particles[0]->f() : " << particles[0]->f() << std::endl;
     std::cout << "particles[0] type name : " << typeid(particles[0]).name() << std::endl;
+    particles[0]->print();
     // std::cout << particles[0]->radius() << std::endl;
     // for(std::size_t i = 0; i < size; ++i){
     //   // std::cout << "xyz = " << dist_pos(generator) << " "<< dist_pos(generator) << " "<< dist_pos(generator) << " r = "<< dist_r(generator) << std::endl;
