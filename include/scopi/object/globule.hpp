@@ -33,8 +33,6 @@ namespace scopi
         virtual void print() const override;
         virtual std::size_t hash() const override;
 
-        XTL_IMPLEMENT_INDEXABLE_CLASS()
-
     private:
 
         void create_hash();

@@ -30,9 +30,9 @@ namespace scopi
         std::unique_ptr<object<dim, false>> operator[](std::size_t i);
 
         void push_back(const object<dim>& s,
-                       const std::vector<velocity_type>& v,
-                       const std::vector<desired_velocity_type>& dv,
-                       const std::vector<force_type>& f);
+                       const velocity_type& v,
+                       const desired_velocity_type& dv,
+                       const force_type& f);
 
         void reserve(std::size_t size);
 
@@ -69,9 +69,9 @@ namespace scopi
 
     template<std::size_t dim>
     void scopi_container<dim>::push_back(const object<dim>& s,
-                                         const std::vector<velocity_type>& v,
-                                         const std::vector<desired_velocity_type>& dv,
-                                         const std::vector<force_type>& f)
+                                         const velocity_type& v,
+                                         const desired_velocity_type& dv,
+                                         const force_type& f)
     {
         if (m_offset.empty())
         {
@@ -85,9 +85,9 @@ namespace scopi
         for(std::size_t i = 0; i< s.size(); ++i)
         {
             m_positions.push_back(s.pos(i));
-            m_velocities.push_back(v[i]);
-            m_desired_velocities.push_back(dv[i]);
-            m_forces.push_back(f[i]);
+            m_velocities.push_back(v);
+            m_desired_velocities.push_back(dv);
+            m_forces.push_back(f);
         }
 
         auto it = m_shape_map.find(s.hash());
