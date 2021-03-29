@@ -10,3 +10,5 @@ target_link_libraries(test_container scopi_cpp)
 add_executable(test_dispatch test_dispatch.cpp)
 target_link_libraries(test_dispatch scopi_cpp)
 
+add_executable(test_distance test_distance.cpp)
+target_link_libraries(test_distance scopi_cpp)

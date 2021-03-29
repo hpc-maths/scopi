@@ -30,6 +30,19 @@ message(STATUS "Building scopi v${${PROJECT_NAME}_VERSION}")
 
 find_package(xtensor REQUIRED)
 
+add_definitions(-DHAVE_CBLAS=1)
+
+if (WIN32)
+    find_package(OpenBLAS REQUIRED)
+    set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
+else()
+    find_package(BLAS REQUIRED)
+    find_package(LAPACK REQUIRED)
+endif()
+
+message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
+message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
+
 set(MKL_THREAD_LAYER "TBB")
 find_package(MKL)
 
@@ -42,7 +55,8 @@ find_package(MKL)
 add_library(scopi_cpp INTERFACE)
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
                                           $<INSTALL_INTERFACE:include>)
-target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL)
+# target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 
@@ -156,7 +170,7 @@ message(STATUS "main ==> SCOPI_HEADERS = ${SCOPI_HEADERS}")
 
 
 
-add_subdirectory(demos)
+add_subdirectory(demos EXCLUDE_FROM_ALL)
 
 
 # ### Module "fm"

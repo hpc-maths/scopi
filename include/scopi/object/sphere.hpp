@@ -14,8 +14,10 @@ namespace scopi
 
         using base_type = object<dim, owner>;
         using position_type = typename base_type::position_type;
+        using rotation_type = typename base_type::rotation_type;
 
         sphere(position_type pos, double radius);
+        sphere(position_type pos, rotation_type r, double radius);
 
         // sphere(const sphere&) = default;
         // sphere& operator=(const sphere&) = default;
@@ -38,7 +40,15 @@ namespace scopi
     ///////////////////////////
     template<std::size_t dim, bool owner>
     sphere<dim, owner>::sphere(position_type pos, double radius)
-    : base_type(pos, 1)
+    : base_type(pos, {{ {{1, 0}, {0, 1}} }}, 1)
+    , m_radius(radius)
+    {
+        create_hash();
+    }
+
+    template<std::size_t dim, bool owner>
+    sphere<dim, owner>::sphere(position_type pos, rotation_type r, double radius)
+    : base_type(pos, r, 1)
     , m_radius(radius)
     {
         create_hash();

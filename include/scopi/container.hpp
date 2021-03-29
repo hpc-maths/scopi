@@ -39,6 +39,9 @@ namespace scopi
         const auto pos() const;
         auto pos();
 
+        const auto R() const;
+        auto R();
+
         const auto f() const;
         auto f();
 
@@ -53,7 +56,8 @@ namespace scopi
     private:
 
         std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
-        std::vector<std::array<double, dim>> m_positions;  //pos()
+        std::vector<std::array<double, dim>> m_positions;  // pos()
+        std::vector<std::array<std::array<double, dim>, dim>> m_rotations;  // R()
         std::vector<std::array<double, dim>> m_forces;  // f()
         std::vector<std::array<double, dim>> m_velocities;  // v()
         std::vector<std::array<double, dim>> m_desired_velocities;  // vd()
@@ -64,7 +68,7 @@ namespace scopi
     template<std::size_t dim>
     std::unique_ptr<object<dim, false>> scopi_container<dim>::operator[](std::size_t i)
     {
-        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]]);
+        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]], &m_rotations[m_offset[i]]);
     }
 
     template<std::size_t dim>
@@ -85,6 +89,7 @@ namespace scopi
         for(std::size_t i = 0; i< s.size(); ++i)
         {
             m_positions.push_back(s.pos(i));
+            m_rotations.push_back(s.R(i));
             m_velocities.push_back(v);
             m_desired_velocities.push_back(dv);
             m_forces.push_back(f);
@@ -103,6 +108,7 @@ namespace scopi
     void scopi_container<dim>::reserve(std::size_t size)
     {
         m_positions.reserve(size);
+        m_rotations.reserve(size);
         m_velocities.reserve(size);
         m_desired_velocities.reserve(size);
         m_forces.reserve(size);
@@ -128,6 +134,20 @@ namespace scopi
     auto scopi_container<dim>::pos()
     {
         return xt::adapt(reinterpret_cast<double*>(m_positions.data()), {m_positions.size(), dim});
+    }
+
+    // rotation
+
+    template<std::size_t dim>
+    const auto scopi_container<dim>::R() const
+    {
+        return xt::adapt(reinterpret_cast<double*>(m_rotations.data()), {m_rotations.size(), dim, dim});
+    }
+
+    template<std::size_t dim>
+    auto scopi_container<dim>::R()
+    {
+        return xt::adapt(reinterpret_cast<double*>(m_rotations.data()), {m_rotations.size(), dim, dim});
     }
 
     // velocity

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <xtensor-blas/xlinalg.hpp>
+
 #include "sphere.hpp"
 #include "globule.hpp"
 #include "plan.hpp"
@@ -7,9 +9,9 @@
 namespace scopi
 {
     template<std::size_t dim>
-    double distance(const sphere<dim, false>, const sphere<dim, false>)
+    double distance(const sphere<dim, false> s1, const sphere<dim, false> s2)
     {
-        return 1;
+        return xt::linalg::norm(s1.pos() - s2.pos()) - s1.radius() - s2.radius();
     }
 
     template<std::size_t dim>

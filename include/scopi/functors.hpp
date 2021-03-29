@@ -1,8 +1,11 @@
 #pragma once
 
+#include <xtensor/xfixed.hpp>
+
 #include "dispatch.hpp"
 
 #include "object/distance.hpp"
+#include "object/closest_points.hpp"
 
 namespace scopi
 {
@@ -60,6 +63,35 @@ namespace scopi
                     const globule<dim, false>,
                     const plan<dim, false>>,
         typename distance_functor::return_type,
+        symmetric_dispatch
+    >;
+
+    template <std::size_t dim>
+    struct closest_points_functor
+    {
+        using return_type = xt::xtensor_fixed<double, xt::xshape<2, dim>>;
+
+        template <class T1, class T2>
+        return_type run(const T1& obj1, const T2& obj2) const
+        {
+            return closest_points(obj1, obj2);
+        }
+
+        return_type on_error(const object<dim, false>&, const object<dim, false>&) const
+        {
+            return 0;
+        }
+    };
+
+    template <std::size_t dim>
+    using closest_points_dispatcher = double_static_dispatcher
+    <
+        closest_points_functor<dim>,
+        const object<dim, false>,
+        mpl::vector<const sphere<dim, false>,
+                    const globule<dim, false>,
+                    const plan<dim, false>>,
+        typename closest_points_functor<dim>::return_type,
         symmetric_dispatch
     >;
 }
