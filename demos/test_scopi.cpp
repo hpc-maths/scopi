@@ -1,17 +1,17 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "xtensor/xarray.hpp"
+#include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
 
-#include "mkl_service.h"
-#include "mkl_spblas.h"
+#include <mkl_service.h>
+#include <mkl_spblas.h>
 
-#include "scopi/particles.hpp"
-#include "scopi/obstacle.hpp"
-#include "scopi/contacts.hpp"
-#include "scopi/projection.hpp"
+#include <scopi/particles.hpp>
+#include <scopi/obstacle.hpp>
+#include <scopi/contacts.hpp>
+#include <scopi/projection.hpp>
 
 
 int main()
