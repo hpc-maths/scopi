@@ -10,6 +10,7 @@
 
 #include "constructor.hpp"
 #include "../utils.hpp"
+#include "../types.hpp"
 
 namespace scopi
 {
@@ -37,100 +38,100 @@ namespace scopi
 
     namespace detail
     {
-        template<std::size_t dim, class T>
-        const auto get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t size)
+        template<std::size_t dim>
+        const auto get_value(const std::vector<type::rotation<dim>>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
         }
 
-        template<std::size_t dim, class T>
-        const auto get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t size)
+        template<std::size_t dim>
+        const auto get_value(const std::vector<type::position<dim>>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
         }
 
-        template<std::size_t dim, class T>
-        auto get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t size)
+        template<std::size_t dim>
+        auto get_value(std::vector<type::rotation<dim>>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim, dim});
         }
 
-        template<std::size_t dim, class T>
-        auto get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t size)
+        template<std::size_t dim>
+        auto get_value(std::vector<type::position<dim>>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
 
         }
 
-        template<std::size_t dim, class T>
-        const auto get_value(const xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t size)
+        template<std::size_t dim>
+        const auto get_value(const type::rotation<dim>* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim, dim});
         }
 
-        template<std::size_t dim, class T>
-        const auto get_value(const xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t size)
+        template<std::size_t dim>
+        const auto get_value(const type::position<dim>* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
         }
 
-        template<std::size_t dim, class T>
-        auto get_value(xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t size)
+        template<std::size_t dim>
+        auto get_value(type::rotation<dim>* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim, dim});
         }
 
-        template<std::size_t dim, class T>
-        auto get_value(xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t size)
+        template<std::size_t dim>
+        auto get_value(type::position<dim>* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
         }
 
-        template<std::size_t dim, class T>
-        const xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        const type::rotation<dim>& get_value(const std::vector<type::rotation<dim>>& t, std::size_t, std::size_t i)
         {
             return t[i];
         }
 
-        template<std::size_t dim, class T>
-        const xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        const type::position<dim>& get_value(const std::vector<type::position<dim>>& t, std::size_t, std::size_t i)
         {
             return t[i];
         }
 
-        template<std::size_t dim, class T>
-        const xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(const xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        const type::position<dim>& get_value(const type::position<dim>* t, std::size_t, std::size_t i)
         {
             return *(t + i);
         }
 
-        template<std::size_t dim, class T>
-        xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        type::position<dim>& get_value(type::position<dim>* t, std::size_t, std::size_t i)
         {
             return *(t + i);
         }
 
-        template<std::size_t dim, class T>
-        xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        type::rotation<dim>& get_value(std::vector<type::rotation<dim>>& t, std::size_t, std::size_t i)
         {
             return t[i];
         }
 
-        template<std::size_t dim, class T>
-        xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        type::position<dim>& get_value(std::vector<type::position<dim>>& t, std::size_t, std::size_t i)
         {
             return t[i];
         }
 
-        template<std::size_t dim, class T>
-        const xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(const xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        const type::rotation<dim>& get_value(const type::rotation<dim>* t, std::size_t, std::size_t i)
         {
             return *(t + i);
         }
 
 
-        template<std::size_t dim, class T>
-        xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t, std::size_t i)
+        template<std::size_t dim>
+        type::rotation<dim>& get_value(type::rotation<dim>* t, std::size_t, std::size_t i)
         {
             return *(t + i);
         }

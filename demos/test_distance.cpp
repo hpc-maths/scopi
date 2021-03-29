@@ -7,17 +7,18 @@
 #include <scopi/object/plan.hpp>
 
 #include <scopi/functors.hpp>
+#include <scopi/types.hpp>
 
 int main()
 {
     constexpr std::size_t dim = 2;
     double theta = 4*std::atan(1.)/4;
 
-    xt::xtensor_fixed<double, xt::xshape<dim, dim>> rotation{{{std::cos(theta), -std::sin(theta)},
-                                                              {std::sin(theta), std::cos(theta)}} };
-    xt::xtensor_fixed<double, xt::xshape<dim, dim>> rotation_inv{ {{std::cos(-theta), -std::sin(-theta)},
-                                                                   {std::sin(-theta), std::cos(-theta)}} };
-    xt::xtensor_fixed<double, xt::xshape<dim>> translation = {0, 0};
+    scopi::type::rotation<dim> rotation{{{std::cos(theta), -std::sin(theta)},
+                                         {std::sin(theta), std::cos(theta)}} };
+    scopi::type::rotation<dim> rotation_inv{ {{std::cos(-theta), -std::sin(-theta)},
+                                              {std::sin(-theta), std::cos(-theta)}} };
+    scopi::type::position<dim> translation = {0, 0};
 
     auto s1_pos = xt::eval(translation + 0.5*xt::view(rotation, xt::all(), 0));
     auto s2_pos = xt::eval(translation - 0.5*xt::view(rotation, xt::all(), 0));
@@ -28,7 +29,7 @@ int main()
 
     scopi::scopi_container<dim> particles;
 
-    xt::xtensor_fixed<double, xt::xshape<dim>> dummy = {0, 0};
+    scopi::type::position<dim> dummy = {0, 0};
 
     particles.push_back(s1, {dummy}, {dummy}, {dummy});
     particles.push_back(s2, {dummy}, {dummy}, {dummy});
