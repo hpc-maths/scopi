@@ -6,6 +6,7 @@
 #include <xtl/xmultimethods.hpp>
 
 #include <xtensor/xadapt.hpp>
+#include <xtensor/xfixed.hpp>
 
 #include "constructor.hpp"
 #include "../utils.hpp"
@@ -37,91 +38,117 @@ namespace scopi
     namespace detail
     {
         template<std::size_t dim, class T>
-        const auto get_value(const std::vector<std::array<std::array<T, dim>, dim>>& t, std::size_t size)
+        const auto get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t.data()), {size, dim, dim});
+            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
         }
 
         template<std::size_t dim, class T>
-        const auto get_value(const std::vector<std::array<T, dim>>& t, std::size_t size)
+        const auto get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t.data()), {size, dim});
+            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
         }
 
         template<std::size_t dim, class T>
-        auto get_value(std::vector<std::array<std::array<T, dim>, dim>>& t, std::size_t size)
+        auto get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t.data()), {size, dim, dim});
+            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim, dim});
         }
 
         template<std::size_t dim, class T>
-        auto get_value(std::vector<std::array<T, dim>>& t, std::size_t size)
+        auto get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t.data()), {size, dim});
+            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
+
         }
 
         template<std::size_t dim, class T>
-        const auto get_value(const std::array<std::array<T, dim>, dim>* t, std::size_t size)
+        const auto get_value(const xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t), {size, dim, dim});
+            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim, dim});
         }
 
         template<std::size_t dim, class T>
-        const auto get_value(const std::array<T, dim>* t, std::size_t size)
+        const auto get_value(const xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t), {size, dim});
+            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
         }
 
         template<std::size_t dim, class T>
-        auto get_value(std::array<std::array<T, dim>, dim>* t, std::size_t size)
+        auto get_value(xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t), {size, dim, dim});
+            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim, dim});
         }
 
         template<std::size_t dim, class T>
-        auto get_value(std::array<T, dim>* t, std::size_t size)
+        auto get_value(xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t), {size, dim});
+            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
         }
 
         template<std::size_t dim, class T>
-        const std::array<std::array<T, dim>, dim>& get_value(const std::vector<std::array<std::array<T, dim>, dim>>& t, std::size_t, std::size_t i)
+        const xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t, std::size_t i)
         {
             return t[i];
         }
 
         template<std::size_t dim, class T>
-        const std::array<T, dim>& get_value(const std::vector<std::array<T, dim>>& t, std::size_t, std::size_t i)
+        const xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(const std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t, std::size_t i)
         {
             return t[i];
         }
 
         template<std::size_t dim, class T>
-        std::array<std::array<T, dim>, dim>& get_value(std::vector<std::array<std::array<T, dim>, dim>>& t, std::size_t, std::size_t i)
+        const xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(const xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t, std::size_t i)
+        {
+            return *(t + i);
+        }
+
+        template<std::size_t dim, class T>
+        xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(xt::xtensor_fixed<T, xt::xshape<dim>>* t, std::size_t, std::size_t i)
+        {
+            return *(t + i);
+        }
+
+        template<std::size_t dim, class T>
+        xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim, dim>>>& t, std::size_t, std::size_t i)
         {
             return t[i];
         }
 
         template<std::size_t dim, class T>
-        std::array<T, dim>& get_value(std::vector<std::array<T, dim>>& t, std::size_t, std::size_t i)
+        xt::xtensor_fixed<T, xt::xshape<dim>>& get_value(std::vector<xt::xtensor_fixed<T, xt::xshape<dim>>>& t, std::size_t, std::size_t i)
         {
             return t[i];
+        }
+
+        template<std::size_t dim, class T>
+        const xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(const xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t, std::size_t i)
+        {
+            return *(t + i);
+        }
+
+
+        template<std::size_t dim, class T>
+        xt::xtensor_fixed<T, xt::xshape<dim, dim>>& get_value(xt::xtensor_fixed<T, xt::xshape<dim, dim>>* t, std::size_t, std::size_t i)
+        {
+            return *(t + i);
         }
 
         template<std::size_t dim, bool owner>
         struct object_inner_type
         {
-            using default_type = typename std::vector<std::array<double, dim>>;
+            using default_type = typename std::vector<xt::xtensor_fixed<double, xt::xshape<dim>>>;
             using position_type = default_type;
-            using rotation_type = typename std::vector<std::array<std::array<double, dim>, dim>> ;
+            using rotation_type = typename std::vector<xt::xtensor_fixed<double, xt::xshape<dim, dim>>> ;
         };
 
         template<std::size_t dim>
         struct object_inner_type<dim, false>
         {
-            using default_type = typename std::array<double, dim>*;
+            using default_type = typename xt::xtensor_fixed<double, xt::xshape<dim>>*;
             using position_type = default_type;
-            using rotation_type = typename std::array<std::array<double, dim>, dim>* ;
+            using rotation_type = typename xt::xtensor_fixed<double, xt::xshape<dim, dim>>*;
         };
     }
 

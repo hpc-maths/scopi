@@ -44,9 +44,9 @@ namespace scopi
     {
         xt::xtensor_fixed<double, xt::xshape<2, dim>> pts;
         // nref = (1,0,0) => n = R nref
-        auto s_pos = xt::view(s.pos(), 0);
-        auto p_pos = xt::view(p.pos(), 0);
-        auto p_rot = xt::view(p.R(), 0);
+        auto s_pos = s.pos(0);
+        auto p_pos = p.pos(0);
+        auto p_rot = p.R(0);
 
         auto normal = xt::view(p.normal(), 0);
 

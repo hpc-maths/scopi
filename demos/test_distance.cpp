@@ -12,29 +12,23 @@ int main()
 {
     constexpr std::size_t dim = 2;
     double theta = 4*std::atan(1.)/4;
-    std::array<std::array<double, dim>, dim> rotation{ {{std::cos(theta), -std::sin(theta)},
-                                                        {std::sin(theta), std::cos(theta)}} };
-    std::array<std::array<double, dim>, dim> rotation_inv{ {{std::cos(-theta), -std::sin(-theta)},
-                                                            {std::sin(-theta), std::cos(-theta)}} };
-    std::array<double, dim> translation{{0, 0}};
 
-    std::array<double, dim> s1_pos;
-    std::array<double, dim> s2_pos;
+    xt::xtensor_fixed<double, xt::xshape<dim, dim>> rotation{{{std::cos(theta), -std::sin(theta)},
+                                                              {std::sin(theta), std::cos(theta)}} };
+    xt::xtensor_fixed<double, xt::xshape<dim, dim>> rotation_inv{ {{std::cos(-theta), -std::sin(-theta)},
+                                                                   {std::sin(-theta), std::cos(-theta)}} };
+    xt::xtensor_fixed<double, xt::xshape<dim>> translation = {0, 0};
 
-    for (std::size_t d=0; d<dim; ++d)
-    {
-        s1_pos[d] = translation[d] + rotation[d][0] * 0.5;
-        s2_pos[d] = translation[d] - rotation[d][0] * 0.5;
-    }
+    auto s1_pos = xt::eval(translation + 0.5*xt::view(rotation, xt::all(), 0));
+    auto s2_pos = xt::eval(translation - 0.5*xt::view(rotation, xt::all(), 0));
+
     scopi::sphere<dim> s1({s1_pos}, 0.4);
     scopi::sphere<dim> s2({s2_pos}, 0.4);
-    // scopi::plan<dim> p1({{0.5, 0}});
-
     scopi::plan<dim> p1({translation}, {rotation_inv});
 
     scopi::scopi_container<dim> particles;
 
-    std::array<double, dim> dummy{{0, 0}};
+    xt::xtensor_fixed<double, xt::xshape<dim>> dummy = {0, 0};
 
     particles.push_back(s1, {dummy}, {dummy}, {dummy});
     particles.push_back(s2, {dummy}, {dummy}, {dummy});
@@ -48,5 +42,5 @@ int main()
         }
     }
 
-    // // std::cout << "particles.pos() = \n" << particles.pos() << "\n\n";
+    std::cout << "particles.pos() = \n" << particles.pos() << "\n\n";
 }
