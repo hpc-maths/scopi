@@ -16,8 +16,7 @@ int main()
 
     scopi::type::rotation<dim> rotation{{{std::cos(theta), -std::sin(theta)},
                                          {std::sin(theta), std::cos(theta)}} };
-    scopi::type::rotation<dim> rotation_inv{ {{std::cos(-theta), -std::sin(-theta)},
-                                              {std::sin(-theta), std::cos(-theta)}} };
+
     scopi::type::position<dim> translation = {0, 0};
 
     auto s1_pos = xt::eval(translation + 0.5*xt::view(rotation, xt::all(), 0));
@@ -25,7 +24,7 @@ int main()
 
     scopi::sphere<dim> s1({s1_pos}, 0.4);
     scopi::sphere<dim> s2({s2_pos}, 0.4);
-    scopi::plan<dim> p1({translation}, {rotation_inv});
+    scopi::plan<dim> p1({translation}, {rotation});
 
     scopi::scopi_container<dim> particles;
 
@@ -43,5 +42,5 @@ int main()
         }
     }
 
-    std::cout << "particles.pos() = \n" << particles.pos() << "\n\n";
+    // std::cout << "particles.pos() = \n" << particles.pos() << "\n\n";
 }

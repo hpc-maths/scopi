@@ -51,7 +51,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     auto plan<dim, owner>::normal() const
     {// nref = (1,0,0)
-        return xt::eval(xt::view(this->R(), xt::all(), 0));
+        return xt::eval(xt::view(this->R(), 0, xt::all(), 0));
     }
 
     template<std::size_t dim, bool owner>

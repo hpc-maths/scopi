@@ -48,7 +48,7 @@ namespace scopi
         auto p_pos = p.pos(0);
         auto p_rot = p.R(0);
 
-        auto normal = xt::view(p.normal(), 0);
+        auto normal = p.normal();
 
         // plan2sphs.n
         auto plan_to_sphere = xt::eval(xt::linalg::dot(s_pos - p_pos, normal));

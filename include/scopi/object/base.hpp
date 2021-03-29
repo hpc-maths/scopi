@@ -41,7 +41,7 @@ namespace scopi
         template<std::size_t dim>
         const auto get_value(const std::vector<type::rotation<dim>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
+            return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, dim, dim});
         }
 
         template<std::size_t dim>
