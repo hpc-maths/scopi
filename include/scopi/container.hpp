@@ -9,6 +9,7 @@
 #include <xtensor/xadapt.hpp>
 
 #include "object/base.hpp"
+#include "types.hpp"
 
 namespace scopi
 {
@@ -21,17 +22,17 @@ namespace scopi
     {
     public:
 
-        using default_container_type = std::array<double, dim>;
+        using default_container_type = type::position<dim>;
         using position_type = default_container_type;
         using velocity_type = default_container_type;
         using force_type = default_container_type;
-        using desired_velocity_type = default_container_type;
+        using rotation_type = type::rotation<dim>;
 
         std::unique_ptr<object<dim, false>> operator[](std::size_t i);
 
         void push_back(const object<dim>& s,
                        const velocity_type& v,
-                       const desired_velocity_type& dv,
+                       const velocity_type& dv,
                        const force_type& f);
 
         void reserve(std::size_t size);
@@ -56,11 +57,11 @@ namespace scopi
     private:
 
         std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
-        std::vector<std::array<double, dim>> m_positions;  // pos()
-        std::vector<std::array<std::array<double, dim>, dim>> m_rotations;  // R()
-        std::vector<std::array<double, dim>> m_forces;  // f()
-        std::vector<std::array<double, dim>> m_velocities;  // v()
-        std::vector<std::array<double, dim>> m_desired_velocities;  // vd()
+        std::vector<position_type> m_positions;  // pos()
+        std::vector<rotation_type> m_rotations;  // R()
+        std::vector<force_type> m_forces;  // f()
+        std::vector<velocity_type> m_velocities;  // v()
+        std::vector<velocity_type> m_desired_velocities;  // vd()
         std::vector<std::size_t> m_shapes_id;
         std::vector<std::size_t> m_offset;
     };
@@ -74,7 +75,7 @@ namespace scopi
     template<std::size_t dim>
     void scopi_container<dim>::push_back(const object<dim>& s,
                                          const velocity_type& v,
-                                         const desired_velocity_type& dv,
+                                         const velocity_type& dv,
                                          const force_type& f)
     {
         if (m_offset.empty())
@@ -127,13 +128,13 @@ namespace scopi
     template<std::size_t dim>
     const auto scopi_container<dim>::pos() const
     {
-        return xt::adapt(reinterpret_cast<double*>(m_positions.data()), {m_positions.size(), dim});
+        return xt::adapt(reinterpret_cast<position_type*>(m_positions.data()), {m_positions.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::pos()
     {
-        return xt::adapt(reinterpret_cast<double*>(m_positions.data()), {m_positions.size(), dim});
+        return xt::adapt(reinterpret_cast<position_type*>(m_positions.data()), {m_positions.size()});
     }
 
     // rotation
@@ -141,13 +142,13 @@ namespace scopi
     template<std::size_t dim>
     const auto scopi_container<dim>::R() const
     {
-        return xt::adapt(reinterpret_cast<double*>(m_rotations.data()), {m_rotations.size(), dim, dim});
+        return xt::adapt(reinterpret_cast<rotation_type*>(m_rotations.data()), {m_rotations.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::R()
     {
-        return xt::adapt(reinterpret_cast<double*>(m_rotations.data()), {m_rotations.size(), dim, dim});
+        return xt::adapt(reinterpret_cast<rotation_type*>(m_rotations.data()), {m_rotations.size()});
     }
 
     // velocity
@@ -155,13 +156,13 @@ namespace scopi
     template<std::size_t dim>
     const auto scopi_container<dim>::v() const
     {
-        return xt::adapt(reinterpret_cast<double*>(m_velocities.data()), {m_velocities.size(), dim});
+        return xt::adapt(reinterpret_cast<velocity_type*>(m_velocities.data()), {m_velocities.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::v()
     {
-        return xt::adapt(reinterpret_cast<double*>(m_velocities.data()), {m_velocities.size(), dim});
+        return xt::adapt(reinterpret_cast<velocity_type*>(m_velocities.data()), {m_velocities.size()});
     }
 
     // desired velocity
@@ -169,13 +170,13 @@ namespace scopi
     template<std::size_t dim>
     const auto scopi_container<dim>::vd() const
     {
-        return xt::adapt(reinterpret_cast<double*>(m_desired_velocities.data()), {m_desired_velocities.size(), dim});
+        return xt::adapt(reinterpret_cast<velocity_type*>(m_desired_velocities.data()), {m_desired_velocities.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::vd()
     {
-        return xt::adapt(reinterpret_cast<double*>(m_desired_velocities.data()), {m_desired_velocities.size(), dim});
+        return xt::adapt(reinterpret_cast<velocity_type*>(m_desired_velocities.data()), {m_desired_velocities.size()});
     }
 
     // force
@@ -183,13 +184,13 @@ namespace scopi
     template<std::size_t dim>
     const auto scopi_container<dim>::f() const
     {
-        return xt::adapt(reinterpret_cast<double*>(m_forces.data()), {m_forces.size(), dim});
+        return xt::adapt(reinterpret_cast<force_type*>(m_forces.data()), {m_forces.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::f()
     {
-        return xt::adapt(reinterpret_cast<double*>(m_forces.data()), {m_forces.size(), dim});
+        return xt::adapt(reinterpret_cast<force_type*>(m_forces.data()), {m_forces.size()});
     }
 
 }

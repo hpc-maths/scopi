@@ -20,7 +20,6 @@ namespace scopi
         using base_type = object<dim, owner>;
         using position_type = typename base_type::position_type;
         using rotation_type = typename base_type::rotation_type;
-        using vector_type = std::array<double, dim>;
 
         plan(position_type pos);
         plan(position_type pos, rotation_type r);
