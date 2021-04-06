@@ -43,10 +43,8 @@ namespace scopi
     auto closest_points(const sphere<dim, false>& s, const plan<dim, false>& p)
     {
         xt::xtensor_fixed<double, xt::xshape<2, dim>> pts;
-        // nref = (1,0,0) => n = R nref
         auto s_pos = s.pos(0);
         auto p_pos = p.pos(0);
-        auto p_rot = p.R(0);
 
         auto normal = p.normal();
 

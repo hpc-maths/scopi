@@ -11,5 +11,7 @@ namespace scopi
 
         template<std::size_t dim>
         using rotation = xt::xtensor_fixed<double, xt::xshape<dim, dim>>;
+
+        using quaternion = xt::xtensor_fixed<double, xt::xshape<4>>;
     }
 }

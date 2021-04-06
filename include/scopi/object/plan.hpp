@@ -6,12 +6,13 @@
 #include <xtensor/xview.hpp>
 
 #include "base.hpp"
+#include "../quaternion.hpp"
 
 namespace scopi
 {
-    ///////////////////////
+    /////////////////////
     // plan definition //
-    ///////////////////////
+    /////////////////////
     template<std::size_t dim, bool owner=true>
     class plan: public object<dim, owner>
     {
@@ -19,10 +20,10 @@ namespace scopi
 
         using base_type = object<dim, owner>;
         using position_type = typename base_type::position_type;
-        using rotation_type = typename base_type::rotation_type;
+        using quaternion_type = typename base_type::quaternion_type;
 
-        plan(position_type pos);
-        plan(position_type pos, rotation_type r);
+        plan(position_type pos, double angle=0);
+        plan(position_type pos, quaternion_type q);
 
         auto normal() const;
 
@@ -37,28 +38,28 @@ namespace scopi
         std::size_t m_hash;
     };
 
-    ///////////////////////////
+    /////////////////////////
     // plan implementation //
-    ///////////////////////////
+    /////////////////////////
     template<std::size_t dim, bool owner>
-    plan<dim, owner>::plan(position_type pos)
-    : base_type(pos, {{ { {1, 0}, {0, 1} } }}, 1)
+    plan<dim, owner>::plan(position_type pos, double angle)
+    : base_type(pos, {quaternion(angle)}, 1)
     {
-        std::size_t size = 1;
+        create_hash();
+    }
+
+    template<std::size_t dim, bool owner>
+    plan<dim, owner>::plan(position_type pos, quaternion_type q)
+    : base_type(pos, q, 1)
+    {
         create_hash();
     }
 
     template<std::size_t dim, bool owner>
     auto plan<dim, owner>::normal() const
-    {// nref = (1,0,0)
-        return xt::eval(xt::view(this->R(), 0, xt::all(), 0));
-    }
-
-    template<std::size_t dim, bool owner>
-    plan<dim, owner>::plan(position_type pos, rotation_type r)
-    : base_type(pos, r, 1)
     {
-        create_hash();
+        auto rotation = rotation_matrix<dim>(this->q(0));
+        return xt::eval(xt::view(rotation, xt::all(), 0));
     }
 
     template<std::size_t dim, bool owner>

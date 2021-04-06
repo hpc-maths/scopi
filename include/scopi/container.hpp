@@ -26,7 +26,7 @@ namespace scopi
         using position_type = default_container_type;
         using velocity_type = default_container_type;
         using force_type = default_container_type;
-        using rotation_type = type::rotation<dim>;
+        using quaternion_type = type::quaternion;
 
         std::unique_ptr<object<dim, false>> operator[](std::size_t i);
 
@@ -40,8 +40,8 @@ namespace scopi
         const auto pos() const;
         auto pos();
 
-        const auto R() const;
-        auto R();
+        const auto q() const;
+        auto q();
 
         const auto f() const;
         auto f();
@@ -58,7 +58,7 @@ namespace scopi
 
         std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
         std::vector<position_type> m_positions;  // pos()
-        std::vector<rotation_type> m_rotations;  // R()
+        std::vector<quaternion_type> m_quaternions;  // q()
         std::vector<force_type> m_forces;  // f()
         std::vector<velocity_type> m_velocities;  // v()
         std::vector<velocity_type> m_desired_velocities;  // vd()
@@ -69,7 +69,7 @@ namespace scopi
     template<std::size_t dim>
     std::unique_ptr<object<dim, false>> scopi_container<dim>::operator[](std::size_t i)
     {
-        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]], &m_rotations[m_offset[i]]);
+        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]], &m_quaternions[m_offset[i]]);
     }
 
     template<std::size_t dim>
@@ -90,7 +90,7 @@ namespace scopi
         for(std::size_t i = 0; i< s.size(); ++i)
         {
             m_positions.push_back(s.pos(i));
-            m_rotations.push_back(s.R(i));
+            m_quaternions.push_back(s.q(i));
             m_velocities.push_back(v);
             m_desired_velocities.push_back(dv);
             m_forces.push_back(f);
@@ -109,7 +109,7 @@ namespace scopi
     void scopi_container<dim>::reserve(std::size_t size)
     {
         m_positions.reserve(size);
-        m_rotations.reserve(size);
+        m_quaternions.reserve(size);
         m_velocities.reserve(size);
         m_desired_velocities.reserve(size);
         m_forces.reserve(size);
@@ -140,15 +140,15 @@ namespace scopi
     // rotation
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::R() const
+    const auto scopi_container<dim>::q() const
     {
-        return xt::adapt(reinterpret_cast<rotation_type*>(m_rotations.data()), {m_rotations.size()});
+        return xt::adapt(reinterpret_cast<quaternion_type*>(m_quaternions.data()), {m_quaternions.size()});
     }
 
     template<std::size_t dim>
-    auto scopi_container<dim>::R()
+    auto scopi_container<dim>::q()
     {
-        return xt::adapt(reinterpret_cast<rotation_type*>(m_rotations.data()), {m_rotations.size()});
+        return xt::adapt(reinterpret_cast<quaternion_type*>(m_quaternions.data()), {m_quaternions.size()});
     }
 
     // velocity

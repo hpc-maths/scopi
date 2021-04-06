@@ -24,7 +24,7 @@ int main()
 
     scopi::sphere<dim> s1({s1_pos}, 0.4);
     scopi::sphere<dim> s2({s2_pos}, 0.4);
-    scopi::plan<dim> p1({translation}, {rotation});
+    scopi::plan<dim> p1({translation}, theta);
 
     scopi::scopi_container<dim> particles;
 

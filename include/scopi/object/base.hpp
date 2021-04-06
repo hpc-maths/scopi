@@ -7,6 +7,7 @@
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xfixed.hpp>
+#include <xtensor/xview.hpp>
 
 #include "constructor.hpp"
 #include "../utils.hpp"
@@ -38,118 +39,70 @@ namespace scopi
 
     namespace detail
     {
+        // position type
         template<std::size_t dim>
-        const auto get_value(const std::vector<type::rotation<dim>>& t, std::size_t size)
+        auto get_value_impl(const std::vector<type::position<dim>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, dim, dim});
+            return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, dim});
         }
 
         template<std::size_t dim>
-        const auto get_value(const std::vector<type::position<dim>>& t, std::size_t size)
+        auto get_value_impl(const type::position<dim>* t, std::size_t size)
+        {
+            return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, dim});
+        }
+
+        template<std::size_t dim>
+        auto get_value_impl(std::vector<type::position<dim>>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
         }
 
         template<std::size_t dim>
-        auto get_value(std::vector<type::rotation<dim>>& t, std::size_t size)
-        {
-            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim, dim});
-        }
-
-        template<std::size_t dim>
-        auto get_value(std::vector<type::position<dim>>& t, std::size_t size)
-        {
-            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
-
-        }
-
-        template<std::size_t dim>
-        const auto get_value(const type::rotation<dim>* t, std::size_t size)
-        {
-            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim, dim});
-        }
-
-        template<std::size_t dim>
-        const auto get_value(const type::position<dim>* t, std::size_t size)
+        auto get_value_impl(type::position<dim>* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
         }
 
-        template<std::size_t dim>
-        auto get_value(type::rotation<dim>* t, std::size_t size)
+        // quaternion type
+        auto get_value_impl(const std::vector<type::quaternion>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim, dim});
+            return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, 4UL});
         }
 
-        template<std::size_t dim>
-        auto get_value(type::position<dim>* t, std::size_t size)
+        auto get_value_impl(const type::quaternion* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
+            return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL});
         }
 
-        template<std::size_t dim>
-        const type::rotation<dim>& get_value(const std::vector<type::rotation<dim>>& t, std::size_t, std::size_t i)
+        auto get_value_impl(std::vector<type::quaternion>& t, std::size_t size)
         {
-            return t[i];
+            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, 4UL});
         }
 
-        template<std::size_t dim>
-        const type::position<dim>& get_value(const std::vector<type::position<dim>>& t, std::size_t, std::size_t i)
+        auto get_value_impl(type::quaternion* t, std::size_t size)
         {
-            return t[i];
+            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL});
         }
 
-        template<std::size_t dim>
-        const type::position<dim>& get_value(const type::position<dim>* t, std::size_t, std::size_t i)
+        template <class T>
+        auto get_value(T t, std::size_t s)
         {
-            return *(t + i);
-        }
-
-        template<std::size_t dim>
-        type::position<dim>& get_value(type::position<dim>* t, std::size_t, std::size_t i)
-        {
-            return *(t + i);
-        }
-
-        template<std::size_t dim>
-        type::rotation<dim>& get_value(std::vector<type::rotation<dim>>& t, std::size_t, std::size_t i)
-        {
-            return t[i];
-        }
-
-        template<std::size_t dim>
-        type::position<dim>& get_value(std::vector<type::position<dim>>& t, std::size_t, std::size_t i)
-        {
-            return t[i];
-        }
-
-        template<std::size_t dim>
-        const type::rotation<dim>& get_value(const type::rotation<dim>* t, std::size_t, std::size_t i)
-        {
-            return *(t + i);
-        }
-
-
-        template<std::size_t dim>
-        type::rotation<dim>& get_value(type::rotation<dim>* t, std::size_t, std::size_t i)
-        {
-            return *(t + i);
+            return get_value_impl(t, s);
         }
 
         template<std::size_t dim, bool owner>
         struct object_inner_type
         {
-            using default_type = typename std::vector<xt::xtensor_fixed<double, xt::xshape<dim>>>;
-            using position_type = default_type;
-            using rotation_type = typename std::vector<xt::xtensor_fixed<double, xt::xshape<dim, dim>>> ;
+            using position_type = std::vector<type::position<dim>>;
+            using quaternion_type = std::vector<type::quaternion> ;
         };
 
         template<std::size_t dim>
         struct object_inner_type<dim, false>
         {
-            using default_type = typename xt::xtensor_fixed<double, xt::xshape<dim>>*;
-            using position_type = default_type;
-            using rotation_type = typename xt::xtensor_fixed<double, xt::xshape<dim, dim>>*;
+            using position_type = type::position<dim>*;
+            using quaternion_type = type::quaternion*;
         };
     }
 
@@ -163,9 +116,9 @@ namespace scopi
 
         using inner_types = detail::object_inner_type<dim, owner>;
         using position_type = typename inner_types::position_type;
-        using rotation_type = typename inner_types::rotation_type;
+        using quaternion_type = typename inner_types::quaternion_type;
 
-        object_container(position_type pos, rotation_type r, std::size_t size);
+        object_container(position_type pos, quaternion_type q, std::size_t size);
 
         const auto pos() const;
         auto pos();
@@ -173,18 +126,18 @@ namespace scopi
         const auto pos(std::size_t i) const;
         auto pos(std::size_t i);
 
-        const auto R() const;
-        auto R();
+        const auto q() const;
+        auto q();
 
-        const auto R(std::size_t i) const;
-        auto R(std::size_t i);
+        const auto q(std::size_t i) const;
+        auto q(std::size_t i);
 
         std::size_t size() const;
 
     private:
 
         position_type m_pos;
-        rotation_type m_r;
+        quaternion_type m_q;
         std::size_t m_size;
     };
 
@@ -194,11 +147,11 @@ namespace scopi
     template<std::size_t dim, bool owner>
     inline object_container<dim, owner>::object_container(
       position_type pos,
-      rotation_type r,
+      quaternion_type q,
       std::size_t size
     )
     : m_pos(pos)
-    , m_r(r)
+    , m_q(q)
     , m_size(size)
     {}
 
@@ -217,37 +170,37 @@ namespace scopi
     template<std::size_t dim, bool owner>
     inline const auto object_container<dim, owner>::pos(std::size_t i) const
     {
-        return detail::get_value(m_pos, m_size, i);
+        return xt::view(detail::get_value(m_pos, m_size), i);
     }
 
     template<std::size_t dim, bool owner>
     inline auto object_container<dim, owner>::pos(std::size_t i)
     {
-        return detail::get_value(m_pos, m_size, i);
+        return xt::view(detail::get_value(m_pos, m_size), i);
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::R() const
+    inline const auto object_container<dim, owner>::q() const
     {
-        return detail::get_value(m_r, m_size);
+        return detail::get_value(m_q, m_size);
     }
 
     template<std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::R()
+    inline auto object_container<dim, owner>::q()
     {
-        return detail::get_value(m_r, m_size);
+        return detail::get_value(m_q, m_size);
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::R(std::size_t i) const
+    inline const auto object_container<dim, owner>::q(std::size_t i) const
     {
-        return detail::get_value(m_r, m_size, i);
+        return xt::view(detail::get_value(m_q, m_size), i);
     }
 
     template<std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::R(std::size_t i)
+    inline auto object_container<dim, owner>::q(std::size_t i)
     {
-        return detail::get_value(m_r, m_size, i);
+        return xt::view(detail::get_value(m_q, m_size), i);
     }
 
     template<std::size_t dim, bool owner>
@@ -267,7 +220,7 @@ namespace scopi
         static constexpr std::size_t dim = Dim;
         using base_type = object_container<dim, owner>;
         using position_type = typename base_type::position_type;
-        using rotation_type = typename base_type::rotation_type;
+        using quaternion_type = typename base_type::quaternion_type;
 
         virtual ~object() = default;
 
@@ -275,7 +228,7 @@ namespace scopi
         object& operator=(const object&) = delete;
         object& operator=(object&&) = delete;
 
-        object(position_type pos, rotation_type r, std::size_t size);
+        object(position_type pos, quaternion_type q, std::size_t size);
 
     protected:
         object() = default;
@@ -286,8 +239,8 @@ namespace scopi
     // object implementation //
     ///////////////////////////
     template<std::size_t dim, bool owner>
-    object<dim, owner>::object(position_type pos, rotation_type r, std::size_t size)
-    : base_type(pos, r, size)
+    object<dim, owner>::object(position_type pos, quaternion_type q, std::size_t size)
+    : base_type(pos, q, size)
     {}
 
 #if defined(__GNUC__) && !defined(__clang__)

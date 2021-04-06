@@ -26,10 +26,10 @@ namespace scopi
 
         using base_type = object<dim, owner>;
         using position_type = typename base_type::position_type;
-        using rotation_type = typename base_type::rotation_type;
+        using quaternion_type = typename base_type::quaternion_type;
 
         globule(position_type pos, double radius);
-        globule(position_type pos, rotation_type r, double radius);
+        globule(position_type pos, quaternion_type q, double radius);
 
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
@@ -48,15 +48,15 @@ namespace scopi
     ////////////////////////////
     template<std::size_t dim, bool owner>
     globule<dim, owner>::globule(position_type pos, double radius)
-    : base_type(pos, 6)
+    : base_type(pos, {quaternion()}, 6)
     , m_radius(radius)
     {
         create_hash();
     }
 
     template<std::size_t dim, bool owner>
-    globule<dim, owner>::globule(position_type pos, rotation_type r, double radius)
-    : base_type(pos, r, 6)
+    globule<dim, owner>::globule(position_type pos, quaternion_type q, double radius)
+    : base_type(pos, q, 6)
     , m_radius(radius)
     {
         create_hash();
