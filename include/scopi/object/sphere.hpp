@@ -27,6 +27,7 @@ namespace scopi
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
         virtual std::size_t hash() const override;
+        auto rotation() const;
 
     private:
 
@@ -85,5 +86,11 @@ namespace scopi
         std::stringstream ss;
         ss << "sphere<" << dim << ">(" << m_radius << ")";
         m_hash = std::hash<std::string>{}(ss.str());
+    }
+
+    template<std::size_t dim, bool owner>
+    auto sphere<dim, owner>::rotation() const
+    {
+        return rotation_matrix<dim>(this->q());
     }
 }
