@@ -296,7 +296,7 @@ if __name__ == '__main__':
         # [ q0**2+q1**2-q2**2-q3**2, 2*q1*q2-2*q0*q3, 2*q1*q3+2*q0*q2, 0 ],
         # [ 2*q1*q2+2*q0*q3, q0**2-q1**2+q2**2-q3**2, 2*q2*q3-2*q0*q1, 0 ],
         # [ 2*q1*q3-2*q0*q2, 2*q2*q3+2*q0*q1, q0**2-q1**2-q2**2+q3**2 ]
-        
+
         s1q00 = s1q0**2
         s1q11 = s1q1**2
         s1q22 = s1q2**2
@@ -524,6 +524,18 @@ if __name__ == '__main__':
         itermax = 200
         u = u0.copy()
         dk = np.ones(u.shape)
+        ### test pour comparaison avec le C++
+        # print("s1 : xc=",s1.xc," yc=",s1.yc," rx=",s1.rx," ry=",s1.ry," e=",s1.e," q=",s1.q)
+        # print("s2 : xc=",s2.xc," yc=",s2.yc," rx=",s2.rx," ry=",s2.ry," e=",s2.e," q=",s2.q)
+        # print("u0 = ",u0)
+        # val1 = np.array([0.43])
+        # val2 = np.array([0.65])
+        # print("s1.surface_pt(val1)      = ",s1.surface_pt(val1),     " s2.surface_pt(val2)      = ",s2.surface_pt(val2))
+        # print("s1.surface_normal(val1)  = ",s1.surface_normal(val1), " s2.surface_normal(val2)  = ",s2.surface_normal(val2))
+        # print("s1.surface_tangent(val1) = ",s1.surface_tangent(val1)," s2.surface_tangent(val2) = ",s2.surface_tangent(val2))
+        # print("grad_f_contacts(u,s1,s2) = ",grad_f_contacts(u,s1,s2), " f_contacts(u,s1,s2) = ",f_contacts(u,s1,s2))
+        # sys.exit()
+
         while (cc<itermax) and (np.linalg.norm(dk)>1.0e-7) and (np.linalg.norm(f_contacts(u,s1,s2))>1e-10) :
             ## dk = -(gradFk)^-1 Fk : direction de descente
             dk = np.linalg.solve(grad_f_contacts(u,s1,s2), -f_contacts(u,s1,s2))
@@ -538,6 +550,10 @@ if __name__ == '__main__':
         print("it = ",it," nb iterations = ",cc," |dk| = ",np.linalg.norm(dk)," cost=",np.linalg.norm(f_contacts(u,s1,s2)))
         p.add_text("nb iterations = "+str(cc),position="upper_left",name="titre")
         b_final = u
+
+        print("u final = ",u)
+
+
 
         p.add_mesh(s2.mesh(),color="green", opacity=0.5, name="s2")
 
@@ -555,7 +571,9 @@ if __name__ == '__main__':
         normal_final_pt1 = s1.surface_normal(np.array( [b_final[0]] ))
         final_pt2 = s2.surface_pt(np.array( [b_final[1]] ))
         normal_final_pt2 = s2.surface_normal(np.array( [b_final[1]] ))
-
+        # print("final_pt1 = ",final_pt1)
+        # print("final_pt2 = ",final_pt2)
+        # sys.exit()
         node_final_pt1 = pv.PolyData(final_pt1)
         node_final_pt1["normal"] = normal_final_pt1
         p.add_mesh(node_final_pt1.glyph(factor=0.05, geom=pv.Sphere()),color="pink",name="fpt1")

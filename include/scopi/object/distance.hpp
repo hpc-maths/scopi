@@ -14,8 +14,6 @@ namespace scopi
     double distance(const superellipsoid<dim, false> s1, const superellipsoid<dim, false> s2)
     {
         std::cout << "distance : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
-        std::cout << "rotation s1 : " << s1.rotation() << std::endl;
-        std::cout << "rotation s2 : " << s2.rotation() << std::endl;
         return 10;
     }
 
