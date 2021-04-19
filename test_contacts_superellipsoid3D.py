@@ -1153,6 +1153,19 @@ if __name__ == '__main__':
     itermax = 2000
     u = u0.copy()
     dk = np.ones(u.shape)
+
+    ### test pour comparaison avec le C++
+    print("s1 : xc=",s1.xc," yc=",s1.yc," zc=",s1.zc," rx=",s1.rx," ry=",s1.ry," rz=",s1.rz," e=",s1.e," n=",s1.n," q=",s1.q)
+    print("s2 : xc=",s2.xc," yc=",s2.yc," zc=",s2.zc," rx=",s2.rx," ry=",s2.ry," rz=",s2.rz," e=",s2.e," n=",s2.n," q=",s2.q)
+    print("u0 = ",u0)
+    val1 = np.array([0.43])
+    val2 = np.array([0.65])
+    # print("s1.surface_pt(val1,val2)      = ",s1.surface_pt(val1,val2),     " s2.surface_pt(val2,val1)      = ",s2.surface_pt(val2,val1))
+    # print("s1.surface_normal(val1,val2)  = ",s1.surface_normal(val1,val2), " s2.surface_normal(val2,val1)  = ",s2.surface_normal(val2,val1))
+    # print("s1.surface_tangent(val1,val2) = ",s1.surface_tangent(val1,val2)," s2.surface_tangent(val2,val1) = ",s2.surface_tangent(val2,val1))
+    # print("u=",u)
+    # print("grad_f_contacts(u,s1,s2) = ",grad_f_contacts(u,s1,s2), " f_contacts(u,s1,s2) = ",f_contacts(u,s1,s2))
+
     while (cc<itermax) and (np.linalg.norm(dk)>1.0e-7) and (np.linalg.norm(f_contacts(u,s1,s2))>1e-10) :
         ## dk = -(gradFk)^-1 Fk : direction de descente
         dk = np.linalg.solve(grad_f_contacts(u,s1,s2), -f_contacts(u,s1,s2))
@@ -1170,6 +1183,10 @@ if __name__ == '__main__':
     normal_final_pt1 = s1.surface_normal(np.array([b_final[0]]),np.array([b_final[1]]))
     final_pt2 = s2.surface_pt(np.array([b_final[2]]),np.array([b_final[3]]))
     normal_final_pt2 = s2.surface_normal(np.array([b_final[2]]),np.array([b_final[3]]))
+
+    print("final_pt1 = ",final_pt1)
+    print("final_pt2 = ",final_pt2)
+    sys.exit()
 
     node_final_pt1 = pv.PolyData(final_pt1)
     node_final_pt1["normal"] = normal_final_pt1

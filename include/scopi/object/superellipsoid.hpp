@@ -25,7 +25,7 @@ namespace scopi
         // superellipsoid& operator=(const superellipsoid&) = default;
 
         const auto radius() const;
-        const auto squareness() const;
+        const auto squareness() const; // e, n
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
         virtual std::size_t hash() const override;
