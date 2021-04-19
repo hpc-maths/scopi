@@ -30,26 +30,12 @@ namespace scopi
     {
         std::cout << "closest_points : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
         xt::xtensor_fixed<double, xt::xshape<2, dim>> pts;
-        auto s1_pos = xt::view(s1.pos(), 0);
-        auto s1_rad = s1.radius();
-        auto s1_rot = s1.rotation();
-        auto s1_sqr = s1.squareness();
-        auto s2_pos = xt::view(s2.pos(), 0);
-        auto s2_rad = s2.radius();
-        auto s2_rot = s2.rotation();
-        auto s2_sqr = s2.squareness();
-        // std::cout << "s1 : pos = " << s1_pos << " rotation = " << s1_rot << " squareness = " << s1_sqr << std::endl;
-        // std::cout << "s2 : pos = " << s2_pos << " rotation = " << s2_rot << " squareness = " << s2_sqr << std::endl;
-        // std::cout << "sign(-1.23) = " << sign(-1.23) << " sign(0.0) " << sign(0.0) << " sign(2.334) = " << sign(2.334) << std::endl;
-        // std::cout << "abs(-1.23) = " << std::abs(-1.23) << " abs(2.334) = " << std::abs(2.334) << std::endl;
+        xt::xtensor_fixed<double, xt::xshape<2*(2*dim+dim-1+dim*dim)>> args = xt::hstack(xt::xtuple(
+          xt::view(s1.pos(), 0), s1.radius(), s1.squareness(), xt::flatten(s1.rotation()),
+          xt::view(s2.pos(), 0), s2.radius(), s2.squareness(), xt::flatten(s2.rotation())
+        ));
+        // std::cout << "args = " << args << std::endl;
         if (dim==2) {
-            // s1xc, s1yc, s1rx, s1ry, s1e, Q1, Q2, Q3, Q4,
-            // s2xc, s2yc, s2rx, s2ry, s2e, R1, R2, R3, R4,
-            xt::xtensor_fixed<double, xt::xshape<18>> args = {
-              s1_pos(0), s1_pos(1), s1_rad(0), s1_rad(1), s1_sqr(0), s1_rot(0,0), s1_rot(1,1), s1_rot(1,0), s1_rot(0,1),
-              s2_pos(0), s2_pos(1), s2_rad(0), s2_rad(1), s2_sqr(0), s2_rot(0,0), s2_rot(1,1), s2_rot(1,0), s2_rot(0,1)
-            };
-            // std::cout << "args = " << args << std::endl;
             auto newton_F = [](auto u, auto args)
             {
                 double b1 = u(0);
@@ -60,18 +46,18 @@ namespace scopi
                 double s1ry = args(3);
                 double s1e = args(4);
                 double Q1 = args(5);
-                double Q2 = args(6);
+                double Q2 = args(8);
                 double Q3 = args(7);
-                double Q4 = args(8);
+                double Q4 = args(6);
                 double s2xc = args(9);
                 double s2yc = args(10);
                 double s2rx = args(11);
                 double s2ry = args(12);
                 double s2e = args(13);
                 double R1 = args(14);
-                double R2 = args(15);
+                double R2 = args(17);
                 double R3 = args(16);
-                double R4 = args(17);
+                double R4 = args(15);
                 double sb2e1 = std::pow(std::fabs(std::sin(b1)),(2 - s1e)) * sign(std::sin(b1));
                 double sbe1  = std::pow(std::fabs(std::sin(b1)),s1e) * sign(std::sin(b1));
                 double cb2e1 = std::pow(std::fabs(std::cos(b1)),(2 - s1e)) * sign(std::cos(b1));
@@ -103,18 +89,18 @@ namespace scopi
                 double s1ry = args(3);
                 double s1e = args(4);
                 double Q1 = args(5);
-                double Q2 = args(6);
+                double Q2 = args(8);
                 double Q3 = args(7);
-                double Q4 = args(8);
+                double Q4 = args(6);
                 double s2xc = args(9);
                 double s2yc = args(10);
                 double s2rx = args(11);
                 double s2ry = args(12);
                 double s2e = args(13);
                 double R1 = args(14);
-                double R2 = args(15);
+                double R2 = args(17);
                 double R3 = args(16);
-                double R4 = args(17);
+                double R4 = args(15);
                 double sb2e1 = std::pow(std::fabs(std::sin(b1)),(2 - s1e)) * sign(std::sin(b1));
                 double sbe1  = std::pow(std::fabs(std::sin(b1)),s1e) * sign(std::sin(b1));
                 double cb2e1 = std::pow(std::fabs(std::cos(b1)),(2 - s1e)) * sign(std::cos(b1));
@@ -203,7 +189,15 @@ namespace scopi
             std::cout << "closest_points : pts = " << pts << std::endl;
         }
         else { // dim == 3
-          std::cout << "not implemented" << std::endl;
+          // xt::xtensor_fixed<double, xt::xshape<18>> args = {
+          //   s1_pos(0), s1_pos(1), s1_pos(2), s1_rad(0), s1_rad(1), s1_rad(2),
+          //   s1_sqr(0), s1_sqr(1),
+          //   s1_rot(0,0), s1_rot(1,1),
+          //   s1_rot(1,0), s1_rot(0,1),
+          //   s2_pos(0), s2_pos(1), s2_pos(2), s2_rad(0), s2_rad(1), s2_rad(2), s2_sqr(0), s2_rot(0,0), s2_rot(1,1), s2_rot(1,0), s2_rot(0,1)
+          // };
+
+
         }
         return pts;
     }
