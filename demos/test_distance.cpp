@@ -54,6 +54,7 @@ int main()
     // particles.push_back(p1, {dummy}, {dummy}, {dummy});
     particles.push_back(se1, {dummy}, {dummy}, {dummy});
     particles.push_back(se2, {dummy}, {dummy}, {dummy});
+    particles[0]->print();
 
     for(std::size_t i = 0; i < particles.size() - 1; ++i)
     {

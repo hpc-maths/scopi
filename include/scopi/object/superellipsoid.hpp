@@ -88,7 +88,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     void superellipsoid<dim, owner>::print() const
     {
-        std::cout << "superellipsoid<" << dim << "> : radius = " << m_radius << " squareness = " << m_squareness << "\n"; //<< " q = "<< xt::view(this->q(0),xt::all()) << "\n";
+        std::cout << "superellipsoid<" << dim << "> : radius = " << m_radius << " squareness = " << m_squareness << " q = "<< this->q() << "\n"; // ?????
     }
 
     template<std::size_t dim, bool owner>
@@ -101,7 +101,7 @@ namespace scopi
     void superellipsoid<dim, owner>::create_hash()
     {
         std::stringstream ss;
-        ss << "superellipsoid<" << dim << "> : radius = " << m_radius << " squareness = " << m_squareness << "\n"; //<< " q = "<< xt::view(this->q(0),xt::all()) << "\n";
+        ss << "superellipsoid<" << dim << "> : radius = " << m_radius << " squareness = " << m_squareness << " q = "<< this->q() << "\n"; // ?????
         m_hash = std::hash<std::string>{}(ss.str());
     }
 
@@ -154,7 +154,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::tangent(const double b) const
+    auto superellipsoid<dim, owner>::tangent(const double b) const  //2D
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> tgt;
         tgt(0) = -m_radius(0) * sign(std::sin(b)) * std::pow(std::abs(std::sin(b)), 2-m_squareness(0));
@@ -165,7 +165,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::tangents(const double a, const double b) const
+    auto superellipsoid<dim, owner>::tangents(const double a, const double b) const //3D
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> tgt1;
         tgt1(0) = -m_radius(0) * sign(std::cos(a)) * sign(std::sin(b)) * std::pow(std::abs(std::sin(b)), 2-m_squareness(0));
