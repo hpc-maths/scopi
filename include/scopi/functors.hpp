@@ -33,6 +33,7 @@ namespace scopi
         print_functor,
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
+                    const superellipsoid<dim, false>,
                     const globule<dim, false>,
                     const plan<dim, false>>,
         typename print_functor::return_type
@@ -61,6 +62,7 @@ namespace scopi
         distance_functor,
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
+                    const superellipsoid<dim, false>,
                     const globule<dim, false>,
                     const plan<dim, false>>,
         typename distance_functor::return_type,
@@ -90,6 +92,7 @@ namespace scopi
         closest_points_functor<dim>,
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
+                    const superellipsoid<dim, false>,
                     const globule<dim, false>,
                     const plan<dim, false>>,
         typename closest_points_functor<dim>::return_type,
