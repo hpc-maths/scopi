@@ -201,10 +201,15 @@ class SuperEllipsoid2D:
         b1,b2 = sympy.symbols("b1,b2",real=True)
         # superellipsoid1
         s1e = sympy.symbols("s1e",real=True)
-        s1q0,s1q1,s1q2,s1q3 = sympy.symbols("s1q0,s1q1,s1q2,s1q3",real=True)
-        s1Mr = sympy.Matrix([[ s1q0**2+s1q1**2-s1q2**2-s1q3**2, 2*s1q1*s1q2-2*s1q0*s1q3, 2*s1q1*s1q3+2*s1q0*s1q2, 0 ],
-                           [ 2*s1q1*s1q2+2*s1q0*s1q3, s1q0**2-s1q1**2+s1q2**2-s1q3**2, 2*s1q2*s1q3-2*s1q0*s1q1, 0 ],
-                           [ 2*s1q1*s1q3-2*s1q0*s1q2, 2*s1q2*s1q3+2*s1q0*s1q1, s1q0**2-s1q1**2-s1q2**2+s1q3**2, 0 ],
+        # s1q0,s1q1,s1q2,s1q3 = sympy.symbols("s1q0,s1q1,s1q2,s1q3",real=True)
+        # s1Mr = sympy.Matrix([[ s1q0**2+s1q1**2-s1q2**2-s1q3**2, 2*s1q1*s1q2-2*s1q0*s1q3, 2*s1q1*s1q3+2*s1q0*s1q2, 0 ],
+        #                    [ 2*s1q1*s1q2+2*s1q0*s1q3, s1q0**2-s1q1**2+s1q2**2-s1q3**2, 2*s1q2*s1q3-2*s1q0*s1q1, 0 ],
+        #                    [ 2*s1q1*s1q3-2*s1q0*s1q2, 2*s1q2*s1q3+2*s1q0*s1q1, s1q0**2-s1q1**2-s1q2**2+s1q3**2, 0 ],
+        #                    [ 0,0,0,1]])
+        M00, M01, M02, M10, M11, M12, M20, M21, M22 = sympy.symbols("M00, M01, M02, M10, M11, M12, M20, M21, M22",real=True)
+        s1Mr = sympy.Matrix([[ M00, M01, M02, 0 ],
+                           [ M10, M11, M12, 0 ],
+                           [ M20, M21, M22, 0 ],
                            [ 0,0,0,1]])
         s1rx,s1ry,s1rz,s1xc,s1yc,s1zc = sympy.symbols("s1rx,s1ry,s1rz,s1xc,s1yc,s1zc",real=True)
         s1Ms= sympy.Matrix([[s1rx,0,0,0],[0,s1ry,0,0],[0,0,s1rz,0],[0,0,0,1]])
@@ -221,22 +226,27 @@ class SuperEllipsoid2D:
         print("\ncalcul formel : pt1 = \n",pt1)
         print("\ncalcul formel : n1 = \n",n1)
         # superellipsoid2
-        s2e = sympy.symbols("s2e",real=True)
-        s2q0,s2q1,s2q2,s2q3 = sympy.symbols("s2q0,s2q1,s2q2,s2q3",real=True)
-        s2Mr = sympy.Matrix([[ s2q0**2+s2q1**2-s2q2**2-s2q3**2, 2*s2q1*s2q2-2*s2q0*s2q3, 2*s2q1*s2q3+2*s2q0*s2q2, 0 ],
-                           [ 2*s2q1*s2q2+2*s2q0*s2q3, s2q0**2-s2q1**2+s2q2**2-s2q3**2, 2*s2q2*s2q3-2*s2q0*s2q1, 0 ],
-                           [ 2*s2q1*s2q3-2*s2q0*s2q2, 2*s2q2*s2q3+2*s2q0*s2q1, s2q0**2-s2q1**2-s2q2**2+s2q3**2, 0 ],
+        # s2e = sympy.symbols("s2e",real=True)  => s2e=1
+        # s2q0,s2q1,s2q2,s2q3 = sympy.symbols("s2q0,s2q1,s2q2,s2q3",real=True)
+        # s2Mr = sympy.Matrix([[ s2q0**2+s2q1**2-s2q2**2-s2q3**2, 2*s2q1*s2q2-2*s2q0*s2q3, 2*s2q1*s2q3+2*s2q0*s2q2, 0 ],
+        #                    [ 2*s2q1*s2q2+2*s2q0*s2q3, s2q0**2-s2q1**2+s2q2**2-s2q3**2, 2*s2q2*s2q3-2*s2q0*s2q1, 0 ],
+        #                    [ 2*s2q1*s2q3-2*s2q0*s2q2, 2*s2q2*s2q3+2*s2q0*s2q1, s2q0**2-s2q1**2-s2q2**2+s2q3**2, 0 ],
+        #                    [ 0,0,0,1]])
+        N00, N01, N02, N10, N11, N12, N20, N21, N22 = sympy.symbols("N00, N01, N02, N10, N11, N12, N20, N21, N22",real=True)
+        s2Mr = sympy.Matrix([[ N00, N01, N02, 0 ],
+                           [ N10, N11, N12, 0 ],
+                           [ N20, N21, N22, 0 ],
                            [ 0,0,0,1]])
-        s2rx,s2ry,s2rz,s2xc,s2yc,s2zc = sympy.symbols("s2rx,s2ry,s2rz,s2xc,s2yc,s2zc",real=True)
-        s2Ms= sympy.Matrix([[s2rx,0,0,0],[0,s2ry,0,0],[0,0,s2rz,0],[0,0,0,1]])
+        s2r,s2xc,s2yc,s2zc = sympy.symbols("s2r,s2xc,s2yc,s2zc",real=True)
+        s2Ms= sympy.Matrix([[s2r,0,0,0],[0,s2r,0,0],[0,0,s2r,0],[0,0,0,1]])
         s2Mt = sympy.Matrix([[1,0,0,s2xc],[0,1,0,s2yc],[0,0,1,s2zc],[0,0,0,1]])
         s2M = s2Mt@s2Mr@s2Ms
-        s2x = sign(cos(b2))*sympy.Abs(cos(b2))**s2e
-        s2y = sign(sin(b2))*sympy.Abs(sin(b2))**s2e
+        s2x = cos(b2)
+        s2y = sin(b2)
         s2z = 0
         pt2 = s2M@sympy.Matrix([s2x,s2y,s2z,1])
-        s2nx = s2ry*sign(cos(b2))*sympy.Abs(cos(b2))**(2-s2e)
-        s2ny = s2rx*sign(sin(b2))*sympy.Abs(sin(b2))**(2-s2e)
+        s2nx = s2r*cos(b2)
+        s2ny = s2r*sin(b2)
         s2nz = 0
         n2 = s2Mr@sympy.Matrix([s2nx,s2ny,s2nz,1])
         print("\ncalcul formel : pt2 = \n",pt2)
@@ -278,19 +288,11 @@ if __name__ == '__main__':
         s1e = s1.e ; s1rx = s1.rx ; s1ry = s1.ry ; s1rz = s1.rz ; s1xc = s1.xc ; s1yc = s1.yc ; s1zc = s1.zc
         s2q0,s2q1,s2q2,s2q3 = s2.q
         s2e = s2.e ; s2rx = s2.rx ; s2ry = s2.ry ; s2rz = s2.rz ; s2xc = s2.xc ; s2yc = s2.yc ; s2zc = s2.zc
-        # ## res_ref est directement obtenu a partir du calcul formel
-        # ## permet de tester que la reecriture des formules n'a pas fait ajouter des erreurs
-        res_ref = np.zeros((2,))
-        res_ref[0] =  -(s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*\
-        (-s1rx*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1)) - s1ry*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) - s1yc + s2rx*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**s2e*np.sign(np.cos(b2)) + s2ry*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**s2e*np.sign(np.sin(b2)) + s2yc) + \
-        (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*\
-        (-s1rx*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1)) - s1ry*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) - s1xc + s2rx*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**s2e*np.sign(np.cos(b2)) + s2ry*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**s2e*np.sign(np.sin(b2)) + s2xc)
-        res_ref[1] = (s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*\
-        (s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2))) + \
-        (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*\
-        (s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2))) + \
-        np.sqrt((s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))**2 + (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))**2)*\
-        np.sqrt((s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))**2 + (s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))**2)
+
+        if (s2rx != s2ry) or (s2e != 1):
+            print("s2 doit etre une sphere ! rx=ry=r et e=1")
+            sys.exit()
+        s2r = s2rx
 
         s1q00 = s1q0**2
         s1q11 = s1q1**2
@@ -304,45 +306,60 @@ if __name__ == '__main__':
         s2q33 = s2q3**2
         s2q03 = 2*s2q0*s2q3
         s2q12 = 2*s2q1*s2q2
-        M00 = (s1q00 + s1q11 - s1q22 - s1q33)
-        M01 = (-s1q03 + s1q12)
-        M10 = (s1q03 + s1q12)
-        M11 = (s1q00 - s1q11 + s1q22 - s1q33)
-        N00 = (s2q00 + s2q11 - s2q22 - s2q33)
-        N01 = (-s2q03 + s2q12)
-        N10 = (s2q03 + s2q12)
-        N11 = (s2q00 - s2q11 + s2q22 - s2q33)
+        M00 = (s1q00 + s1q11 - s1q22 - s1q33)  # M1[0,0]
+        M01 = (-s1q03 + s1q12) # M1[0,1]
+        M10 = (s1q03 + s1q12)  # M1[1,0]
+        M11 = (s1q00 - s1q11 + s1q22 - s1q33)  # M1[1,1]
+        N00 = (s2q00 + s2q11 - s2q22 - s2q33)  # M2[0,0]
+        N01 = (-s2q03 + s2q12) # M2[0,1]
+        N10 = (s2q03 + s2q12)  # M2[1,0]
+        N11 = (s2q00 - s2q11 + s2q22 - s2q33)  # M2[1,1]
 
-        cb1 = np.cos(b1)
-        cb1e = np.sign(cb1)*np.abs(cb1)**s1e
-        cb1e2 = np.sign(cb1)*np.abs(cb1)**(2 - s1e)
+        ## res_ref est directement obtenu a partir du calcul formel
+        ## permet de tester que la reecriture des formules n'a pas fait ajouter des erreurs
+        res_ref = np.zeros((2,))
+        res_ref[0] = -( M00*s1ry*np.abs(np.cos(b1))**(2 - s1e) * np.sign(np.cos(b1)) + \
+                        M01*s1rx*np.abs(np.sin(b1))**(2 - s1e) * np.sign(np.sin(b1))) * \
+                      (-M10*s1rx*np.abs(np.cos(b1))**s1e * np.sign(np.cos(b1)) - \
+                        M11*s1ry*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) + \
+                        N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2) - s1yc + s2yc) + \
+                      ( M10*s1ry*np.abs(np.cos(b1))**(2 - s1e) * np.sign(np.cos(b1)) + \
+                        M11*s1rx*np.abs(np.sin(b1))**(2 - s1e) * np.sign(np.sin(b1)) ) * \
+                      (-M00*s1rx*np.abs(np.cos(b1))**s1e * np.sign(np.cos(b1)) - \
+                        M01*s1ry*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) + \
+                        N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2) - s1xc + s2xc)
+        res_ref[1] = (N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2)) * \
+                     (M00*s1ry*np.abs(np.cos(b1))**(2 - s1e) * np.sign(np.cos(b1)) + \
+                      M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))) + \
+                      (N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2)) * \
+                      (M10*s1ry*np.abs(np.cos(b1))**(2 - s1e) * np.sign(np.cos(b1)) + \
+                      M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))) + \
+                      np.sqrt((N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2))**2 + \
+                      (N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2))**2) * \
+                      np.sqrt((M00*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + \
+                      M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))**2 + \
+                      (M10*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + \
+                      M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))**2)
 
-        sb1 = np.sin(b1)
-        sb1e = np.sign(sb1)*np.abs(sb1)**s1e
-        sb1e2 = np.sign(sb1)*np.abs(sb1)**(2 - s1e)
 
-        F1 = s1rx * sb1e2
-        F2 = s1ry * sb1e
-        F3 = s1ry * cb1e2
-        F4 = s1rx * cb1e
+        D1 = s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))
+        D2 = s1ry*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1))
+        D3 = s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))
+        D4 = s1rx*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1))
+        D5 = s2r*np.sin(b2)
+        D6 = s2r*np.cos(b2)
 
-        cb2 = np.cos(b2)
-        cb2e = np.sign(cb2)*np.abs(cb2)**s2e
-        cb2e2 = np.sign(cb2)*np.abs(cb2)**(2 - s2e)
+        res[0] = -( M00*D3 + M01*D1 ) * \
+                  (-M10*D4 - M11*D2 + N10*D6 + N11*D5 - s1yc + s2yc ) + \
+                  ( M10*D3 + M11*D1 ) * \
+                  (-M00*D4 - M01*D2 + N00*D6 + N01*D5 - s1xc + s2xc )
+        res[1] =  ( N00*D6 + N01*D5 ) * \
+                  ( M00*D3 + M01*D1 ) + \
+                  ( N10*D6 + N11*D5 ) * \
+                  ( M10*D3 + M11*D1 ) + \
+                  np.sqrt( (N00*D6 + N01*D5)**2 + (N10*D6 + N11*D5)**2 ) * \
+                  np.sqrt( (M00*D3 + M01*D1)**2 + (M10*D3 + M11*D1)**2 )
 
-        sb2 = np.sin(b2)
-        sb2e = np.sign(sb2)*np.abs(sb2)**s2e
-        sb2e2 = np.sign(sb2)*np.abs(sb2)**(2 - s2e)
-
-        F5 = s2rx * sb2e2
-        F6 = s2ry * sb2e
-        F7 = s2ry * cb2e2
-        F8 = s2rx * cb2e
-
-        res[0] =  -( M01*F1 + M00*F3 ) * ( -M10*F4 - M11*F2 - s1yc + N10*F8 + N11*F6 + s2yc ) + \
-                   ( M11*F1 + M10*F3 ) * ( -M00*F4 - M01*F2 - s1xc + N00*F8 + N01*F6 + s2xc )
-        res[1] = ( M01*F1 + M00*F3 ) * ( N01*F5 + N00*F7 ) + ( M11*F1 + M10*F3 ) * ( N11*F5 + N10*F7 ) + \
-                 np.sqrt( (M01*F1 + M00*F3)**2 + (M11*F1 + M10*F3)**2 ) * np.sqrt( (N01*F5 + N00*F7)**2 + (N11*F5 + N10*F7)**2 )
         print("F : res = ",res," res_ref = ",res_ref," ecart = ",np.linalg.norm(res-res_ref))
         return res
 
@@ -355,6 +372,12 @@ if __name__ == '__main__':
         s1e = s1.e ; s1rx = s1.rx ; s1ry = s1.ry ; s1rz = s1.rz ; s1xc = s1.xc ; s1yc = s1.yc ; s1zc = s1.zc
         s2q0,s2q1,s2q2,s2q3 = s2.q
         s2e = s2.e ; s2rx = s2.rx ; s2ry = s2.ry ; s2rz = s2.rz ; s2xc = s2.xc ; s2yc = s2.yc ; s2zc = s2.zc
+
+        if (s2rx != s2ry) or (s2e != 1):
+            print("s2 doit etre une sphere ! rx=ry=r et e=1")
+            sys.exit()
+        s2r = s2rx
+
         res = np.zeros((2,2))
         s1q00 = s1q0**2
         s1q11 = s1q1**2
@@ -368,75 +391,65 @@ if __name__ == '__main__':
         s2q33 = s2q3**2
         s2q03 = 2*s2q0*s2q3
         s2q12 = 2*s2q1*s2q2
-        M00 = (s1q00 + s1q11 - s1q22 - s1q33)
-        M01 = (-s1q03 + s1q12)
-        M10 = (s1q03 + s1q12)
-        M11 = (s1q00 - s1q11 + s1q22 - s1q33)
-        N00 = (s2q00 + s2q11 - s2q22 - s2q33)
-        N01 = (-s2q03 + s2q12)
-        N10 = (s2q03 + s2q12)
-        N11 = (s2q00 - s2q11 + s2q22 - s2q33)
+        M00 = (s1q00 + s1q11 - s1q22 - s1q33)  # M1[0,0]
+        M01 = (-s1q03 + s1q12) # M1[0,1]
+        M10 = (s1q03 + s1q12)  # M1[1,0]
+        M11 = (s1q00 - s1q11 + s1q22 - s1q33)  # M1[1,1]
+        N00 = (s2q00 + s2q11 - s2q22 - s2q33)  # M2[0,0]
+        N01 = (-s2q03 + s2q12) # M2[0,1]
+        N10 = (s2q03 + s2q12)  # M2[1,0]
+        N11 = (s2q00 - s2q11 + s2q22 - s2q33)  # M2[1,1]
+        D1 = s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))
+        D2 = s1ry*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1))
+        D3 = s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))
+        D4 = s1rx*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1))
+        D5 = s2r*np.sin(b2)
+        D6 = s2r*np.cos(b2)
 
-        cb1 = np.cos(b1)
-        cb1e = np.sign(cb1)*np.abs(cb1)**s1e
-        cb1e2 = np.sign(cb1)*np.abs(cb1)**(2 - s1e)
 
-        sb1 = np.sin(b1)
-        sb1e = np.sign(sb1)*np.abs(sb1)**s1e
-        sb1e2 = np.sign(sb1)*np.abs(sb1)**(2 - s1e)
+        D7 = s1e*s1rx*np.sin(b1)*np.abs(np.cos(b1))**(s1e - 1)
+        D8 = s1e*s1ry*np.cos(b1)*np.abs(np.sin(b1))**(s1e - 1)
+        D9 = s1ry*(2 - s1e)*np.sin(b1)*np.abs(np.cos(b1))**(1 - s1e)
+        D10 = s1rx*(2 - s1e)*np.cos(b1)*np.abs(np.sin(b1))**(1 - s1e)
 
-        F1 = s1rx * sb1e2
-        F2 = s1ry * sb1e
-        F3 = s1ry * cb1e2
-        F4 = s1rx * cb1e
+        res[0,0] = (-M00*D3 - M01*D1 ) * ( M10*D7 - M11*D8 ) + \
+                   ( M10*D3 + M11*D1 ) * ( M00*D7 - M01*D8 ) + \
+                   ( M00*D9 - M01*D10 ) * (-M10*D4 - M11*D2 + N10*D6 + N11*D5 - s1yc + s2yc ) + \
+                   (-M10*D9 + M11*D10 ) * (-M00*D4 - M01*D2 + N00*D6 + N01*D5 - s1xc + s2xc)
 
-        cb2 = np.cos(b2)
-        cb2e = np.sign(cb2)*np.abs(cb2)**s2e
-        cb2e2 = np.sign(cb2)*np.abs(cb2)**(2 - s2e)
+        res[0,1] = (-N00*D5 + N01*D6 ) * ( M10*D3 + M11*D1 ) + \
+                   (-N10*D5 + N11*D6 ) * (-M00*D3 - M01*D1 )
 
-        sb2 = np.sin(b2)
-        sb2e = np.sign(sb2)*np.abs(sb2)**s2e
-        sb2e2 = np.sign(sb2)*np.abs(sb2)**(2 - s2e)
+        res[1,0] = ( ( M00*D3 + M01*D1 ) * (-M00*D9 + M01*D10 ) + \
+                     ( M10*D3 + M11*D1 ) * (-M10*D9 + M11*D10 )\
+                   ) \
+                  * np.sqrt( ( N00*D6 + N01*D5 )**2 + ( N10*D6 + N11*D5 )**2 ) \
+                  / np.sqrt( ( M00*D3 + M01*D1 )**2 + ( M10*D3 + M11*D1 )**2 ) \
+                  + ( N00*D6 + N01*D5 ) * (-M00*D9 + M01*D10 ) + \
+                    ( N10*D6 + N11*D5 ) * (-M10*D9 + M11*D10 )
 
-        F5 = s2rx * sb2e2
-        F6 = s2ry * sb2e
-        F7 = s2ry * cb2e2
-        F8 = s2rx * cb2e
+        res[1,1] = ( (-N00*D5 + N01*D6 ) * ( N00*D6 + N01*D5 ) + \
+                     (-N10*D5 + N11*D6 ) * ( N10*D6 + N11*D5 ) ) \
+                   * np.sqrt( ( M00*D3 + M01*D1 )**2 + \
+                              ( M10*D3 + M11*D1 )**2 ) \
+                   / np.sqrt( ( N00*D6 + N01*D5 )**2 + \
+                              ( N10*D6 + N11*D5 )**2 ) \
+                   + (-N00*D5 + N01*D6 ) * ( M00*D3 + M01*D1 ) + \
+                     (-N10*D5 + N11*D6 ) * ( M10*D3 + M11*D1 )
 
-        F9 = s1e * s1rx * sb1 * np.abs(cb1)**(s1e - 1)
-        F10 = s1e * s1ry * cb1 * np.abs(sb1)**(s1e - 1)
-        F11 = s1ry * (2 - s1e) * sb1 * np.abs(cb1)**(1 - s1e)
-        F12 = s1rx * (2 - s1e) * cb1 * np.abs(sb1)**(1 - s1e)
-        F13 = s2e * s2rx * sb2 * np.abs(cb2)**(s2e - 1)
-        F14 = s2e * s2ry * cb2 * np.abs(sb2)**(s2e - 1)
-        F15 = s2ry * (2 - s2e) * sb2 * np.abs(cb2)**(1 - s2e)
-        F16 = s2rx * (2 - s2e) * cb2 * np.abs(sb2)**(1 - s2e)
-        res[0,0] =  ( -M01*F1 - M00*F3 ) * ( M10*F9 - M11*F10 ) + \
-                    (  M11*F1 + M10*F3 ) * ( M00*F9 - M01*F10 ) + \
-                    ( -M01*F12 + M00*F11 ) * ( -M10*F4 - M11*F2 - s1yc + N10*F8 + N11*F6 + s2yc ) + \
-                    (  M11*F12 - M10*F11 ) * ( -M00*F4 - M01*F2 - s1xc + N00*F8 + N01*F6 + s2xc )
-        res[0,1] = ( -M01*F1 - M00*F3 ) * ( -N10*F13 + N11*F14 ) + \
-                   (  M11*F1 + M10*F3 ) * ( -N00*F13 + N01*F14 )
-        res[1,0] =  ( ( M01*F1 + M00*F3 ) * ( M01*F12 - M00*F11 ) + \
-                      ( M11*F1 + M10*F3) * ( M11*F12 - M10*F11 ) \
-                    ) \
-        * np.sqrt( ( N01*F5 + N00*F7)**2 + ( N11*F5 + N10*F7)**2 ) \
-        / np.sqrt( ( M01*F1 + M00*F3)**2 + ( M11*F1 + M10*F3)**2 ) \
-        + ( N01*F5 + N00*F7 ) * ( M01*F12 - M00*F11 ) \
-        + ( N11*F5 + N10*F7 ) * ( M11*F12 - M10*F11 )
-        res[1,1] = ( (N01*F5 + N00*F7) * (N01*F16 - N00*F15 ) \
-        + (N11*F5 + N10*F7) * (N11*F16 - N10*F15 ) ) \
-        * np.sqrt( ( M01*F1 + M00*F3 )**2 + ( M11*F1 + M10*F3 )**2 ) \
-        / np.sqrt( ( N01*F5 + N00*F7 )**2 + ( N11*F5 + N10*F7 )**2 ) \
-        + ( M01*F1 + M00*F3 ) * ( N01*F16 - N00*F15 ) + ( M11*F1 + M10*F3 ) * ( N11*F16 - N10*F15 )
-        # ## res_ref est directement obtenu a partir du calcul formel
-        # ## permet de tester que la reecriture des formules n'a pas fait ajouter des erreurs
+        # # ## res_ref est directement obtenu a partir du calcul formel
+        # # ## permet de tester que la reecriture des formules n'a pas fait ajouter des erreurs
         res_ref = np.zeros((2,2))
-        res_ref[0,0] =  (-s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) - s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(s1e*s1rx*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - s1e*s1ry*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*s1rx*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**s1e*DiracDelta(np.cos(b1)) - 2*s1ry*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**s1e*DiracDelta(np.sin(b1))) + (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(s1e*s1rx*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - s1e*s1ry*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*s1rx*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**s1e*DiracDelta(np.cos(b1)) - 2*s1ry*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**s1e*DiracDelta(np.sin(b1))) + (-s1rx*(2 - s1e)*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) - 2*s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)) + s1ry*(2 - s1e)*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) + 2*s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)))*(-s1rx*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1)) - s1ry*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) - s1yc + s2rx*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**s2e*np.sign(np.cos(b2)) + s2ry*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**s2e*np.sign(np.sin(b2)) + s2yc) + (s1rx*(2 - s1e)*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)) - s1ry*(2 - s1e)*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 2*s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)))*(-s1rx*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1)) - s1ry*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) - s1xc + s2rx*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**s2e*np.sign(np.cos(b2)) + s2ry*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**s2e*np.sign(np.sin(b2)) + s2xc)
-        res_ref[0,1] = (-s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) - s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(-s2e*s2rx*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.sin(b2)*np.abs(np.cos(b2))**s2e*np.sign(np.cos(b2))**2/np.abs(np.cos(b2)) + s2e*s2ry*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.cos(b2)*np.abs(np.sin(b2))**s2e*np.sign(np.sin(b2))**2/np.abs(np.sin(b2)) - 2*s2rx*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.sin(b2)*np.abs(np.cos(b2))**s2e*DiracDelta(np.cos(b2)) + 2*s2ry*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.cos(b2)*np.abs(np.sin(b2))**s2e*DiracDelta(np.sin(b2))) + (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(-s2e*s2rx*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.sin(b2)*np.abs(np.cos(b2))**s2e*np.sign(np.cos(b2))**2/np.abs(np.cos(b2)) + s2e*s2ry*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.cos(b2)*np.abs(np.sin(b2))**s2e*np.sign(np.sin(b2))**2/np.abs(np.sin(b2)) - 2*s2rx*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.sin(b2)*np.abs(np.cos(b2))**s2e*DiracDelta(np.cos(b2)) + 2*s2ry*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.cos(b2)*np.abs(np.sin(b2))**s2e*DiracDelta(np.sin(b2)))
-        res_ref[1,0] =  ((s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(2*s1rx*(2 - s1e)*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 4*s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)) - 2*s1ry*(2 - s1e)*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 4*s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)))/2 + (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(2*s1rx*(2 - s1e)*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 4*s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)) - 2*s1ry*(2 - s1e)*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 4*s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)))/2)*np.sqrt((s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))**2 + (s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))**2)/np.sqrt((s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))**2 + (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))**2) + (s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))*(s1rx*(2 - s1e)*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)) - s1ry*(2 - s1e)*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 2*s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1))) + (s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))*(s1rx*(2 - s1e)*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)) - s1ry*(2 - s1e)*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 2*s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)))
-        res_ref[1,1] = ((s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))*(2*s2rx*(2 - s2e)*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2))**2/np.abs(np.sin(b2)) + 4*s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*DiracDelta(np.sin(b2)) - 2*s2ry*(2 - s2e)*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2))**2/np.abs(np.cos(b2)) - 4*s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*DiracDelta(np.cos(b2)))/2 + (s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))*(2*s2rx*(2 - s2e)*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2))**2/np.abs(np.sin(b2)) + 4*s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*DiracDelta(np.sin(b2)) - 2*s2ry*(2 - s2e)*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2))**2/np.abs(np.cos(b2)) - 4*s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*DiracDelta(np.cos(b2)))/2)*np.sqrt((s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))**2 + (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))**2)/np.sqrt((s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))**2 + (s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2)) + s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2)))**2) + (s1rx*(-2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(s1q0**2 + s1q1**2 - s1q2**2 - s1q3**2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(s2rx*(2 - s2e)*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2))**2/np.abs(np.sin(b2)) + 2*s2rx*(-2*s2q0*s2q3 + 2*s2q1*s2q2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*DiracDelta(np.sin(b2)) - s2ry*(2 - s2e)*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2))**2/np.abs(np.cos(b2)) - 2*s2ry*(s2q0**2 + s2q1**2 - s2q2**2 - s2q3**2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*DiracDelta(np.cos(b2))) + (s1rx*(s1q0**2 - s1q1**2 + s1q2**2 - s1q3**2)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)) + s1ry*(2*s1q0*s1q3 + 2*s1q1*s1q2)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)))*(s2rx*(2 - s2e)*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*np.sign(np.sin(b2))**2/np.abs(np.sin(b2)) + 2*s2rx*(s2q0**2 - s2q1**2 + s2q2**2 - s2q3**2)*np.cos(b2)*np.abs(np.sin(b2))**(2 - s2e)*DiracDelta(np.sin(b2)) - s2ry*(2 - s2e)*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*np.sign(np.cos(b2))**2/np.abs(np.cos(b2)) - 2*s2ry*(2*s2q0*s2q3 + 2*s2q1*s2q2)*np.sin(b2)*np.abs(np.cos(b2))**(2 - s2e)*DiracDelta(np.cos(b2)))
+        res_ref[0,0] = (-M00*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) - M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))*(M10*s1e*s1rx*np.sin(b1)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) + 2*M10*s1rx*np.sin(b1)*np.abs(np.cos(b1))**s1e*DiracDelta(np.cos(b1)) - M11*s1e*s1ry*np.cos(b1)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) - 2*M11*s1ry*np.cos(b1)*np.abs(np.sin(b1))**s1e*DiracDelta(np.sin(b1))) + (M10*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))*(M00*s1e*s1rx*np.sin(b1)*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) + 2*M00*s1rx*np.sin(b1)*np.abs(np.cos(b1))**s1e*DiracDelta(np.cos(b1)) - M01*s1e*s1ry*np.cos(b1)*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) - 2*M01*s1ry*np.cos(b1)*np.abs(np.sin(b1))**s1e*DiracDelta(np.sin(b1))) + (M00*s1ry*(2 - s1e)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) + 2*M00*s1ry*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)) - M01*s1rx*(2 - s1e)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) - 2*M01*s1rx*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)))*(-M10*s1rx*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1)) - M11*s1ry*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) + N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2) - s1yc + s2yc) + (-M10*s1ry*(2 - s1e)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 2*M10*s1ry*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)) + M11*s1rx*(2 - s1e)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*M11*s1rx*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)))*(-M00*s1rx*np.abs(np.cos(b1))**s1e*np.sign(np.cos(b1)) - M01*s1ry*np.abs(np.sin(b1))**s1e*np.sign(np.sin(b1)) + N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2) - s1xc + s2xc)
+
+        res_ref[0,1] = (-N00*s2r*np.sin(b2) + N01*s2r*np.cos(b2))*(M10*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))) + (-N10*s2r*np.sin(b2) + N11*s2r*np.cos(b2))*(-M00*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) - M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))
+
+        res_ref[1,0] = ((M00*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))*(-2*M00*s1ry*(2 - s1e)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 4*M00*s1ry*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)) + 2*M01*s1rx*(2 - s1e)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 4*M01*s1rx*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)))/2 + (M10*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))*(-2*M10*s1ry*(2 - s1e)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 4*M10*s1ry*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)) + 2*M11*s1rx*(2 - s1e)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 4*M11*s1rx*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)))/2)*np.sqrt((N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2))**2 + (N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2))**2)/np.sqrt((M00*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))**2 + (M10*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))**2) + (N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2))*(-M00*s1ry*(2 - s1e)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 2*M00*s1ry*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)) + M01*s1rx*(2 - s1e)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*M01*s1rx*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1))) + (N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2))*(-M10*s1ry*(2 - s1e)*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1))**2/np.abs(np.cos(b1)) - 2*M10*s1ry*np.sin(b1)*np.abs(np.cos(b1))**(2 - s1e)*DiracDelta(np.cos(b1)) + M11*s1rx*(2 - s1e)*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))**2/np.abs(np.sin(b1)) + 2*M11*s1rx*np.cos(b1)*np.abs(np.sin(b1))**(2 - s1e)*DiracDelta(np.sin(b1)))
+
+        res_ref[1,1] = ((-2*N00*s2r*np.sin(b2) + 2*N01*s2r*np.cos(b2))*(N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2))/2 + (-2*N10*s2r*np.sin(b2) + 2*N11*s2r*np.cos(b2))*(N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2))/2)*np.sqrt((M00*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))**2 + (M10*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))**2)/np.sqrt((N00*s2r*np.cos(b2) + N01*s2r*np.sin(b2))**2 + (N10*s2r*np.cos(b2) + N11*s2r*np.sin(b2))**2) + (-N00*s2r*np.sin(b2) + N01*s2r*np.cos(b2))*(M00*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M01*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1))) + (-N10*s2r*np.sin(b2) + N11*s2r*np.cos(b2))*(M10*s1ry*np.abs(np.cos(b1))**(2 - s1e)*np.sign(np.cos(b1)) + M11*s1rx*np.abs(np.sin(b1))**(2 - s1e)*np.sign(np.sin(b1)))
+
         print("grad F : res = ",res," res_ref = ",res_ref," ecart = ",np.linalg.norm(res-res_ref))
+
         return res
 
     def linesearch(f,x,d,s1,s2):
@@ -462,7 +475,8 @@ if __name__ == '__main__':
     thetagrid = np.linspace(0,180,N)
     R = 10
     s1 = SuperEllipsoid2D(1,-2, 1,1, e=0.5, theta=80)
-    #s1.calcul_formel()
+    s1.calcul_formel()
+    # sys.exit()
 
     # p = pv.Plotter(window_size=[2400,1350],off_screen=True)
     p = pv.Plotter(window_size=[2400,1350])
@@ -494,7 +508,7 @@ if __name__ == '__main__':
         xc = 2 + R*np.cos(2*np.pi*t)
         yc = 4 + R*np.sin(2*np.pi*t)
         theta = thetagrid[it]
-        s2 = SuperEllipsoid2D(xc,yc, 2,3, e=1, theta=theta)
+        s2 = SuperEllipsoid2D(xc,yc, 2,2, e=1, theta=theta) ### DOIT ETRE UNE SPHERE rx=ry=r et e=1
 
         ## Determination de la donne initiale de la methode de Newton
         # 1/ on calcule les positions des 4 "extremites" des deux superellipsoid2D,
@@ -600,7 +614,7 @@ if __name__ == '__main__':
         else:
             p.render()
             # p.show(auto_close=False, cpos="xy",screenshot='image_'+str(it)+'.png')
-            time.sleep(0.5)
+            time.sleep(0.01)
 
 
     # """
