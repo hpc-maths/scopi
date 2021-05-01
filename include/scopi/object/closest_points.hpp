@@ -7,21 +7,26 @@
 #include "superellipsoid.hpp"
 #include "globule.hpp"
 #include "plan.hpp"
+#include "neighbor.hpp"
 
 namespace scopi
 {
     // SPHERE - SPHERE
     template<std::size_t dim>
-    auto closest_points(const sphere<dim, false>& s1, const sphere<dim, false>& s2)
+    auto closest_points(const sphere<dim, false>& si, const sphere<dim, false>& sj)
     {
         std::cout << "closest_points : SPHERE - SPHERE" << std::endl;
         xt::xtensor_fixed<double, xt::xshape<2, dim>> pts;
-        auto s1_pos = xt::view(s1.pos(), 0);
-        auto s2_pos = xt::view(s2.pos(), 0);
-        auto s1_to_s2 = s2_pos - s1_pos;
-        xt::view(pts, 0) = s1_pos + s1.radius()*s1_to_s2;
-        xt::view(pts, 1) = s2_pos - s2.radius()*s1_to_s2;
-        return pts;
+        auto si_pos = xt::view(si.pos(), 0);
+        auto sj_pos = xt::view(sj.pos(), 0);
+        auto si_to_sj = (sj_pos - si_pos)/xt::linalg::norm(sj_pos - si_pos);
+
+        neighbor<dim> neigh;
+        neigh.pi = si_pos + si.radius()*si_to_sj;
+        neigh.pj = sj_pos - sj.radius()*si_to_sj;
+        neigh.nj = (neigh.pj - sj_pos)/xt::linalg::norm(neigh.pj - sj_pos);
+        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+        return neigh;
     }
 
     // SUPERELLIPSOID - SUPERELLIPSOID
@@ -969,24 +974,36 @@ namespace scopi
     template<std::size_t dim>
     auto closest_points(const plan<dim, false>, const plan<dim, false>)
     {
+<<<<<<< HEAD
+        return neighbor<dim>();
+=======
         std::cout << "closest_points : PLAN - PLAN" << std::endl;
         return xt::xtensor_fixed<double, xt::xshape<2, dim>>();
+>>>>>>> 4781eeb05cb6337f96579a5fb47c402037e2d876
     }
 
     // GLOBULE - GLOBULE
     template<std::size_t dim>
     auto closest_points(const globule<dim, false>, const globule<dim, false>)
     {
+<<<<<<< HEAD
+        return neighbor<dim>();
+=======
         std::cout << "closest_points : GLOBULE - GLOBULE" << std::endl;
         return xt::xtensor_fixed<double, xt::xshape<2, dim>>();
+>>>>>>> 4781eeb05cb6337f96579a5fb47c402037e2d876
     }
 
     // SPHERE - GLOBULE
     template<std::size_t dim>
     auto closest_points(const sphere<dim, false>, const globule<dim, false>)
     {
+<<<<<<< HEAD
+        return neighbor<dim>();
+=======
         std::cout << "closest_points : SPHERE - GLOBULE" << std::endl;
         return xt::xtensor_fixed<double, xt::xshape<2, dim>>();
+>>>>>>> 4781eeb05cb6337f96579a5fb47c402037e2d876
     }
 
     // SPHERE - PLAN
@@ -1004,9 +1021,12 @@ namespace scopi
         auto plan_to_sphere = xt::eval(xt::linalg::dot(s_pos - p_pos, normal));
         auto sign = xt::sign(plan_to_sphere);
 
-        xt::view(pts, 0) = s_pos - sign*s.radius()*normal;
-        xt::view(pts, 1) = s_pos - plan_to_sphere*normal;
-        return pts;
+        neighbor<dim> neigh;
+        neigh.pi = s_pos - sign*s.radius()*normal;
+        neigh.pj = s_pos - plan_to_sphere*normal;
+        neigh.nj = sign*normal;
+        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+        return neigh;
     }
 
     // SPHERE - SUPERELLIPSOID
@@ -1037,7 +1057,11 @@ namespace scopi
     template<std::size_t dim>
     auto closest_points(const globule<dim, false>, const plan<dim, false>)
     {
+<<<<<<< HEAD
+        return neighbor<dim>();
+=======
         std::cout << "closest_points : GLOBULE - PLAN" << std::endl;
         return xt::xtensor_fixed<double, xt::xshape<2, dim>>();
+>>>>>>> 4781eeb05cb6337f96579a5fb47c402037e2d876
     }
 }

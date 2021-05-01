@@ -6,6 +6,7 @@
 
 #include "object/distance.hpp"
 #include "object/closest_points.hpp"
+#include "object/neighbor.hpp"
 
 namespace scopi
 {
@@ -71,7 +72,7 @@ namespace scopi
     template <std::size_t dim>
     struct closest_points_functor
     {
-        using return_type = xt::xtensor_fixed<double, xt::xshape<2, dim>>;
+        using return_type = neighbor<dim>;
 
         template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2) const
@@ -81,7 +82,7 @@ namespace scopi
 
         return_type on_error(const object<dim, false>&, const object<dim, false>&) const
         {
-            return 0;
+            return {};
         }
     };
 
