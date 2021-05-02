@@ -10,8 +10,22 @@ target_link_libraries(test_container scopi_cpp)
 add_executable(test_dispatch test_dispatch.cpp)
 target_link_libraries(test_dispatch scopi_cpp)
 
+
 add_executable(test_distance test_distance.cpp)
 target_link_libraries(test_distance scopi_cpp)
+add_custom_command(TARGET test_distance
+ POST_BUILD COMMAND
+ ${CMAKE_INSTALL_NAME_TOOL} -change
+ `otool -L test_distance | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+ ${MOSEK_LIBRARIES} test_distance
+)
+
 
 add_executable(test_distance_3d test_distance_3d.cpp)
 target_link_libraries(test_distance_3d scopi_cpp)
+add_custom_command(TARGET test_distance_3d
+ POST_BUILD COMMAND
+ ${CMAKE_INSTALL_NAME_TOOL} -change
+ `otool -L test_distance_3d | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+ ${MOSEK_LIBRARIES} test_distance_3d
+)
