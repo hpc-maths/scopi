@@ -28,6 +28,10 @@ namespace scopi
         virtual void print() const override;
         virtual std::size_t hash() const override;
         auto rotation() const;
+        auto point(const double b) const; // dim = 2
+        auto point(const double a, const double b) const; // dim = 3
+        auto normal(const double b) const; // dim = 2
+        auto normal(const double a, const double b) const; // dim = 3
 
     private:
 
@@ -93,4 +97,48 @@ namespace scopi
     {
         return rotation_matrix<dim>(this->q());
     }
+
+    template<std::size_t dim, bool owner>
+    auto sphere<dim, owner>::point(const double b) const
+    {
+        xt::xtensor_fixed<double, xt::xshape<dim>> pt;
+        pt(0) = m_radius * std::cos(b);
+        pt(1) = m_radius * std::sin(b);
+        return xt::flatten(xt::eval(xt::linalg::dot(rotation_matrix<dim>(this->q()),pt) + this->pos()));
+    }
+
+    template<std::size_t dim, bool owner>
+    auto sphere<dim, owner>::point(const double a, const double b) const
+    {
+        xt::xtensor_fixed<double, xt::xshape<dim>> pt;
+        pt(0) = m_radius * std::cos(a) * std::cos(b);
+        pt(1) = m_radius * std::cos(a) * std::sin(b);
+        pt(2) = m_radius * std::sin(a);
+        return xt::flatten(xt::eval(xt::linalg::dot(rotation_matrix<dim>(this->q()),pt) + this->pos()));
+    }
+
+    template<std::size_t dim, bool owner>
+    auto sphere<dim, owner>::normal(const double b) const
+    {
+        xt::xtensor_fixed<double, xt::xshape<dim>> n;
+        n(0) = m_radius * std::cos(b);
+        n(1) = m_radius * std::sin(b);
+        n = xt::flatten(xt::linalg::dot(rotation_matrix<dim>(this->q()),n));
+        n /= xt::linalg::norm(n, 2);
+        return n;
+    }
+
+    template<std::size_t dim, bool owner>
+    auto sphere<dim, owner>::normal(const double a, const double b) const
+    {
+        xt::xtensor_fixed<double, xt::xshape<dim>> n;
+        n(0) =  std::cos(a) * std::cos(b);
+        n(1) =  std::cos(a) * std::sin(b);
+        n(2) =  std::sin(a);
+        n = xt::flatten(xt::linalg::dot(rotation_matrix<dim>(this->q()),n));
+        n /= xt::linalg::norm(n, 2);
+        return n;
+    }
+
+
 }

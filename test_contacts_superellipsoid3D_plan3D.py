@@ -16,7 +16,7 @@ class Plan3D:
         self.xc = x
         self.yc = y
         self.zc = z
-        # normal definissant le plan : n = (0,0,1)
+        # normal definissant le plan : n = (1,0,0)
         # quaternion
         norm_w = np.linalg.norm(w)
         w = w/norm_w
