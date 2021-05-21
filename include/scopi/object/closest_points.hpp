@@ -15,7 +15,7 @@ namespace scopi
     template<std::size_t dim>
     auto closest_points(const sphere<dim, false>& si, const sphere<dim, false>& sj)
     {
-        std::cout << "closest_points : SPHERE - SPHERE" << std::endl;
+        // std::cout << "closest_points : SPHERE - SPHERE" << std::endl;
         auto si_pos = xt::view(si.pos(), 0);
         auto sj_pos = xt::view(sj.pos(), 0);
         auto si_to_sj = (sj_pos - si_pos)/xt::linalg::norm(sj_pos - si_pos);
@@ -23,8 +23,8 @@ namespace scopi
         neighbor<dim> neigh;
         neigh.pi = si_pos + si.radius()*si_to_sj;
         neigh.pj = sj_pos - sj.radius()*si_to_sj;
-        neigh.nj = (neigh.pj - sj_pos)/xt::linalg::norm(neigh.pj - sj_pos);
-        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+        neigh.nij = (neigh.pj - sj_pos)/xt::linalg::norm(neigh.pj - sj_pos);
+        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
 
@@ -181,8 +181,8 @@ namespace scopi
         auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
         neigh.pi = s1.point(u(0));
         neigh.pj = s2.point(u(1));
-        neigh.nj = s2.normal(u(1));
-        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+        neigh.nij = s2.normal(u(1));
+        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
 
@@ -514,9 +514,9 @@ namespace scopi
         auto binit = xt::linspace<double>(-pi, pi, num);
         xt::xtensor_fixed<double, xt::xshape<num,num>> dinit;
         for (std::size_t i = 0; i < binit.size(); i++) {
-            for (std::size_t j = 0; j < binit.size(); j++) {
-                dinit(i,j) = xt::linalg::norm(s1.point(ainit(i),binit(i))-s2.point(ainit(j),binit(j)),2);
-            }
+          for (std::size_t j = 0; j < binit.size(); j++) {
+            dinit(i,j) = xt::linalg::norm(s1.point(ainit(i),binit(i))-s2.point(ainit(j),binit(j)),2);
+          }
         }
         // std::cout << "initialization : b = " << binit << " distances = " << dinit << std::endl;
         auto dmin = xt::amin(dinit);
@@ -530,8 +530,8 @@ namespace scopi
         auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
         neigh.pi = s1.point(u(0),u(1));
         neigh.pj = s2.point(u(2),u(3));
-        neigh.nj = s2.normal(u(2),u(3));
-        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+        neigh.nij = s2.normal(u(2),u(3));
+        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
 
@@ -563,7 +563,7 @@ namespace scopi
     template<std::size_t dim>
     auto closest_points(const sphere<dim, false>& s, const plan<dim, false>& p)
     {
-        std::cout << "closest_points : SPHERE - PLAN" << std::endl;
+        // std::cout << "closest_points : SPHERE - PLAN" << std::endl;
         auto s_pos = s.pos(0);
         auto p_pos = p.pos(0);
 
@@ -576,8 +576,8 @@ namespace scopi
         neighbor<dim> neigh;
         neigh.pi = s_pos - sign*s.radius()*normal;
         neigh.pj = s_pos - plan_to_sphere*normal;
-        neigh.nj = sign*normal;
-        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+        neigh.nij = sign*normal;
+        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
 
@@ -901,8 +901,8 @@ namespace scopi
         auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
         neigh.pi = s1.point(u(0),u(1));
         neigh.pj = s2.point(u(2),u(3));
-        neigh.nj = s2.normal(u(2),u(3));
-        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+        neigh.nij = s2.normal(u(2),u(3));
+        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
 
@@ -1037,8 +1037,8 @@ namespace scopi
       auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
       neigh.pi = s1.point(u(0));
       neigh.pj = s2.point(u(1));
-      neigh.nj = s2.normal(u(1));
-      neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+      neigh.nij = s2.normal(u(1));
+      neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
       return neigh;
     }
 
@@ -1314,8 +1314,8 @@ namespace scopi
       auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
       neigh.pi = s1.point(u(0),u(1));
       neigh.pj = p2.point(u(2),u(3));
-      neigh.nj = p2.normal();
-      neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+      neigh.nij = p2.normal();
+      neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
       return neigh;
     }
 
@@ -1458,8 +1458,8 @@ namespace scopi
       auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
       neigh.pi = s1.point(u(0));
       neigh.pj = d2.point(u(1));
-      neigh.nj = d2.normal();
-      neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nj)[0];
+      neigh.nij = d2.normal();
+      neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
       return neigh;
     }
 
