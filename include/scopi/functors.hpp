@@ -6,6 +6,7 @@
 
 #include "object/distance.hpp"
 #include "object/closest_points.hpp"
+#include "object/write_objects.hpp"
 #include "object/neighbor.hpp"
 
 namespace scopi
@@ -97,5 +98,34 @@ namespace scopi
                     const plan<dim, false>>,
         typename closest_points_functor<dim>::return_type,
         symmetric_dispatch
+    >;
+
+    template <std::size_t dim>
+    struct write_objects_functor
+    {
+        using return_type = std::string;
+
+        template <class T1>
+        return_type run(const T1& obj1) const
+        {
+            return write_objects(obj1);
+        }
+
+        return_type on_error(const object<dim, false>&) const
+        {
+            return {};
+        }
+    };
+
+    template <std::size_t dim>
+    using write_objects_dispatcher = unit_static_dispatcher
+    <
+        write_objects_functor<dim>,
+        const object<dim, false>,
+        mpl::vector<const sphere<dim, false>,
+                    const superellipsoid<dim, false>,
+                    const globule<dim, false>,
+                    const plan<dim, false>>,
+        typename write_objects_functor<dim>::return_type
     >;
 }

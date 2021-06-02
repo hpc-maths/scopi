@@ -12,7 +12,7 @@ target_link_libraries(test_dispatch scopi_cpp)
 
 
 add_executable(test_distance test_distance.cpp)
-target_link_libraries(test_distance scopi_cpp)
+target_link_libraries(test_distance scopi_cpp )
 if (APPLE)
   add_custom_command(TARGET test_distance
   POST_BUILD COMMAND

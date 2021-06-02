@@ -58,6 +58,24 @@ find_package(MOSEK REQUIRED)
 set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
 
 
+############ PYTHON MODULES #################
+find_package (Python3 COMPONENTS Interpreter Development NumPy)
+# message(STATUS "PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
+# message(STATUS "PYTHON_LIBRARY=${PYTHON_LIBRARY}")
+# message(STATUS "Python3_EXECUTABLE=${Python3_EXECUTABLE}")
+# message(STATUS "Python3_INCLUDE_DIR=${Python3_INCLUDE_DIR}")
+# message(STATUS "Python3_LIBRARY_RELEASE=${Python3_LIBRARY_RELEASE}")
+# message(STATUS "Python3_INCLUDE_DIR=${Python3_INCLUDE_DIR}")
+# message(STATUS "Python3_NumPy_INCLUDE_DIR=${Python3_NumPy_INCLUDE_DIR}")
+message(STATUS "==> Python3_INCLUDE_DIRS=${Python3_INCLUDE_DIRS}")
+message(STATUS "==> Python3_NumPy_INCLUDE_DIRS=${Python3_NumPy_INCLUDE_DIRS}")
+find_package(pybind11 REQUIRED)
+set(PYBIND11_INCLUDE_DIR ${pybind11_INCLUDE_DIRS})
+# message(STATUS "PYBIND11_MODULE=${PYBIND11_MODULE}")
+# message(STATUS "PYBIND11_INCLUDE_DIR=${PYBIND11_INCLUDE_DIR}")
+# #message(STATUS "pybind11 module=${pybind11::module}")
+
+
 message(STATUS "PROJECT_NAME:    " ${PROJECT_NAME})
 message(STATUS "CMAKE_INSTALL_NAME_TOOL:    " ${CMAKE_INSTALL_NAME_TOOL})
 
@@ -80,12 +98,13 @@ find_package(MKL)
 add_library(scopi_cpp INTERFACE)
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
                                                $<BUILD_INTERFACE:${MOSEK_INCLUDE_DIR}>
-                                               $<INSTALL_INTERFACE:include>)
+                                               $<INSTALL_INTERFACE:include>
+                                               ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS} )
 
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
+target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY} pybind11::embed )
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 

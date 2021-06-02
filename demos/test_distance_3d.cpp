@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xio.hpp>
 
@@ -66,4 +68,22 @@ int main()
         }
     }
     // std::cout << "particles.pos() = \n" << particles.pos() << "\n\n";
+
+
+    std::fstream my_file;
+    my_file.open("scopi_objects.json", std::ios::out);
+    my_file << "{ \"objects\": [ ";
+    for(std::size_t i = 0; i < particles.size(); ++i)
+    {
+        auto content = scopi::write_objects_dispatcher<dim>::dispatch(*particles[i]);
+        std::cout << content << std::endl;
+        my_file << "{" << content ;
+        if (i == particles.size()-1) {
+          my_file << "} ] }" << std::endl;
+        }
+        else {
+          my_file << "}," << std::endl;
+        }
+    }
+    my_file.close();
 }

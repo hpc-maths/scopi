@@ -1,4 +1,7 @@
 #include <iostream>
+#include <fstream>
+#include <typeinfo>
+
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xio.hpp>
 
@@ -11,8 +14,11 @@
 #include <scopi/functors.hpp>
 #include <scopi/types.hpp>
 
-#include <iostream>
 #include "fusion.h"
+
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <pybind11/embed.h>
 
 using namespace mosek::fusion;
 using namespace monty;
@@ -162,5 +168,87 @@ int main()
     // std::cout << "y1,y2,y3 = " << ylvl << std::endl;
     // std::cout << "qc1 levels = " << qc1lvl << std::endl;
     // std::cout << "qc1 dual conic var levels = " << qc1dl << std::endl;
+
+
+    pybind11::scoped_interpreter guard{};
+    pybind11::gil_scoped_acquire acquire;
+    pybind11::dict scope;
+    xt::xarray<double> arr1
+      {{1.0, 2.0, 3.0},
+       {2.0, 5.0, 7.0},
+       {2.0, 5.0, 7.0}};
+    pybind11::array_t<double> xn(arr1.size(), arr1.data());
+    scope["x"] = xn;
+    std::cout << "particles.size() = "<< particles.size() << std::endl;
+    std::cout << "particles.pos().shape() = "<< xt::adapt(particles.pos().shape()) << std::endl;
+    std::cout << "particles.pos() = "<< particles.pos() << std::endl;
+    auto pp = xt::zeros<double>({particles.size(), dim});
+    for(std::size_t ip = 0; ip < particles.size() - 1; ++ip){
+      std::cout << "ip = "<< ip << " particles[ip]->pos() = "<< particles[ip]->pos() << std::endl;
+      std::cout << "ip = "<< ip << " particles[ip]->q() = "<< particles[ip]->q() << std::endl;
+      // if (scopi::sphere<dim,false> * d = dynamic_cast< scopi::sphere<dim,false> * >(particles[ip]))
+      // {
+      //   std::cout << "sucess" << std::endl;
+      // }
+      // else{
+      //   std::cout << "fail" << std::endl;
+      // }
+    }
+
+    // auto pos = particles.pos();
+    // auto pos3 = pos.reshape({-1, 1}); // xt::flatten(pos);
+    // auto arr2 = xt::flatten(arr1);
+    // std::cout << "pos.shape() = "<< xt::adapt(pos.shape()) << std::endl;
+    // std::cout << "pos3.shape() = "<< xt::adapt(pos3.shape()) << std::endl;
+    // std::cout << "arr1.shape() = "<< xt::adapt(arr1.shape()) << std::endl;
+    // std::cout << "arr2.shape() = "<< xt::adapt(arr2.shape()) << std::endl;
+    // std::cout << "pos = "<< pos3 << std::endl;
+    // std::cout << typeid(pos).name() << std::endl;
+    // std::cout << pos.size() << std::endl;
+    // std::cout << pos.data()  << std::endl;
+    // // pybind11::array_t<double> pp(pos.size(), pos.data());
+
+
+    pybind11::exec(R"(
+
+      import numpy as np
+      import pyvista as pv
+
+      print("pyvista version : ",pv.__version__)
+      print("x = ",_scope_)
+      x = _scope_["x"]
+      print("x = ",x)
+      print("x.shape = ",x.shape)
+      ## rx ry rz n e
+      param_superellipsoids = np.array([[0.25, 0.25, 0.25, 1,   1],
+                                        [1,    0.25, 0.25, 1,   1],
+                                        [0.25, 1,    0.25, 1,   1],
+                                        [0.25, 0.25, 1,    1,   1],
+                                        [0.25, 0.5,  0.75, 0.9, 0.8]])
+
+      #geoms = [pv.ParametricSuperEllipsoid(xradius=rx, yradius=ry, zradius=rz, n1=n1, n2=n2) for rx, ry, rz, n1, n2 in param_superellipsoids]
+
+
+
+    )",
+    pybind11::globals(),
+    pybind11::dict(pybind11::arg("_scope_") = scope));
+
+    std::fstream my_file;
+    my_file.open("scopi_objects.json", std::ios::out);
+    my_file << "{ \"objects\": [ ";
+    for(std::size_t i = 0; i < particles.size(); ++i)
+    {
+        auto content = scopi::write_objects_dispatcher<dim>::dispatch(*particles[i]);
+        std::cout << content << std::endl;
+        my_file << "{" << content ;
+        if (i == particles.size()-1) {
+          my_file << "} ] }" << std::endl;
+        }
+        else {
+          my_file << "}," << std::endl;
+        }
+    }
+    my_file.close();
 
 }
