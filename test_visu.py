@@ -2,6 +2,122 @@ import pyvista as pv
 from pyvista import examples
 import numpy as np
 import json
+import glob
+import sys
+import time
+
+prefix = "./build/results/"
+
+files = np.sort(glob.glob(prefix+"/*.json"))
+print(files)
+
+plotter = pv.Plotter()
+
+actors = []
+
+it = 0
+for file in files:
+
+    plotter.clear()
+
+    with open(file) as json_file:
+        print("read json file :",file)
+        data = json.load(json_file)
+
+    objects = data["objects"]
+    contacts = data["contacts"]
+
+    positions = []
+    geometries = []
+
+
+    for obj in objects:
+
+        positions.append(obj["position"])
+        v = np.zeros( (len(obj["position"]),) )
+        v[0] = 1
+        orientation = np.array(obj["rotation"]).reshape((len(obj["position"]),len(obj["position"])))@v
+        if (obj["type"] == "sphere"):
+            if (len(obj["position"])==2):  # 2D
+                geom = pv.ParametricSuperEllipsoid(
+                    xradius=obj["radius"],
+                    yradius=obj["radius"],
+                    zradius=0,
+                    n1=1,
+                    n2=1,
+                    center=(obj["position"][0],obj["position"][1],0),
+                    direction=(orientation[0],orientation[1],0)
+                )
+                # geom = pv.Sphere(
+                #     radius=obj["radius"],
+                #     center=(obj["position"][0],obj["position"][1],0),
+                #     direction=(orientation[0],orientation[1],0)
+                #     )
+
+            else: # 3D
+                geom = pv.Sphere(
+                    radius=obj["radius"],
+                    center=(obj["position"][0],obj["position"][1],obj["position"][2]),
+                    direction=(orientation[0],orientation[1],orientation[2])
+                    )
+        elif (obj["type"] == "superellipsoid"):
+            if (len(obj["position"])==2):  # 2D
+                geom = pv.ParametricSuperEllipsoid(
+                    xradius=obj["radius"][0],
+                    yradius=obj["radius"][1],
+                    zradius=0,
+                    n1=1,
+                    n2=obj["squareness"][0],
+                    center=(obj["position"][0],obj["position"][1],0),
+                    direction=(orientation[0],orientation[1],0)
+                    )
+            else: # 3D
+                geom = pv.ParametricSuperEllipsoid(
+                    xradius=obj["radius"][0],
+                    yradius=obj["radius"][1],
+                    zradius=obj["radius"][2],
+                    n1=obj["squareness"][0],
+                    n2=obj["squareness"][1],
+                    center=(obj["position"][0],obj["position"][1],obj["position"][2]),
+                    direction=(orientation[0],orientation[1],orientation[2])
+                    )
+        geometries.append(geom)
+        plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False)
+
+    print("positions = ",positions)
+    print("geometries = ",geometries)
+
+    for contact in contacts:
+        contact["pi"].append(0)
+        contact["pj"].append(0)
+        contact["nij"].append(0)
+        pvpti = pv.PolyData(np.array([contact["pi"]]))
+        pvptj = pv.PolyData(np.array([contact["pj"]]))
+        pvpti["normal"] = -np.asarray([contact["nij"]])
+        pvptj["normal"] = np.array([contact["nij"]])
+        plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name="ni")
+        plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="blue",name="nj")
+
+        plotter.camera_position = 'xy'
+        plotter.camera.SetParallelProjection(True)
+
+        if (it == 0):
+            plotter.show_grid()
+            plotter.show_bounds()
+            # plotter.show(auto_close=False, cpos="xy")
+            plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
+        else:
+            plotter.render()
+            # plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
+            time.sleep(0.001)
+
+        it+=1
+
+sys.exit()
+
+
+
+
 
 with open('build/scopi_objects_0599.json') as json_file:
     data = json.load(json_file)
