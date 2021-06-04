@@ -20,7 +20,8 @@ int main()
 {
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
-    double dt = .01;
+    double dt = .005;
+    std::size_t total_ite = 600;
     scopi::scopi_container<dim> particles;
 
     // by default the angle of the objects is 0
@@ -50,7 +51,7 @@ int main()
     theta(0) = PI/4;
     theta(1) = -PI/4;
 
-    for (std::size_t nite=0; nite<300; ++nite)
+    for (std::size_t nite=0; nite<total_ite; ++nite)
     {
         std::cout << "Time iteration -> " << nite << std::endl;
         std::vector<scopi::neighbor<dim>> contacts;
@@ -175,7 +176,7 @@ int main()
 
         nl::json json_output;
 
-        os << "scopi_objects_" << nite << ".json";
+        os << "Results/scopi_objects_" << std::setw(4) << std::setfill('0') << nite << ".json";
         std::ofstream file(os.str());
 
         json_output["objects"] = {};

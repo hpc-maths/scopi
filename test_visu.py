@@ -3,7 +3,7 @@ from pyvista import examples
 import numpy as np
 import json
 
-with open('build/scopi_objects_299.json') as json_file:
+with open('build/scopi_objects_0599.json') as json_file:
     data = json.load(json_file)
 
 objects = data["objects"]
