@@ -92,6 +92,7 @@ namespace scopi
         object["position"] = p.pos();
         object["normal"] = p.normal();
         object["rotation"] = xt::flatten(p.rotation());
+        object["quaternion"] = p.q();
 
         return object;
 
