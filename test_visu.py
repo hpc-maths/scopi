@@ -3,7 +3,7 @@ from pyvista import examples
 import numpy as np
 import json
 
-with open('build/scopi_objects_1.json') as json_file:
+with open('build/scopi_objects_299.json') as json_file:
     data = json.load(json_file)
 
 objects = data["objects"]
@@ -74,9 +74,12 @@ for contact in contacts:
     contact["pi"].append(0)
     contact["pj"].append(0)
     contact["nij"].append(0)
-    pvpt = pv.PolyData(np.array([contact["pi"],contact["pj"]]))
-    pvpt["normal"] = np.array([-np.asarray(contact["nij"]), contact["nij"]])
-    plotter.add_mesh(pvpt.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name="n")
+    pvpti = pv.PolyData(np.array([contact["pi"]]))
+    pvptj = pv.PolyData(np.array([contact["pj"]]))
+    pvpti["normal"] = -np.asarray([contact["nij"]])
+    pvptj["normal"] = np.array([contact["nij"]])
+    plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name="ni")
+    plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="blue",name="nj")
 
 plotter.camera_position = 'xy'
 plotter.camera.SetParallelProjection(True)
