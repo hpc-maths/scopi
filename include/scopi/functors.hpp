@@ -9,6 +9,9 @@
 #include "object/write_objects.hpp"
 #include "object/neighbor.hpp"
 
+#include "nlohmann/json.hpp"
+
+namespace nl = nlohmann;
 namespace scopi
 {
     struct print_functor
@@ -103,7 +106,7 @@ namespace scopi
     template <std::size_t dim>
     struct write_objects_functor
     {
-        using return_type = std::string;
+        using return_type = nl::json;
 
         template <class T1>
         return_type run(const T1& obj1) const
@@ -113,7 +116,7 @@ namespace scopi
 
         return_type on_error(const object<dim, false>&) const
         {
-            return {};
+            return nl::json::object();
         }
     };
 

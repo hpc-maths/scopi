@@ -1,4 +1,7 @@
 #include <iostream>
+#include <fstream>
+#include <strstream>
+
 #include <xtensor/xmath.hpp>
 #include <scopi/object/plan.hpp>
 #include <scopi/object/neighbor.hpp>
@@ -7,9 +10,11 @@
 #include <scopi/types.hpp>
 #include <scopi/container.hpp>
 #include <fusion.h>
+#include "nlohmann/json.hpp"
 
 using namespace mosek::fusion;
 using namespace monty;
+namespace nl = nlohmann;
 
 int main()
 {
@@ -45,7 +50,7 @@ int main()
     theta(0) = PI/4;
     theta(1) = -PI/4;
 
-    for (std::size_t nite=0; nite<1000; ++nite)
+    for (std::size_t nite=0; nite<300; ++nite)
     {
         std::cout << "Time iteration -> " << nite << std::endl;
         std::vector<scopi::neighbor<dim>> contacts;
@@ -164,6 +169,39 @@ int main()
         std::cout << "pos = " << particles.pos() << std::endl << std::endl;
         std::cout << "w = " << wlvl << std::endl;
         std::cout << "theta = " << theta << std::endl << std::endl;
+
+        std::fstream my_file;
+        std::ostrstream os;
+
+        nl::json json_output;
+
+        os << "scopi_objects_" << nite << ".json";
+        std::ofstream file(os.str());
+
+        json_output["objects"] = {};
+
+        for(std::size_t i = 0; i < particles.size(); ++i)
+        {
+            json_output["objects"].push_back(scopi::write_objects_dispatcher<dim>::dispatch(*particles[i]));
+        }
+
+        json_output["contacts"] = {};
+
+        for(std::size_t i=0; i<contacts.size(); ++i)
+        {
+            nl::json contact;
+
+            contact["pi"] = contacts[i].pi;
+            contact["pj"] = contacts[i].pj;
+            contact["nij"] = contacts[i].nij;
+
+            json_output["contacts"].push_back(contact);
+
+        }
+
+
+        file << json_output;
+        // my_file.close();
     }
     // for(auto &c: contacts)
     // {

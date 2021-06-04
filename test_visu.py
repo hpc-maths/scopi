@@ -3,10 +3,11 @@ from pyvista import examples
 import numpy as np
 import json
 
-with open('build/scopi_objects.json') as json_file:
+with open('build/scopi_objects_1.json') as json_file:
     data = json.load(json_file)
 
 objects = data["objects"]
+contacts = data["contacts"]
 
 plotter = pv.Plotter()
 
@@ -68,6 +69,14 @@ for obj in objects:
 
 print("positions = ",positions)
 print("geometries = ",geometries)
+
+for contact in contacts:
+    contact["pi"].append(0)
+    contact["pj"].append(0)
+    contact["nij"].append(0)
+    pvpt = pv.PolyData(np.array([contact["pi"],contact["pj"]]))
+    pvpt["normal"] = np.array([-np.asarray(contact["nij"]), contact["nij"]])
+    plotter.add_mesh(pvpt.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name="n")
 
 plotter.camera_position = 'xy'
 plotter.camera.SetParallelProjection(True)
@@ -167,7 +176,7 @@ plotter.show()
 #
 # # rng_int = rng.integers(0, N, size=x.size)
 # rng_int = np.array([4, 1, 2, 0, 4, 0, 1, 4, 3, 1, 1, 3, 3, 4, 3, 4, 4, 3, 3, 2, 2, 1, 1, 1, 2, 0, 3])
-#
+j#
 #
 # # get dataset for the glyphs: supertoroids in xy plane
 # # use N random kinds of toroids over a mesh with 27 points
