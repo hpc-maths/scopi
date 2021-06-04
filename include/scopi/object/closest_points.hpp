@@ -163,8 +163,10 @@ namespace scopi
         };
         // std::cout << "newton_F = " << newton_F(u0,args) << "\n" << std::endl;
         // std::cout << "newton_GradF = " << newton_GradF(u0,args) << "\n" << std::endl;
-        xt::xtensor_fixed<double, xt::xshape<4>> binit = { -pi, -pi/2, 0.001, pi/2 };
-        xt::xtensor_fixed<double, xt::xshape<4,4>> dinit;
+        constexpr int num = 20;
+        auto binit = xt::linspace<double>(-pi, pi, num);
+        // xt::xtensor_fixed<double, xt::xshape<4>> binit = { -pi, -pi/2, 0.001, pi/2 };
+        xt::xtensor_fixed<double, xt::xshape<num,num>> dinit;
         for (std::size_t i = 0; i < binit.size(); i++) {
             for (std::size_t j = 0; j < binit.size(); j++) {
                 dinit(i,j) = xt::linalg::norm(s1.point(binit(i))-s2.point(binit(j)),2);
