@@ -25,6 +25,7 @@ namespace scopi
         using default_container_type = type::position<dim>;
         using position_type = default_container_type;
         using velocity_type = default_container_type;
+        using rotation_type = double; // Fix std::array<double, 3> in 3d
         using force_type = default_container_type;
         using quaternion_type = type::quaternion;
 
@@ -33,6 +34,8 @@ namespace scopi
         void push_back(const object<dim>& s,
                        const velocity_type& v,
                        const velocity_type& dv,
+                       const rotation_type& omega,
+                       const rotation_type& domega,
                        const force_type& f);
 
         void reserve(std::size_t size);
@@ -49,6 +52,12 @@ namespace scopi
         const auto v() const;
         auto v();
 
+        const auto omega() const;
+        auto omega();
+
+        const auto desired_omega() const;
+        auto desired_omega();
+
         const auto vd() const;
         auto vd();
 
@@ -62,6 +71,8 @@ namespace scopi
         std::vector<force_type> m_forces;  // f()
         std::vector<velocity_type> m_velocities;  // v()
         std::vector<velocity_type> m_desired_velocities;  // vd()
+        std::vector<rotation_type> m_omega;  // omega()
+        std::vector<rotation_type> m_desired_omega;  // desired_omega()
         std::vector<std::size_t> m_shapes_id;
         std::vector<std::size_t> m_offset;
     };
@@ -76,6 +87,8 @@ namespace scopi
     void scopi_container<dim>::push_back(const object<dim>& s,
                                          const velocity_type& v,
                                          const velocity_type& dv,
+                                         const rotation_type& omega,
+                                         const rotation_type& domega,
                                          const force_type& f)
     {
         if (m_offset.empty())
@@ -92,6 +105,8 @@ namespace scopi
             m_positions.push_back(s.pos(i));
             m_quaternions.push_back(s.q(i));
             m_velocities.push_back(v);
+            m_omega.push_back(omega);
+            m_desired_omega.push_back(domega);
             m_desired_velocities.push_back(dv);
             m_forces.push_back(f);
         }
@@ -112,6 +127,8 @@ namespace scopi
         m_quaternions.reserve(size);
         m_velocities.reserve(size);
         m_desired_velocities.reserve(size);
+        m_omega.reserve(size);
+        m_desired_omega.reserve(size);
         m_forces.reserve(size);
         m_offset.reserve(size+1);
         m_shapes_id.reserve(size);
@@ -177,6 +194,34 @@ namespace scopi
     auto scopi_container<dim>::vd()
     {
         return xt::adapt(reinterpret_cast<velocity_type*>(m_desired_velocities.data()), {m_desired_velocities.size()});
+    }
+
+    // omega
+
+    template<std::size_t dim>
+    const auto scopi_container<dim>::omega() const
+    {
+        return xt::adapt(reinterpret_cast<rotation_type*>(m_omega.data()), {m_omega.size()});
+    }
+
+    template<std::size_t dim>
+    auto scopi_container<dim>::omega()
+    {
+        return xt::adapt(reinterpret_cast<rotation_type*>(m_omega.data()), {m_omega.size()});
+    }
+
+    // desired velocity
+
+    template<std::size_t dim>
+    const auto scopi_container<dim>::desired_omega() const
+    {
+        return xt::adapt(reinterpret_cast<rotation_type*>(m_desired_omega.data()), {m_desired_omega.size()});
+    }
+
+    template<std::size_t dim>
+    auto scopi_container<dim>::desired_omega()
+    {
+        return xt::adapt(reinterpret_cast<rotation_type*>(m_desired_omega.data()), {m_desired_omega.size()});
     }
 
     // force
