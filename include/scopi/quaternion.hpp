@@ -5,6 +5,8 @@
 
 #include "types.hpp"
 
+using namespace xt::placeholders;
+
 namespace scopi
 {
     void normalize(type::quaternion& q)
@@ -82,4 +84,27 @@ namespace scopi
     {
         return detail::rotation_matrix_impl(q, std::integral_constant<std::size_t, dim>{});
     }
+
+    type::quaternion mult_quaternion(const type::quaternion& q1, const type::quaternion& q2)
+    {
+        type::quaternion result;
+
+        auto q1_axe = xt::view(q1, xt::range(1, _));
+        auto q2_axe = xt::view(q2, xt::range(1, _));
+        result(0) = q1(0)*q2(0) - xt::linalg::dot(q1_axe, q2_axe)(0);
+        xt::view(result, xt::range(1, _)) = q1(0)*q2_axe + q2(0)*q1_axe + xt::linalg::cross(q1_axe, q2_axe);
+        return result;
+    }
+
+    // type::quaternion operator*(const type::quaternion& q1, const type::quaternion& q2)
+    // {
+    //     type::quaternion result;
+
+    //     auto q1_axe = xt::view(q1, xt::range(1, _));
+    //     auto q2_axe = xt::view(q2, xt::range(1, _));
+    //     result(0) = q1(0)*q2(0) - xt::linalg::dot(q1_axe, q2_axe)(0);
+    //     std::cout << "cross " << xt::linalg::cross(q1_axe, q2_axe) << std::endl;
+    //     xt::view(result, xt::range(1, _)) = q1(0)*q2_axe + q2(0)*q1_axe + xt::linalg::cross(q1_axe, q2_axe);
+    //     return result;
+    // }
 }

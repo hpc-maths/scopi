@@ -55,6 +55,7 @@ find_package(xtensor REQUIRED)
 # MOSEK_LIBRARY                    /Users/faure/Dev/scopi-v2/dependances_scopi_dec_2020/mosek/9.2/tools/platform/osx64x86/bin/libmosek64.9.2.dylib
 # MOSEK_FUSION_LIBRARY             /Users/faure/Dev/scopi-v2/dependances_scopi_dec_2020/mosek/9.2/tools/platform/osx64x86/bin/libfusion64.a
 find_package(nlohmann_json REQUIRED)
+find_package(fmt REQUIRED)
 find_package(MOSEK REQUIRED)
 set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
 
@@ -105,7 +106,7 @@ target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY} pybind11::embed )
+target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY} pybind11::embed )
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 

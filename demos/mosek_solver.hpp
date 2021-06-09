@@ -1,18 +1,20 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
-#include <strstream>
+#include <vector>
 
-#include <xtensor/xmath.hpp>
-#include <scopi/object/plan.hpp>
-#include <scopi/object/neighbor.hpp>
+#include <xtensor/xtensor.hpp>
+#include <xtensor/xfixed.hpp>
 
-#include <scopi/functors.hpp>
-#include <scopi/types.hpp>
-#include <scopi/container.hpp>
 #include <fmt/format.h>
-
 #include <fusion.h>
 #include <nlohmann/json.hpp>
+
+#include <scopi/container.hpp>
+#include <scopi/functors.hpp>
+#include <scopi/object/neighbor.hpp>
+#include <scopi/quaternion.hpp>
 
 using namespace mosek::fusion;
 using namespace monty;
@@ -20,55 +22,12 @@ namespace nl = nlohmann;
 
 using namespace xt::placeholders;
 
-int main()
+template<std::size_t dim>
+void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t total_it, std::size_t active_ptr)
 {
-    constexpr std::size_t dim = 3;
-    double PI = xt::numeric_constants<double>::PI;
-    double dt = .005;
-    std::size_t total_ite = 600;
-    scopi::scopi_container<dim> particles;
-
-    // by default the angle of the objects is 0
-    // scopi::superellipsoid<dim> s1({{0.2, 0.}}, {{.1, .05}}, {{1}});
-    // scopi::superellipsoid<dim> s2({{-0.2, 0.}}, {{.1, .05}}, {{1}});
-    // scopi::superellipsoid<dim> s3({{0.5, 0.}}, {{.1, .05}}, {{1}});
-
-    // particles.push_back(s1, {{0, 0}}, {{0, 0}}, 0, 0, {{0, 0}});
-    // particles.push_back(s2, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-    // particles.push_back(s3, {{0, 0}}, {{-0.15, 0}}, 0, 0, {{0, 0}});
-
-    // scopi::superellipsoid<dim> s0({{0.0, 0.}}, {scopi::quaternion(-PI/4)}, {{.01, .01}}, {{1}});
-    // scopi::superellipsoid<dim> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{1.}});
-    // scopi::superellipsoid<dim> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1.}});
-    // particles.push_back(s0, {{0, 0}}, {{0., 0}}, 0, 0, {{0, 0}});
-    // particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-    // particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
-
-    // dim 3
-    // spheres
-    // scopi::superellipsoid<dim> s1({{-0.2, 0., 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1, .1}}, {{1, 1}});
-    // scopi::superellipsoid<dim> s2({{0.2, 0., 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1, .1}}, {{1, 1}});
-    // particles.push_back(s1, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
-    // particles.push_back(s2, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
-
-    // ellipsoids
-    scopi::superellipsoid<dim> s1({{-0.2, 0., 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05, .05}}, {{1, 1}});
-    scopi::superellipsoid<dim> s2({{0.2, 0., 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05, .05}}, {{1, 1}});
-    particles.push_back(s1, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
-    particles.push_back(s2, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
-
-    // scopi::plan<dim> p({{0, 0}}, PI/2.);
-    // scopi::superellipsoid<dim> s1({{0.5, 0.5}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1}});
-    // particles.push_back(p, {{0, 0}}, {{0., 0}}, 0, 0, {{0, 0}});
-    // particles.push_back(s1, {{0, 0}}, {{0., -0.1}}, 0, 0, {{0, 0}});
-
-    std::size_t active_ptr = 0;
-
-    // std::size_t Nactiveactive = particles.size();
     std::size_t Nactive = particles.size() - active_ptr;
-
     // Time Loop
-    for (std::size_t nite=0; nite<total_ite; ++nite)
+    for (std::size_t nite=0; nite<total_it; ++nite)
     {
         std::cout << "Time iteration -> " << nite << std::endl;
         std::vector<scopi::neighbor<dim>> contacts;
@@ -138,7 +97,6 @@ int main()
         }
 
         file << std::setw(4) << json_output;
-        // file << json_output;
         file.close();
 
         // for (std::size_t i=0; i<Nactive; ++i)
@@ -174,7 +132,6 @@ int main()
             distances[i] = contacts[i].dij;
         }
         std::cout << "distances " << distances << std::endl;
-
 
         //Create contstaint matrices A and B
         xt::xtensor<double, 2> Au = xt::zeros<double>({3*contacts.size(), Nactive*3});
@@ -250,9 +207,6 @@ int main()
 
         auto dtBAu = xt::eval(dt*xt::linalg::dot(B, Au));
         auto dtBAw = xt::eval(dt*xt::linalg::dot(B, Aw));
-        // std::cout << A << std::endl;
-        // std::cout << B << std::endl;
-
 
         // Create Mosek optimization problem
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
@@ -286,7 +240,7 @@ int main()
         ndarray<double, 1> ulvl   = *(u->level());
         ndarray<double, 1> wlvl   = *(w->level());
 
-        using position_type = typename decltype(particles)::position_type;
+        using position_type = typename scopi::scopi_container<dim>::position_type;
         auto uadapt = xt::adapt(reinterpret_cast<double*>(ulvl.raw()), {particles.size()-active_ptr, 3UL});
         auto wadapt = xt::adapt(reinterpret_cast<double*>(wlvl.raw()), {particles.size()-active_ptr, 3UL});
         std::cout << "uadapt = " << uadapt << std::endl;
@@ -315,20 +269,5 @@ int main()
             // std::cout << particles.q()(i) << std::endl << std::endl;
 
         }
-
-
-        // particles.pos() = particles.pos() + dt*uadapt;
-        // std::cout << "u = " << ulvl << std::endl;
-        // std::cout << "pos = " << particles.pos() << std::endl << std::endl;
-        // std::cout << "w = " << wlvl << std::endl;
-        // std::cout << "theta = " << theta << std::endl << std::endl;
-
-        // my_file.close();
     }
-    // for(auto &c: contacts)
-    // {
-    //     std::cout << c << std::endl;
-    // }
-
-    return 0;
 }

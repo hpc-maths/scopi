@@ -6,7 +6,7 @@ import glob
 import sys
 import time
 
-prefix = "./build/results/"
+prefix = "./build/Results/"
 
 files = np.sort(glob.glob(prefix+"/*.json"))
 print(files)
@@ -18,6 +18,7 @@ actors = []
 it = 0
 for file in files:
 
+    # plotter = pv.Plotter(off_screen=True)
     plotter.clear()
 
     with open(file) as json_file:
@@ -32,7 +33,6 @@ for file in files:
 
 
     for obj in objects:
-
         positions.append(obj["position"])
         v = np.zeros( (len(obj["position"]),) )
         v[0] = 1
@@ -81,13 +81,21 @@ for file in files:
                     center=(obj["position"][0],obj["position"][1],obj["position"][2]),
                     direction=(orientation[0],orientation[1],orientation[2])
                     )
+        elif (obj["type"] == "plan"):
+            if (len(obj["position"])==2):  # 2D
+                geom = pv.Plane(
+                    center=(obj["position"][0],obj["position"][1],0),
+                    direction=(orientation[0],orientation[1],0)
+                    )
+
+
         geometries.append(geom)
         plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False)
 
     print("positions = ",positions)
     print("geometries = ",geometries)
 
-    for contact in contacts:
+    for ic, contact in enumerate(contacts):
         contact["pi"].append(0)
         contact["pj"].append(0)
         contact["nij"].append(0)
@@ -95,23 +103,23 @@ for file in files:
         pvptj = pv.PolyData(np.array([contact["pj"]]))
         pvpti["normal"] = -np.asarray([contact["nij"]])
         pvptj["normal"] = np.array([contact["nij"]])
-        plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name="ni")
-        plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="blue",name="nj")
+        plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name=f"ni_{ic}")
+        plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
 
-        plotter.camera_position = 'xy'
-        plotter.camera.SetParallelProjection(True)
+        # plotter.camera_position = 'xy'
+        # plotter.camera.SetParallelProjection(True)
 
-        if (it == 0):
-            plotter.show_grid()
-            plotter.show_bounds()
-            # plotter.show(auto_close=False, cpos="xy")
-            plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
-        else:
-            plotter.render()
-            # plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
-            time.sleep(0.001)
+    if (it == 0):
+        plotter.show_grid()
+        plotter.show_bounds()
+        # plotter.show(auto_close=False, cpos="xy")
+        plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
+    else:
+        plotter.render()
+        # plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
+        time.sleep(0.001)
 
-        it+=1
+    it+=1
 
 sys.exit()
 

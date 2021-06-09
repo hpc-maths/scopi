@@ -35,3 +35,9 @@ endif(APPLE)
 
 add_executable(test_mosek test_mosek.cpp)
 target_link_libraries(test_mosek scopi_cpp)
+
+add_executable(critical_2d critical/2d_case.cpp)
+target_link_libraries(critical_2d scopi_cpp)
+
+add_executable(critical_3d critical/3d_case.cpp)
+target_link_libraries(critical_3d scopi_cpp)
