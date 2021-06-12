@@ -35,9 +35,33 @@ endif(APPLE)
 
 add_executable(test_mosek test_mosek.cpp)
 target_link_libraries(test_mosek scopi_cpp)
+if (APPLE)
+  add_custom_command(TARGET test_mosek
+  POST_BUILD COMMAND
+  ${CMAKE_INSTALL_NAME_TOOL} -change
+  `otool -L test_mosek | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+  ${MOSEK_LIBRARIES} test_mosek
+  )
+endif(APPLE)
 
 add_executable(critical_2d critical/2d_case.cpp)
 target_link_libraries(critical_2d scopi_cpp)
+if (APPLE)
+  add_custom_command(TARGET critical_2d
+  POST_BUILD COMMAND
+  ${CMAKE_INSTALL_NAME_TOOL} -change
+  `otool -L critical_2d | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+  ${MOSEK_LIBRARIES} critical_2d
+  )
+endif(APPLE)
 
 add_executable(critical_3d critical/3d_case.cpp)
 target_link_libraries(critical_3d scopi_cpp)
+if (APPLE)
+  add_custom_command(TARGET critical_3d
+  POST_BUILD COMMAND
+  ${CMAKE_INSTALL_NAME_TOOL} -change
+  `otool -L critical_3d | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+  ${MOSEK_LIBRARIES} critical_3d
+  )
+endif(APPLE)

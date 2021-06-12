@@ -455,7 +455,118 @@ if __name__ == '__main__':
             gg[:,i] = (f(x+e,s1,s2) - f(x-e,s1,s2))/(2*eps)
         print('erreur numerique dans le calcul du gradient: %g (doit etre petit)' % np.linalg.norm(df(x,s1,s2)-gg))
 
-    #verifier_gradient(f_contacts,grad_f_contacts,np.array([2*np.pi/3, np.pi/3]),s1,s2)
+
+    def create_binit(theta_g, theta_d, n, s, liste_pts=None):
+        if(liste_pts == None):
+            liste_pts = []
+        if n == 0:
+            return liste_pts
+        d1 = np.sqrt(2*(1-np.cos(theta_g-theta_d)))
+        xnew = s.rx*( np.sin(theta_g)-np.sin(theta_d) )/d1
+        ynew = -s.ry*( np.cos(theta_g)-np.cos(theta_d) )/d1
+        xnew2 = xnew*s.rx*s.ry/( ( (s.ry*xnew)**(2/s.e)+(s.rx*ynew)**(2/s.e) )**(s.e/2) )
+        ynew2 = ynew*s.rx*s.ry/( ( (s.ry*xnew)**(2/s.e)+(s.rx*ynew)**(2/s.e) )**(s.e/2) )
+        sinb = np.sqrt(((ynew2/s.ry)**2)**(1/s.e))
+        b = np.arcsin(sinb)
+        liste_pts.append(b)
+        liste_pts.append(b+np.pi/2)
+        liste_pts.append(b+np.pi)
+        liste_pts.append(b+3*np.pi/2)
+        theta_milieu = 0.5*(theta_g+theta_d)
+        create_binit(theta_milieu, theta_d, n-1, s, liste_pts=liste_pts)
+        create_binit(theta_g, theta_milieu, n-1, s, liste_pts=liste_pts)
+        return liste_pts
+
+    def create_pts(theta_g, theta_d, n, s, liste_pts=None):
+        if(liste_pts == None):
+            liste_pts = []
+        if n == 0:
+            return liste_pts
+        d1 = np.sqrt(2*(1-np.cos(theta_g-theta_d)))
+        xnew = s.rx*( np.sin(theta_g)-np.sin(theta_d) )/d1
+        ynew = -s.ry*( np.cos(theta_g)-np.cos(theta_d) )/d1
+        # liste_pts.append( s.Mt()@s.Mr()@[xnew, ynew, 0, 1] )
+        xnew2 = xnew*s.rx*s.ry/( ( (s.ry*xnew)**(2/s.e)+(s.rx*ynew)**(2/s.e) )**(s.e/2) )
+        ynew2 = ynew*s.rx*s.ry/( ( (s.ry*xnew)**(2/s.e)+(s.rx*ynew)**(2/s.e) )**(s.e/2) )
+
+        # cosb = np.sqrt(((xnew2/s.rx)**2)**(1/s.e))
+        sinb = np.sqrt(((ynew2/s.ry)**2)**(1/s.e))
+        b1 = np.arcsin(sinb)
+        b2 = np.arcsin(-sinb)
+        # b3 = np.arccos(cosb)
+        # b4 = np.arccos(-cosb)
+        # print("cosb =",cosb," sinb =",sinb)
+        # print("b1 =",b1," b2 =",b2," b3 =",b3," b4 =",b4)
+        # print("b1 =",b1," b2 =",b2)
+        # pts3 = s.surface_pt(np.array([b1,b2,np.pi-b1,np.pi-b2]))
+        pts3 = s.surface_pt(np.array([b1, b1+np.pi/2, b1+np.pi, b1+3*np.pi/2]))# b1, b1+np.pi/2, b1+np.pi, b1-np.pi/2]))
+        # print("pts3=",pts3)
+        # liste_pts.append( s.Mt()@s.Mr()@[xnew2, ynew2, 0, 1] )
+        liste_pts.append( [pts3[0,0], pts3[0,1], 0, 1] )
+        liste_pts.append( [pts3[1,0], pts3[1,1], 0, 1] )
+        liste_pts.append( [pts3[2,0], pts3[2,1], 0, 1] )
+        liste_pts.append( [pts3[3,0], pts3[3,1], 0, 1] )
+
+        theta_milieu = 0.5*(theta_g+theta_d)
+        create_pts(theta_milieu, theta_d, n-1, s, liste_pts=liste_pts)
+        create_pts(theta_g, theta_milieu, n-1, s, liste_pts=liste_pts)
+        return liste_pts
+
+
+    def test_initialisation():
+        s = SuperEllipsoid2D(1,-2,   8,2, e=0.2, theta=-np.pi/5)
+        p = pv.Plotter(window_size=[2400,1350])
+        L = 10
+        grid = pv.UniformGrid()
+        arr = np.arange((2*L)**2).reshape((2*L,2*L,1))
+        grid.dimensions = np.array(arr.shape) + 1 #dim + 1 because cells
+        grid.origin = (-L, -L, 0)
+        grid.spacing = (1, 1, 0)
+        p.add_mesh(grid, show_edges=True, opacity=0.1)
+        p.add_mesh(s.mesh(),color="red", opacity=0.5, name="s")
+
+        theta1 = 0
+        theta2 = np.pi/2
+
+        binit = np.array( create_binit(np.pi/2, 0, 5, s, liste_pts=[0, np.pi/2, np.pi, 3*np.pi/2]) )
+        # binit = np.array( create_binit(np.pi/2, 0, 4, s) )
+        print("binit = ",binit)
+        pts = s.surface_pt(binit)
+        normals = s.surface_normal(binit)
+        # sys.exit()
+        # pts = np.array( create_pts(np.pi/2, 0, 5, s, #)[:,:3]
+        #     liste_pts=[
+        #         s.Mt()@s.Mr()@np.array([s.rx*np.cos(theta2),s.ry*np.sin(theta2),0,1]),
+        #         s.Mt()@s.Mr()@np.array([s.rx*np.cos(-theta2),s.ry*np.sin(-theta2),0,1])
+        #         # s.Mt()@s.Mr()@np.array([s.rx*np.cos(theta1),s.ry*np.sin(theta1),0,1])
+        #     ]) )[:,:3]
+        # print("pts =",pts)
+        nodes = pv.PolyData(pts)
+        nodes["normal"] = normals
+        p.add_mesh(nodes.glyph(factor=0.1, geom=pv.Sphere()),color="blue", name="pts")
+        p.add_mesh(nodes.glyph(orient="normal",factor=0.25, geom=pv.Arrow()),color="blue", name="normals")
+
+        num = 17
+        angles = np.linspace(theta1,theta2,num)
+        x = s.rx*np.cos(angles)
+        y = s.ry*np.sin(angles)
+        pts2 = np.zeros((num,4))
+        pts2[:,0] = x
+        pts2[:,1] = y
+        pts2[:,3] = 1
+        for i,pt in enumerate(pts2):
+            pts2[i,:] = s.Mt()@s.Mr()@pt
+        nodes2 = pv.PolyData(pts2[:,:3])
+        # p.add_mesh(nodes2.glyph(factor=0.15, geom=pv.Sphere()),color="green", name="pts2", opacity=0.5)
+
+        pts3 = s.surface_pt(angles)
+        nodes3 = pv.PolyData(pts3)
+        #p.add_mesh(nodes3.glyph(factor=0.15, geom=pv.Sphere()),color="yellow", name="pts3", opacity=0.5)
+
+        p.show(cpos="xy")
+
+    # test_initialisation()
+    # sys.exit()
 
     N = 180
     tgrid = np.linspace(0,1,N)
@@ -501,18 +612,27 @@ if __name__ == '__main__':
         # 2/ on calcule toutes les distances
         # 3/ on cherche la distance minimale => on a la donnee initiale
         # binit = np.linspace(-np.pi,np.pi,num=20)
-        binit = np.array([-np.pi, -np.pi/2, 0.001, np.pi/2])
-        pts_ext_s1 = s1.surface_pt(binit)
-        pts_ext_s2 = s2.surface_pt(binit)
-        distances = np.zeros((binit.shape[0],binit.shape[0]))
-        for i in range(binit.shape[0]):
-            for j in range(binit.shape[0]):
-                distances[i,j] = np.linalg.norm(pts_ext_s1[i,:]-pts_ext_s2[j,:])
-        # print("distances = ",distances)
-        indmin = np.where(distances==distances.min())
-        u0 = np.array( [ binit[indmin[0][0]], binit[indmin[1][0]] ])
+        # binit = np.array([-np.pi, -np.pi/2, 0.001, np.pi/2])
+        # pts_ext_s1 = s1.surface_pt(binit)
+        # pts_ext_s2 = s2.surface_pt(binit)
+        # distances = np.zeros((binit.shape[0],binit.shape[0]))
+        # for i in range(binit.shape[0]):
+        #     for j in range(binit.shape[0]):
+        #         distances[i,j] = np.linalg.norm(pts_ext_s1[i,:]-pts_ext_s2[j,:])
+        # # print("distances = ",distances)
+        # indmin = np.where(distances==distances.min())
+        # u0 = np.array( [ binit[indmin[0][0]], binit[indmin[1][0]] ])
         # print("u0 = ",u0)
-
+        binit1 = np.array( create_binit(np.pi/2, 0, 5, s1, liste_pts=[0, np.pi/2, np.pi, 3*np.pi/2]) )
+        pts_ext_s1 = s1.surface_pt(binit1)
+        binit2 = np.array( create_binit(np.pi/2, 0, 5, s2, liste_pts=[0, np.pi/2, np.pi, 3*np.pi/2]) )
+        pts_ext_s2 = s2.surface_pt(binit2)
+        distances = np.zeros((binit1.shape[0],binit2.shape[0]))
+        for i in range(binit1.shape[0]):
+            for j in range(binit2.shape[0]):
+                distances[i,j] = np.linalg.norm(pts_ext_s1[i,:]-pts_ext_s2[j,:])
+        indmin = np.where(distances==distances.min())
+        u0 = np.array( [ binit1[indmin[0][0]], binit2[indmin[1][0]] ])
         ## Methode de Newton de scipy
         # root = fsolve(f_contacts, u0, fprime=grad_f_contacts, xtol=1.0e-14, args=(s1,s2), full_output=True)
         # b_final = root[0]

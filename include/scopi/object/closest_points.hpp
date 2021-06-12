@@ -161,24 +161,53 @@ namespace scopi
                        ( M01*F1 + M00*F3 ) * ( N01*F16 - N00*F15 ) + ( M11*F1 + M10*F3 ) * ( N11*F16 - N10*F15 );
             return res;
         };
+
+        std::vector< double > binit1 = { 0, pi/2, pi, 3*pi/2 };
+        binit1 = create_binit(binit1, 4, pi/2, 0, s1.radius()[0], s1.radius()[1], s1.squareness()[0]);
+        // std::cout << "binit1 = { ";
+        // for (double d : binit1) {
+        //   std::cout << d << ", ";
+        // }
+        // std::cout << "}; \n";
+        std::vector< double > binit2 = { 0, pi/2, pi, 3*pi/2 };
+        binit2 = create_binit(binit2, 4, pi/2, 0, s2.radius()[0], s2.radius()[1], s2.squareness()[0]);
+        // std::cout << "binit2 = { ";
+        // for (double d : binit2) {
+        //   std::cout << d << ", ";
+        // }
+        // std::cout << "}; \n";
+
         // std::cout << "newton_F = " << newton_F(u0,args) << "\n" << std::endl;
         // std::cout << "newton_GradF = " << newton_GradF(u0,args) << "\n" << std::endl;
-        constexpr int num = 20;
-        auto binit = xt::linspace<double>(-pi, pi, num);
+        // constexpr int num = 20;
+        // auto binit = xt::linspace<double>(-pi, pi, num);
         // xt::xtensor_fixed<double, xt::xshape<4>> binit = { -pi, -pi/2, 0.001, pi/2 };
-        xt::xtensor_fixed<double, xt::xshape<num,num>> dinit;
-        for (std::size_t i = 0; i < binit.size(); i++) {
-            for (std::size_t j = 0; j < binit.size(); j++) {
-                dinit(i,j) = xt::linalg::norm(s1.point(binit(i))-s2.point(binit(j)),2);
+        // xt::xtensor_fixed<double, xt::xshape<num,num>> dinit;
+        // for (std::size_t i = 0; i < binit.size(); i++) {
+        //     for (std::size_t j = 0; j < binit.size(); j++) {
+        //         dinit(i,j) = xt::linalg::norm(s1.point(binit(i))-s2.point(binit(j)),2);
+        //     }
+        // }
+        std::size_t i1, i2;
+        double dmin = 1.0e99;
+        for (std::size_t i = 0; i < binit1.size(); i++) {
+            for (std::size_t j = 0; j < binit2.size(); j++) {
+                double d = xt::linalg::norm(s1.point(binit1[i])-s2.point(binit2[j]),2);
+                if (d<dmin) {
+                  dmin = d;
+                  i1 = i;
+                  i2 = j;
+                }
             }
         }
         // std::cout << "initialization : b = " << binit << " distances = " << dinit << std::endl;
-        auto dmin = xt::amin(dinit);
+        // auto dmin = xt::amin(dinit);
         // std::cout << "initialization : dmin = " << dmin << std::endl;
-        auto indmin = xt::from_indices(xt::where(xt::equal(dinit, dmin)));
+        // auto indmin = xt::from_indices(xt::where(xt::equal(dinit, dmin)));
         // std::cout << "initialization : indmin = " << indmin << std::endl;
         // std::cout << "initialization : imin = " << indmin(0,0) << " jmin = " << indmin(1,0) << std::endl;
-        xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), binit(indmin(1,0))};
+        // xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), binit(indmin(1,0))};
+        xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1[i1], binit2[i2]};
         // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
         auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
         neigh.pi = s1.point(u(0));

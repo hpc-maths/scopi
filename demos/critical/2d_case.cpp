@@ -6,12 +6,12 @@ int main()
 {
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
-    double dt = .005;
+    double dt = .05;
     std::size_t total_it = 600;
     scopi::scopi_container<dim> particles;
 
-    scopi::superellipsoid<dim> s0({{0.0, 0.}}, {scopi::quaternion(-PI/4)}, {{.01, .01}}, {{1}});
-    scopi::superellipsoid<dim> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{1.}});
+    scopi::superellipsoid<dim> s0({{0.0, 0.}}, {scopi::quaternion(-PI/4)}, {{.01, .01}}, {{0.2}});
+    scopi::superellipsoid<dim> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{0.2}});
     scopi::superellipsoid<dim> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1.}});
     particles.push_back(s0, {{0, 0}}, {{0., 0}}, 0, 0, {{0, 0}});
     particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});

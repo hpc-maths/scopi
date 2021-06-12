@@ -96,15 +96,16 @@ for file in files:
     print("geometries = ",geometries)
 
     for ic, contact in enumerate(contacts):
-        contact["pi"].append(0)
-        contact["pj"].append(0)
-        contact["nij"].append(0)
+        if (len(contact["pi"])==2): # dim=2
+            contact["pi"].append(0)
+            contact["pj"].append(0)
+            contact["nij"].append(0)
         pvpti = pv.PolyData(np.array([contact["pi"]]))
         pvptj = pv.PolyData(np.array([contact["pj"]]))
         pvpti["normal"] = -np.asarray([contact["nij"]])
         pvptj["normal"] = np.array([contact["nij"]])
-        plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name=f"ni_{ic}")
-        plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
+        plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="pink",name=f"ni_{ic}")
+        plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
 
         # plotter.camera_position = 'xy'
         # plotter.camera.SetParallelProjection(True)
@@ -202,8 +203,8 @@ for contact in contacts:
     pvptj = pv.PolyData(np.array([contact["pj"]]))
     pvpti["normal"] = -np.asarray([contact["nij"]])
     pvptj["normal"] = np.array([contact["nij"]])
-    plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="pink",name="ni")
-    plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.1, geom=pv.Arrow()),color="blue",name="nj")
+    plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.01, geom=pv.Arrow()),color="pink",name="ni")
+    plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.01, geom=pv.Arrow()),color="blue",name="nj")
 
 plotter.camera_position = 'xy'
 plotter.camera.SetParallelProjection(True)
