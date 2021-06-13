@@ -162,37 +162,53 @@ namespace scopi
             return res;
         };
 
-        std::vector< double > binit1 = { 0, pi/2, pi, 3*pi/2 };
-        binit1 = create_binit(binit1, 4, pi/2, 0, s1.radius()[0], s1.radius()[1], s1.squareness()[0]);
+
+        // std::vector< double > binit1 = { 0, pi/2, pi, 3*pi/2 };
+        // binit1 = create_binit(binit1, 4, pi/2, 0, s1.radius()[0], s1.radius()[1], s1.squareness()[0]);
         // std::cout << "binit1 = { ";
         // for (double d : binit1) {
         //   std::cout << d << ", ";
         // }
         // std::cout << "}; \n";
-        std::vector< double > binit2 = { 0, pi/2, pi, 3*pi/2 };
-        binit2 = create_binit(binit2, 4, pi/2, 0, s2.radius()[0], s2.radius()[1], s2.squareness()[0]);
-        // std::cout << "binit2 = { ";
-        // for (double d : binit2) {
+        // std::vector< double > binit2 = { 0, pi/2, pi, 3*pi/2 };
+        // binit2 = create_binit(binit2, 4, pi/2, 0, s2.radius()[0], s2.radius()[1], s2.squareness()[0]);
+        // // std::cout << "binit2 = { ";
+        // // for (double d : binit2) {
+        // //   std::cout << d << ", ";
+        // // }
+        // // std::cout << "}; \n";
+        // std::size_t i1, i2;
+        // double dmin = 1.0e99;
+        // for (std::size_t i = 0; i < binit1.size(); i++) {
+        //     for (std::size_t j = 0; j < binit2.size(); j++) {
+        //         double d = xt::linalg::norm(s1.point(binit1[i])-s2.point(binit2[j]),2);
+        //         if (d<dmin) {
+        //           dmin = d;
+        //           i1 = i;
+        //           i2 = j;
+        //         }
+        //     }
+        // }
+        // xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1[i1], binit2[i2]};
+
+        int num = 32;
+        auto binit1_xy = s1.binit_xy(num);
+        // std::cout << "binit1_xy = { ";
+        // for (double d : binit1_xy) {
         //   std::cout << d << ", ";
         // }
         // std::cout << "}; \n";
-
-        // std::cout << "newton_F = " << newton_F(u0,args) << "\n" << std::endl;
-        // std::cout << "newton_GradF = " << newton_GradF(u0,args) << "\n" << std::endl;
-        // constexpr int num = 20;
-        // auto binit = xt::linspace<double>(-pi, pi, num);
-        // xt::xtensor_fixed<double, xt::xshape<4>> binit = { -pi, -pi/2, 0.001, pi/2 };
-        // xt::xtensor_fixed<double, xt::xshape<num,num>> dinit;
-        // for (std::size_t i = 0; i < binit.size(); i++) {
-        //     for (std::size_t j = 0; j < binit.size(); j++) {
-        //         dinit(i,j) = xt::linalg::norm(s1.point(binit(i))-s2.point(binit(j)),2);
-        //     }
-        // }
+        auto binit2_xy = s2.binit_xy(num);
+        // // std::cout << "binit2 = { ";
+        // // for (double d : binit2) {
+        // //   std::cout << d << ", ";
+        // // }
+        // // std::cout << "}; \n";
         std::size_t i1, i2;
         double dmin = 1.0e99;
-        for (std::size_t i = 0; i < binit1.size(); i++) {
-            for (std::size_t j = 0; j < binit2.size(); j++) {
-                double d = xt::linalg::norm(s1.point(binit1[i])-s2.point(binit2[j]),2);
+        for (std::size_t i = 0; i < binit1_xy.size(); i++) {
+            for (std::size_t j = 0; j < binit2_xy.size(); j++) {
+                double d = xt::linalg::norm(s1.point(binit1_xy[i])-s2.point(binit2_xy[j]),2);
                 if (d<dmin) {
                   dmin = d;
                   i1 = i;
@@ -200,15 +216,8 @@ namespace scopi
                 }
             }
         }
-        // std::cout << "initialization : b = " << binit << " distances = " << dinit << std::endl;
-        // auto dmin = xt::amin(dinit);
-        // std::cout << "initialization : dmin = " << dmin << std::endl;
-        // auto indmin = xt::from_indices(xt::where(xt::equal(dinit, dmin)));
-        // std::cout << "initialization : indmin = " << indmin << std::endl;
-        // std::cout << "initialization : imin = " << indmin(0,0) << " jmin = " << indmin(1,0) << std::endl;
-        // xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), binit(indmin(1,0))};
-        xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1[i1], binit2[i2]};
-        // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
+        xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1_xy[i1], binit2_xy[i2]};
+
         auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
         neigh.pi = s1.point(u(0));
         neigh.pj = s2.point(u(1));
@@ -269,9 +278,10 @@ namespace scopi
             double N20 = args(31);
             double N21 = args(32);
             double N22 = args(33);
+
             double ca1 = std::cos(a1);
             double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
-            double ca1n2 = std::pow(std::fabs(ca1), 2 - s1n);
+            double ca1n2 = sign(ca1) * std::pow(std::fabs(ca1), 2 - s1n);
 
             double sa1 = std::sin(a1);
             double sa1n = sign(sa1) * std::pow(std::fabs(sa1), s1n);
@@ -287,14 +297,14 @@ namespace scopi
 
             double A1 = s1ry * s1rz * ca1n2 * cb1e2;
             double A2 = s1rx * s1rz * sb1e2 * ca1n2;
-            double A3 = s1rx * s1ry * sa1n2 * sign(ca1);
+            double A3 = s1rx * s1ry * sa1n2;
             double A4 = s1rx * ca1n  * cb1e;
             double A5 = s1ry * sb1e  * ca1n;
             double A6 = s1rz * sa1n;
 
             double ca2 = std::cos(a2);
             double ca2n = sign(ca2) * std::pow(std::fabs(ca2), s2n);
-            double ca2n2 = std::pow(std::fabs(ca2), 2 - s2n);
+            double ca2n2 = sign(ca2) * std::pow(std::fabs(ca2), 2 - s2n);
 
             double sa2 = std::sin(a2);
             double sa2n = sign(sa2) * std::pow(std::fabs(sa2), s2n);
@@ -313,7 +323,8 @@ namespace scopi
             double B3 = s2rz * sa2n;
             double B4 = s2ry * s2rz * ca2n2 * cb2e2;
             double B5 = s2rx * s2rz * sb2e2 * ca2n2;
-            double B6 = s2rx * s2ry * sa2n2 * sign(ca2);
+            double B6 = s2rx * s2ry * sa2n2;
+
             xt::xtensor_fixed<double, xt::xshape<4>> res;
             res(0) = - (M10*A1 + M11*A2 + M12*A3) * (-M20*A4 - M21*A5 - M22*A6 + N20*B1 + N21*B2 + N22*B3 - s1zc + s2zc) +
                        (M20*A1 + M21*A2 + M22*A3) * (-M10*A4 - M11*A5 - M12*A6 + N10*B1 + N11*B2 + N12*B3 - s1yc + s2yc);
@@ -372,8 +383,8 @@ namespace scopi
             double ca1 = std::cos(a1);
             double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
             double ca1n1 = s1n * std::pow(std::fabs(ca1), s1n - 1);
-            double ca1n2 = std::pow(std::fabs(ca1), 2 - s1n);
-            double ca1n3 = (2 - s1n) * sign(ca1) * std::pow(std::fabs(ca1), 1 - s1n);
+            double ca1n2 = sign(ca1) * std::pow(std::fabs(ca1), 2 - s1n);
+            double ca1n3 = (2 - s1n) * std::pow(std::fabs(ca1), 1 - s1n);
 
             double sa1 = std::sin(a1);
             double sa1n = sign(sa1) * std::pow(std::fabs(sa1), s1n);
@@ -395,7 +406,7 @@ namespace scopi
 
             double A1 = s1ry * s1rz * ca1n2 * cb1e2;
             double A2 = s1rx * s1rz * sb1e2 * ca1n2;
-            double A3 = s1rx * s1ry * sa1n2 * sign(ca1);
+            double A3 = s1rx * s1ry * sa1n2;
             double A4 = s1rx * ca1n  * cb1e;
             double A5 = s1ry * sb1e  * ca1n;
             double A6 = s1rz * sa1n;
@@ -404,7 +415,7 @@ namespace scopi
             double A9 = s1rz * ca1 * sa1n1;
             double A10 = s1ry * s1rz * sa1 * ca1n3 * cb1e2;
             double A11 = s1rx * s1rz * sa1 * sb1e2 * ca1n3;
-            double A12 = s1rx * s1ry * std::fabs(ca1) * sa1n3;
+            double A12 = s1rx * s1ry * ca1 * sa1n3;
             double A13 = s1rx * sb1 * ca1n  * cb1e1;
             double A14 = s1ry * cb1 * sb1e1 * ca1n;
             double A15 = s1ry * s1rz  * sb1 * ca1n2 * cb1e3;
@@ -413,8 +424,8 @@ namespace scopi
             double ca2 = std::cos(a2);
             double ca2n = sign(ca2) * std::pow(std::fabs(ca2), s2n);
             double ca2n1 = s2n * std::pow(std::fabs(ca2), s2n - 1);
-            double ca2n2 = std::pow(std::fabs(ca2), 2 - s2n);
-            double ca2n3 = (2 - s2n) * sign(ca2) * std::pow(std::fabs(ca2), 1 - s2n);
+            double ca2n2 = sign(ca2) * std::pow(std::fabs(ca2), 2 - s2n);
+            double ca2n3 = (2 - s2n) * std::pow(std::fabs(ca2), 1 - s2n);
 
             double sa2 = std::sin(a2);
             double sa2n = sign(sa2) * std::pow(std::fabs(sa2), s2n);
@@ -439,7 +450,7 @@ namespace scopi
             double B3 = s2rz * sa2n;
             double B4 = s2ry * s2rz * ca2n2 * cb2e2;
             double B5 = s2rx * s2rz * sb2e2 * ca2n2;
-            double B6 = s2rx * s2ry * sa2n2 * sign(ca2);
+            double B6 = s2rx * s2ry * sa2n2;
             double B7 = s2rx * sa2 * ca2n1 * cb2e;
             double B8 = s2ry * sa2 * sb2e * ca2n1;
             double B9 = s2rz * ca2 * sa2n1;
@@ -447,7 +458,7 @@ namespace scopi
             double B11 = s2ry * cb2 * sb2e1 * ca2n;
             double B12 = s2ry * s2rz * sa2 * ca2n3 * cb2e2;
             double B13 = s2rx * s2rz * sa2 * sb2e2 * ca2n3;
-            double B14 = s2rx * s2ry * std::fabs(ca2) * sa2n3;
+            double B14 = s2rx * s2ry * ca2 * sa2n3;
             double B15 = s2ry * s2rz * sb2 * ca2n2 * cb2e3;
             double B16 = s2rx * s2rz * cb2 * sb2e3 * ca2n2;
             xt::xtensor_fixed<double, xt::xshape<4,4>> res;
@@ -540,22 +551,63 @@ namespace scopi
                        (M20*A1 + M21*A2 + M22*A3) * (-N20*B15 + N21*B16);
             return res;
         };
-        const int num = 10;
-        auto ainit = xt::linspace<double>(-pi/2, pi/2, num);
-        auto binit = xt::linspace<double>(-pi, pi, num);
-        xt::xtensor_fixed<double, xt::xshape<num,num>> dinit;
-        for (std::size_t i = 0; i < binit.size(); i++) {
-          for (std::size_t j = 0; j < binit.size(); j++) {
-            dinit(i,j) = xt::linalg::norm(s1.point(ainit(i),binit(i))-s2.point(ainit(j),binit(j)),2);
-          }
+        const int num = 2;
+        auto binit1_xy = s1.binit_xy(num);
+        auto ainit1_yz = s1.ainit_yz(num);
+        auto ainit1_xz = s1.ainit_xz(num);
+        std::cout << " binit1_xy.size() = " << binit1_xy.size() << " ainit1_yz.size() = " << ainit1_yz.size() << " ainit1_xz.size() = " << ainit1_xz.size() << std::endl;
+        auto binit1 = xt::concatenate(xt::xtuple(xt::adapt(binit1_xy),xt::adapt(binit1_xy)));
+        auto ainit1 = xt::concatenate(xt::xtuple(xt::adapt(ainit1_yz),xt::adapt(ainit1_xz)));
+        std::cout << " ainit1.size() = " << ainit1.size() << " binit1.size() = " << binit1.size() << std::endl;
+        auto [ agrid1, bgrid1 ] = xt::meshgrid(ainit1, binit1);
+        auto fl_agrid1 = xt::flatten(agrid1);
+        auto fl_bgrid1 = xt::flatten(bgrid1);
+        // std::cout << agrid1 << bgrid1 << std::endl;
+        // std::cout << fl_agrid1 << std::endl;
+
+        auto binit2_xy = s2.binit_xy(num);
+        auto ainit2_yz = s2.ainit_yz(num);
+        auto ainit2_xz = s2.ainit_xz(num);
+        std::cout << " binit2_xy.size() = " << binit2_xy.size() << " ainit2_yz.size() = " << ainit2_yz.size() << " ainit2_xz.size() = " << ainit2_xz.size() << std::endl;
+        auto binit2 = xt::concatenate(xt::xtuple(xt::adapt(binit2_xy),xt::adapt(binit2_xy)));
+        auto ainit2 = xt::concatenate(xt::xtuple(xt::adapt(ainit2_yz),xt::adapt(ainit2_xz)));
+        std::cout << " ainit2.size() = " << ainit2.size() << " binit2.size() = " << binit2.size() << std::endl;
+        auto [ agrid2, bgrid2 ] = xt::meshgrid(ainit2, binit2);
+        auto fl_agrid2 = xt::flatten(agrid2);
+        auto fl_bgrid2 = xt::flatten(bgrid2);
+
+        std::size_t i1, i2;
+        double dmin = 1.0e99;
+        std::cout << " fl_agrid1.size() = " << fl_agrid1.size() << " fl_agrid2.size() = " << fl_agrid2.size() << std::endl;
+        for (std::size_t i = 0; i < fl_agrid1.size(); i++) {
+            for (std::size_t j = 0; j < fl_agrid2.size(); j++) {
+                double d = xt::linalg::norm(s1.point(fl_agrid1(i),fl_bgrid1(i))-s2.point(fl_agrid2(j),fl_bgrid2(j)),2);
+                if (d<dmin) {
+                  dmin = d;
+                  i1 = i;
+                  i2 = j;
+                }
+            }
         }
-        // std::cout << "initialization : b = " << binit << " distances = " << dinit << std::endl;
-        auto dmin = xt::amin(dinit);
-        // std::cout << "initialization : dmin = " << dmin << std::endl;
-        auto indmin = xt::from_indices(xt::where(xt::equal(dinit, dmin)));
-        // std::cout << "initialization : indmin = " << indmin << std::endl;
-        // std::cout << "initialization : imin = " << indmin(0,0) << " jmin = " << indmin(1,0) << std::endl;
-        xt::xtensor_fixed<double, xt::xshape<4>> u0 = { ainit(indmin(0,0)), binit(indmin(0,0)), ainit(indmin(1,0)), binit(indmin(1,0)) };
+        xt::xtensor_fixed<double, xt::xshape<4>> u0 = {fl_agrid1(i1),fl_bgrid1(i1), fl_agrid2(i2),fl_bgrid2(i2)};
+        std::cout << "u0 =" << u0 << std::endl;
+
+        // exit(0);
+        // auto ainit = xt::linspace<double>(-pi/2, pi/2, num);
+        // auto binit = xt::linspace<double>(-pi, pi, num);
+        // xt::xtensor_fixed<double, xt::xshape<num,num>> dinit;
+        // for (std::size_t i = 0; i < binit.size(); i++) {
+        //   for (std::size_t j = 0; j < binit.size(); j++) {
+        //     dinit(i,j) = xt::linalg::norm(s1.point(ainit(i),binit(i))-s2.point(ainit(j),binit(j)),2);
+        //   }
+        // }
+        // // std::cout << "initialization : b = " << binit << " distances = " << dinit << std::endl;
+        // auto dmin = xt::amin(dinit);
+        // // std::cout << "initialization : dmin = " << dmin << std::endl;
+        // auto indmin = xt::from_indices(xt::where(xt::equal(dinit, dmin)));
+        // // std::cout << "initialization : indmin = " << indmin << std::endl;
+        // // std::cout << "initialization : imin = " << indmin(0,0) << " jmin = " << indmin(1,0) << std::endl;
+        // xt::xtensor_fixed<double, xt::xshape<4>> u0 = { ainit(indmin(0,0)), binit(indmin(0,0)), ainit(indmin(1,0)), binit(indmin(1,0)) };
         // std::cout << "u0 = "<< u0 << std::endl;
         // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
         auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);

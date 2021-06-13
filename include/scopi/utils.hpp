@@ -46,6 +46,7 @@ std::vector<double> create_binit(std::vector<double> binit, int n,
     }
 }
 
+
 // sign function (-1 if <0, +1 if >0 and 0 otherwise)
 int sign(double val) {
   return (0 < val) - (val < 0);

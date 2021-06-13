@@ -6,7 +6,7 @@ int main()
 {
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
-    double dt = .005;
+    double dt = .05;
     std::size_t total_it = 600;
     scopi::scopi_container<dim> particles;
 

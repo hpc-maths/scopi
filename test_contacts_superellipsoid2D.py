@@ -477,6 +477,24 @@ if __name__ == '__main__':
         create_binit(theta_g, theta_milieu, n-1, s, liste_pts=liste_pts)
         return liste_pts
 
+    def create_binit_bis(n, s, liste_pts=None):
+        if(liste_pts == None):
+            liste_pts = []
+        angles = np.linspace(0.5*np.pi, 0,  num=n, endpoint=True)
+        for b_ell in angles:
+            x_ell =  s.rx*np.cos(b_ell)
+            y_ell =  s.ry*np.sin(b_ell)
+            d = ( (s.ry*x_ell)**(2/s.e)+(s.rx*y_ell)**(2/s.e) )**(s.e/2)
+            x_supell = x_ell*s.rx*s.ry/d
+            y_supell = y_ell*s.rx*s.ry/d
+            sinb = max(-1.0, min( 1.0, np.sqrt( ((y_supell/s.ry)**2)**(1/s.e) )) )
+            b = np.arcsin(sinb)
+            liste_pts.append(b)
+            liste_pts.append(b+np.pi/2)
+            liste_pts.append(b+np.pi)
+            liste_pts.append(b+3*np.pi/2)
+        return liste_pts
+
     def create_pts(theta_g, theta_d, n, s, liste_pts=None):
         if(liste_pts == None):
             liste_pts = []
@@ -529,10 +547,17 @@ if __name__ == '__main__':
         theta2 = np.pi/2
 
         binit = np.array( create_binit(np.pi/2, 0, 5, s, liste_pts=[0, np.pi/2, np.pi, 3*np.pi/2]) )
-        # binit = np.array( create_binit(np.pi/2, 0, 4, s) )
         print("binit = ",binit)
-        pts = s.surface_pt(binit)
-        normals = s.surface_normal(binit)
+
+        binit_bis = np.array( create_binit_bis(33, s) )
+        print("binit_bis = ",binit_bis)
+
+        # pts = s.surface_pt(binit)
+        # normals = s.surface_normal(binit)
+
+        pts = s.surface_pt(binit_bis)
+        normals = s.surface_normal(binit_bis)
+
         # sys.exit()
         # pts = np.array( create_pts(np.pi/2, 0, 5, s, #)[:,:3]
         #     liste_pts=[
@@ -565,8 +590,8 @@ if __name__ == '__main__':
 
         p.show(cpos="xy")
 
-    # test_initialisation()
-    # sys.exit()
+    test_initialisation()
+    sys.exit()
 
     N = 180
     tgrid = np.linspace(0,1,N)

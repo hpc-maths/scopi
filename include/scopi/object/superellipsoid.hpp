@@ -36,7 +36,9 @@ namespace scopi
         auto normal(const double a, const double b) const; // dim = 3
         auto tangent(const double b) const; // dim = 2
         auto tangents(const double a, const double b) const; // dim = 3
-
+        std::vector<double> binit_xy(const int n) const; // dim = 2 et 3
+        std::vector<double> ainit_yz(const int n) const; // dim  3
+        std::vector<double> ainit_xz(const int n) const; // dim  3
     private:
 
         void create_hash();
@@ -145,9 +147,9 @@ namespace scopi
     auto superellipsoid<dim, owner>::normal(const double a, const double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> n;
-        n(0) =  m_radius(1) * m_radius(2) * std::pow(std::abs(std::cos(a)), 2-m_squareness(1)) * sign(std::cos(b)) * std::pow(std::abs(std::cos(b)), 2-m_squareness(0));
-        n(1) =  m_radius(0) * m_radius(2) * std::pow(std::abs(std::cos(a)), 2-m_squareness(1)) * sign(std::sin(b)) * std::pow(std::abs(std::sin(b)), 2-m_squareness(0));
-        n(2) =  m_radius(0) * m_radius(1) * sign(std::cos(a)) * sign(std::sin(a)) * std::pow(std::abs(std::sin(a)), 2-m_squareness(1));
+        n(0) =  m_radius(1) * m_radius(2) * sign(std::cos(a)) * std::pow(std::abs(std::cos(a)), 2-m_squareness(1)) * sign(std::cos(b)) * std::pow(std::abs(std::cos(b)), 2-m_squareness(0));
+        n(1) =  m_radius(0) * m_radius(2) * sign(std::cos(a)) * std::pow(std::abs(std::cos(a)), 2-m_squareness(1)) * sign(std::sin(b)) * std::pow(std::abs(std::sin(b)), 2-m_squareness(0));
+        n(2) =  m_radius(0) * m_radius(1) * sign(std::sin(a)) * std::pow(std::abs(std::sin(a)), 2-m_squareness(1));
         n = xt::flatten(xt::linalg::dot(rotation_matrix<dim>(this->q()),n));
         n /= xt::linalg::norm(n, 2);
         return n;
@@ -182,4 +184,95 @@ namespace scopi
         return std::make_pair(tgt1,tgt2);
     }
 
+    // return a regular angle b distribution, used to initialize newton method
+    template<std::size_t dim, bool owner>
+    std::vector<double> superellipsoid<dim, owner>::binit_xy(const int n) const
+    {
+      const double pi = 4*std::atan(1);
+      std::vector<double> bs;
+      auto angles = xt::linspace<double>(0, 0.5*pi, n, true);
+      for (std::size_t i = 0; i < angles.size(); i++) {
+        double b_ell = angles(i);
+        // std::cout << "b_ell= " << b_ell << std::endl;
+        double x_ell =  m_radius(0)*std::cos(b_ell);
+        double y_ell =  m_radius(1)*std::sin(b_ell);
+        // std::cout << "x_ell= " << x_ell << " y_ell= " << y_ell<< std::endl;
+        double d = std::pow( std::pow(m_radius(1)*x_ell,2/m_squareness(0))+std::pow(m_radius(0)*y_ell,2/m_squareness(0)), m_squareness(0)/2);
+        // std::cout << "d= " << d << std::endl;
+        double x_supell = x_ell*m_radius(0)*m_radius(1)/d;
+        double y_supell = y_ell*m_radius(0)*m_radius(1)/d;
+        // std::cout << "x_supell= " << x_supell << " y_supell= " << y_supell<< std::endl;
+        double sinb = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(y_supell/m_radius(1),2), 1/m_squareness(0)) )) );
+        // std::cout << "sinb= " << sinb << std::endl;
+        double b = std::asin(sinb);
+        // std::cout << "b= " << b << std::endl;
+        bs.push_back(b);
+        bs.push_back(b+pi/2);
+        bs.push_back(b+pi);
+        bs.push_back(b+3*pi/2);
+      }
+      return bs;
+    }
+    // return a regular angle b distribution, used to initialize newton method
+    template<std::size_t dim, bool owner>
+    std::vector<double> superellipsoid<dim, owner>::ainit_yz(const int n) const
+    {
+      const double pi = 4*std::atan(1);
+      std::vector<double> as;
+      auto angles = xt::linspace<double>(0, 0.5*pi, n, true);
+      for (std::size_t i = 0; i < angles.size(); i++) {
+        double a_ell = angles(i);
+        // std::cout << "a_ell= " << a_ell << std::endl;
+        double y_ell =  m_radius(1)*std::cos(a_ell);
+        double z_ell =  m_radius(2)*std::sin(a_ell);
+        // std::cout << "y_ell= " << y_ell << " z_ell= " << z_ell<< std::endl;
+        // double d = std::pow( std::pow(m_radius(2)*y_ell,2/m_squareness(0))+std::pow(m_radius(1)*z_ell,2/m_squareness(0)), m_squareness(0)/2);
+        double d = std::pow( std::pow(m_radius(2)*y_ell,2/m_squareness(1))+std::pow(m_radius(1)*z_ell,2/m_squareness(1)), m_squareness(1)/2);
+        // std::cout << "d= " << d << std::endl;
+        double y_supell = y_ell*m_radius(1)*m_radius(2)/d;
+        double z_supell = z_ell*m_radius(1)*m_radius(2)/d;
+        // std::cout << "y_supell= " << y_supell << " z_supell= " << z_supell<< std::endl;
+        // double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1/m_squareness(0)) )) );
+        double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1/m_squareness(1)) )) );
+        // std::cout << "sina= " << sina << std::endl;
+        double a = std::asin(sina);
+        // std::cout << "a= " << a << std::endl;
+        as.push_back(a);
+        as.push_back(a+pi/2);
+        as.push_back(a-pi);
+        as.push_back(a-pi/2);
+      }
+      return as;
+    }
+    // return a regular angle b distribution, used to initialize newton method
+    template<std::size_t dim, bool owner>
+    std::vector<double> superellipsoid<dim, owner>::ainit_xz(const int n) const
+    {
+      const double pi = 4*std::atan(1);
+      std::vector<double> as;
+      auto angles = xt::linspace<double>(0, 0.5*pi, n, true);
+      for (std::size_t i = 0; i < angles.size(); i++) {
+        double a_ell = angles(i);
+        // std::cout << "a_ell= " << a_ell << std::endl;
+        double x_ell =  m_radius(0)*std::cos(a_ell);
+        double z_ell =  m_radius(2)*std::sin(a_ell);
+        // std::cout << "x_ell= " << x_ell << " z_ell= " << z_ell<< std::endl;
+        // double d = std::pow( std::pow(m_radius(2)*x_ell,2/m_squareness(0))+std::pow(m_radius(0)*z_ell,2/m_squareness(0)), m_squareness(0)/2);
+        double d = std::pow( std::pow(m_radius(2)*x_ell,2/m_squareness(1))+std::pow(m_radius(0)*z_ell,2/m_squareness(1)), m_squareness(1)/2);
+        // std::cout << "d= " << d << std::endl;
+        double x_supell = x_ell*m_radius(0)*m_radius(2)/d;
+        double z_supell = z_ell*m_radius(0)*m_radius(2)/d;
+        // std::cout << "y_supell= " << y_supell << " z_supell= " << z_supell<< std::endl;
+        // double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1/m_squareness(0)) )) );
+        double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1/m_squareness(1)) )) );
+        // std::cout << "sina= " << sina << std::endl;
+        double a = std::asin(sina);
+        // std::cout << "a= " << a << std::endl;
+        as.push_back(a);
+        as.push_back(a+pi/2);
+        as.push_back(a-pi);
+        as.push_back(a-pi/2);
+      }
+      return as;
+    }
 }
