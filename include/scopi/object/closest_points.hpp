@@ -2,6 +2,11 @@
 
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xfixed.hpp>
+#include <xtensor/xarray.hpp>
+#include <xtensor/xview.hpp>
+#include <xtensor/xsort.hpp>
+#include <xtensor/xio.hpp>
+
 
 #include "sphere.hpp"
 #include "superellipsoid.hpp"
@@ -31,7 +36,7 @@ namespace scopi
     // SUPERELLIPSOID 2D - SUPERELLIPSOID 2D
     auto closest_points(const superellipsoid<2, false>& s1, const superellipsoid<2, false>& s2)
     {
-        std::cout << "closest_points : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
+        // std::cout << "closest_points : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
         double pi = 4*std::atan(1);
         neighbor<2> neigh;
         // xt::xtensor_fixed<double, xt::xshape<2*(2*dim+dim-1+dim*dim)>> args = xt::hstack(xt::xtuple(
@@ -63,21 +68,21 @@ namespace scopi
             double N10 = args(16);
             double N11 = args(17);
             double cb1 = std::cos(b1);
-            double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-            double cb1e2 = sign(cb1) * std::pow(std::fabs(cb1), 2 - s1e);
+            double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+            double cb1e2 = sign(cb1) * std::pow(std::abs(cb1), 2 - s1e);
             double sb1 = std::sin(b1);
-            double sb1e = sign(sb1) * std::pow(std::fabs(sb1),s1e);
-            double sb1e2 = sign(sb1) * std::pow(std::fabs(sb1), 2 - s1e);
+            double sb1e = sign(sb1) * std::pow(std::abs(sb1),s1e);
+            double sb1e2 = sign(sb1) * std::pow(std::abs(sb1), 2 - s1e);
             double F1 = s1rx * sb1e2;
             double F2 = s1ry * sb1e;
             double F3 = s1ry * cb1e2;
             double F4 = s1rx * cb1e;
             double cb2 = std::cos(b2);
-            double cb2e = sign(cb2) * std::pow(std::fabs(cb2),s2e);
-            double cb2e2 = sign(cb2) * std::pow(std::fabs(cb2),2 - s2e);
+            double cb2e = sign(cb2) * std::pow(std::abs(cb2),s2e);
+            double cb2e2 = sign(cb2) * std::pow(std::abs(cb2),2 - s2e);
             double sb2 = std::sin(b2);
-            double sb2e = sign(sb2) * std::pow(std::fabs(sb2), s2e);
-            double sb2e2 = sign(sb2) * std::pow(std::fabs(sb2),2 - s2e);
+            double sb2e = sign(sb2) * std::pow(std::abs(sb2), s2e);
+            double sb2e2 = sign(sb2) * std::pow(std::abs(sb2),2 - s2e);
             double F5 = s2rx * sb2e2;
             double F6 = s2ry * sb2e;
             double F7 = s2ry * cb2e2;
@@ -112,33 +117,33 @@ namespace scopi
             double N10 = args(16);
             double N11 = args(17);
             double cb1 = std::cos(b1);
-            double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-            double cb1e2 = sign(cb1) * std::pow(std::fabs(cb1), 2 - s1e);
+            double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+            double cb1e2 = sign(cb1) * std::pow(std::abs(cb1), 2 - s1e);
             double sb1 = std::sin(b1);
-            double sb1e = sign(sb1) * std::pow(std::fabs(sb1),s1e);
-            double sb1e2 = sign(sb1) * std::pow(std::fabs(sb1), 2 - s1e);
+            double sb1e = sign(sb1) * std::pow(std::abs(sb1),s1e);
+            double sb1e2 = sign(sb1) * std::pow(std::abs(sb1), 2 - s1e);
             double F1 = s1rx * sb1e2;
             double F2 = s1ry * sb1e;
             double F3 = s1ry * cb1e2;
             double F4 = s1rx * cb1e;
             double cb2 = std::cos(b2);
-            double cb2e = sign(cb2) * std::pow(std::fabs(cb2),s2e);
-            double cb2e2 = sign(cb2) * std::pow(std::fabs(cb2),2 - s2e);
+            double cb2e = sign(cb2) * std::pow(std::abs(cb2),s2e);
+            double cb2e2 = sign(cb2) * std::pow(std::abs(cb2),2 - s2e);
             double sb2 = std::sin(b2);
-            double sb2e = sign(sb2) * std::pow(std::fabs(sb2), s2e);
-            double sb2e2 = sign(sb2) * std::pow(std::fabs(sb2),2 - s2e);
+            double sb2e = sign(sb2) * std::pow(std::abs(sb2), s2e);
+            double sb2e2 = sign(sb2) * std::pow(std::abs(sb2),2 - s2e);
             double F5 = s2rx * sb2e2;
             double F6 = s2ry * sb2e;
             double F7 = s2ry * cb2e2;
             double F8 = s2rx * cb2e;
-            double F9 = s1e * s1rx * sb1 * std::pow(std::fabs(cb1), s1e - 1);
-            double F10 = s1e * s1ry * cb1 * std::pow(std::fabs(sb1), s1e - 1);
-            double F11 = s1ry * (2 - s1e) * sb1 * std::pow(std::fabs(cb1), 1 - s1e);
-            double F12 = s1rx * (2 - s1e) * cb1 * std::pow(std::fabs(sb1), 1 - s1e);
-            double F13 = s2e * s2rx * sb2 * std::pow(std::fabs(cb2), s2e - 1);
-            double F14 = s2e * s2ry * cb2 * std::pow(std::fabs(sb2), s2e - 1);
-            double F15 = s2ry * (2 - s2e) * sb2 * std::pow(std::fabs(cb2), 1 - s2e);
-            double F16 = s2rx * (2 - s2e) * cb2 * std::pow(std::fabs(sb2), 1 - s2e);
+            double F9 = s1e * s1rx * sb1 * std::pow(std::abs(cb1), s1e - 1);
+            double F10 = s1e * s1ry * cb1 * std::pow(std::abs(sb1), s1e - 1);
+            double F11 = s1ry * (2 - s1e) * sb1 * std::pow(std::abs(cb1), 1 - s1e);
+            double F12 = s1rx * (2 - s1e) * cb1 * std::pow(std::abs(sb1), 1 - s1e);
+            double F13 = s2e * s2rx * sb2 * std::pow(std::abs(cb2), s2e - 1);
+            double F14 = s2e * s2ry * cb2 * std::pow(std::abs(sb2), s2e - 1);
+            double F15 = s2ry * (2 - s2e) * sb2 * std::pow(std::abs(cb2), 1 - s2e);
+            double F16 = s2rx * (2 - s2e) * cb2 * std::pow(std::abs(sb2), 1 - s2e);
             xt::xtensor_fixed<double, xt::xshape<2,2>> res;
             res(0,0) =  ( -M01*F1 - M00*F3 ) * ( M10*F9 - M11*F10 ) +
                         (  M11*F1 + M10*F3 ) * ( M00*F9 - M01*F10 ) +
@@ -162,74 +167,58 @@ namespace scopi
             return res;
         };
 
-
-        // std::vector< double > binit1 = { 0, pi/2, pi, 3*pi/2 };
-        // binit1 = create_binit(binit1, 4, pi/2, 0, s1.radius()[0], s1.radius()[1], s1.squareness()[0]);
-        // std::cout << "binit1 = { ";
-        // for (double d : binit1) {
-        //   std::cout << d << ", ";
-        // }
-        // std::cout << "}; \n";
-        // std::vector< double > binit2 = { 0, pi/2, pi, 3*pi/2 };
-        // binit2 = create_binit(binit2, 4, pi/2, 0, s2.radius()[0], s2.radius()[1], s2.squareness()[0]);
-        // // std::cout << "binit2 = { ";
-        // // for (double d : binit2) {
-        // //   std::cout << d << ", ";
-        // // }
-        // // std::cout << "}; \n";
-        // std::size_t i1, i2;
-        // double dmin = 1.0e99;
-        // for (std::size_t i = 0; i < binit1.size(); i++) {
-        //     for (std::size_t j = 0; j < binit2.size(); j++) {
-        //         double d = xt::linalg::norm(s1.point(binit1[i])-s2.point(binit2[j]),2);
-        //         if (d<dmin) {
-        //           dmin = d;
-        //           i1 = i;
-        //           i2 = j;
-        //         }
-        //     }
-        // }
-        // xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1[i1], binit2[i2]};
-
         int num = 32;
-        auto binit1_xy = s1.binit_xy(num);
-        // std::cout << "binit1_xy = { ";
-        // for (double d : binit1_xy) {
-        //   std::cout << d << ", ";
-        // }
-        // std::cout << "}; \n";
-        auto binit2_xy = s2.binit_xy(num);
-        // // std::cout << "binit2 = { ";
-        // // for (double d : binit2) {
-        // //   std::cout << d << ", ";
-        // // }
-        // // std::cout << "}; \n";
-        std::size_t i1, i2;
-        double dmin = 1.0e99;
+        auto binit1_xy = xt::unique(xt::adapt(s1.binit_xy(num)));
+        // std::cout << "binit1_xy = " << binit1_xy << std::endl;
+        auto binit2_xy = xt::unique(xt::adapt(s2.binit_xy(num)));
+        // std::cout << "binit2_xy = " << binit2_xy << std::endl;
+
+        xt::xtensor<double, 2> distances = xt::zeros<double>({binit1_xy.size(), binit2_xy.size()});
         for (std::size_t i = 0; i < binit1_xy.size(); i++) {
             for (std::size_t j = 0; j < binit2_xy.size(); j++) {
-                double d = xt::linalg::norm(s1.point(binit1_xy[i])-s2.point(binit2_xy[j]),2);
-                if (d<dmin) {
-                  dmin = d;
-                  i1 = i;
-                  i2 = j;
-                }
+                distances(i,j) = xt::linalg::norm(xt::flatten(s1.point(binit1_xy(i)))-xt::flatten(s2.point(binit2_xy(j))),2) +
+                  2*(1+xt::linalg::vdot(s1.normal(binit1_xy(i)),s2.normal(binit2_xy(j))));
             }
         }
-        xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1_xy[i1], binit2_xy[i2]};
+        // std::cout << "distances =" << distances << std::endl;
+        auto dmin = xt::amin(distances);
+        // std::cout << "distance min =" << dmin << std::endl;
+        auto indmin = xt::from_indices(xt::where(xt::equal(distances, dmin(0)))); //xt::argmin(distances);
+        // std::cout << "indmin =" << indmin << std::endl;
+        // std::cout << "indmin(0,0) =" << xt::row(indmin,0)(0) << std::endl;
+        // std::cout << "indmin(1,0) =" << xt::row(indmin,1)(0) << std::endl;
 
-        auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+        // std::cout << "pt s1 = " << s1.point(binit1_xy(xt::row(indmin,0)(0))) << std::endl;
+        // std::cout << "pt s2 = " << s2.point(binit2_xy(xt::row(indmin,1)(0))) << std::endl;
+        xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1_xy(xt::row(indmin,0)(0)), binit2_xy(xt::row(indmin,1)(0))};
+        // std::cout << "u0 =" << u0 << std::endl;
+
+        auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,2000,1.0e-10,1.0e-7);
+        if (info==-1){
+          std::cout << "\ns1 : " << std::endl;
+          s1.print();
+          std::cout << "s2 : " << std::endl;
+          s2.print();
+          std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
+          std::cout << "s2.pos = " << s2.pos() << " s2.rotation = " << xt::flatten(s2.rotation()) << std::endl;
+          exit(0);
+        }
         neigh.pi = s1.point(u(0));
         neigh.pj = s2.point(u(1));
         neigh.nij = s2.normal(u(1));
-        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+        // neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+        auto sign = xt::sign(xt::eval(xt::linalg::dot(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), xt::flatten(neigh.nij))));
+        neigh.dij = sign(0)*xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
+        // std::cout << "pi = " << neigh.pi << " pj = " << neigh.pj << std::endl;
+        // std::cout << "nij = " << neigh.nij << " dij = " << neigh.dij << std::endl;
+
         return neigh;
     }
 
     // SUPERELLIPSOID 3D - SUPERELLIPSOID 3D
     auto closest_points(const superellipsoid<3, false>& s1, const superellipsoid<3, false>& s2)
     {
-        std::cout << "closest_points : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
+        // std::cout << "closest_points : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
         double pi = 4*std::atan(1);
         neighbor<3> neigh;
         // xt::xtensor_fixed<double, xt::xshape<2*(2*dim+dim-1+dim*dim)>> args = xt::hstack(xt::xtuple(
@@ -237,6 +226,10 @@ namespace scopi
             xt::view(s1.pos(), 0), s1.radius(), s1.squareness(), xt::flatten(s1.rotation()),
           xt::view(s2.pos(), 0), s2.radius(), s2.squareness(), xt::flatten(s2.rotation())
         ));
+        // s1.print();
+        // s2.print();
+        // std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
+        // std::cout << "s2.pos = " << s2.pos() << " s2.rotation = " << xt::flatten(s2.rotation()) << std::endl;
         // std::cout << "args = " << args << std::endl;
         auto newton_F = [](auto u, auto args)
         {
@@ -280,20 +273,20 @@ namespace scopi
             double N22 = args(33);
 
             double ca1 = std::cos(a1);
-            double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
-            double ca1n2 = sign(ca1) * std::pow(std::fabs(ca1), 2 - s1n);
+            double ca1n = sign(ca1) * std::pow(std::abs(ca1), s1n);
+            double ca1n2 = sign(ca1) * std::pow(std::abs(ca1), 2 - s1n);
 
             double sa1 = std::sin(a1);
-            double sa1n = sign(sa1) * std::pow(std::fabs(sa1), s1n);
-            double sa1n2 = sign(sa1) * std::pow(std::fabs(sa1), 2 - s1n);
+            double sa1n = sign(sa1) * std::pow(std::abs(sa1), s1n);
+            double sa1n2 = sign(sa1) * std::pow(std::abs(sa1), 2 - s1n);
 
             double cb1 = std::cos(b1);
-            double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-            double cb1e2 = sign(cb1) * std::pow(std::fabs(cb1), 2 - s1e);
+            double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+            double cb1e2 = sign(cb1) * std::pow(std::abs(cb1), 2 - s1e);
 
             double sb1 = std::sin(b1);
-            double sb1e = sign(sb1) * std::pow(std::fabs(sb1), s1e);
-            double sb1e2 = sign(sb1) * std::pow(std::fabs(sb1), 2 - s1e);
+            double sb1e = sign(sb1) * std::pow(std::abs(sb1), s1e);
+            double sb1e2 = sign(sb1) * std::pow(std::abs(sb1), 2 - s1e);
 
             double A1 = s1ry * s1rz * ca1n2 * cb1e2;
             double A2 = s1rx * s1rz * sb1e2 * ca1n2;
@@ -303,20 +296,20 @@ namespace scopi
             double A6 = s1rz * sa1n;
 
             double ca2 = std::cos(a2);
-            double ca2n = sign(ca2) * std::pow(std::fabs(ca2), s2n);
-            double ca2n2 = sign(ca2) * std::pow(std::fabs(ca2), 2 - s2n);
+            double ca2n = sign(ca2) * std::pow(std::abs(ca2), s2n);
+            double ca2n2 = sign(ca2) * std::pow(std::abs(ca2), 2 - s2n);
 
             double sa2 = std::sin(a2);
-            double sa2n = sign(sa2) * std::pow(std::fabs(sa2), s2n);
-            double sa2n2 = sign(sa2) * std::pow(std::fabs(sa2), 2 - s2n);
+            double sa2n = sign(sa2) * std::pow(std::abs(sa2), s2n);
+            double sa2n2 = sign(sa2) * std::pow(std::abs(sa2), 2 - s2n);
 
             double cb2 = std::cos(b2);
-            double cb2e = sign(cb2) * std::pow(std::fabs(cb2), s2e);
-            double cb2e2 = sign(cb2) * std::pow(std::fabs(cb2), 2 - s2e);
+            double cb2e = sign(cb2) * std::pow(std::abs(cb2), s2e);
+            double cb2e2 = sign(cb2) * std::pow(std::abs(cb2), 2 - s2e);
 
             double sb2 = std::sin(b2);
-            double sb2e = sign(sb2) * std::pow(std::fabs(sb2), s2e);
-            double sb2e2 = sign(sb2) * std::pow(std::fabs(sb2), 2 - s2e);
+            double sb2e = sign(sb2) * std::pow(std::abs(sb2), s2e);
+            double sb2e2 = sign(sb2) * std::pow(std::abs(sb2), 2 - s2e);
 
             double B1 = s2rx * ca2n *cb2e;
             double B2 = s2ry * sb2e *ca2n;
@@ -381,28 +374,28 @@ namespace scopi
             double N22 = args(33);
 
             double ca1 = std::cos(a1);
-            double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
-            double ca1n1 = s1n * std::pow(std::fabs(ca1), s1n - 1);
-            double ca1n2 = sign(ca1) * std::pow(std::fabs(ca1), 2 - s1n);
-            double ca1n3 = (2 - s1n) * std::pow(std::fabs(ca1), 1 - s1n);
+            double ca1n = sign(ca1) * std::pow(std::abs(ca1), s1n);
+            double ca1n1 = s1n * std::pow(std::abs(ca1), s1n - 1);
+            double ca1n2 = sign(ca1) * std::pow(std::abs(ca1), 2 - s1n);
+            double ca1n3 = (2 - s1n) * std::pow(std::abs(ca1), 1 - s1n);
 
             double sa1 = std::sin(a1);
-            double sa1n = sign(sa1) * std::pow(std::fabs(sa1), s1n);
-            double sa1n1 = s1n * std::pow(std::fabs(sa1), s1n - 1);
-            double sa1n2 = sign(sa1) * std::pow(std::fabs(sa1), 2 - s1n);
-            double sa1n3 = (2 - s1n) * std::pow(std::fabs(sa1), 1 - s1n);
+            double sa1n = sign(sa1) * std::pow(std::abs(sa1), s1n);
+            double sa1n1 = s1n * std::pow(std::abs(sa1), s1n - 1);
+            double sa1n2 = sign(sa1) * std::pow(std::abs(sa1), 2 - s1n);
+            double sa1n3 = (2 - s1n) * std::pow(std::abs(sa1), 1 - s1n);
 
             double cb1 = std::cos(b1);
-            double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-            double cb1e1 = s1e * std::pow(std::fabs(cb1), s1e - 1);
-            double cb1e2 = sign(cb1) * std::pow(std::fabs(cb1), 2 - s1e);
-            double cb1e3 = (2 - s1e) * std::pow(std::fabs(cb1), 1 - s1e);
+            double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+            double cb1e1 = s1e * std::pow(std::abs(cb1), s1e - 1);
+            double cb1e2 = sign(cb1) * std::pow(std::abs(cb1), 2 - s1e);
+            double cb1e3 = (2 - s1e) * std::pow(std::abs(cb1), 1 - s1e);
 
             double sb1 = std::sin(b1);
-            double sb1e = sign(sb1) * std::pow(std::fabs(sb1), s1e);
-            double sb1e1 = s1e * std::pow(std::fabs(sb1), s1e - 1);
-            double sb1e2 = sign(sb1) * std::pow(std::fabs(sb1), 2 - s1e);
-            double sb1e3 = (2 - s1e) * std::pow(std::fabs(sb1), 1 - s1e);
+            double sb1e = sign(sb1) * std::pow(std::abs(sb1), s1e);
+            double sb1e1 = s1e * std::pow(std::abs(sb1), s1e - 1);
+            double sb1e2 = sign(sb1) * std::pow(std::abs(sb1), 2 - s1e);
+            double sb1e3 = (2 - s1e) * std::pow(std::abs(sb1), 1 - s1e);
 
             double A1 = s1ry * s1rz * ca1n2 * cb1e2;
             double A2 = s1rx * s1rz * sb1e2 * ca1n2;
@@ -422,28 +415,28 @@ namespace scopi
             double A16 = s1rx * s1rz  * cb1 * sb1e3 * ca1n2;
 
             double ca2 = std::cos(a2);
-            double ca2n = sign(ca2) * std::pow(std::fabs(ca2), s2n);
-            double ca2n1 = s2n * std::pow(std::fabs(ca2), s2n - 1);
-            double ca2n2 = sign(ca2) * std::pow(std::fabs(ca2), 2 - s2n);
-            double ca2n3 = (2 - s2n) * std::pow(std::fabs(ca2), 1 - s2n);
+            double ca2n = sign(ca2) * std::pow(std::abs(ca2), s2n);
+            double ca2n1 = s2n * std::pow(std::abs(ca2), s2n - 1);
+            double ca2n2 = sign(ca2) * std::pow(std::abs(ca2), 2 - s2n);
+            double ca2n3 = (2 - s2n) * std::pow(std::abs(ca2), 1 - s2n);
 
             double sa2 = std::sin(a2);
-            double sa2n = sign(sa2) * std::pow(std::fabs(sa2), s2n);
-            double sa2n1 = s2n * std::pow(std::fabs(sa2), s2n - 1);
-            double sa2n2 = sign(sa2) * std::pow(std::fabs(sa2), 2 - s2n);
-            double sa2n3 = (2 - s2n) * std::pow(std::fabs(sa2), 1 - s2n);
+            double sa2n = sign(sa2) * std::pow(std::abs(sa2), s2n);
+            double sa2n1 = s2n * std::pow(std::abs(sa2), s2n - 1);
+            double sa2n2 = sign(sa2) * std::pow(std::abs(sa2), 2 - s2n);
+            double sa2n3 = (2 - s2n) * std::pow(std::abs(sa2), 1 - s2n);
 
             double cb2 = std::cos(b2);
-            double cb2e = sign(cb2) * std::pow(std::fabs(cb2), s2e);
-            double cb2e1 = s2e * std::pow(std::fabs(cb2), s2e - 1);
-            double cb2e2 = sign(cb2) * std::pow(std::fabs(cb2), 2 - s2e);
-            double cb2e3 = (2 - s2e) * std::pow(std::fabs(cb2), 1 - s2e);
+            double cb2e = sign(cb2) * std::pow(std::abs(cb2), s2e);
+            double cb2e1 = s2e * std::pow(std::abs(cb2), s2e - 1);
+            double cb2e2 = sign(cb2) * std::pow(std::abs(cb2), 2 - s2e);
+            double cb2e3 = (2 - s2e) * std::pow(std::abs(cb2), 1 - s2e);
 
             double sb2 = std::sin(b2);
-            double sb2e = sign(sb2) * std::pow(std::fabs(sb2), s2e);
-            double sb2e1 = s2e * std::pow(std::fabs(sb2), s2e - 1);
-            double sb2e2 = sign(sb2) * std::pow(std::fabs(sb2), 2 - s2e);
-            double sb2e3 = (2 - s2e) * std::pow(std::fabs(sb2), 1 - s2e);
+            double sb2e = sign(sb2) * std::pow(std::abs(sb2), s2e);
+            double sb2e1 = s2e * std::pow(std::abs(sb2), s2e - 1);
+            double sb2e2 = sign(sb2) * std::pow(std::abs(sb2), 2 - s2e);
+            double sb2e3 = (2 - s2e) * std::pow(std::abs(sb2), 1 - s2e);
 
             double B1 = s2rx * ca2n * cb2e;
             double B2 = s2ry * sb2e * ca2n;
@@ -551,45 +544,74 @@ namespace scopi
                        (M20*A1 + M21*A2 + M22*A3) * (-N20*B15 + N21*B16);
             return res;
         };
-        const int num = 2;
-        auto binit1_xy = s1.binit_xy(num);
-        auto ainit1_yz = s1.ainit_yz(num);
-        auto ainit1_xz = s1.ainit_xz(num);
-        std::cout << " binit1_xy.size() = " << binit1_xy.size() << " ainit1_yz.size() = " << ainit1_yz.size() << " ainit1_xz.size() = " << ainit1_xz.size() << std::endl;
-        auto binit1 = xt::concatenate(xt::xtuple(xt::adapt(binit1_xy),xt::adapt(binit1_xy)));
-        auto ainit1 = xt::concatenate(xt::xtuple(xt::adapt(ainit1_yz),xt::adapt(ainit1_xz)));
-        std::cout << " ainit1.size() = " << ainit1.size() << " binit1.size() = " << binit1.size() << std::endl;
+        const int num = 8;
+        auto binit1 = xt::unique(xt::adapt(s1.binit_xy(num)));
+        auto ainit1 = xt::unique(xt::adapt(s1.ainit_yz(num)));
+
+        // auto binit1_xy = xt::unique(xt::adapt(s1.binit_xy(num)));
+        // std::cout << " binit1_xy = " << binit1_xy << std::endl;
+        // auto ainit1_yz = xt::unique(xt::adapt(s1.ainit_yz(num)));
+        // std::cout << " ainit1_yz = " << ainit1_yz << std::endl;
+        // auto ainit1_xz = xt::unique(xt::adapt(s1.ainit_xz(num)));
+        // std::cout << " ainit1_xz = " << ainit1_xz << std::endl;
+        // // exit(0);
+        // // std::cout << " binit1_xy.size() = " << binit1_xy.size() << " ainit1_yz.size() = " << ainit1_yz.size() << " ainit1_xz.size() = " << ainit1_xz.size() << std::endl;
+        // auto binit1 = xt::concatenate(xt::xtuple(binit1_xy,binit1_xy));
+        // auto ainit1 = xt::concatenate(xt::xtuple(ainit1_yz,ainit1_xz));
+        // std::cout << " ainit1.size() = " << ainit1.size() << " binit1.size() = " << binit1.size() << std::endl;
         auto [ agrid1, bgrid1 ] = xt::meshgrid(ainit1, binit1);
         auto fl_agrid1 = xt::flatten(agrid1);
         auto fl_bgrid1 = xt::flatten(bgrid1);
-        // std::cout << agrid1 << bgrid1 << std::endl;
-        // std::cout << fl_agrid1 << std::endl;
+        // std::cout << "agrid1 = " << agrid1 << "bgrid1 = " << bgrid1 << std::endl;
+        // std::cout << "flatten agrid1 =" << fl_agrid1 << std::endl;
+        // std::cout << "flatten bgrid1 =" << fl_bgrid1 << std::endl;
 
-        auto binit2_xy = s2.binit_xy(num);
-        auto ainit2_yz = s2.ainit_yz(num);
-        auto ainit2_xz = s2.ainit_xz(num);
-        std::cout << " binit2_xy.size() = " << binit2_xy.size() << " ainit2_yz.size() = " << ainit2_yz.size() << " ainit2_xz.size() = " << ainit2_xz.size() << std::endl;
-        auto binit2 = xt::concatenate(xt::xtuple(xt::adapt(binit2_xy),xt::adapt(binit2_xy)));
-        auto ainit2 = xt::concatenate(xt::xtuple(xt::adapt(ainit2_yz),xt::adapt(ainit2_xz)));
-        std::cout << " ainit2.size() = " << ainit2.size() << " binit2.size() = " << binit2.size() << std::endl;
+        auto binit2 = xt::unique(xt::adapt(s2.binit_xy(num)));
+        auto ainit2 = xt::unique(xt::adapt(s2.ainit_yz(num)));
+        // auto binit2_xy = xt::unique(xt::adapt(s2.binit_xy(num)));
+        // std::cout << " binit2_xy = " << binit2_xy << std::endl;
+        // auto ainit2_yz = xt::unique(xt::adapt(s2.ainit_yz(num)));
+        // std::cout << " ainit2_yz = " << ainit2_yz << std::endl;
+        // auto ainit2_xz = xt::unique(xt::adapt(s2.ainit_xz(num)));
+        // std::cout << " ainit2_xz = " << ainit2_xz << std::endl;
+        // // std::cout << " binit2_xy.size() = " << binit2_xy.size() << " ainit2_yz.size() = " << ainit2_yz.size() << " ainit2_xz.size() = " << ainit2_xz.size() << std::endl;
+        // auto binit2 = xt::concatenate(xt::xtuple(binit2_xy,binit2_xy));
+        // auto ainit2 = xt::concatenate(xt::xtuple(ainit2_yz,ainit2_xz));
+        // std::cout << " ainit2.size() = " << ainit2.size() << " binit2.size() = " << binit2.size() << std::endl;
         auto [ agrid2, bgrid2 ] = xt::meshgrid(ainit2, binit2);
+        // std::cout << "agrid2 = " << agrid2 << "bgrid2 = " << bgrid2 << std::endl;
+
         auto fl_agrid2 = xt::flatten(agrid2);
         auto fl_bgrid2 = xt::flatten(bgrid2);
-
-        std::size_t i1, i2;
-        double dmin = 1.0e99;
-        std::cout << " fl_agrid1.size() = " << fl_agrid1.size() << " fl_agrid2.size() = " << fl_agrid2.size() << std::endl;
+        // std::cout << "flatten agrid2 =" << fl_agrid2 << std::endl;
+        // std::cout << "flatten bgrid2 =" << fl_bgrid2 << std::endl;
+        //
+        // std::cout << " fl_agrid1.size() = " << fl_agrid1.size() << " fl_agrid2.size() = " << fl_agrid2.size() << std::endl;
+        xt::xtensor<double, 2> distances = xt::zeros<double>({fl_agrid1.size(), fl_agrid2.size()});
         for (std::size_t i = 0; i < fl_agrid1.size(); i++) {
             for (std::size_t j = 0; j < fl_agrid2.size(); j++) {
-                double d = xt::linalg::norm(s1.point(fl_agrid1(i),fl_bgrid1(i))-s2.point(fl_agrid2(j),fl_bgrid2(j)),2);
-                if (d<dmin) {
-                  dmin = d;
-                  i1 = i;
-                  i2 = j;
-                }
+                distances(i,j) = xt::linalg::norm(xt::flatten(s1.point(fl_agrid1(i),fl_bgrid1(i)))-xt::flatten(s2.point(fl_agrid2(j),fl_bgrid2(j))),2) +
+                2*(1+xt::linalg::vdot(s1.normal(fl_agrid1(i),fl_bgrid1(i)),s2.normal(fl_agrid2(j),fl_bgrid2(j))));
             }
         }
-        xt::xtensor_fixed<double, xt::xshape<4>> u0 = {fl_agrid1(i1),fl_bgrid1(i1), fl_agrid2(i2),fl_bgrid2(i2)};
+        std::cout << "distances =" << distances << std::endl;
+        auto dmin = xt::amin(distances);
+        std::cout << "distance min =" << dmin << std::endl;
+        auto indmin = xt::from_indices(xt::where(xt::equal(distances, dmin(0)))); //xt::argmin(distances);
+        std::cout << "indmin =" << indmin << std::endl;
+        std::cout << "indmin(0,0) =" << xt::row(indmin,0)(0) << std::endl;
+        std::cout << "indmin(1,0) =" << xt::row(indmin,1)(0) << std::endl;
+
+        // for (int l=0; xt::row(indmin,0).size(); ++l){
+        //     std::cout << "l =" << l << " pt s1 = " << s1.point(fl_agrid1(xt::row(indmin,0)(l)),fl_bgrid1(xt::row(indmin,0)(l))) << std::endl;
+        //     std::cout << "l =" << l << " pt s2 = " << s2.point(fl_agrid1(xt::row(indmin,1)(l)),fl_bgrid1(xt::row(indmin,1)(l))) << std::endl;
+        // }
+        std::cout << "pt s1 = " << s1.point(fl_agrid1(xt::row(indmin,0)(0)),fl_bgrid1(xt::row(indmin,0)(0))) << std::endl;
+        std::cout << "pt s2 = " << s2.point(fl_agrid2(xt::row(indmin,1)(0)),fl_bgrid2(xt::row(indmin,1)(0))) << std::endl;
+        // xt::xtensor_fixed<double, xt::xshape<4>> u0 = {fl_agrid1(iindmin(0,0)),fl_bgrid1(indmin(0,1)),
+        //                                                fl_agrid2(indmin(1,0)),fl_bgrid2(indmin(1,1))};
+        xt::xtensor_fixed<double, xt::xshape<4>> u0 = {fl_agrid1(xt::row(indmin,0)(0)),fl_bgrid1(xt::row(indmin,0)(0)),
+                                                       fl_agrid2(xt::row(indmin,1)(0)),fl_bgrid2(xt::row(indmin,1)(0))};
         std::cout << "u0 =" << u0 << std::endl;
 
         // exit(0);
@@ -610,16 +632,28 @@ namespace scopi
         // xt::xtensor_fixed<double, xt::xshape<4>> u0 = { ainit(indmin(0,0)), binit(indmin(0,0)), ainit(indmin(1,0)), binit(indmin(1,0)) };
         // std::cout << "u0 = "<< u0 << std::endl;
         // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
-        auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+        auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,4000,1.0e-8,1.0e-7); //itermax,  ftol,  xtol
+        // if (info==-1){
+          std::cout << "\ns1 : " << std::endl;
+          s1.print();
+          std::cout << "s2 : " << std::endl;
+          s2.print();
+          std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
+          std::cout << "s2.pos = " << s2.pos() << " s2.rotation = " << xt::flatten(s2.rotation()) << std::endl;
+          // exit(0);
+        // }
+        // if (info==-1){
+        //   exit(0);
+        // }
         neigh.pi = s1.point(u(0),u(1));
         neigh.pj = s2.point(u(2),u(3));
         neigh.nij = s2.normal(u(2),u(3));
-        neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+        auto sign = xt::sign(xt::eval(xt::linalg::dot(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), xt::flatten(neigh.nij))));
+        neigh.dij = sign(0)*xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
+        std::cout << "pi = " << neigh.pi << " pj = " << neigh.pj << std::endl;
+        std::cout << "nij = " << neigh.nij << " dij = " << neigh.dij << std::endl;
         return neigh;
     }
-
-
-
 
     // PLAN - PLAN
     template<std::size_t dim>
@@ -715,20 +749,20 @@ namespace scopi
             double N22 = args(29);
 
             double ca1 = std::cos(a1);
-            double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
-            double ca1n2 = std::pow(std::fabs(ca1), 2 - s1n);
+            double ca1n = sign(ca1) * std::pow(std::abs(ca1), s1n);
+            double ca1n2 = std::pow(std::abs(ca1), 2 - s1n);
 
             double sa1 = std::sin(a1);
-            double sa1n = sign(sa1) * std::pow(std::fabs(sa1), s1n);
-            double sa1n2 = sign(sa1) * std::pow(std::fabs(sa1), 2 - s1n);
+            double sa1n = sign(sa1) * std::pow(std::abs(sa1), s1n);
+            double sa1n2 = sign(sa1) * std::pow(std::abs(sa1), 2 - s1n);
 
             double cb1 = std::cos(b1);
-            double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-            double cb1e2 = sign(cb1) * std::pow(std::fabs(cb1), 2 - s1e);
+            double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+            double cb1e2 = sign(cb1) * std::pow(std::abs(cb1), 2 - s1e);
 
             double sb1 = std::sin(b1);
-            double sb1e = sign(sb1) * std::pow(std::fabs(sb1), s1e);
-            double sb1e2 = sign(sb1) * std::pow(std::fabs(sb1), 2 - s1e);
+            double sb1e = sign(sb1) * std::pow(std::abs(sb1), s1e);
+            double sb1e2 = sign(sb1) * std::pow(std::abs(sb1), 2 - s1e);
 
             double A1 = s1ry * s1rz * ca1n2 * cb1e2;
             double A2 = s1rx * s1rz * sb1e2 * ca1n2;
@@ -739,7 +773,7 @@ namespace scopi
 
             double ca2 = std::cos(a2);
 
-            double ca2n2 = std::fabs(ca2);
+            double ca2n2 = std::abs(ca2);
 
             double sa2 = std::sin(a2);
 
@@ -806,28 +840,28 @@ namespace scopi
           double N22 = args(29);
 
           double ca1 = std::cos(a1);
-          double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
-          double ca1n1 = s1n * std::pow(std::fabs(ca1), s1n - 1);
-          double ca1n2 = std::pow(std::fabs(ca1), 2 - s1n);
-          double ca1n3 = (2 - s1n) * sign(ca1) * std::pow(std::fabs(ca1), 1 - s1n);
+          double ca1n = sign(ca1) * std::pow(std::abs(ca1), s1n);
+          double ca1n1 = s1n * std::pow(std::abs(ca1), s1n - 1);
+          double ca1n2 = std::pow(std::abs(ca1), 2 - s1n);
+          double ca1n3 = (2 - s1n) * sign(ca1) * std::pow(std::abs(ca1), 1 - s1n);
 
           double sa1 = std::sin(a1);
-          double sa1n = sign(sa1) * std::pow(std::fabs(sa1), s1n);
-          double sa1n1 = s1n * std::pow(std::fabs(sa1), s1n - 1);
-          double sa1n2 = sign(sa1) * std::pow(std::fabs(sa1), 2 - s1n);
-          double sa1n3 = (2 - s1n) * std::pow(std::fabs(sa1), 1 - s1n);
+          double sa1n = sign(sa1) * std::pow(std::abs(sa1), s1n);
+          double sa1n1 = s1n * std::pow(std::abs(sa1), s1n - 1);
+          double sa1n2 = sign(sa1) * std::pow(std::abs(sa1), 2 - s1n);
+          double sa1n3 = (2 - s1n) * std::pow(std::abs(sa1), 1 - s1n);
 
           double cb1 = std::cos(b1);
-          double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-          double cb1e1 = s1e * std::pow(std::fabs(cb1), s1e - 1);
-          double cb1e2 = sign(cb1) * std::pow(std::fabs(cb1), 2 - s1e);
-          double cb1e3 = (2 - s1e) * std::pow(std::fabs(cb1), 1 - s1e);
+          double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+          double cb1e1 = s1e * std::pow(std::abs(cb1), s1e - 1);
+          double cb1e2 = sign(cb1) * std::pow(std::abs(cb1), 2 - s1e);
+          double cb1e3 = (2 - s1e) * std::pow(std::abs(cb1), 1 - s1e);
 
           double sb1 = std::sin(b1);
-          double sb1e = sign(sb1) * std::pow(std::fabs(sb1), s1e);
-          double sb1e1 = s1e * std::pow(std::fabs(sb1), s1e - 1);
-          double sb1e2 = sign(sb1) * std::pow(std::fabs(sb1), 2 - s1e);
-          double sb1e3 = (2 - s1e) * std::pow(std::fabs(sb1), 1 - s1e);
+          double sb1e = sign(sb1) * std::pow(std::abs(sb1), s1e);
+          double sb1e1 = s1e * std::pow(std::abs(sb1), s1e - 1);
+          double sb1e2 = sign(sb1) * std::pow(std::abs(sb1), 2 - s1e);
+          double sb1e3 = (2 - s1e) * std::pow(std::abs(sb1), 1 - s1e);
 
           double A1 = s1ry * s1rz * ca1n2 * cb1e2;
           double A2 = s1rx * s1rz * sb1e2 * ca1n2;
@@ -840,14 +874,14 @@ namespace scopi
           double A9 = s1rz * ca1 * sa1n1;
           double A10 = s1ry * s1rz * sa1 * ca1n3 * cb1e2;
           double A11 = s1rx * s1rz * sa1 * sb1e2 * ca1n3;
-          double A12 = s1rx * s1ry * std::fabs(ca1) * sa1n3;
+          double A12 = s1rx * s1ry * std::abs(ca1) * sa1n3;
           double A13 = s1rx * sb1 * ca1n  * cb1e1;
           double A14 = s1ry * cb1 * sb1e1 * ca1n;
           double A15 = s1ry * s1rz  * sb1 * ca1n2 * cb1e3;
           double A16 = s1rx * s1rz  * cb1 * sb1e3 * ca1n2;
 
           double ca2 = std::cos(a2);
-          double ca2n2 = std::fabs(ca2);
+          double ca2n2 = std::abs(ca2);
           double ca2n3 = sign(ca2);
 
           double sa2 = std::sin(a2);
@@ -869,7 +903,7 @@ namespace scopi
           double B11 = s2r * cb2 * ca2;
           double B12 = s2r * s2r * sa2 * ca2n3 * cb2;
           double B13 = s2r * s2r * sa2 * sb2 * ca2n3;
-          double B14 = s2r * s2r * std::fabs(ca2);
+          double B14 = s2r * s2r * std::abs(ca2);
           double B15 = s2r * s2r * sb2 * ca2n2;
           double B16 = s2r * s2r * cb2 * ca2n2;
 
@@ -981,7 +1015,7 @@ namespace scopi
         xt::xtensor_fixed<double, xt::xshape<4>> u0 = { ainit(indmin(0,0)), binit(indmin(0,0)), ainit(indmin(1,0)), binit(indmin(1,0)) };
         // std::cout << "u0 = "<< u0 << std::endl;
         // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
-        auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+        auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
         neigh.pi = s1.point(u(0),u(1));
         neigh.pj = s2.point(u(2),u(3));
         neigh.nij = s2.normal(u(2),u(3));
@@ -1023,10 +1057,10 @@ namespace scopi
         double N10 = args(14);
         double N11 = args(15);
 
-        double D1 = s1rx * std::pow(std::fabs(std::sin(b1)), 2 - s1e) * sign(std::sin(b1));
-        double D2 = s1ry * std::pow(std::fabs(std::sin(b1)), s1e) * sign(std::sin(b1));
-        double D3 = s1ry * std::pow(std::fabs(std::cos(b1)), 2 - s1e) * sign(std::cos(b1));
-        double D4 = s1rx * std::pow(std::fabs(std::cos(b1)), s1e) * sign(std::cos(b1));
+        double D1 = s1rx * std::pow(std::abs(std::sin(b1)), 2 - s1e) * sign(std::sin(b1));
+        double D2 = s1ry * std::pow(std::abs(std::sin(b1)), s1e) * sign(std::sin(b1));
+        double D3 = s1ry * std::pow(std::abs(std::cos(b1)), 2 - s1e) * sign(std::cos(b1));
+        double D4 = s1rx * std::pow(std::abs(std::cos(b1)), s1e) * sign(std::cos(b1));
         double D5 = s2r * std::sin(b2);
         double D6 = s2r * std::cos(b2);
 
@@ -1064,16 +1098,16 @@ namespace scopi
         double N10 = args(14);
         double N11 = args(15);
 
-        double D1 = s1rx * std::pow(std::fabs(std::sin(b1)), 2 - s1e) * sign(std::sin(b1));
-        double D2 = s1ry * std::pow(std::fabs(std::sin(b1)), s1e) * sign(std::sin(b1));
-        double D3 = s1ry * std::pow(std::fabs(std::cos(b1)), 2 - s1e) * sign(std::cos(b1));
-        double D4 = s1rx * std::pow(std::fabs(std::cos(b1)), s1e) * sign(std::cos(b1));
+        double D1 = s1rx * std::pow(std::abs(std::sin(b1)), 2 - s1e) * sign(std::sin(b1));
+        double D2 = s1ry * std::pow(std::abs(std::sin(b1)), s1e) * sign(std::sin(b1));
+        double D3 = s1ry * std::pow(std::abs(std::cos(b1)), 2 - s1e) * sign(std::cos(b1));
+        double D4 = s1rx * std::pow(std::abs(std::cos(b1)), s1e) * sign(std::cos(b1));
         double D5 = s2r * std::sin(b2);
         double D6 = s2r * std::cos(b2);
-        double D7 = s1e * s1rx * std::sin(b1) * std::pow(std::fabs(std::cos(b1)), s1e - 1);
-        double D8 = s1e * s1ry * std::cos(b1) * std::pow(std::fabs(std::sin(b1)), s1e - 1);
-        double D9 = s1ry * (2 - s1e) * std::sin(b1) * std::pow(std::fabs(std::cos(b1)), 1 - s1e);
-        double D10 = s1rx * (2 - s1e) * std::cos(b1) * std::pow(std::fabs(std::sin(b1)), 1 - s1e);
+        double D7 = s1e * s1rx * std::sin(b1) * std::pow(std::abs(std::cos(b1)), s1e - 1);
+        double D8 = s1e * s1ry * std::cos(b1) * std::pow(std::abs(std::sin(b1)), s1e - 1);
+        double D9 = s1ry * (2 - s1e) * std::sin(b1) * std::pow(std::abs(std::cos(b1)), 1 - s1e);
+        double D10 = s1rx * (2 - s1e) * std::cos(b1) * std::pow(std::abs(std::sin(b1)), 1 - s1e);
 
         xt::xtensor_fixed<double, xt::xshape<2,2>> res;
         res(0,0) = (-M00*D3 - M01*D1 ) * ( M10*D7 - M11*D8 ) +
@@ -1117,7 +1151,7 @@ namespace scopi
       // std::cout << "initialization : imin = " << indmin(0,0) << " jmin = " << indmin(1,0) << std::endl;
       xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), binit(indmin(1,0))};
       // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
-      auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+      auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
       neigh.pi = s1.point(u(0));
       neigh.pj = s2.point(u(1));
       neigh.nij = s2.normal(u(1));
@@ -1178,20 +1212,20 @@ namespace scopi
         double sign_p2s = args(29);
 
         double ca1 = std::cos(a1);
-        double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
-        double ca1n2 = std::pow(std::fabs(ca1), 2 - s1n);
+        double ca1n = sign(ca1) * std::pow(std::abs(ca1), s1n);
+        double ca1n2 = std::pow(std::abs(ca1), 2 - s1n);
 
         double sa1 = std::sin(a1);
-        double sa1n = std::pow(std::fabs(sa1), s1n) * sign(sa1);
-        double sa1n2 = std::pow(std::fabs(sa1), 2 - s1n) * sign(sa1);
+        double sa1n = std::pow(std::abs(sa1), s1n) * sign(sa1);
+        double sa1n2 = std::pow(std::abs(sa1), 2 - s1n) * sign(sa1);
 
         double cb1 = std::cos(b1);
-        double cb1e = sign(cb1)*std::pow(std::fabs(cb1), s1e);
-        double cb1e2 = std::pow(std::fabs(cb1), 2 - s1e) * sign(cb1);
+        double cb1e = sign(cb1)*std::pow(std::abs(cb1), s1e);
+        double cb1e2 = std::pow(std::abs(cb1), 2 - s1e) * sign(cb1);
 
         double sb1 = std::sin(b1);
-        double sb1e = std::pow(std::fabs(sb1), s1e) * sign(sb1);
-        double sb1e2 = std::pow(std::fabs(sb1), 2 - s1e) * sign(sb1);
+        double sb1e = std::pow(std::abs(sb1), s1e) * sign(sb1);
+        double sb1e2 = std::pow(std::abs(sb1), 2 - s1e) * sign(sb1);
 
         double A1 = s1ry * s1rz * ca1n2 * cb1e2;
         double A2 = s1rx * s1rz * sb1e2 * ca1n2;
@@ -1264,28 +1298,28 @@ namespace scopi
         double sign_p2s = args(29);
 
         double ca1 = std::cos(a1);
-        double ca1n = sign(ca1) * std::pow(std::fabs(ca1), s1n);
-        double ca1n1 = s1n * std::pow(std::fabs(ca1), s1n - 1);
-        double ca1n2 = std::pow(std::fabs(ca1), 2 - s1n);
-        double ca1n3 = (2 - s1n) * sign(ca1) * std::pow(std::fabs(ca1), 1 - s1n);
+        double ca1n = sign(ca1) * std::pow(std::abs(ca1), s1n);
+        double ca1n1 = s1n * std::pow(std::abs(ca1), s1n - 1);
+        double ca1n2 = std::pow(std::abs(ca1), 2 - s1n);
+        double ca1n3 = (2 - s1n) * sign(ca1) * std::pow(std::abs(ca1), 1 - s1n);
 
         double sa1 = std::sin(a1);
-        double sa1n = std::pow(std::fabs(sa1), s1n) * sign(sa1);
-        double sa1n1 = s1n * std::pow(std::fabs(sa1), s1n - 1);
-        double sa1n2 = std::pow(std::fabs(sa1), 2 - s1n) * sign(sa1);
-        double sa1n3 = (2 - s1n) * std::pow(std::fabs(sa1), 1 - s1n);
+        double sa1n = std::pow(std::abs(sa1), s1n) * sign(sa1);
+        double sa1n1 = s1n * std::pow(std::abs(sa1), s1n - 1);
+        double sa1n2 = std::pow(std::abs(sa1), 2 - s1n) * sign(sa1);
+        double sa1n3 = (2 - s1n) * std::pow(std::abs(sa1), 1 - s1n);
 
         double cb1 = std::cos(b1);
-        double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-        double cb1e1 = s1e * std::pow(std::fabs(cb1), s1e - 1);
-        double cb1e2 = std::pow(std::fabs(cb1), 2 - s1e) * sign(cb1);
-        double cb1e3 = (2 - s1e) * std::pow(std::fabs(cb1), 1 - s1e);
+        double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+        double cb1e1 = s1e * std::pow(std::abs(cb1), s1e - 1);
+        double cb1e2 = std::pow(std::abs(cb1), 2 - s1e) * sign(cb1);
+        double cb1e3 = (2 - s1e) * std::pow(std::abs(cb1), 1 - s1e);
 
         double sb1 = std::sin(b1);
-        double sb1e = std::pow(std::fabs(sb1), s1e) * sign(sb1);
-        double sb1e1 = s1e * std::pow(std::fabs(sb1), s1e - 1);
-        double sb1e2 = std::pow(std::fabs(sb1), 2 - s1e) * sign(sb1);
-        double sb1e3 = (2 - s1e) * std::pow(std::fabs(sb1), 1 - s1e);
+        double sb1e = std::pow(std::abs(sb1), s1e) * sign(sb1);
+        double sb1e1 = s1e * std::pow(std::abs(sb1), s1e - 1);
+        double sb1e2 = std::pow(std::abs(sb1), 2 - s1e) * sign(sb1);
+        double sb1e3 = (2 - s1e) * std::pow(std::abs(sb1), 1 - s1e);
 
         double A1 = s1ry * s1rz * ca1n2 * cb1e2;
         double A2 = s1rx * s1rz * sb1e2 * ca1n2;
@@ -1298,7 +1332,7 @@ namespace scopi
         double A9 = s1rz * ca1 * sa1n1;
         double A10 = s1ry * s1rz * sa1 * ca1n3 * cb1e2;
         double A11 = s1rx * s1rz * sa1 * sb1e2 * ca1n3;
-        double A12 = s1rx * s1ry * std::fabs(ca1) * sa1n3;
+        double A12 = s1rx * s1ry * std::abs(ca1) * sa1n3;
         double A13 = s1rx * sb1 * ca1n  * cb1e1;
         double A14 = s1ry * cb1 * sb1e1 * ca1n;
         double A15 = s1ry * s1rz  * sb1 * ca1n2 * cb1e3;
@@ -1394,7 +1428,7 @@ namespace scopi
       xt::xtensor_fixed<double, xt::xshape<4>> u0 = { ainit(indmin(0,0)), binit(indmin(0,0)), ainit(indmin(1,0)), binit(indmin(1,0)) };
       // std::cout << "u0 = "<< u0 << std::endl;
       // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
-      auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+      auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
       neigh.pi = s1.point(u(0),u(1));
       neigh.pj = p2.point(u(2),u(3));
       neigh.nij = p2.normal();
@@ -1405,7 +1439,7 @@ namespace scopi
     // SUPERELLIPSOID 2D - DROITE 2D
     auto closest_points(const superellipsoid<2, false> s1, const plan<2, false> d2)
     {
-      std::cout << "closest_points : SUPERELLIPSOID 2D - DROITE 2D" << std::endl;
+      // std::cout << "closest_points : SUPERELLIPSOID 2D - DROITE 2D" << std::endl;
       double pi = 4*std::atan(1);
       neighbor<2> neigh;
       // Pour déterminer de quel cote on est
@@ -1439,12 +1473,12 @@ namespace scopi
         double sign_d2s = args(15);
 
         double cb1 = std::cos(b1);
-        double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-        double cb1e2 = std::pow(std::fabs(cb1), 2 - s1e) * sign(cb1);
+        double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+        double cb1e2 = std::pow(std::abs(cb1), 2 - s1e) * sign(cb1);
 
         double sb1 = std::sin(b1);
-        double sb1e = std::pow(std::fabs(sb1), s1e) * sign(sb1);
-        double sb1e2 = std::pow(std::fabs(sb1), 2 - s1e) * sign(sb1);
+        double sb1e = std::pow(std::abs(sb1), s1e) * sign(sb1);
+        double sb1e2 = std::pow(std::abs(sb1), 2 - s1e) * sign(sb1);
 
         double A1 = s1ry * cb1e2;
         double A2 = s1rx * sb1e2;
@@ -1481,16 +1515,16 @@ namespace scopi
         double sign_d2s = args(15);
 
         double cb1 = std::cos(b1);
-        double cb1e = sign(cb1) * std::pow(std::fabs(cb1), s1e);
-        double cb1e1 = s1e * std::pow(std::fabs(cb1), s1e - 1);
-        double cb1e2 = std::pow(std::fabs(cb1), 2 - s1e) * sign(cb1);
-        double cb1e3 = (2 - s1e) * std::pow(std::fabs(cb1), 1 - s1e);
+        double cb1e = sign(cb1) * std::pow(std::abs(cb1), s1e);
+        double cb1e1 = s1e * std::pow(std::abs(cb1), s1e - 1);
+        double cb1e2 = std::pow(std::abs(cb1), 2 - s1e) * sign(cb1);
+        double cb1e3 = (2 - s1e) * std::pow(std::abs(cb1), 1 - s1e);
 
         double sb1 = std::sin(b1);
-        double sb1e = std::pow(std::fabs(sb1), s1e) * sign(sb1);
-        double sb1e1 = s1e * std::pow(std::fabs(sb1), s1e - 1);
-        double sb1e2 = std::pow(std::fabs(sb1), 2 - s1e) * sign(sb1);
-        double sb1e3 = (2 - s1e) * std::pow(std::fabs(sb1), 1 - s1e);
+        double sb1e = std::pow(std::abs(sb1), s1e) * sign(sb1);
+        double sb1e1 = s1e * std::pow(std::abs(sb1), s1e - 1);
+        double sb1e2 = std::pow(std::abs(sb1), 2 - s1e) * sign(sb1);
+        double sb1e3 = (2 - s1e) * std::pow(std::abs(sb1), 1 - s1e);
 
         double A1 = s1ry * cb1e2;
         double A2 = s1rx * sb1e2;
@@ -1538,7 +1572,18 @@ namespace scopi
       // std::cout << "initialization : imin = " << indmin(0,0) << " jmin = " << indmin(1,0) << std::endl;
       xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), ainit(indmin(1,0))};
       // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
-      auto u = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+      auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+      std::cout << "info = " << info << std::endl;
+      exit(0);
+      if (info==-1){
+        std::cout << "\ns1 : " << std::endl;
+        s1.print();
+        std::cout << "s2 : " << std::endl;
+        d2.print();
+        std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
+        std::cout << "d2.pos = " << d2.pos() << " d2.rotation = " << xt::flatten(d2.rotation()) << std::endl;
+        exit(0);
+      }
       neigh.pi = s1.point(u(0));
       neigh.pj = d2.point(u(1));
       neigh.nij = d2.normal();

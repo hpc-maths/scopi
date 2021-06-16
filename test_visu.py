@@ -14,12 +14,14 @@ print(files)
 plotter = pv.Plotter()
 
 actors = []
+geometries = []
+
 
 it = 0
 for file in files:
 
     # plotter = pv.Plotter(off_screen=True)
-    plotter.clear()
+    # plotter.clear()
 
     with open(file) as json_file:
         print("read json file :",file)
@@ -29,83 +31,172 @@ for file in files:
     contacts = data["contacts"]
 
     positions = []
-    geometries = []
 
-
-    for obj in objects:
-        positions.append(obj["position"])
-        v = np.zeros( (len(obj["position"]),) )
-        v[0] = 1
-        orientation = np.array(obj["rotation"]).reshape((len(obj["position"]),len(obj["position"])))@v
-        if (obj["type"] == "sphere"):
-            if (len(obj["position"])==2):  # 2D
-                geom = pv.ParametricSuperEllipsoid(
-                    xradius=obj["radius"],
-                    yradius=obj["radius"],
-                    zradius=0,
-                    n1=1,
-                    n2=1,
-                    center=(obj["position"][0],obj["position"][1],0),
-                    direction=(orientation[0],orientation[1],0)
-                )
-                # geom = pv.Sphere(
-                #     radius=obj["radius"],
-                #     center=(obj["position"][0],obj["position"][1],0),
-                #     direction=(orientation[0],orientation[1],0)
-                #     )
-
-            else: # 3D
-                geom = pv.Sphere(
-                    radius=obj["radius"],
-                    center=(obj["position"][0],obj["position"][1],obj["position"][2]),
-                    direction=(orientation[0],orientation[1],orientation[2])
+    if (it==0):
+        for obj in objects:
+            positions.append(obj["position"])
+            v = np.zeros( (len(obj["position"]),) )
+            v[0] = 1
+            orientation = np.array(obj["rotation"]).reshape((len(obj["position"]),len(obj["position"])))@v
+            if (obj["type"] == "sphere"):
+                if (len(obj["position"])==2):  # 2D
+                    geom = pv.ParametricSuperEllipsoid(
+                        xradius=obj["radius"],
+                        yradius=obj["radius"],
+                        zradius=0,
+                        n1=1,
+                        n2=1,
+                        center=(obj["position"][0],obj["position"][1],0),
+                        direction=(orientation[0],orientation[1],0)
                     )
-        elif (obj["type"] == "superellipsoid"):
-            if (len(obj["position"])==2):  # 2D
-                geom = pv.ParametricSuperEllipsoid(
-                    xradius=obj["radius"][0],
-                    yradius=obj["radius"][1],
-                    zradius=0,
-                    n1=1,
-                    n2=obj["squareness"][0],
-                    center=(obj["position"][0],obj["position"][1],0),
-                    direction=(orientation[0],orientation[1],0)
+                    geom["e"] = 1
+                    geom["n"] = 1
+                    # geom = pv.Sphere(
+                    #     radius=obj["radius"],
+                    #     center=(obj["position"][0],obj["position"][1],0),
+                    #     direction=(orientation[0],orientation[1],0)
+                    #     )
+
+                else: # 3D
+                    geom = pv.Sphere(
+                        radius=obj["radius"],
+                        center=(obj["position"][0],obj["position"][1],obj["position"][2]),
+                        direction=(orientation[0],orientation[1],orientation[2])
+                        )
+                    geom["e"] = 1
+                    geom["n"] = 1
+
+            elif (obj["type"] == "superellipsoid"):
+                if (len(obj["position"])==2):  # 2D
+                    geom = pv.ParametricSuperEllipsoid(
+                        xradius=obj["radius"][0],
+                        yradius=obj["radius"][1],
+                        zradius=0,
+                        n1=1,
+                        n2=obj["squareness"][0],
+                        center=(obj["position"][0],obj["position"][1],0),
+                        direction=(orientation[0],orientation[1],0)
+                        )
+                    geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = np.ones((np.array(geom.points).shape[0],))
+
+                else: # 3D
+                    geom = pv.ParametricSuperEllipsoid(
+                        xradius=obj["radius"][0],
+                        yradius=obj["radius"][1],
+                        zradius=obj["radius"][2],
+                        n1=obj["squareness"][0],
+                        n2=obj["squareness"][1],
+                        center=(obj["position"][0],obj["position"][1],obj["position"][2]),
+                        direction=(orientation[0],orientation[1],orientation[2])
+                        )
+                    geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
+
+            elif (obj["type"] == "plan"):
+                if (len(obj["position"])==2):  # 2D
+                    geom = pv.Plane(
+                        center=(obj["position"][0],obj["position"][1],0),
+                        direction=(orientation[0],orientation[1],0)
+                        )
+                    geom["e"] = -1*np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = -1*np.ones((np.array(geom.points).shape[0],))
+
+            geometries.append(geom)
+            plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False, scalars="e",clim=[0, 1])
+
+    else: # it>1
+
+        for io,obj in enumerate(objects):
+            # print(io)
+            positions.append(obj["position"])
+            v = np.zeros( (len(obj["position"]),) )
+            v[0] = 1
+            orientation = np.array(obj["rotation"]).reshape((len(obj["position"]),len(obj["position"])))@v
+            if (obj["type"] == "sphere"):
+                if (len(obj["position"])==2):  # 2D
+                    geom = pv.ParametricSuperEllipsoid(
+                        xradius=obj["radius"],
+                        yradius=obj["radius"],
+                        zradius=0,
+                        n1=1,
+                        n2=1,
+                        center=(obj["position"][0],obj["position"][1],0),
+                        direction=(orientation[0],orientation[1],0)
                     )
-            else: # 3D
-                geom = pv.ParametricSuperEllipsoid(
-                    xradius=obj["radius"][0],
-                    yradius=obj["radius"][1],
-                    zradius=obj["radius"][2],
-                    n1=obj["squareness"][0],
-                    n2=obj["squareness"][1],
-                    center=(obj["position"][0],obj["position"][1],obj["position"][2]),
-                    direction=(orientation[0],orientation[1],orientation[2])
-                    )
-        elif (obj["type"] == "plan"):
-            if (len(obj["position"])==2):  # 2D
-                geom = pv.Plane(
-                    center=(obj["position"][0],obj["position"][1],0),
-                    direction=(orientation[0],orientation[1],0)
-                    )
+                    geom["e"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = np.ones((np.array(geom.points).shape[0],))
+                    # geom = pv.Sphere(
+                    #     radius=obj["radius"],
+                    #     center=(obj["position"][0],obj["position"][1],0),
+                    #     direction=(orientation[0],orientation[1],0)
+                    #     )
+
+                else: # 3D
+                    geom = pv.Sphere(
+                        radius=obj["radius"],
+                        center=(obj["position"][0],obj["position"][1],obj["position"][2]),
+                        direction=(orientation[0],orientation[1],orientation[2])
+                        )
+                    geom["e"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = np.ones((np.array(geom.points).shape[0],))
+
+            elif (obj["type"] == "superellipsoid"):
+                if (len(obj["position"])==2):  # 2D
+                    geom = pv.ParametricSuperEllipsoid(
+                        xradius=obj["radius"][0],
+                        yradius=obj["radius"][1],
+                        zradius=0,
+                        n1=1,
+                        n2=obj["squareness"][0],
+                        center=(obj["position"][0],obj["position"][1],0),
+                        direction=(orientation[0],orientation[1],0)
+                        )
+                    geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = np.ones((np.array(geom.points).shape[0],))
+
+                else: # 3D
+                    geom = pv.ParametricSuperEllipsoid(
+                        xradius=obj["radius"][0],
+                        yradius=obj["radius"][1],
+                        zradius=obj["radius"][2],
+                        n1=obj["squareness"][0],
+                        n2=obj["squareness"][1],
+                        center=(obj["position"][0],obj["position"][1],obj["position"][2]),
+                        direction=(orientation[0],orientation[1],orientation[2])
+                        )
+                    geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
+
+            elif (obj["type"] == "plan"):
+                if (len(obj["position"])==2):  # 2D
+                    geom = pv.Plane(
+                        center=(obj["position"][0],obj["position"][1],0),
+                        direction=(orientation[0],orientation[1],0)
+                        )
+                    geom["e"] = -np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = -np.ones((np.array(geom.points).shape[0],))
+
+            #print("test1 = ",np.linalg.norm(np.array(geom.points)-np.array(geometries[io].points)))
+            geometries[io].points = geom.points
+            #print("test2 = ",np.linalg.norm(np.array(geom.points)-np.array(geometries[io].points)))
 
 
-        geometries.append(geom)
-        plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False)
+    # print("positions = ",positions)
+    # print("geometries = ",geometries)
 
-    print("positions = ",positions)
-    print("geometries = ",geometries)
-
-    for ic, contact in enumerate(contacts):
-        if (len(contact["pi"])==2): # dim=2
-            contact["pi"].append(0)
-            contact["pj"].append(0)
-            contact["nij"].append(0)
-        pvpti = pv.PolyData(np.array([contact["pi"]]))
-        pvptj = pv.PolyData(np.array([contact["pj"]]))
-        pvpti["normal"] = -np.asarray([contact["nij"]])
-        pvptj["normal"] = np.array([contact["nij"]])
-        plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="pink",name=f"ni_{ic}")
-        plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
+    if contacts is not None:
+        for ic, contact in enumerate(contacts):
+            if (len(contact["pi"])==2): # dim=2
+                contact["pi"].append(0)
+                contact["pj"].append(0)
+                contact["nij"].append(0)
+            pvpti = pv.PolyData(np.array([contact["pi"]]))
+            pvptj = pv.PolyData(np.array([contact["pj"]]))
+            pvpti["normal"] = -np.asarray([contact["nij"]])
+            pvptj["normal"] = np.array([contact["nij"]])
+            plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="pink",name=f"ni_{ic}")
+            plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
 
         # plotter.camera_position = 'xy'
         # plotter.camera.SetParallelProjection(True)
@@ -115,13 +206,21 @@ for file in files:
         plotter.show_bounds()
         # plotter.show(auto_close=False, cpos="xy")
         plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
+        # plotter.show(auto_close=False, screenshot=file.replace(".json",".png"))
+        # plotter.write_frame()
+
+        # Open a movie file
+        plotter.open_movie("film.mp4")
+
     else:
+        plotter.write_frame()
         plotter.render()
         # plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
         time.sleep(0.001)
 
     it+=1
 
+plotter.close()
 sys.exit()
 
 
@@ -189,6 +288,7 @@ for obj in objects:
                 center=(obj["position"][0],obj["position"][1],obj["position"][2]),
                 direction=(orientation[0],orientation[1],orientation[2])
                 )
+
     geometries.append(geom)
     plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False)
 

@@ -90,7 +90,12 @@ namespace scopi
     template<std::size_t dim, bool owner>
     void superellipsoid<dim, owner>::print() const
     {
-        std::cout << "superellipsoid<" << dim << "> : radius = " << m_radius << " squareness = " << m_squareness << " q = "<< this->q() << "\n"; // ?????
+      if (dim==2){
+        std::cout << "superellipsoid 2D : radius = " << m_radius << " squareness e =" << m_squareness(0) << " q = "<< this->q() << "\n";
+      }
+      else {
+        std::cout << "superellipsoid 3D : radius = " << m_radius << " squareness e =" << m_squareness(0) << " n =" << m_squareness(1) << " q = "<< this->q() << "\n";
+      }
     }
 
     template<std::size_t dim, bool owner>
@@ -190,26 +195,46 @@ namespace scopi
     {
       const double pi = 4*std::atan(1);
       std::vector<double> bs;
+      // double epsilon = 0.01;
+      // auto angles = xt::linspace<double>(epsilon, 0.5*pi-epsilon, n, true);
       auto angles = xt::linspace<double>(0, 0.5*pi, n, true);
       for (std::size_t i = 0; i < angles.size(); i++) {
         double b_ell = angles(i);
-        // std::cout << "b_ell= " << b_ell << std::endl;
+        // std::cout << "\nb_ell= " << b_ell << std::endl;
         double x_ell =  m_radius(0)*std::cos(b_ell);
         double y_ell =  m_radius(1)*std::sin(b_ell);
         // std::cout << "x_ell= " << x_ell << " y_ell= " << y_ell<< std::endl;
-        double d = std::pow( std::pow(m_radius(1)*x_ell,2/m_squareness(0))+std::pow(m_radius(0)*y_ell,2/m_squareness(0)), m_squareness(0)/2);
+        // e = m_squareness(0)
+        double d = std::pow( std::pow(m_radius(1)*x_ell,2.0/m_squareness(0))+std::pow(m_radius(0)*y_ell,2.0/m_squareness(0)), m_squareness(0)/2.0);
+        // std::cout << "std::pow(m_radius(1)*x_ell,2.0/m_squareness(dim-2))= " << std::pow(m_radius(1)*x_ell,2.0/m_squareness(dim-2)) << std::endl;
+        // std::cout << "std::pow(m_radius(0)*y_ell,2.0/m_squareness(dim-2))= " << std::pow(m_radius(0)*y_ell,2.0/m_squareness(dim-2)) << std::endl;
+        // std::cout << "m_radius(0)= " << m_radius(0) << std::endl;
+        // std::cout << "m_radius(1)= " << m_radius(1) << std::endl;
+        // std::cout << "m_squareness(0)= " << m_squareness(0) << std::endl;
+        // std::cout << "m_squareness(1)= " << m_squareness(1) << std::endl;
         // std::cout << "d= " << d << std::endl;
         double x_supell = x_ell*m_radius(0)*m_radius(1)/d;
         double y_supell = y_ell*m_radius(0)*m_radius(1)/d;
         // std::cout << "x_supell= " << x_supell << " y_supell= " << y_supell<< std::endl;
-        double sinb = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(y_supell/m_radius(1),2), 1/m_squareness(0)) )) );
+        double sinb = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(y_supell/m_radius(1),2), 1.0/m_squareness(0)) )) );
         // std::cout << "sinb= " << sinb << std::endl;
         double b = std::asin(sinb);
         // std::cout << "b= " << b << std::endl;
+        if (b>pi) {
+          b -= 2*pi;
+        }
+        if (b<-pi) {
+          b += 2*pi;
+        }
         bs.push_back(b);
         bs.push_back(b+pi/2);
-        bs.push_back(b+pi);
-        bs.push_back(b+3*pi/2);
+        bs.push_back(b-pi);
+        bs.push_back(b-pi/2);
+      }
+      for(std::size_t i = 0; i < bs.size(); ++i) {
+        if (std::abs(bs[i])<1.0e-6) {
+          bs[i] = 0.01;
+        }
       }
       return bs;
     }
@@ -219,13 +244,16 @@ namespace scopi
     {
       const double pi = 4*std::atan(1);
       std::vector<double> as;
+      // double epsilon = 0.01;
+      // auto angles = xt::linspace<double>(epsilon, 0.5*pi-epsilon, n, true);
       auto angles = xt::linspace<double>(0, 0.5*pi, n, true);
       for (std::size_t i = 0; i < angles.size(); i++) {
         double a_ell = angles(i);
-        // std::cout << "a_ell= " << a_ell << std::endl;
+        // std::cout << "\na_ell= " << a_ell << std::endl;
         double y_ell =  m_radius(1)*std::cos(a_ell);
         double z_ell =  m_radius(2)*std::sin(a_ell);
         // std::cout << "y_ell= " << y_ell << " z_ell= " << z_ell<< std::endl;
+        // n = m_squareness(1)
         // double d = std::pow( std::pow(m_radius(2)*y_ell,2/m_squareness(0))+std::pow(m_radius(1)*z_ell,2/m_squareness(0)), m_squareness(0)/2);
         double d = std::pow( std::pow(m_radius(2)*y_ell,2/m_squareness(1))+std::pow(m_radius(1)*z_ell,2/m_squareness(1)), m_squareness(1)/2);
         // std::cout << "d= " << d << std::endl;
@@ -237,10 +265,21 @@ namespace scopi
         // std::cout << "sina= " << sina << std::endl;
         double a = std::asin(sina);
         // std::cout << "a= " << a << std::endl;
+        if (a>pi) {
+          a -= 2*pi;
+        }
+        if (a<-pi) {
+          a += 2*pi;
+        }
         as.push_back(a);
         as.push_back(a+pi/2);
         as.push_back(a-pi);
         as.push_back(a-pi/2);
+        for(std::size_t i = 0; i < as.size(); ++i) {
+          if (std::abs(as[i])<1.0e-6) {
+            as[i] = 0.01;
+          }
+        }
       }
       return as;
     }
@@ -250,6 +289,8 @@ namespace scopi
     {
       const double pi = 4*std::atan(1);
       std::vector<double> as;
+      // double epsilon = 0.01;
+      // auto angles = xt::linspace<double>(epsilon, 0.5*pi-epsilon, n, true);
       auto angles = xt::linspace<double>(0, 0.5*pi, n, true);
       for (std::size_t i = 0; i < angles.size(); i++) {
         double a_ell = angles(i);
@@ -257,21 +298,33 @@ namespace scopi
         double x_ell =  m_radius(0)*std::cos(a_ell);
         double z_ell =  m_radius(2)*std::sin(a_ell);
         // std::cout << "x_ell= " << x_ell << " z_ell= " << z_ell<< std::endl;
+        // n = m_squareness(1)
         // double d = std::pow( std::pow(m_radius(2)*x_ell,2/m_squareness(0))+std::pow(m_radius(0)*z_ell,2/m_squareness(0)), m_squareness(0)/2);
-        double d = std::pow( std::pow(m_radius(2)*x_ell,2/m_squareness(1))+std::pow(m_radius(0)*z_ell,2/m_squareness(1)), m_squareness(1)/2);
+        double d = std::pow( std::pow(m_radius(2)*x_ell,2.0/m_squareness(1))+std::pow(m_radius(0)*z_ell,2.0/m_squareness(1)), m_squareness(1)/2.0);
         // std::cout << "d= " << d << std::endl;
         double x_supell = x_ell*m_radius(0)*m_radius(2)/d;
         double z_supell = z_ell*m_radius(0)*m_radius(2)/d;
         // std::cout << "y_supell= " << y_supell << " z_supell= " << z_supell<< std::endl;
         // double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1/m_squareness(0)) )) );
-        double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1/m_squareness(1)) )) );
+        double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1.0/m_squareness(1)) )) );
         // std::cout << "sina= " << sina << std::endl;
         double a = std::asin(sina);
         // std::cout << "a= " << a << std::endl;
+        if (a>pi) {
+          a -= 2*pi;
+        }
+        if (a<-pi) {
+          a += 2*pi;
+        }
         as.push_back(a);
         as.push_back(a+pi/2);
         as.push_back(a-pi);
         as.push_back(a-pi/2);
+        for(std::size_t i = 0; i < as.size(); ++i) {
+          if (std::abs(as[i])<1.0e-6) {
+            as[i] = 0.01;
+          }
+        }
       }
       return as;
     }

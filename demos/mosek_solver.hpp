@@ -29,9 +29,9 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
     // Time Loop
     for (std::size_t nite=0; nite<total_it; ++nite)
     {
-        std::cout << "Time iteration -> " << nite << std::endl;
+      std::cout << "\n\n------------------- Time iteration ----------------> " << nite << std::endl;
         std::vector<scopi::neighbor<dim>> contacts;
-        double dmax = 1;
+        double dmax = 4;
 
         //displacement of obstacles
         for (std::size_t i=0; i<active_ptr; ++i)

@@ -3,6 +3,7 @@
 #include <array>
 #include <algorithm>
 #include <vector>
+#include <cmath> 
 
 #include <xtl/xmultimethods.hpp>
 
