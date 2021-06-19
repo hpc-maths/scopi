@@ -570,8 +570,11 @@ if __name__ == '__main__':
 
     # s1 = SuperEllipsoid3D(-1.875000e-01, -1.696776e-18, -2.012550e-19,    0.1 ,  0.05,  0.05, e=1, n=0.6,  q=[ 0.866025,  0.      ,  0.      ,  0.5  ])
     # s2 = SuperEllipsoid3D( 1.975000e-01,  1.692440e-18,  2.029491e-19,     0.1 ,  0.05,  0.05, e=1, n=1, q = [ 0.92388 ,  0.      ,  0.      , -0.382683])
-    s1 = SuperEllipsoid3D(0.060811,  0.001614,  0.00076,    0.1 ,  0.05,  0.05, e=1, n=0.6,  q=[ 0.61985 ,  0.      ,  0.      ,  0.784721  ])
-    s2 = SuperEllipsoid3D(-0.050811, -0.001614, -0.00076,     0.1 ,  0.05,  0.05, e=1, n=1, q = [ 0.724848,  0.      ,  0.      , -0.688909])
+
+    s1 = SuperEllipsoid3D(0.045066, -0.000012,  0.000977,    0.1 ,  0.05,  0.05, e=1, n=0.6,  q=[ 0.688131,  0.      ,  0.      ,  0.725587  ])
+    s2 = SuperEllipsoid3D(-0.045066,  0.000012, -0.000977,     0.1 ,  0.05,  0.05, e=1, n=1, q = [  0.78304 ,  0.      ,  0.      , -0.621971 ])
+    # s1 = SuperEllipsoid3D(0.045066, -0.000012,  0.000977,    0.1 ,  0.1,  0.1, e=0.6, n=0.6,  q=[ 0.688131,  0.      ,  0.      ,  0.725587  ])
+    # s2 = SuperEllipsoid3D(-0.045066,  0.000012, -0.000977,     0.1 ,  0.1,  0.1, e=0.6, n=0.6, q = [  0.78304 ,  0.      ,  0.      , -0.621971 ])
 
     #s1.calcul_formel()
     #sys.exit()
@@ -1194,51 +1197,39 @@ if __name__ == '__main__':
     print("distances.min = ",distances.min())
     indmin = np.where(distances==distances.min())
     print("indmin = ",indmin)
-    # print("points s1 dmin =",s1.surface_pt(agrid1[indmin[0]],bgrid1[indmin[0]]))
-    # print("points s2 dmin =",s2.surface_pt(agrid2[indmin[1]],bgrid2[indmin[1]]))
+
     print("points1.shape =",points1.shape," points2.shape =",points2.shape)
     print("points s1 dmin =",s1.surface_pt([agrid1[indmin[0][0]]],[bgrid1[indmin[0][0]]]))
     print("points s2 dmin =",s2.surface_pt([agrid2[indmin[1][0]]],[bgrid2[indmin[1][0]]]))
     u0 = np.array( [ agrid1[indmin[0][0]], bgrid1[indmin[0][0]], agrid2[indmin[1][0]], bgrid2[indmin[1][0]] ])
-    # print("points s1 dmin =",s1.surface_pt([ainit1[indmin[0][0]]],[binit1[indmin[0][0]]]))
-    # print("points s2 dmin =",s2.surface_pt([ainit2[indmin[1][0]]],[binit2[indmin[1][0]]]))
-    # u0 = np.array( [ ainit1[indmin[0][0]], binit1[indmin[0][0]], ainit2[indmin[1][0]], binit2[indmin[1][0]] ])
     print("u0 = ",u0)
-    # sys.exit()
-    pv_pts_ext_s1 = pv.PolyData(points1)
-    pv_pts_ext_s1["normal"] = normals1
-    pv_pts_ext_s2 = pv.PolyData(points2)
-    pv_pts_ext_s2["normal"] = normals2
-    p.add_mesh(pv_pts_ext_s1.glyph(factor=0.005, geom=pv.Sphere()),color="yellow")
-    p.add_mesh(pv_pts_ext_s1.glyph(orient="normal",factor=0.02, geom=pv.Arrow()),color="yellow")
-    p.add_mesh(pv_pts_ext_s2.glyph(factor=0.005, geom=pv.Sphere()),color="yellow")
-    p.add_mesh(pv_pts_ext_s2.glyph(orient="normal",factor=0.02, geom=pv.Arrow()),color="yellow")
 
+    # pv_pts_ext_s1 = pv.PolyData(points1)
+    # pv_pts_ext_s1["normal"] = normals1
+    # pv_pts_ext_s2 = pv.PolyData(points2)
+    # pv_pts_ext_s2["normal"] = normals2
+    # p.add_mesh(pv_pts_ext_s1.glyph(factor=0.005, geom=pv.Sphere()),color="yellow")
+    # p.add_mesh(pv_pts_ext_s1.glyph(orient="normal",factor=0.02, geom=pv.Arrow()),color="yellow")
+    # p.add_mesh(pv_pts_ext_s2.glyph(factor=0.005, geom=pv.Sphere()),color="yellow")
+    # p.add_mesh(pv_pts_ext_s2.glyph(orient="normal",factor=0.02, geom=pv.Arrow()),color="yellow")
+    #
     pv_start_s1 = pv.PolyData(s1.surface_pt(agrid1[indmin[0][0]], bgrid1[indmin[0][0]]))
     pv_start_s1["normal"] = s1.surface_normal([agrid1[indmin[0][0]]], [bgrid1[indmin[0][0]]])
     pv_start_s2 = pv.PolyData(s2.surface_pt(agrid2[indmin[1][0]], bgrid2[indmin[1][0]]))
     pv_start_s2["normal"] = s2.surface_normal([agrid2[indmin[1][0]]], [bgrid2[indmin[1][0]]])
-    # pv_start_s1 = pv.PolyData(s1.surface_pt(ainit1[indmin[0][0]], binit1[indmin[0][0]]))
-    # pv_start_s1["normal"] = s1.surface_normal([ainit1[indmin[0][0]]], [binit1[indmin[0][0]]])
-    # pv_start_s2 = pv.PolyData(s2.surface_pt(ainit2[indmin[1][0]], binit2[indmin[1][0]]))
-    # pv_start_s2["normal"] = s2.surface_normal([ainit2[indmin[1][0]]], [binit2[indmin[1][0]]])
     p.add_mesh(pv_start_s1.glyph(factor=0.01, geom=pv.Sphere()),color="green")
     p.add_mesh(pv_start_s1.glyph(orient="normal",factor=0.03, geom=pv.Arrow()),color="green")
     p.add_mesh(pv_start_s2.glyph(factor=0.01, geom=pv.Sphere()),color="green")
     p.add_mesh(pv_start_s2.glyph(orient="normal",factor=0.03, geom=pv.Arrow()),color="green")
 
-    pv_startall_s1 = pv.PolyData(s1.surface_pt(agrid1[indmin[0]], bgrid1[indmin[0]]))
-    pv_startall_s1["normal"] = s1.surface_normal(agrid1[indmin[0]], bgrid1[indmin[0]])
-    pv_startall_s2 = pv.PolyData(s2.surface_pt(agrid2[indmin[1]], bgrid2[indmin[1]]))
-    pv_startall_s2["normal"] = s2.surface_normal(agrid2[indmin[1]], bgrid2[indmin[1]])
-    # pv_startall_s1 = pv.PolyData(s1.surface_pt(ainit1[indmin[0]], binit1[indmin[0]]))
-    # pv_startall_s1["normal"] = s1.surface_normal(ainit1[indmin[0]], binit1[indmin[0]])
-    # pv_startall_s2 = pv.PolyData(s2.surface_pt(ainit2[indmin[1]], binit2[indmin[1]]))
-    # pv_startall_s2["normal"] = s2.surface_normal(ainit2[indmin[1]], binit2[indmin[1]])
-    p.add_mesh(pv_startall_s1.glyph(factor=0.008, geom=pv.Sphere()),color="orange")
-    p.add_mesh(pv_startall_s1.glyph(orient="normal",factor=0.008, geom=pv.Arrow()),color="orange")
-    p.add_mesh(pv_startall_s2.glyph(factor=0.008, geom=pv.Sphere()),color="orange")
-    p.add_mesh(pv_startall_s2.glyph(orient="normal",factor=0.008, geom=pv.Arrow()),color="orange")
+    # pv_startall_s1 = pv.PolyData(s1.surface_pt(agrid1[indmin[0]], bgrid1[indmin[0]]))
+    # pv_startall_s1["normal"] = s1.surface_normal(agrid1[indmin[0]], bgrid1[indmin[0]])
+    # pv_startall_s2 = pv.PolyData(s2.surface_pt(agrid2[indmin[1]], bgrid2[indmin[1]]))
+    # pv_startall_s2["normal"] = s2.surface_normal(agrid2[indmin[1]], bgrid2[indmin[1]])
+    # p.add_mesh(pv_startall_s1.glyph(factor=0.008, geom=pv.Sphere()),color="orange")
+    # p.add_mesh(pv_startall_s1.glyph(orient="normal",factor=0.008, geom=pv.Arrow()),color="orange")
+    # p.add_mesh(pv_startall_s2.glyph(factor=0.008, geom=pv.Sphere()),color="orange")
+    # p.add_mesh(pv_startall_s2.glyph(orient="normal",factor=0.008, geom=pv.Arrow()),color="orange")
 
     # p.show_grid()
     # p.show_bounds()
@@ -1275,35 +1266,30 @@ if __name__ == '__main__':
             t -= 0.01
         return t
     cc = 0
-    itermax = 4000
+    itermax = 20000
     u = u0.copy()
     dk = np.ones(u.shape)
 
-    # ### test pour comparaison avec le C++
-    # print("s1 : xc=",s1.xc," yc=",s1.yc," zc=",s1.zc," rx=",s1.rx," ry=",s1.ry," rz=",s1.rz," e=",s1.e," n=",s1.n," q=",s1.q)
-    # print("s2 : xc=",s2.xc," yc=",s2.yc," zc=",s2.zc," rx=",s2.rx," ry=",s2.ry," rz=",s2.rz," e=",s2.e," n=",s2.n," q=",s2.q)
-    # print("u0 = ",u0)
-    # val1 = np.array([0.43])
-    # val2 = np.array([0.65])
-    # # print("s1.surface_pt(val1,val2)      = ",s1.surface_pt(val1,val2),     " s2.surface_pt(val2,val1)      = ",s2.surface_pt(val2,val1))
-    # # print("s1.surface_normal(val1,val2)  = ",s1.surface_normal(val1,val2), " s2.surface_normal(val2,val1)  = ",s2.surface_normal(val2,val1))
-    # # print("s1.surface_tangent(val1,val2) = ",s1.surface_tangent(val1,val2)," s2.surface_tangent(val2,val1) = ",s2.surface_tangent(val2,val1))
-    # # print("u=",u)
-    # # print("grad_f_contacts(u,s1,s2) = ",grad_f_contacts(u,s1,s2), " f_contacts(u,s1,s2) = ",f_contacts(u,s1,s2))
-
+    lambda_ = 0.0
+    tab_u = []
     # while (cc<itermax) and (np.linalg.norm(dk)>1.0e-7) and (np.linalg.norm(f_contacts(u,s1,s2))>1e-10) :
     while (cc<itermax) and (np.linalg.norm(dk)>1.0e-7) and (np.linalg.norm(f_contacts(u,s1,s2))>1e-9) :
         ## dk = -(gradFk)^-1 Fk : direction de descente
-        dk = np.linalg.solve(grad_f_contacts(u,s1,s2), -f_contacts(u,s1,s2))
+        dk = np.linalg.solve(grad_f_contacts(u,s1,s2)+lambda_*np.eye(4), -f_contacts(u,s1,s2))
         # print("grad Fk = ",grad_f_contacts(u,s1,s2)," -Fk = ",-f_contacts(u,s1,s2))
         ## tk : pas d'armijo
         # tk = pas_armijo(u,dk,f_contacts,grad_f_contacts,s1,s2)
         # tk = backtrack(f_contacts,u,dk,-np.linalg.norm(dk)**2,s1,s2)
         tk = linesearch(f_contacts,u,dk,s1,s2)
         u += tk*dk
+        if (cc%1==0):
+            tab_u.append(u.copy())
         print("iteration ",cc," dk = ",dk," tk = ",tk," u = ",u," |dk| = ",np.linalg.norm(dk)," np.cost=",np.linalg.norm(f_contacts(u,s1,s2)))
         cc += 1
+
     b_final = u
+
+    tab_u.append(u.copy())
 
     final_pt1 = s1.surface_pt(np.array([b_final[0]]),np.array([b_final[1]]))
     normal_final_pt1 = s1.surface_normal(np.array([b_final[0]]),np.array([b_final[1]]))
@@ -1323,6 +1309,32 @@ if __name__ == '__main__':
     p.add_mesh(glyphs_final_pt1,color="yellow")
     glyphs_normal_final_pt1 = node_final_pt1.glyph(orient="normal",factor=0.1, geom=pv.Arrow())
     p.add_mesh(glyphs_normal_final_pt1,color="yellow")
+
+    ## trajectoires suivies...
+    tab_u = np.array(tab_u)
+    #print("tab_u = ",tab_u)
+    traj1 = np.array(s1.surface_pt(tab_u[:,0],tab_u[:,1]))
+    traj2 = np.array(s2.surface_pt(tab_u[:,2],tab_u[:,3]))
+    #print("traj1 =",traj1)
+    #print("traj2 =",traj2)
+    poly1 = pv.PolyData()
+    poly1.points = traj1
+    cells1 = np.full( (traj1.shape[0]-1, 3), 2, dtype=np.int_)
+    cells1[:, 1] = np.arange(0, traj1.shape[0]-1, dtype=np.int_)
+    cells1[:, 2] = np.arange(1, traj1.shape[0], dtype=np.int_)
+    poly1.lines = cells1
+    poly1["scalars"] = np.arange(poly1.n_points)
+    tube1 = poly1.tube(radius=0.001)
+    p.add_mesh(tube1,color="yellow")
+    poly2 = pv.PolyData()
+    poly2.points = traj2
+    cells2 = np.full( (traj2.shape[0]-1, 3), 2, dtype=np.int_)
+    cells2[:, 1] = np.arange(0, traj2.shape[0]-1, dtype=np.int_)
+    cells2[:, 2] = np.arange(1, traj2.shape[0], dtype=np.int_)
+    poly2.lines = cells2
+    poly2["scalars"] = np.arange(poly2.n_points)
+    tube2 = poly2.tube(radius=0.001)
+    p.add_mesh(tube2,color="yellow")
 
 
     node_final_pt2 = pv.PolyData(final_pt2)

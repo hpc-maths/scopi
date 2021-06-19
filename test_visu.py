@@ -12,6 +12,8 @@ files = np.sort(glob.glob(prefix+"/*.json"))
 print(files)
 
 plotter = pv.Plotter()
+plotter.show_grid()
+# plotter.show_bounds()
 
 actors = []
 geometries = []
@@ -49,8 +51,9 @@ for file in files:
                         center=(obj["position"][0],obj["position"][1],0),
                         direction=(orientation[0],orientation[1],0)
                     )
-                    geom["e"] = 1
-                    geom["n"] = 1
+                    geom["e"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = 2*np.ones((np.array(geom.points).shape[0],))
                     # geom = pv.Sphere(
                     #     radius=obj["radius"],
                     #     center=(obj["position"][0],obj["position"][1],0),
@@ -63,8 +66,10 @@ for file in files:
                         center=(obj["position"][0],obj["position"][1],obj["position"][2]),
                         direction=(orientation[0],orientation[1],orientation[2])
                         )
-                    geom["e"] = 1
-                    geom["n"] = 1
+                    geom["e"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["n"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = 2*np.ones((np.array(geom.points).shape[0],))
+
 
             elif (obj["type"] == "superellipsoid"):
                 if (len(obj["position"])==2):  # 2D
@@ -79,6 +84,8 @@ for file in files:
                         )
                     geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))+np.ones((np.array(geom.points).shape[0],))
+
 
                 else: # 3D
                     geom = pv.ParametricSuperEllipsoid(
@@ -92,7 +99,7 @@ for file in files:
                         )
                     geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
-
+                    geom["e+n"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))+obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
             elif (obj["type"] == "plan"):
                 if (len(obj["position"])==2):  # 2D
                     geom = pv.Plane(
@@ -101,9 +108,10 @@ for file in files:
                         )
                     geom["e"] = -1*np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = -1*np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = -2*np.ones((np.array(geom.points).shape[0],))
 
             geometries.append(geom)
-            plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False, scalars="e",clim=[0, 1])
+            plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False, scalars="e+n",clim=[1.3, 1.6])
 
     else: # it>1
 
@@ -126,6 +134,7 @@ for file in files:
                     )
                     geom["e"] = np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = 2*np.ones((np.array(geom.points).shape[0],))
                     # geom = pv.Sphere(
                     #     radius=obj["radius"],
                     #     center=(obj["position"][0],obj["position"][1],0),
@@ -140,6 +149,7 @@ for file in files:
                         )
                     geom["e"] = np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = 2*np.ones((np.array(geom.points).shape[0],))
 
             elif (obj["type"] == "superellipsoid"):
                 if (len(obj["position"])==2):  # 2D
@@ -154,6 +164,8 @@ for file in files:
                         )
                     geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))+np.ones((np.array(geom.points).shape[0],))
+
 
                 else: # 3D
                     geom = pv.ParametricSuperEllipsoid(
@@ -167,6 +179,7 @@ for file in files:
                         )
                     geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))+obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
 
             elif (obj["type"] == "plan"):
                 if (len(obj["position"])==2):  # 2D
@@ -176,11 +189,13 @@ for file in files:
                         )
                     geom["e"] = -np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = -np.ones((np.array(geom.points).shape[0],))
+                    geom["e+n"] = -2*np.ones((np.array(geom.points).shape[0],))
 
             #print("test1 = ",np.linalg.norm(np.array(geom.points)-np.array(geometries[io].points)))
             geometries[io].points = geom.points
             #print("test2 = ",np.linalg.norm(np.array(geom.points)-np.array(geometries[io].points)))
 
+            # print(geom["e+n"] )
 
     # print("positions = ",positions)
     # print("geometries = ",geometries)
@@ -198,14 +213,13 @@ for file in files:
             plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="pink",name=f"ni_{ic}")
             plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
 
+
         # plotter.camera_position = 'xy'
         # plotter.camera.SetParallelProjection(True)
 
     if (it == 0):
-        plotter.show_grid()
-        plotter.show_bounds()
         # plotter.show(auto_close=False, cpos="xy")
-        plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
+        plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))#,title=str(it))
         # plotter.show(auto_close=False, screenshot=file.replace(".json",".png"))
         # plotter.write_frame()
 
@@ -213,9 +227,11 @@ for file in files:
         plotter.open_movie("film.mp4")
 
     else:
+        # plotter.show_grid()
+        # plotter.show_bounds()
         plotter.write_frame()
         plotter.render()
-        # plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))
+        # plotter.show(auto_close=True, cpos="xy",screenshot=file.replace(".json",".png"),title=str(it))
         time.sleep(0.001)
 
     it+=1

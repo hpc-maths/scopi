@@ -749,6 +749,7 @@ if __name__ == '__main__':
         # tk = backtrack(f_contacts,u,dk,-np.linalg.norm(dk)**2,s1,s2)
         tk = linesearch(f_contacts,u,dk,s1,s2)
         print("       tk =",tk)
+        # u += tk*dk
         u += tk*dk
         print("       u =",u)
         # print("iteration ",cc," dk = ",dk," tk = ",tk," u = ",u," |dk| = ",np.linalg.norm(dk)," cost=",np.linalg.norm(f_contacts(u,s1,s2)))

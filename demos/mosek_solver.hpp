@@ -31,7 +31,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
     {
       std::cout << "\n\n------------------- Time iteration ----------------> " << nite << std::endl;
         std::vector<scopi::neighbor<dim>> contacts;
-        double dmax = 4;
+        double dmax = 1;
 
         //displacement of obstacles
         for (std::size_t i=0; i<active_ptr; ++i)

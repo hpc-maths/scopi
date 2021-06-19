@@ -7,6 +7,7 @@
 #include <xtensor/xsort.hpp>
 #include <xtensor/xio.hpp>
 
+#include "../minpack.hpp"
 
 #include "sphere.hpp"
 #include "superellipsoid.hpp"
@@ -192,8 +193,12 @@ namespace scopi
         // std::cout << "pt s2 = " << s2.point(binit2_xy(xt::row(indmin,1)(0))) << std::endl;
         xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit1_xy(xt::row(indmin,0)(0)), binit2_xy(xt::row(indmin,1)(0))};
         // std::cout << "u0 =" << u0 << std::endl;
-
-        auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,2000,1.0e-10,1.0e-7);
+        auto [ xx, info ] = hybrd1(u0,newton_F,newton_GradF,args);
+        xt::xtensor_fixed<double, xt::xshape<2>> u;
+        for (int j = 0; j < 2; j++ ) {
+          u(j) = xx[j];
+        }
+        // auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,2000,1.0e-10,1.0e-7);
         if (info==-1){
           std::cout << "\ns1 : " << std::endl;
           s1.print();
@@ -544,7 +549,7 @@ namespace scopi
                        (M20*A1 + M21*A2 + M22*A3) * (-N20*B15 + N21*B16);
             return res;
         };
-        const int num = 8;
+        const int num = 6;
         auto binit1 = xt::unique(xt::adapt(s1.binit_xy(num)));
         auto ainit1 = xt::unique(xt::adapt(s1.ainit_yz(num)));
 
@@ -594,25 +599,25 @@ namespace scopi
                 2*(1+xt::linalg::vdot(s1.normal(fl_agrid1(i),fl_bgrid1(i)),s2.normal(fl_agrid2(j),fl_bgrid2(j))));
             }
         }
-        std::cout << "distances =" << distances << std::endl;
+        // std::cout << "distances =" << distances << std::endl;
         auto dmin = xt::amin(distances);
-        std::cout << "distance min =" << dmin << std::endl;
+        // std::cout << "distance min =" << dmin << std::endl;
         auto indmin = xt::from_indices(xt::where(xt::equal(distances, dmin(0)))); //xt::argmin(distances);
-        std::cout << "indmin =" << indmin << std::endl;
-        std::cout << "indmin(0,0) =" << xt::row(indmin,0)(0) << std::endl;
-        std::cout << "indmin(1,0) =" << xt::row(indmin,1)(0) << std::endl;
+        // std::cout << "indmin =" << indmin << std::endl;
+        // std::cout << "indmin(0,0) =" << xt::row(indmin,0)(0) << std::endl;
+        // std::cout << "indmin(1,0) =" << xt::row(indmin,1)(0) << std::endl;
 
         // for (int l=0; xt::row(indmin,0).size(); ++l){
         //     std::cout << "l =" << l << " pt s1 = " << s1.point(fl_agrid1(xt::row(indmin,0)(l)),fl_bgrid1(xt::row(indmin,0)(l))) << std::endl;
         //     std::cout << "l =" << l << " pt s2 = " << s2.point(fl_agrid1(xt::row(indmin,1)(l)),fl_bgrid1(xt::row(indmin,1)(l))) << std::endl;
         // }
-        std::cout << "pt s1 = " << s1.point(fl_agrid1(xt::row(indmin,0)(0)),fl_bgrid1(xt::row(indmin,0)(0))) << std::endl;
-        std::cout << "pt s2 = " << s2.point(fl_agrid2(xt::row(indmin,1)(0)),fl_bgrid2(xt::row(indmin,1)(0))) << std::endl;
+        // std::cout << "pt s1 = " << s1.point(fl_agrid1(xt::row(indmin,0)(0)),fl_bgrid1(xt::row(indmin,0)(0))) << std::endl;
+        // std::cout << "pt s2 = " << s2.point(fl_agrid2(xt::row(indmin,1)(0)),fl_bgrid2(xt::row(indmin,1)(0))) << std::endl;
         // xt::xtensor_fixed<double, xt::xshape<4>> u0 = {fl_agrid1(iindmin(0,0)),fl_bgrid1(indmin(0,1)),
         //                                                fl_agrid2(indmin(1,0)),fl_bgrid2(indmin(1,1))};
         xt::xtensor_fixed<double, xt::xshape<4>> u0 = {fl_agrid1(xt::row(indmin,0)(0)),fl_bgrid1(xt::row(indmin,0)(0)),
                                                        fl_agrid2(xt::row(indmin,1)(0)),fl_bgrid2(xt::row(indmin,1)(0))};
-        std::cout << "u0 =" << u0 << std::endl;
+        // std::cout << "u0 =" << u0 << std::endl;
 
         // exit(0);
         // auto ainit = xt::linspace<double>(-pi/2, pi/2, num);
@@ -632,26 +637,37 @@ namespace scopi
         // xt::xtensor_fixed<double, xt::xshape<4>> u0 = { ainit(indmin(0,0)), binit(indmin(0,0)), ainit(indmin(1,0)), binit(indmin(1,0)) };
         // std::cout << "u0 = "<< u0 << std::endl;
         // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
-        auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,4000,1.0e-8,1.0e-7); //itermax,  ftol,  xtol
+        auto [ xx, info ] = hybrd1(u0,newton_F,newton_GradF,args);
+        xt::xtensor_fixed<double, xt::xshape<4>> u;
+        for (int j = 0; j < 4; j++ ) {
+          u(j) = xx[j];
+        }
+        // std::cout << " u hybr = " << u << std::endl;
+        // std::cout << " info hybr = " << info << std::endl;
+        // auto [ ubis, infobis ] = newton_method(u0,newton_F,newton_GradF,args,4000,1.0e-8,1.0e-7); //itermax,  ftol,  xtol
+        // std::cout << " u newton = " << ubis << std::endl;
+        // std::cout << " info newton = " << infobis << std::endl;
+
         // if (info==-1){
-          std::cout << "\ns1 : " << std::endl;
-          s1.print();
-          std::cout << "s2 : " << std::endl;
-          s2.print();
-          std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
-          std::cout << "s2.pos = " << s2.pos() << " s2.rotation = " << xt::flatten(s2.rotation()) << std::endl;
+          // std::cout << "\ns1 : " << std::endl;
+          // s1.print();
+          // std::cout << "s2 : " << std::endl;
+          // s2.print();
+          // std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
+          // std::cout << "s2.pos = " << s2.pos() << " s2.rotation = " << xt::flatten(s2.rotation()) << std::endl;
           // exit(0);
         // }
-        // if (info==-1){
-        //   exit(0);
-        // }
+        if (info==-1){
+          exit(0);
+        }
         neigh.pi = s1.point(u(0),u(1));
         neigh.pj = s2.point(u(2),u(3));
         neigh.nij = s2.normal(u(2),u(3));
         auto sign = xt::sign(xt::eval(xt::linalg::dot(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), xt::flatten(neigh.nij))));
         neigh.dij = sign(0)*xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
-        std::cout << "pi = " << neigh.pi << " pj = " << neigh.pj << std::endl;
-        std::cout << "nij = " << neigh.nij << " dij = " << neigh.dij << std::endl;
+        // std::cout << "pi = " << neigh.pi << " pj = " << neigh.pj << std::endl;
+        // std::cout << "nij = " << neigh.nij << " dij = " << neigh.dij << std::endl;
+        std::cout << "dij = " << neigh.dij << std::endl;
         return neigh;
     }
 
