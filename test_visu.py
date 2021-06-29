@@ -12,15 +12,21 @@ files = np.sort(glob.glob(prefix+"/*.json"))
 print(files)
 
 plotter = pv.Plotter()
-plotter.show_grid()
+# plotter.show_grid()
 # plotter.show_bounds()
+
+# light_types = [light.light_type for light in plotter.renderer.lights]
+# Remove from plotters so output is not produced in docs
+# pv.plotting._ALL_PLOTTERS.clear()
+# print("light_types =",light_types)
+
 
 actors = []
 geometries = []
 
 
 it = 0
-for file in files:
+for file in files[::1]:
 
     # plotter = pv.Plotter(off_screen=True)
     # plotter.clear()
@@ -111,7 +117,7 @@ for file in files:
                     geom["e+n"] = -2*np.ones((np.array(geom.points).shape[0],))
 
             geometries.append(geom)
-            plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False, scalars="e+n",clim=[1.3, 1.6])
+            plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False, scalars="e+n",clim=[1.2, 2.0])
 
     else: # it>1
 
@@ -210,7 +216,7 @@ for file in files:
             pvptj = pv.PolyData(np.array([contact["pj"]]))
             pvpti["normal"] = -np.asarray([contact["nij"]])
             pvptj["normal"] = np.array([contact["nij"]])
-            plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="pink",name=f"ni_{ic}")
+            plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"ni_{ic}")
             plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
 
 
@@ -224,7 +230,7 @@ for file in files:
         # plotter.write_frame()
 
         # Open a movie file
-        plotter.open_movie("film.mp4")
+        plotter.open_movie(prefix+"/film.mp4")
 
     else:
         # plotter.show_grid()

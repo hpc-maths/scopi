@@ -8,7 +8,7 @@ int main()
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .05;
-    std::size_t total_it = 6000;
+    std::size_t total_it = 1;
     scopi::scopi_container<dim> particles;
 
     std::default_random_engine generator;
@@ -28,18 +28,25 @@ int main()
     // particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
     // particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
 
-    // int n = 20;
-    //
-    // for (int i=0;i<n;++i){
-    //   std::cout << i << std::endl;
-    //   const double e = distrib_e(generator);
-    //   scopi::superellipsoid<dim> s({{distrib_gp1(generator), distrib_gp1(generator)}},
-    //     {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
-    //     {{e}});
-    //   s.print();
-    //   particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-    // }
-    // // exit(0);
+    int n = 20;
+
+    for (int i=0;i<n;++i){
+      const double e = distrib_e(generator);
+      std::cout << "i = " << i << " e = " << e << std::endl;
+      scopi::superellipsoid<dim> s({{distrib_gp1(generator), distrib_gp1(generator)}},
+        {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
+        {{e}});
+      s.print();
+      particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+    }
+
+    std::cout << "pos = " << particles.pos() << std::endl << std::endl;
+    std::cout << "vd = " << particles.vd() << std::endl << std::endl;
+    std::cout << "q = " << particles.q() << std::endl << std::endl;
+
+    // exit(0);
+
+
 
     // scopi::superellipsoid<dim> s0({{-3.453169298559871,-6.376584982229874}}, {scopi::quaternion(0.9148915951510761)}, {{0.6286366013308933,0.8170145642109674}}, {{0.20927894118442245}});
     // particles.push_back(s0, {{0, 0}}, {{0.5, 0}}, 0, 0, {{0, 0}});
@@ -130,15 +137,15 @@ int main()
     // }
     // exit(0);
 
-    scopi::superellipsoid<dim> s0({{0.0, 0.}}, {scopi::quaternion(-PI/4)}, {{.01, .01}}, {{0.2}});
-    scopi::superellipsoid<dim> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{0.2}});
-    scopi::superellipsoid<dim> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1.}});
-    particles.push_back(s0, {{0, 0}}, {{0., 0}}, 0, 0, {{0, 0}});
-    particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-    particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+    // scopi::superellipsoid<dim> s0({{0.0, 0.}}, {scopi::quaternion(-PI/4)}, {{.01, .01}}, {{0.2}});
+    // scopi::superellipsoid<dim> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{0.2}});
+    // scopi::superellipsoid<dim> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1.}});
+    // particles.push_back(s0, {{0, 0}}, {{0., 0}}, 0, 0, {{0, 0}});
+    // particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+    // particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
 
-    std::size_t active_ptr = 1;
-    // std::size_t active_ptr = 0; // pas d'obstacles
+    // std::size_t active_ptr = 1;
+    std::size_t active_ptr = 0; // pas d'obstacles
 
     mosek_solver(particles, dt, total_it, active_ptr);
 
