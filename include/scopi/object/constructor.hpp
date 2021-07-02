@@ -29,7 +29,7 @@ namespace scopi
     public:
         static constexpr std::size_t dim = T::dim;
         using object_type = T;
-        using tuple_type = std::tuple<Args...>;
+        using tuple_type = std::tuple<const std::decay_t<Args>...>;
 
         template<class... CTA>
         object_constructor(CTA&&... args);
