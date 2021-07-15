@@ -1734,7 +1734,7 @@ int hybrd (F f, DF grad_f, A args,
 template<typename F, typename DF, typename U, typename A>
 auto hybrd1 (U u0, F f, DF grad_f, A args) {
   int n = u0.size();
-  std::cout << "minpack : u0 = " << u0 << " size n = " << n << std::endl;
+  // std::cout << "minpack : u0 = " << u0 << " size n = " << n << std::endl;
   double epsfcn = 0.0;
   double factor = 100.0;;
   int info = 0;
@@ -1768,8 +1768,8 @@ auto hybrd1 (U u0, F f, DF grad_f, A args) {
   info = hybrd ( f, grad_f, args, n, x, fvec, xtol, maxfev, ml, mu, epsfcn, wa, mode,
                  factor, nprint, nfev, wa+index, n, wa+6*n, lr,
                  wa+n, wa+2*n, wa+3*n, wa+4*n, wa+5*n );
-  std::cout << "hybrd : nfev = " << nfev << std::endl;
-  std::cout << "hybrd : info = " << info << std::endl;
+  // std::cout << "hybrd : nfev = " << nfev << std::endl;
+  // std::cout << "hybrd : info = " << info << std::endl;
   if ( info == 5 ) {
     info = 4;
   }

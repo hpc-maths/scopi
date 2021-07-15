@@ -16,11 +16,47 @@
 #include <scopi/object/neighbor.hpp>
 #include <scopi/quaternion.hpp>
 
+#include <nanoflann/nanoflann.hpp>
+
 using namespace mosek::fusion;
 using namespace monty;
 namespace nl = nlohmann;
 
 using namespace xt::placeholders;
+
+
+namespace scopi
+{
+  ///////////////////////
+  // KdTree definition //
+  ///////////////////////
+  template<std::size_t dim>
+  class KdTree
+  {
+    public:
+      KdTree(scopi::scopi_container<dim> &p, std::size_t actptr) : _p{p}, _actptr{actptr} {}
+      inline std::size_t kdtree_get_point_count() const
+      {
+        //std::cout << "KDTREE _p.size() = "<< _p.size() <<std::endl;
+        return _p.size();
+      }
+      inline double kdtree_get_pt(std::size_t idx, const std::size_t d) const
+      {
+        //std::cout << "KDTREE _p["<< _actptr+idx << "][" << d << "] = " << _p.pos()(_actptr+idx)[d] << std::endl;
+        return _p.pos()(_actptr+idx)(d); //_p[idx]->pos()[d];
+        // return _p.pos()(idx)[d];
+      }
+      template<class BBOX>
+      bool kdtree_get_bbox(BBOX & /* bb */) const
+      {
+        return false;
+      }
+    private:
+      scopi::scopi_container<dim> &_p;
+      std::size_t _actptr;
+  };
+}
+
 
 template<std::size_t dim>
 void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t total_it, std::size_t active_ptr)
@@ -56,8 +92,26 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         }
 
         // create list of contacts
+        std::cout << "----> create list of contacts " << nite << std::endl;
+
+        // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
+        // tic();
+        // using my_kd_tree_t = typename nanoflann::KDTreeSingleIndexAdaptor<
+        //   nanoflann::L2_Simple_Adaptor<double, scopi::KdTree<dim>>, scopi::KdTree<dim>, dim >;
+        // scopi::KdTree kd(particles,active_ptr);
+        // my_kd_tree_t index(
+        //   dim, kd,
+        //   nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)
+        // );
+        // index.buildIndex();
+        // auto duration = toc();
+        // std::cout << "----> CPUTIME : build kdtree index = " << duration << std::endl;
+
+        tic();
+        #pragma omp parallel for num_threads(8)
         for(std::size_t i = 0; i < particles.size() - 1; ++i)
         {
+
             for(std::size_t j = i + 1; j < particles.size(); ++j)
             {
                 auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
@@ -68,9 +122,56 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
                     contacts.back().j = j;
                 }
             }
+
+            // double query_pt[dim];
+            // for (std::size_t d=0; d<dim; ++d)
+            // {
+            //     query_pt[d] = particles.pos()(active_ptr + i)(d);
+            //     // query_pt[d] = particles.pos()(i)(d);
+            // }
+            // //std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+            //
+            // std::vector<std::pair<size_t, double>> indices_dists;
+            // double radius = 4;
+            //
+            // nanoflann::RadiusResultSet<double, std::size_t> resultSet(
+            //     radius, indices_dists);
+            //
+            //   std::vector<std::pair<unsigned long, double>> ret_matches;
+            //
+            //   const std::size_t nMatches = index.radiusSearch(query_pt, radius, ret_matches,
+            //       nanoflann::SearchParams());
+            //
+            //   //std::cout << i << " nMatches = " << nMatches << std::endl;
+            //
+            //   for (std::size_t ic = 0; ic < nMatches; ++ic) {
+            //
+            //     std::size_t j = ret_matches[ic].first;
+            //     //double dist = ret_matches[ic].second;
+            //     if (i != j) {
+            //       auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+            //       //std::cout << "contact " << i << "," << j << " dij = " << neigh.dij << std::endl;
+            //       if (neigh.dij < dmax) {
+            //           contacts.emplace_back(std::move(neigh));
+            //           contacts.back().i = i;
+            //           contacts.back().j = j;
+            //       }
+            //     }
+            //
+            //   }
+
         }
+        auto duration = toc();
+        std::cout << "----> CPUTIME : compute contacts = " << duration << std::endl;
+        //exit(0);
+
+
+
+
 
         // output files
+        std::cout << "----> json output files " << nite << std::endl;
+
         nl::json json_output;
 
         std::ofstream file(fmt::format("./Results/scopi_objects_{:04d}.json", nite));
@@ -107,7 +208,9 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         //     }
         // }
 
+
         // create mass and inertia matrices
+        std::cout << "----> create mass and inertia matrices " << nite << std::endl;
         double mass = 1.;
         double moment = .1;
 
@@ -131,7 +234,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         {
             distances[i] = contacts[i].dij;
         }
-        std::cout << "distances " << distances << std::endl;
+        // std::cout << "distances " << distances << std::endl;
 
         //Create contstaint matrices A and B
         xt::xtensor<double, 2> Au = xt::zeros<double>({3*contacts.size(), Nactive*3});
@@ -209,6 +312,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         auto dtBAw = xt::eval(dt*xt::linalg::dot(B, Aw));
 
         // Create Mosek optimization problem
+        std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
         Variable::t u = model->variable("u", 3*Nactive);
@@ -243,8 +347,8 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         using position_type = typename scopi::scopi_container<dim>::position_type;
         auto uadapt = xt::adapt(reinterpret_cast<double*>(ulvl.raw()), {particles.size()-active_ptr, 3UL});
         auto wadapt = xt::adapt(reinterpret_cast<double*>(wlvl.raw()), {particles.size()-active_ptr, 3UL});
-        std::cout << "uadapt = " << uadapt << std::endl;
-        std::cout << "pos = " << particles.pos() << std::endl << std::endl;
+        // std::cout << "uadapt = " << uadapt << std::endl;
+        // std::cout << "pos = " << particles.pos() << std::endl << std::endl;
 
         for (std::size_t i=0; i<Nactive; ++i)
         {

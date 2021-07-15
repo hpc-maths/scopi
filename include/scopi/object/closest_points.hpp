@@ -168,7 +168,7 @@ namespace scopi
             return res;
         };
 
-        int num = 32;
+        int num = 4;
         auto binit1_xy = xt::unique(xt::adapt(s1.binit_xy(num)));
         // std::cout << "binit1_xy = " << binit1_xy << std::endl;
         auto binit2_xy = xt::unique(xt::adapt(s2.binit_xy(num)));

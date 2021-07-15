@@ -8,14 +8,15 @@ int main()
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .05;
-    std::size_t total_it = 1;
+    std::size_t total_it = 1000;
     scopi::scopi_container<dim> particles;
 
     std::default_random_engine generator;
-    std::uniform_real_distribution<double> distrib_e(0.1,1.0);
+    std::uniform_real_distribution<double> distrib_e(1.,1.);
     std::uniform_real_distribution<double> distrib_r(0.1,1.0);
     std::uniform_real_distribution<double> distrib_gp1(2.0,10.0);
     std::uniform_real_distribution<double> distrib_gp2(-10.0,-2.0);
+    std::uniform_real_distribution<double> distrib_y(-10.0,10.0);
     std::uniform_real_distribution<double> distrib_rot(0,PI);
 
     // scopi::superellipsoid<dim> s0({{0.0, 0.}}, {scopi::quaternion(-PI/4)}, {{.01, .01}}, {{0.2}});
@@ -28,21 +29,31 @@ int main()
     // particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
     // particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
 
-    int n = 20;
+    int n = 10;
 
     for (int i=0;i<n;++i){
+
       const double e = distrib_e(generator);
+
       std::cout << "i = " << i << " e = " << e << std::endl;
-      scopi::superellipsoid<dim> s({{distrib_gp1(generator), distrib_gp1(generator)}},
+
+      scopi::superellipsoid<dim> s1({{distrib_gp1(generator), distrib_y(generator)}},
         {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
         {{e}});
-      s.print();
-      particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+      // s1.print();
+      particles.push_back(s1, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+
+      scopi::superellipsoid<dim> s2({{distrib_gp2(generator), distrib_y(generator)}},
+        {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
+        {{e}});
+      // s2.print();
+      particles.push_back(s2, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
     }
 
-    std::cout << "pos = " << particles.pos() << std::endl << std::endl;
-    std::cout << "vd = " << particles.vd() << std::endl << std::endl;
-    std::cout << "q = " << particles.q() << std::endl << std::endl;
+    // std::cout << "pos = " << particles.pos() << std::endl << std::endl;
+    // std::cout << "vd = " << particles.vd() << std::endl << std::endl;
+    // std::cout << "q = " << particles.q() << std::endl << std::endl;
 
     // exit(0);
 

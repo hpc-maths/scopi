@@ -7,7 +7,7 @@ int main()
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .01;
-    std::size_t total_it = 425;
+    std::size_t total_it = 50;
     scopi::scopi_container<dim> particles;
 
     // ellipsoids

@@ -12,8 +12,8 @@ files = np.sort(glob.glob(prefix+"/*.json"))
 print(files)
 
 plotter = pv.Plotter()
-# plotter.show_grid()
-# plotter.show_bounds()
+plotter.show_grid()
+plotter.show_bounds()
 
 # light_types = [light.light_type for light in plotter.renderer.lights]
 # Remove from plotters so output is not produced in docs
@@ -117,7 +117,7 @@ for file in files[::1]:
                     geom["e+n"] = -2*np.ones((np.array(geom.points).shape[0],))
 
             geometries.append(geom)
-            plotter.add_mesh(geom, specular=1, specular_power=15,smooth_shading=True, show_scalar_bar=False, scalars="e+n",clim=[1.2, 2.0])
+            plotter.add_mesh(geom, show_scalar_bar=False, scalars="e+n",clim=[1.2, 2.0])#, specular=1, specular_power=15, smooth_shading=True, scalars="e+n",clim=[1.2, 2.0])
 
     else: # it>1
 
@@ -206,19 +206,19 @@ for file in files[::1]:
     # print("positions = ",positions)
     # print("geometries = ",geometries)
 
-    if contacts is not None:
-        for ic, contact in enumerate(contacts):
-            if (len(contact["pi"])==2): # dim=2
-                contact["pi"].append(0)
-                contact["pj"].append(0)
-                contact["nij"].append(0)
-            pvpti = pv.PolyData(np.array([contact["pi"]]))
-            pvptj = pv.PolyData(np.array([contact["pj"]]))
-            pvpti["normal"] = -np.asarray([contact["nij"]])
-            pvptj["normal"] = np.array([contact["nij"]])
-            plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"ni_{ic}")
-            plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
-
+    # if contacts is not None:
+    #     for ic, contact in enumerate(contacts):
+    #         if (len(contact["pi"])==2): # dim=2
+    #             contact["pi"].append(0)
+    #             contact["pj"].append(0)
+    #             contact["nij"].append(0)
+    #         pvpti = pv.PolyData(np.array([contact["pi"]]))
+    #         pvptj = pv.PolyData(np.array([contact["pj"]]))
+    #         pvpti["normal"] = -np.asarray([contact["nij"]])
+    #         pvptj["normal"] = np.array([contact["nij"]])
+    #         plotter.add_mesh(pvpti.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"ni_{ic}")
+    #         plotter.add_mesh(pvptj.glyph(orient="normal",factor=0.05, geom=pv.Arrow()),color="blue",name=f"nj_{ic}")
+    #
 
         # plotter.camera_position = 'xy'
         # plotter.camera.SetParallelProjection(True)

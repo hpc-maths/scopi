@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.6)
+project(Scopi)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_STANDARD 17)
 
