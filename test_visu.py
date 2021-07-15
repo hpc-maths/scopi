@@ -226,6 +226,7 @@ for file in files[::1]:
     if (it == 0):
         # plotter.show(auto_close=False, cpos="xy")
         plotter.show(auto_close=False, cpos="xy",screenshot=file.replace(".json",".png"))#,title=str(it))
+        # plotter.render()
         # plotter.show(auto_close=False, screenshot=file.replace(".json",".png"))
         # plotter.write_frame()
 

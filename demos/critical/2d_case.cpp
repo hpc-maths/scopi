@@ -8,7 +8,7 @@ int main()
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .05;
-    std::size_t total_it = 1000;
+    std::size_t total_it = 10000;
     scopi::scopi_container<dim> particles;
 
     std::default_random_engine generator;
@@ -29,7 +29,7 @@ int main()
     // particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
     // particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
 
-    int n = 10;
+    int n = 100;
 
     for (int i=0;i<n;++i){
 

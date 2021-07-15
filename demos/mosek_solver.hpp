@@ -95,78 +95,76 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         std::cout << "----> create list of contacts " << nite << std::endl;
 
         // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
-        // tic();
-        // using my_kd_tree_t = typename nanoflann::KDTreeSingleIndexAdaptor<
-        //   nanoflann::L2_Simple_Adaptor<double, scopi::KdTree<dim>>, scopi::KdTree<dim>, dim >;
-        // scopi::KdTree kd(particles,active_ptr);
-        // my_kd_tree_t index(
-        //   dim, kd,
-        //   nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)
-        // );
-        // index.buildIndex();
-        // auto duration = toc();
-        // std::cout << "----> CPUTIME : build kdtree index = " << duration << std::endl;
+        tic();
+        using my_kd_tree_t = typename nanoflann::KDTreeSingleIndexAdaptor<
+          nanoflann::L2_Simple_Adaptor<double, scopi::KdTree<dim>>, scopi::KdTree<dim>, dim >;
+        scopi::KdTree kd(particles,active_ptr);
+        my_kd_tree_t index(
+          dim, kd,
+          nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)
+        );
+        index.buildIndex();
+        auto duration = toc();
+        std::cout << "----> CPUTIME : build kdtree index = " << duration << std::endl;
 
         tic();
         #pragma omp parallel for num_threads(8)
         for(std::size_t i = 0; i < particles.size() - 1; ++i)
         {
 
-            for(std::size_t j = i + 1; j < particles.size(); ++j)
-            {
-                auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                if (neigh.dij < dmax)
-                {
-                    contacts.emplace_back(std::move(neigh));
-                    contacts.back().i = i;
-                    contacts.back().j = j;
-                }
-            }
-
-            // double query_pt[dim];
-            // for (std::size_t d=0; d<dim; ++d)
+            // for(std::size_t j = i + 1; j < particles.size(); ++j)
             // {
-            //     query_pt[d] = particles.pos()(active_ptr + i)(d);
-            //     // query_pt[d] = particles.pos()(i)(d);
-            // }
-            // //std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
-            //
-            // std::vector<std::pair<size_t, double>> indices_dists;
-            // double radius = 4;
-            //
-            // nanoflann::RadiusResultSet<double, std::size_t> resultSet(
-            //     radius, indices_dists);
-            //
-            //   std::vector<std::pair<unsigned long, double>> ret_matches;
-            //
-            //   const std::size_t nMatches = index.radiusSearch(query_pt, radius, ret_matches,
-            //       nanoflann::SearchParams());
-            //
-            //   //std::cout << i << " nMatches = " << nMatches << std::endl;
-            //
-            //   for (std::size_t ic = 0; ic < nMatches; ++ic) {
-            //
-            //     std::size_t j = ret_matches[ic].first;
-            //     //double dist = ret_matches[ic].second;
-            //     if (i != j) {
-            //       auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-            //       //std::cout << "contact " << i << "," << j << " dij = " << neigh.dij << std::endl;
-            //       if (neigh.dij < dmax) {
-            //           contacts.emplace_back(std::move(neigh));
-            //           contacts.back().i = i;
-            //           contacts.back().j = j;
-            //       }
+            //     auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+            //     if (neigh.dij < dmax)
+            //     {
+            //         contacts.emplace_back(std::move(neigh));
+            //         contacts.back().i = i;
+            //         contacts.back().j = j;
             //     }
-            //
-            //   }
+            // }
+
+            double query_pt[dim];
+            for (std::size_t d=0; d<dim; ++d)
+            {
+                query_pt[d] = particles.pos()(active_ptr + i)(d);
+                // query_pt[d] = particles.pos()(i)(d);
+            }
+            //std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+
+            std::vector<std::pair<size_t, double>> indices_dists;
+            double radius = 4;
+
+            nanoflann::RadiusResultSet<double, std::size_t> resultSet(
+                radius, indices_dists);
+
+              std::vector<std::pair<unsigned long, double>> ret_matches;
+
+              const std::size_t nMatches = index.radiusSearch(query_pt, radius, ret_matches,
+                  nanoflann::SearchParams());
+
+              //std::cout << i << " nMatches = " << nMatches << std::endl;
+
+              for (std::size_t ic = 0; ic < nMatches; ++ic) {
+
+                std::size_t j = ret_matches[ic].first;
+                //double dist = ret_matches[ic].second;
+                if (i != j) {
+                  auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+                  //std::cout << "contact " << i << "," << j << " dij = " << neigh.dij << std::endl;
+                  if (neigh.dij < dmax) {
+                      #pragma omp critical
+                      contacts.emplace_back(std::move(neigh));
+                      contacts.back().i = i;
+                      contacts.back().j = j;
+                  }
+                }
+
+              }
 
         }
-        auto duration = toc();
+        duration = toc();
         std::cout << "----> CPUTIME : compute contacts = " << duration << std::endl;
         //exit(0);
-
-
-
 
 
         // output files
@@ -371,7 +369,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
             // std::cout << expw << " " << particles.q()(i) << std::endl;
             particles.q()(i + active_ptr) = scopi::mult_quaternion(particles.q()(i + active_ptr), expw);
             // std::cout << particles.q()(i) << std::endl << std::endl;
-
+    
         }
     }
 }
