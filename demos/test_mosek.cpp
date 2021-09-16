@@ -185,8 +185,8 @@ int main()
         std::size_t ic = 0;
         for (auto &c: contacts)
         {
-            auto r_i = c.pi - particles.pos()(c.i);
-            auto r_j = c.pj - particles.pos()(c.j);
+            auto r_i = xt::eval(c.pi - particles.pos()(c.i));
+            auto r_j = xt::eval(c.pj - particles.pos()(c.j));
 
             xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
 

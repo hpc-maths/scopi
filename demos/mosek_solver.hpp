@@ -109,6 +109,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
 
         tic();
         #pragma omp parallel for num_threads(8)
+
         for(std::size_t i = 0; i < particles.size() - 1; ++i)
         {
 
@@ -152,10 +153,12 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
                   auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
                   //std::cout << "contact " << i << "," << j << " dij = " << neigh.dij << std::endl;
                   if (neigh.dij < dmax) {
+                      neigh.i = i;
+                      neigh.j = j;
                       #pragma omp critical
                       contacts.emplace_back(std::move(neigh));
-                      contacts.back().i = i;
-                      contacts.back().j = j;
+                      // contacts.back().i = i;
+                      // contacts.back().j = j;
                   }
                 }
 
@@ -163,7 +166,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
 
         }
         duration = toc();
-        std::cout << "----> CPUTIME : compute contacts = " << duration << std::endl;
+        std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
         //exit(0);
 
 
@@ -209,6 +212,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
 
         // create mass and inertia matrices
         std::cout << "----> create mass and inertia matrices " << nite << std::endl;
+        tic();
         double mass = 1.;
         double moment = .1;
 
@@ -243,8 +247,11 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         std::size_t ic = 0;
         for (auto &c: contacts)
         {
+
             auto r_i = c.pi - particles.pos()(c.i);
             auto r_j = c.pj - particles.pos()(c.j);
+            // auto r_i = xt::eval(c.pi - particles.pos()(c.i));
+            // auto r_j = xt::eval(c.pj - particles.pos()(c.j));
 
             xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
 
@@ -309,8 +316,13 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         auto dtBAu = xt::eval(dt*xt::linalg::dot(B, Au));
         auto dtBAw = xt::eval(dt*xt::linalg::dot(B, Aw));
 
+        auto duration4 = toc();
+        std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
+
+
         // Create Mosek optimization problem
         std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
+        tic();
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
         Variable::t u = model->variable("u", 3*Nactive);
@@ -337,6 +349,9 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
 
         //solve
         model->solve();
+
+        auto duration5 = toc();
+        std::cout << "----> CPUTIME : mosek = " << duration5 << std::endl;
 
         // move the active particles
         ndarray<double, 1> ulvl   = *(u->level());
@@ -369,7 +384,7 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
             // std::cout << expw << " " << particles.q()(i) << std::endl;
             particles.q()(i + active_ptr) = scopi::mult_quaternion(particles.q()(i + active_ptr), expw);
             // std::cout << particles.q()(i) << std::endl << std::endl;
-    
+
         }
     }
 }

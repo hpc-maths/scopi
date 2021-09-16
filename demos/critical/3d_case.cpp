@@ -67,6 +67,5 @@ int main()
 
     mosek_solver(particles, dt, total_it, active_ptr);
 
-
     return 0;
 }
