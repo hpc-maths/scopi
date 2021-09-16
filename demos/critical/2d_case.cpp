@@ -1,6 +1,7 @@
 #include <xtensor/xmath.hpp>
 #include <scopi/object/superellipsoid.hpp>
-#include "../mosek_solver.hpp"
+// #include "../mosek_solver.hpp"
+#include "../mosek_solver_sparse.hpp"
 #include <random>
 
 int main()
@@ -27,23 +28,23 @@ int main()
 
       std::cout << "i = " << i << " e = " << e << std::endl;
 
-      // scopi::sphere<dim> s1(
-      //   {{distrib_gp1(generator), distrib_y(generator)}},
-      //   {scopi::quaternion(distrib_rot(generator))},
-      //   distrib_r(generator));
-      scopi::superellipsoid<dim> s1({{distrib_gp1(generator), distrib_y(generator)}},
-        {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
-        {{e}});
+      scopi::sphere<dim> s1(
+        {{distrib_gp1(generator), distrib_y(generator)}},
+        {scopi::quaternion(distrib_rot(generator))},
+        distrib_r(generator));
+      // scopi::superellipsoid<dim> s1({{distrib_gp1(generator), distrib_y(generator)}},
+      //   {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
+      //   {{e}});
       // s1.print();
       particles.push_back(s1, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
 
-      // scopi::sphere<dim> s2(
-      //   {{distrib_gp2(generator), distrib_y(generator)}},
-      //   {scopi::quaternion(distrib_rot(generator))},
-      //   distrib_r(generator));
-      scopi::superellipsoid<dim> s2({{distrib_gp2(generator), distrib_y(generator)}},
-        {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
-        {{e}});
+      scopi::sphere<dim> s2(
+        {{distrib_gp2(generator), distrib_y(generator)}},
+        {scopi::quaternion(distrib_rot(generator))},
+        distrib_r(generator));
+      // scopi::superellipsoid<dim> s2({{distrib_gp2(generator), distrib_y(generator)}},
+      //   {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
+      //   {{e}});
       // s2.print();
       particles.push_back(s2, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
