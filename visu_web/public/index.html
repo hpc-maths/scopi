@@ -1,0 +1,59 @@
+<html>
+<head>
+    <meta charset=utf-8>
+    <title>Visualization</title>
+    <style>
+        body { margin: 0; }
+        canvas { width: 100%; height: 100% }
+    </style>
+</head>
+<body>
+
+  <p> Sélectionner un dossier de résultats dans scopi/build/ </p>
+    <input type="file" id="filepicker" name="fileList" accept=".json" webkitdirectory multiple />
+    <!-- <ul id="listing"></ul> -->
+
+    <!-- <script type='x-shader/x-vertex' id='vertexshader'>
+       attribute float alpha;
+       varying float vAlpha;
+       void main() {
+         vAlpha = alpha;
+         vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+         gl_PointSize = 2.0;
+         gl_Position = projectionMatrix * mvPosition;
+       }
+
+     </script> -->
+     <!-- <script type='x-shader/x-fragment' id='fragmentshader'>
+       uniform vec3 color;
+       varying float vAlpha;
+       void main() {
+         gl_FragColor = vec4( color, vAlpha );
+       }
+     </script> -->
+
+     <script type="x-shader/x-vertex" id="vertexshader">
+     			attribute float size;
+     			attribute vec3 customColor;
+     			varying vec3 vColor;
+     			void main() {
+     				vColor = customColor;
+     				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+     				gl_PointSize = size * ( 300.0 / -mvPosition.z );
+     				gl_Position = projectionMatrix * mvPosition;
+     			}
+     		</script>
+
+     		<script type="x-shader/x-fragment" id="fragmentshader">
+     			uniform vec3 color;
+     			uniform sampler2D pointTexture;
+     			varying vec3 vColor;
+     			void main() {
+     				gl_FragColor = vec4( color * vColor, 1.0 );
+     				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+     			}
+     		</script>
+
+  <script type="module" src="visu.js"></script>
+
+</body>
