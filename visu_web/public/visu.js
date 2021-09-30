@@ -25,7 +25,7 @@ document.getElementById("filepicker").addEventListener("change", function(event)
   })
   .sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
 
-  console.log("files = ",files);
+  // console.log("files = ",files);
 
   let current_index_file_old = -1;
   let current_index_file = 0;
@@ -37,6 +37,7 @@ document.getElementById("filepicker").addEventListener("change", function(event)
   let sph_positions = null;
   let sph_radius = null;
   let sph_rotations = null;
+  let sph_quaternions = null;
   let sph_geometry = null;
   let sph_material = null;
   let sph_actors = null;
@@ -45,12 +46,17 @@ document.getElementById("filepicker").addEventListener("change", function(event)
   let ell_positions = null;
   let ell_radius = null;
   let ell_rotations = null;
+  let ell_quaternions = null;
+  let ell_actors = [];
 
   let supell_nb = 0;
   let supell_positions = null;
   let supell_radius = null;
   let supell_rotations = null;
+  let supell_quaternions = null;
   let supell_squareness = null;
+  let supell_actors = [];
+
 
   let contacts_nij = null;
   let contacts_pi = null;
@@ -70,8 +76,9 @@ document.getElementById("filepicker").addEventListener("change", function(event)
 
   let spheres;
 
-  let camera_zmin = 10;
   let sprite_scaling = 5.9;
+
+
 
   // https://observablehq.com/@d3/color-schemes
   let mycolors = ["#ffffcc","#fffecb","#fffec9","#fffdc8","#fffdc6","#fffcc5",
@@ -158,9 +165,20 @@ document.getElementById("filepicker").addEventListener("change", function(event)
     // const cube = new THREE.Mesh( cube_geometry, cube_material );
     // scene.add( cube );
 
+
+    // // pour tester une forme parametree
+    // var param_geometry = new THREE.ParametricGeometry( createSuperellipsoid(1, 2, 4, 1, 1), 25, 25 );
+    // var param_material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    // var param_obj = new THREE.Mesh( param_geometry, param_material );
+    // console.log("param_obj = ",param_obj);
+    // var quaternion = new THREE.Quaternion(1.2, 0, 2, 1).normalize(); // x,y,z,w
+    // console.log("quaternion = ",quaternion);
+    // param_obj.applyQuaternion(quaternion);
+    // scene.add( param_obj );
+
     //camera
-    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
-    console.log("window.innerWidth = "+window.innerWidth+" window.innerHeight = "+window.innerHeight);
+    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
+    // console.log("window.innerWidth = "+window.innerWidth+" window.innerHeight = "+window.innerHeight);
     camera.position.z = 40;
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -211,9 +229,9 @@ document.getElementById("filepicker").addEventListener("change", function(event)
 
   function update_json_data() {
     if (current_index_file != current_index_file_old) {
-      console.log("current index file : " + current_index_file);
+      // console.log("current index file : " + current_index_file);
       current_index_file_old = current_index_file;
-      console.log("current file : " + files[current_index_file].webkitRelativePath);
+      // console.log("current file : " + files[current_index_file].webkitRelativePath);
       fetch('api/json?filename='+files[current_index_file].webkitRelativePath)
       .then(response => response.json())
       .then(
@@ -222,15 +240,15 @@ document.getElementById("filepicker").addEventListener("change", function(event)
         }
       ).then(
         () => {
-          console.log("current json data : ",current_json_data);
-          console.log("nb particules : ",current_json_data.objects.length);
+          // console.log("current json data : ",current_json_data);
+          // console.log("nb particules : ",current_json_data.objects.length);
 
           // nb de spheres et de superellipsoids
           sph_nb = 0;
           supell_nb = 0;
           ell_nb = 0;
           dim = current_json_data.objects[0].position.length;
-          console.log("dim = ",dim);
+          // console.log("dim = ",dim);
           current_json_data.objects.forEach(function(obj) {
             if (obj.type === "sphere") {
               sph_nb += 1;
@@ -245,87 +263,105 @@ document.getElementById("filepicker").addEventListener("change", function(event)
               }
             }
           });
-          console.log("nb spheres = "+sph_nb);
-          console.log("nb ellipsoids= "+ell_nb);
-          console.log("nb superellipsoids = "+supell_nb);
+          // console.log("nb spheres = "+sph_nb);
+          // console.log("nb ellipsoids= "+ell_nb);
+          // console.log("nb superellipsoids = "+supell_nb);
 
           if (sph_nb>0){
             sph_positions = new Float32Array(sph_nb * 3);
             sph_radius = new Float32Array( sph_nb);
             sph_rotations = new Float32Array( sph_nb * dim * dim);
+            sph_quaternions = new Float32Array( sph_nb * 4);
           }
           if (ell_nb>0){
             ell_positions = new Float32Array(ell_nb * 3);
             ell_radius = new Float32Array( ell_nb * dim);
             ell_rotations = new Float32Array( ell_nb * dim * dim);
+            ell_quaternions = new Float32Array( ell_nb * 4);
           }
           if (supell_nb>0){
             supell_positions = new Float32Array(supell_nb * 3);
             supell_radius = new Float32Array(supell_nb * dim);
             supell_squareness = new Float32Array(supell_nb * (dim-1));
             supell_rotations = new Float32Array(supell_nb * dim * dim);
+            supell_quaternions = new Float32Array(supell_nb * 4);
           }
+          let isph = 0;
+          let iell = 0;
+          let isupell = 0;
           for ( let i = 0; i < current_json_data.objects.length; i ++ ) {
             if (current_json_data.objects[i].type==="sphere"){
-              sph_radius[i] = current_json_data.objects[i].radius;
-              sph_positions[3*i] = current_json_data.objects[i].position[0];
-              sph_positions[3*i+1] = current_json_data.objects[i].position[1];
+              sph_radius[isph] = current_json_data.objects[i].radius;
+              sph_positions[3*isph] = current_json_data.objects[i].position[0];
+              sph_positions[3*isph+1] = current_json_data.objects[i].position[1];
               if (dim==3) {
-                sph_positions[3*i+2] = current_json_data.objects[i].position[2];
+                sph_positions[3*isph+2] = current_json_data.objects[i].position[2];
               }
               else {
-                sph_positions[3*i+2] = 0;
+                sph_positions[3*isph+2] = 0;
               }
               for ( let k = 0; k<dim*dim; k++){
-                sph_rotations[dim*dim*i+k] = current_json_data.objects[i].rotation[k];
+                sph_rotations[dim*dim*isph+k] = current_json_data.objects[i].rotation[k];
               }
+              for ( let k = 0; k<4; k++){
+                sph_quaternions[4*isph+k] = current_json_data.objects[i].quaternion[k];
+              }
+              isph += 1;
             }
             else if (current_json_data.objects[i].type==="ellipsoid") {
               for ( let k = 0; k<dim; k++){
-                ell_radius[dim*i+k] = current_json_data.objects[i].radius[k];
+                ell_radius[dim*iell+k] = current_json_data.objects[i].radius[k];
               }
-              ell_positions[3*i] = current_json_data.objects[i].position[0];
-              ell_positions[3*i+1] = current_json_data.objects[i].position[1];
+              ell_positions[3*iell] = current_json_data.objects[i].position[0];
+              ell_positions[3*iell+1] = current_json_data.objects[i].position[1];
               if (dim==3) {
-                ell_positions[3*i+2] = current_json_data.objects[i].position[2];
+                ell_positions[3*iell+2] = current_json_data.objects[i].position[2];
               }
               else {
-                ell_positions[3*i+2] = 0;
+                ell_positions[3*iell+2] = 0;
               }
               for ( let k = 0; k<dim*dim; k++){
-                ell_rotations[dim*dim*i+k] = current_json_data.objects[i].rotation[k];
+                ell_rotations[dim*dim*iell+k] = current_json_data.objects[i].rotation[k];
               }
+              for ( let k = 0; k<4; k++){
+                ell_quaternions[4*iell+k] = current_json_data.objects[i].quaternion[k];
+              }
+              iell += 1;
             }
             else if (current_json_data.objects[i].type==="superellipsoid") {
               for ( let k = 0; k<dim; k++){
-                supell_radius[dim*i+k] = current_json_data.objects[i].radius[k];
+                supell_radius[dim*isupell+k] = current_json_data.objects[i].radius[k];
               }
-              supell_positions[3*i] = current_json_data.objects[i].position[0];
-              supell_positions[3*i+1] = current_json_data.objects[i].position[1];
+              supell_positions[3*isupell] = current_json_data.objects[i].position[0];
+              supell_positions[3*isupell+1] = current_json_data.objects[i].position[1];
               if (dim==3) {
-                supell_positions[3*i+2] = current_json_data.objects[i].position[2];
+                supell_positions[3*isupell+2] = current_json_data.objects[i].position[2];
               }
               else {
-                supell_positions[3*i+2] = 0;
+                supell_positions[3*isupell+2] = 0;
               }
               for ( let k = 0; k<dim*dim; k++){
-                supell_rotations[dim*dim*i+k] = current_json_data.objects[i].rotation[k];
+                supell_rotations[dim*dim*isupell+k] = current_json_data.objects[i].rotation[k];
               }
               for ( let k = 0; k<dim-1; k++){
-                supell_squareness[(dim-1)*i+k] = current_json_data.objects[i].squareness[k];
+                supell_squareness[(dim-1)*isupell+k] = current_json_data.objects[i].squareness[k];
               }
+              for ( let k = 0; k<4; k++){
+                supell_quaternions[4*isupell+k] = current_json_data.objects[i].quaternion[k];
+              }
+              isupell += 1;
             }
           }
-          console.log("spheres : positions = ",sph_positions);
-          console.log("spheres : radius = ",sph_radius);
-          console.log("spheres : rotations = ",sph_rotations);
-          console.log("ellipsoids : positions = ",ell_positions);
-          console.log("ellipsoids : radius = ",ell_radius);
-          console.log("ellipsoids : rotations = ",ell_rotations);
-          console.log("superellipsoids : positions = ",supell_positions);
-          console.log("superellipsoids : radius = ",supell_radius);
-          console.log("superellipsoids : rotations = ",supell_rotations);
-          console.log("superellipsoids : squareness = ",supell_squareness);
+          // console.log("spheres : positions = ",sph_positions);
+          // console.log("spheres : radius = ",sph_radius);
+          // console.log("spheres : rotations = ",sph_rotations);
+          // console.log("ellipsoids : positions = ",ell_positions);
+          // console.log("ellipsoids : radius = ",ell_radius);
+          // console.log("ellipsoids : rotations = ",ell_rotations);
+          // console.log("superellipsoids : positions = ",supell_positions);
+          // console.log("superellipsoids : radius = ",supell_radius);
+          // console.log("superellipsoids : rotations = ",supell_rotations);
+          // console.log("superellipsoids : squareness = ",supell_squareness);
         }
       ).then(
         () => {
@@ -341,51 +377,138 @@ document.getElementById("filepicker").addEventListener("change", function(event)
 
   function redrawParticules () {
 
-    try {
-      const geom = sph_actors.geometry;
-			const attributes = geom.attributes;
+    // SPHERES
+    if (sph_nb>0) {
+      try {
+        const geom = sph_actors.geometry;
+  			const attributes = geom.attributes;
 
-				for ( let i = 0; i < attributes.size.array.length; i ++ ) {
-					attributes.size.array[ i ] = sprite_scaling*sph_radius[ i ];
-          attributes.position.array[ 3*i ] = sph_positions[ 3*i ];
-          attributes.position.array[ 3*i+1 ] = sph_positions[ 3*i+1 ];
-          attributes.position.array[ 3*i+2 ] = sph_positions[ 3*i+2 ];
-				}
-				attributes.size.needsUpdate = true;
-        attributes.position.needsUpdate = true;
-    } catch (error) {
-      console.error(error);
-    	const colors = new Float32Array( sph_nb * 3 );
-  		const sizes = new Float32Array( sph_nb );
-  		const color = new THREE.Color( 0xffffff );
-  		for ( let i = 0; i < sph_nb; i ++ ) {
-  			// color.setHSL( 0.5, 0.7, 0.5 );
-        color.setHSL( 1, 1, 1 );
-  			color.toArray( colors, i * 3 );
-  			sizes[ i ] = sprite_scaling*sph_radius[i];
-  		}
-  		const geom = new THREE.BufferGeometry();
-  		geom.setAttribute( 'position', new THREE.BufferAttribute( sph_positions, 3 ) );
-  		geom.setAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-  		geom.setAttribute( 'size', new THREE.BufferAttribute(sizes , 1 ) );
-    	const material = new THREE.ShaderMaterial( {
-  			uniforms: {
-  				color: { value: new THREE.Color( 0xff0000 ) },
-  				// pointTexture: { value: new THREE.TextureLoader().load( "disc2.png" ) }
-          // disc2.png : 32x32
-          pointTexture: { value: new THREE.TextureLoader().load( "disc_100x100.png" ) }
-          //
-          // pointTexture: { value: new THREE.TextureLoader().load( "sprite.png" ) }
-  			},
-  			vertexShader: document.getElementById( 'vertexshader' ).textContent,
-  			fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-  			blending: THREE.AdditiveBlending,
-  			depthTest: false,
-  			transparent: true
-  		} );
-      sph_actors = new THREE.Points( geom, material );
-  		scene.add( sph_actors );
+  				for ( let i = 0; i < attributes.size.array.length; i ++ ) {
+  					attributes.size.array[ i ] = sprite_scaling*sph_radius[ i ];
+            attributes.position.array[ 3*i ] = sph_positions[ 3*i ];
+            attributes.position.array[ 3*i+1 ] = sph_positions[ 3*i+1 ];
+            attributes.position.array[ 3*i+2 ] = sph_positions[ 3*i+2 ];
+  				}
+  				attributes.size.needsUpdate = true;
+          attributes.position.needsUpdate = true;
+      } catch (error) {
+        // console.error(error);
+      	const colors = new Float32Array( sph_nb * 3 );
+    		const sizes = new Float32Array( sph_nb );
+    		const color = new THREE.Color( 0xffffff );
+    		for ( let i = 0; i < sph_nb; i ++ ) {
+    			// color.setHSL( 0.5, 0.7, 0.5 );
+          color.setHSL( 1, 1, 1 );
+    			color.toArray( colors, i * 3 );
+    			sizes[ i ] = sprite_scaling*sph_radius[i];
+    		}
+    		const geom = new THREE.BufferGeometry();
+    		geom.setAttribute( 'position', new THREE.BufferAttribute( sph_positions, 3 ) );
+    		geom.setAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+    		geom.setAttribute( 'size', new THREE.BufferAttribute(sizes , 1 ) );
+      	const material = new THREE.ShaderMaterial( {
+    			uniforms: {
+    				color: { value: new THREE.Color( 0xff0000 ) },
+    				// pointTexture: { value: new THREE.TextureLoader().load( "disc2.png" ) }
+            // disc2.png : 32x32
+            pointTexture: { value: new THREE.TextureLoader().load( "disc_100x100.png" ) }
+            //
+            // pointTexture: { value: new THREE.TextureLoader().load( "sprite.png" ) }
+    			},
+    			vertexShader: document.getElementById( 'vertexshader' ).textContent,
+    			fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+    			blending: THREE.AdditiveBlending,
+    			depthTest: false,
+    			transparent: true
+    		} );
+        sph_actors = new THREE.Points( geom, material );
+    		scene.add( sph_actors );
+      }
     }
+
+    // ELLIPSOIDS
+    var bar = new Promise((resolve, reject) => {
+      if (ell_actors.length == 0) {
+        resolve();
+      }
+      else {
+        ell_actors.forEach((value, index, array) => {
+          scene.remove(value);
+          if (index === array.length -1) resolve();
+        });
+      }
+    });
+    bar.then(() => {
+      ell_actors=[];
+      if (ell_nb>0){
+        for ( let i = 0; i < ell_nb; i ++ ) {
+          var rz = 0.1;
+          if (dim==3) {
+            rz = ell_radius[dim*i+2];
+          }
+          var param_geometry = new THREE.ParametricGeometry( createSuperellipsoid(ell_radius[dim*i], ell_radius[dim*i+1], rz, 1, 1), 12, 12 );
+          var param_material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+          var param_obj = new THREE.Mesh( param_geometry, param_material );
+          // console.log("param_obj = ",param_obj);
+          var quaternion = new THREE.Quaternion(ell_quaternions[4*i+1], ell_quaternions[4*i+2], ell_quaternions[4*i+3], ell_quaternions[4*i]).normalize(); // x,y,z,w
+          // console.log("quaternion = ",quaternion);
+          param_obj.applyQuaternion(quaternion);
+          // var m = new THREE.Matrix4();
+          // m.set( ell_quaternions[dim*dim*i],   ell_quaternions[dim*dim*i+1], 0, ell_positions[3*i],
+          //        ell_quaternions[dim*dim*i+2], ell_quaternions[dim*dim*i+3], 0, ell_positions[3*i+1],
+          //        0,                            0,                            1, 0,
+          //        0,                            0,                            0, 1 );
+          // param_obj.applyMatrix4(m);
+          param_obj.position.set(ell_positions[3*i], ell_positions[3*i+1], ell_positions[3*i+2]);
+          ell_actors.push(param_obj);
+          scene.add( param_obj );
+        }
+      }
+    });
+    // console.log("ell_actors = ",ell_actors);
+
+    // SUPERELLIPSOIDS
+    var bar = new Promise((resolve, reject) => {
+      if (supell_actors.length == 0) {
+        resolve();
+      }
+      else {
+        supell_actors.forEach((value, index, array) => {
+          scene.remove(value);
+          if (index === array.length -1) resolve();
+        });
+      }
+    });
+    bar.then(() => {
+      supell_actors=[];
+      if (supell_nb>0){
+        for ( let i = 0; i < supell_nb; i ++ ) {
+          var rz = 0.1;
+          var sqz = 1;
+          if (dim==3) {
+            rz = supell_radius[dim*i+2];
+            sqz = supell_squareness[(dim-1)*i+1];
+          }
+          var param_geometry = new THREE.ParametricGeometry( createSuperellipsoid(supell_radius[dim*i], supell_radius[dim*i+1], rz, supell_squareness[(dim-1)*i], sqz), 12, 12 );
+          var param_material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+          var param_obj = new THREE.Mesh( param_geometry, param_material );
+          // console.log("param_obj = ",param_obj);
+          var quaternion = new THREE.Quaternion(supell_quaternions[4*i+1], supell_quaternions[4*i+2], supell_quaternions[4*i+3], supell_quaternions[4*i]).normalize(); // x,y,z,w
+          // console.log("quaternion = ",quaternion);
+          param_obj.applyQuaternion(quaternion);
+          // var m = new THREE.Matrix4();
+          // m.set( ell_quaternions[dim*dim*i],   ell_quaternions[dim*dim*i+1], 0, ell_positions[3*i],
+          //        ell_quaternions[dim*dim*i+2], ell_quaternions[dim*dim*i+3], 0, ell_positions[3*i+1],
+          //        0,                            0,                            1, 0,
+          //        0,                            0,                            0, 1 );
+          // param_obj.applyMatrix4(m);
+          param_obj.position.set(supell_positions[3*i], supell_positions[3*i+1], supell_positions[3*i+2]);
+          supell_actors.push(param_obj);
+          scene.add( param_obj );
+        }
+      }
+    });
+    // console.log("supell_actors = ",supell_actors);
   }
 
   function update() {
@@ -400,9 +523,9 @@ document.getElementById("filepicker").addEventListener("change", function(event)
 
   function render() {
     // console.log("camera.position.z = "+camera.position.z);
-    if (camera.position.z < camera_zmin) {
-      camera.position.z = camera_zmin;
-    }
+    // if (camera.position.z < camera_zmin) {
+    //   camera.position.z = camera_zmin;
+    // }
     renderer.render(scene, camera);
     //var sss = renderer.getSize();
     //console.log("PixelRatio = "+renderer.getPixelRatio()+" DrawingBufferSize = ",sss);
@@ -411,48 +534,21 @@ document.getElementById("filepicker").addEventListener("change", function(event)
   init();
   animate();
 
-  // function createSuperellipsoidMesh() {
-  // 				// if ( superellipsoidMesh ) {
-  // 				// 	scene.remove( superellipsoidMesh );
-  // 				// }
-  // 				var klein = function ( v, u ) {
-  // 					u *= Math.PI;
-  // 					v *= 2 * Math.PI;
-  // 					u = u * 2;
-  // 					var x, y, z;
-  // 					if ( u < Math.PI ) {
-  // 						x = 3 * Math.cos( u ) * ( 1 + Math.sin( u ) ) + ( 2 * ( 1 - Math.cos( u ) / 2 ) ) * Math.cos( u ) * Math.cos( v );
-  // 						z = - 8 * Math.sin( u ) - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( u ) * Math.cos( v );
-  // 					} else {
-  // 						x = 3 * Math.cos( u ) * ( 1 + Math.sin( u ) ) + ( 2 * ( 1 - Math.cos( u ) / 2 ) ) * Math.cos( v + Math.PI );
-  // 						z = - 8 * Math.sin( u );
-  // 					}
-  // 					y = - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
-  // 					return new THREE.Vector3( x, y, z );
-  // 				};
-  // 				var superellipsoid = function( u, v ) {
-  // 					var uu = ( u * 2.0 - 1.0 ) * Math.PI;
-  // 					var vv = ( v * 2.0 - 1.0 ) * Math.PI * 0.5;
-  // 					var c = function( w, m ) {
-  // 						var cos = Math.cos( w );
-  // 						return Math.sign( cos ) * Math.pow( Math.abs( cos ), m );
-  // 					};
-  // 					var s = function( w, m ) {
-  // 						var sin = Math.sin( w );
-  // 						return Math.sign( sin ) * Math.pow( Math.abs( sin ), m )
-  // 					};
-  // 					return new THREE.Vector3(
-  // 						c( vv, 2.0 / params.t ) * c( uu, 2.0 / params.r ),
-  // 						c( vv, 2.0 / params.t ) * s( uu, 2.0 / params.r ),
-  // 						s( vv, 2.0 / params.t )
-  // 					);
-  // 				};
-  // 				var geometry = new THREE.ParametricGeometry( superellipsoid, 50, 50 );
-  // 				superellipsoidMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
-  // 				superellipsoidMesh = new THREE.Mesh( geometry, superellipsoidMaterial );
-  // 				scene.add( superellipsoidMesh );
-  // 			}
-  //
+  function createSuperellipsoid(rx, ry, rz, e, n) {
+    return function (a, b, target) {
+      a = -0.5*Math.PI + a*Math.PI;
+      b = -Math.PI + 2*b*Math.PI;
+      var cos_a = Math.cos( a );
+      var sin_a = Math.sin( a );
+      var cos_b = Math.cos( b );
+      var sin_b = Math.sin( b );
+      var x = rx * Math.sign( cos_a ) * Math.pow( Math.abs( cos_a ), n ) * Math.sign( cos_b ) * Math.pow( Math.abs( cos_b ), e );
+      var y = ry * Math.sign( cos_a ) * Math.pow( Math.abs( cos_a ), n ) * Math.sign( sin_b ) * Math.pow( Math.abs( sin_b ), e );
+      var z = rz * Math.sign( sin_a ) * Math.pow( Math.abs( sin_a ), n );
+      target.set(x, y, z);
+    }
+  }
+
 
 
 }, false);

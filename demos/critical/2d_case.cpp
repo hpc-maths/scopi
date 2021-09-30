@@ -3,12 +3,14 @@
 #include "../mosek_solver.hpp"
 #include <random>
 
+// cmake --build . --target critical_2d
+
 int main()
 {
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .1;
-    std::size_t total_it = 50000;
+    std::size_t total_it = 10;//50000;
     scopi::scopi_container<dim> particles;
 
     std::default_random_engine generator;
@@ -24,8 +26,10 @@ int main()
     std::uniform_real_distribution<double> distrib_x(-40.0,40.0);
     std::uniform_real_distribution<double> distrib_y(-40.0,40.0);
     std::uniform_real_distribution<double> distrib_rot(0,PI);
+    // std::uniform_real_distribution<double> distrib_rot(PI/4,PI/4);
 
-    int n = 2000;
+    int n = 200;
+    // int n = 10;
 
     for (int i=0;i<n;++i){
 
@@ -37,12 +41,19 @@ int main()
       const double rot = distrib_rot(generator);
       const double dist_orig = std::sqrt(x*x+y*y);
 
-      scopi::sphere<dim> s1( {{x, y}}, {scopi::quaternion(rot)}, r);
       // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
-      // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r}}, {{e}});
-      particles.push_back(s1, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+      // particles.push_back(s1, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+
+      // scopi::sphere<dim> s2( {{x, y}}, {scopi::quaternion(rot)}, r);
+      // particles.push_back(s2, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+
+      scopi::superellipsoid<dim> s3({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{e}});
+      particles.push_back(s3, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
 
     }
+
+
+
     // for (int i=0;i<n;++i){
     //
     //   const double e = distrib_e(generator);

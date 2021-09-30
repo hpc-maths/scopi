@@ -34,6 +34,7 @@ namespace scopi
         object["position"] = s.pos();
         object["radius"] = s.radius();
         object["rotation"] = xt::flatten(s.rotation());
+        object["quaternion"] = s.q();
 
         return object;
         // std::cout << "write_objects : SPHERE" << std::endl;
@@ -63,6 +64,7 @@ namespace scopi
         object["radius"] = s.radius();
         object["squareness"] = s.squareness();
         object["rotation"] = xt::flatten(s.rotation());
+        object["quaternion"] = s.q();
 
         return object;
 
