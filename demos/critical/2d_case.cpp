@@ -9,8 +9,8 @@ int main()
 {
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
-    double dt = .1;
-    std::size_t total_it = 10;//50000;
+    double dt = .01;
+    std::size_t total_it = 1000;//50000;
     scopi::scopi_container<dim> particles;
 
     std::default_random_engine generator;
@@ -28,29 +28,48 @@ int main()
     std::uniform_real_distribution<double> distrib_rot(0,PI);
     // std::uniform_real_distribution<double> distrib_rot(PI/4,PI/4);
 
-    int n = 200;
+    int n = 60;
     // int n = 10;
 
     for (int i=0;i<n;++i){
 
-      const double e = distrib_e(generator);
-      const double r = distrib_r(generator);
-      const double r2 = distrib_r2(generator);
-      const double x = distrib_x(generator);
-      const double y = distrib_y(generator);
-      const double rot = distrib_rot(generator);
-      const double dist_orig = std::sqrt(x*x+y*y);
+      double e = distrib_e(generator);
+      double r = distrib_r(generator);
+      double r2 = distrib_r2(generator);
+      double x = distrib_x(generator);
+      double y = distrib_y(generator);
+      double rot = distrib_rot(generator);
+      double dist_orig = std::sqrt(x*x+y*y);
 
-      // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
-      // particles.push_back(s1, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+      scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
+      particles.push_back(s1, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
 
+      e = distrib_e(generator);
+      r = distrib_r(generator);
+      r2 = distrib_r2(generator);
+      x = distrib_x(generator);
+      y = distrib_y(generator);
+      rot = distrib_rot(generator);
+      dist_orig = std::sqrt(x*x+y*y);
       // scopi::sphere<dim> s2( {{x, y}}, {scopi::quaternion(rot)}, r);
       // particles.push_back(s2, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+      scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r}}, {{1}});
+      particles.push_back(s2, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
 
-      scopi::superellipsoid<dim> s3({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{e}});
-      particles.push_back(s3, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+      // e = distrib_e(generator);
+      // r = distrib_r(generator);
+      // r2 = distrib_r2(generator);
+      // x = distrib_x(generator);
+      // y = distrib_y(generator);
+      // rot = distrib_rot(generator);
+      // dist_orig = std::sqrt(x*x+y*y);
+      // scopi::superellipsoid<dim> s3({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{e}});
+      // particles.push_back(s3, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
 
     }
+
+
+
 
 
 
