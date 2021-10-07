@@ -14,11 +14,11 @@ console.log(path.join(__dirname, 'public', 'favicon.ico'));
 // exemple : http://localhost:8080/api/json?date=2020-07-15
 app.get('/api/json', (req, res) => {
   // console.log(req);
-  console.log('Load file : ' + '../build/'+req.query.filename);
-  fs.readFile('../build/'+req.query.filename, (err, json) => {
-        let obj = JSON.parse(json);
-        res.json(obj);
-    });
+  console.log('Load file : ' + '../../../build/' + req.query.filename);
+  fs.readFile('../../../build/' + req.query.filename, (err, json) => {
+    let obj = JSON.parse(json);
+    res.json(obj);
+  });
 });
 
 app.listen(8080, () => {

@@ -6,7 +6,8 @@ dependencies:
   - cmake
   - xtensor
   - xtensor-blas
-  - xtensor-io
+  - pyvista
+  - imageio-ffmpeg
   - xsimd
   - fmt
   - nanoflann

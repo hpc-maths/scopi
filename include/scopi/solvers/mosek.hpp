@@ -97,8 +97,8 @@ namespace scopi
             // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
             tic();
             using my_kd_tree_t = typename nanoflann::KDTreeSingleIndexAdaptor<
-            nanoflann::L2_Simple_Adaptor<double, scopi::KdTree<dim>>, scopi::KdTree<dim>, dim >;
-            scopi::KdTree kd(particles,active_ptr);
+            nanoflann::L2_Simple_Adaptor<double, KdTree<dim>>, KdTree<dim>, dim >;
+            KdTree<dim> kd(particles,active_ptr);
             my_kd_tree_t index(
             dim, kd,
             nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)
@@ -332,7 +332,6 @@ namespace scopi
                 ++ic;
             }
 
-            std::cout << "A construction" << std::endl;
             auto A = Matrix::sparse(contacts.size(), 1 + 6*Nactive + 6*Nactive,
                                     std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
                                     std::make_shared<ndarray<int, 1>>(A_cols.data(), shape_t<1>({A_cols.size()})),
@@ -353,9 +352,9 @@ namespace scopi
                     Az_rows.push_back(3*i + d);
                     Az_cols.push_back(1 + 3*i + d);
                     Az_values.push_back(std::sqrt(mass)); // TODO: add mass into particles
-                }
-                for (std::size_t d=0; d<3; ++d)
-                {
+                // }
+                // for (std::size_t d=0; d<3; ++d)
+                // {
                     Az_rows.push_back(3*i + d);
                     Az_cols.push_back(1 + 6*Nactive + 3*i + d);
                     Az_values.push_back(-1.);
@@ -371,15 +370,16 @@ namespace scopi
                 Az_cols.push_back(1 + 3*Nactive + 3*i + 2);
                 Az_values.push_back(std::sqrt(moment));
 
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    Az_rows.push_back(3*Nactive + 3*i + d);
-                    Az_cols.push_back( 1 + 6*Nactive + 3*Nactive + 3*i + d);
-                    Az_values.push_back(-1);
-                }
+                // for (std::size_t d=0; d<3; ++d)
+                // {
+                //     Az_rows.push_back(3*Nactive + 3*i + d);
+                //     Az_cols.push_back( 1 + 6*Nactive + 3*Nactive + 3*i + d);
+                //     Az_values.push_back(-1);
+                // }
+                Az_rows.push_back(3*Nactive + 3*i + 2);
+                Az_cols.push_back( 1 + 6*Nactive + 3*Nactive + 3*i + 2);
+                Az_values.push_back(-1);
             }
-
-            std::cout << "Az construction" << std::endl;
 
             auto Az = Matrix::sparse(6*Nactive, 1 + 6*Nactive + 6*Nactive,
                                     std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>({Az_rows.size()})),

@@ -6,7 +6,7 @@ import glob
 import sys
 import time
 
-prefix = "./build/Results/"
+prefix = "../../../build/Results/"
 
 files = np.sort(glob.glob(prefix+"/*.json"))
 print(files)
