@@ -6,7 +6,7 @@
 #include <xtensor/xview.hpp>
 
 #include "base.hpp"
-#include "../quaternion.hpp"
+#include "../../quaternion.hpp"
 
 namespace scopi
 {

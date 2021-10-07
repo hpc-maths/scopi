@@ -258,18 +258,31 @@ if (UNIX)
   endif ()
 endif ()
 
+set (MOSEK_FUSION_LIBRARY_NAME "fusion")
+if (MOSEK_NO_OMP)
+  set (MOSEK_FUSION_LIBRARY_NAME "${MOSEK_FUSION_LIBRARY_NAME}noomp")
+endif ()
+if (UNIX)
+  if (NOT CMAKE_SIZE_OF_VOID_P EQUAL 4)
+    set (MOSEK_FUSION_LIBRARY_NAME "${MOSEK_FUSION_LIBRARY_NAME}64")
+  endif ()
+endif ()
+
 # append/set library version suffixes
 if (WIN32)
   if (_MOSEK_FIND_VERSIONS)
     foreach (_MOSEK_VERSION IN LISTS _MOSEK_FIND_VERSIONS)
       string (REPLACE "." "_" _MOSEK_VERSION "${_MOSEK_VERSION}")
       list (APPEND MOSEK_LIBRARY_NAMES "${MOSEK_LIBRARY_NAME}${_MOSEK_VERSION}")
+      list (APPEND MOSEK_FUSION_LIBRARY_NAMES "${MOSEK_FUSION_LIBRARY_NAME}${_MOSEK_VERSION}")
     endforeach ()
   else ()
     set (MOSEK_LIBRARY_NAMES "${MOSEK_LIBRARY_NAME}")
+    set (MOSEK_FUSION_LIBRARY_NAMES "${MOSEK_FUSION_LIBRARY_NAME}")
   endif ()
 else ()
   set (MOSEK_LIBRARY_NAMES "${MOSEK_LIBRARY_NAME}")
+  set (MOSEK_FUSION_LIBRARY_NAMES "${MOSEK_FUSION_LIBRARY_NAME}")
   if (_MOSEK_FIND_VERSIONS)
     set (CMAKE_FIND_LIBRARY_SUFFIXES)
     foreach (_MOSEK_VERSION IN LISTS _MOSEK_FIND_VERSIONS)
@@ -336,6 +349,15 @@ foreach (_MOSEK_I IN ITEMS 1 2) # try twice in case MOSEK_DIR
         NO_DEFAULT_PATH
     )
 
+    find_library (
+      MOSEK_FUSION_LIBRARY
+        NAMES         ${MOSEK_FUSION_LIBRARY_NAMES}
+        HINTS         "${MOSEK_DIR}"
+        PATH_SUFFIXES "${MOSEK_TOOLS_SUFFIX}/bin"
+        DOC           "MOSEK FUSION link library."
+        NO_DEFAULT_PATH
+    )
+
   else ()
 
     find_path (
@@ -352,6 +374,12 @@ foreach (_MOSEK_I IN ITEMS 1 2) # try twice in case MOSEK_DIR
         DOC   "MOSEK link library."
     )
 
+    find_library (
+      MOSEK_FUSION_LIBRARY
+        NAMES ${MOSEK_FUSION_LIBRARY_NAMES}
+        HINTS ENV LD_LIBRARY_PATH
+        DOC   "MOSEK FUSION link library."
+    )
   endif ()
 
   # derive MOSEK_DIR
@@ -367,19 +395,23 @@ foreach (_MOSEK_I IN ITEMS 1 2) # try twice in case MOSEK_DIR
     elseif (MOSEK_LIBRARY)
       string (REGEX REPLACE "${_MOSEK_TOOLS_SUFFIX_RE}/.*$" "" _MOSEK_DIR "${MOSEK_LIBRARY}")
       set (MOSEK_DIR "${_MOSEK_DIR}" CACHE PATH "Installation prefix for MOSEK." FORCE)
+    elseif (MOSEK_FUSION_LIBRARY)
+      string (REGEX REPLACE "${_MOSEK_TOOLS_SUFFIX_RE}/.*$" "" _MOSEK_DIR "${MOSEK_FUSION_LIBRARY}")
+      set (MOSEK_DIR "${_MOSEK_DIR}" CACHE PATH "Installation prefix for MOSEK." FORCE)
     endif ()
     unset (_MOSEK_TOOLS_SUFFIX_RE)
     unset (_MOSEK_DIR)
   endif ()
 
   # skip second iteration if both found already
-  if (MOSEL_INCLUDE_DIR AND MOSEK_LIBRARY)
+  if (MOSEL_INCLUDE_DIR AND MOSEK_LIBRARY AND MOSEK_FUSION_LIBRARY)
     break ()
   endif ()
 endforeach ()
 
 mark_as_advanced (MOSEK_INCLUDE_DIR)
 mark_as_advanced (MOSEK_LIBRARY)
+mark_as_advanced (MOSEK_FUSION_LIBRARY)
 
 # MATLAB components
 if (MOSEK_FIND_mex)
@@ -472,7 +504,7 @@ endif ()
 # ----------------------------------------------------------------------------
 # prerequisite libraries
 set (MOSEK_INCLUDES  "${MOSEK_INCLUDE_DIR}")
-set (MOSEK_LIBRARIES "${MOSEK_LIBRARY}")
+list (APPEND MOSEK_LIBRARIES "${MOSEK_LIBRARY}" "${MOSEK_FUSION_LIBRARY}")
 
 # ----------------------------------------------------------------------------
 # aliases / backwards compatibility

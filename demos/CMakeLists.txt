@@ -68,3 +68,14 @@ if (APPLE)
   ${MOSEK_LIBRARIES} critical_3d
   )
 endif(APPLE)
+
+add_executable(two_ellipsoid two_ellipsoid.cpp)
+target_link_libraries(two_ellipsoid scopi_cpp)
+if (APPLE)
+  add_custom_command(TARGET two_ellipsoid
+  POST_BUILD COMMAND
+  ${CMAKE_INSTALL_NAME_TOOL} -change
+  `otool -L two_ellipsoid | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+  ${MOSEK_LIBRARIES} two_ellipsoid
+  )
+endif(APPLE)

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "base.hpp"
-#include "../quaternion.hpp"
-#include "../types.hpp"
+#include "../../quaternion.hpp"
+#include "../../types.hpp"
 
 namespace scopi
 {

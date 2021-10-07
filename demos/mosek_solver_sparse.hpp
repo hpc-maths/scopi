@@ -433,7 +433,8 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
         using position_type = typename scopi::scopi_container<dim>::position_type;
         auto uadapt = xt::adapt(reinterpret_cast<double*>(ulvl.raw()), {particles.size()-active_ptr, 3UL});
         auto wadapt = xt::adapt(reinterpret_cast<double*>(wlvl.raw()), {particles.size()-active_ptr, 3UL});
-        // std::cout << "uadapt = " << uadapt << std::endl;
+        std::cout << "uadapt = " << uadapt << std::endl;
+        std::cout << "wadapt = " << wadapt << std::endl;
         // std::cout << "pos = " << particles.pos() << std::endl << std::endl;
 
         for (std::size_t i=0; i<Nactive; ++i)
@@ -456,7 +457,8 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
             // particles.q()(i) = scopi::quaternion(theta(i));
             // std::cout << expw << " " << particles.q()(i) << std::endl;
             particles.q()(i + active_ptr) = scopi::mult_quaternion(particles.q()(i + active_ptr), expw);
-            // std::cout << particles.q()(i) << std::endl << std::endl;
+            std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
+            std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
 
         }
     }

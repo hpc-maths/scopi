@@ -5,7 +5,7 @@
 #include <tuple>
 
 #include <xtensor/xfixed.hpp>
-#include "../types.hpp"
+#include "../../types.hpp"
 
 
 namespace scopi

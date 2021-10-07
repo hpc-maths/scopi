@@ -3,7 +3,7 @@
 #include <array>
 #include <algorithm>
 #include <vector>
-#include <cmath> 
+#include <cmath>
 
 #include <xtl/xmultimethods.hpp>
 
@@ -12,8 +12,8 @@
 #include <xtensor/xview.hpp>
 
 #include "constructor.hpp"
-#include "../utils.hpp"
-#include "../types.hpp"
+#include "../../utils.hpp"
+#include "../../types.hpp"
 
 namespace scopi
 {

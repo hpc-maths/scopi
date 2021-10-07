@@ -2,11 +2,6 @@
 
 #include <xtl/xmultimethods.hpp>
 
-#include "object/sphere.hpp"
-#include "object/superellipsoid.hpp"
-#include "object/globule.hpp"
-#include "object/plan.hpp"
-
 namespace scopi
 {
     namespace mpl = xtl::mpl;

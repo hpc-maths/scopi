@@ -52,13 +52,11 @@ namespace scopi
         type::rotation<2> rotation_matrix_impl(const type::quaternion& q, std::integral_constant<std::size_t, 2>)
         {
             auto x = q[0];
-            auto y = q[1];    // en 2D on a y = z = 0 et x*x+w*w = 1
-            auto z = q[2];    // x = cos(theta/2) et w = sin(theta/2) rotation autour de (0,0,1)
+            // auto y = q[1];    // en 2D on a y = z = 0 et x*x+w*w = 1
+            // auto z = q[2];    // x = cos(theta/2) et w = sin(theta/2) rotation autour de (0,0,1)
             auto w = q[3];
             return { { 1-2*w*w,  -2*x*w },
                      {   2*x*w, 1-2*w*w } };
-            // Loic : return { { (1-2*y*y-2*z*z),   (2*x*y-2*z*w) },
-            //               {     (2*x*y+2*z*w), (1-2*x*x-2*z*z) } };
         }
 
         type::rotation<3> rotation_matrix_impl(const type::quaternion& q, std::integral_constant<std::size_t, 3>)
@@ -73,9 +71,6 @@ namespace scopi
             return { { 1-2*z*z-2*w*w,   2*y*z-2*x*w,   2*y*w+2*x*z },
                      {   2*y*z+2*x*w, 1-2*y*y-2*w*w,   2*z*w-2*x*y },
                      {   2*y*w-2*x*z,   2*z*w+2*x*y, 1-2*y*y-2*z*z } };
-            // Loic : return { { (1-2*y*y-2*z*z),   (2*x*y-2*z*w),   (2*x*z+2*y*w) },
-            //                 {   (2*x*y+2*z*w), (1-2*x*x-2*z*z),   (2*y*z-2*x*w) },
-            //                 {   (2*x*z-2*y*w),   (2*y*z+2*x*w), (1-2*x*x-2*y*y) } };
         }
     }
 

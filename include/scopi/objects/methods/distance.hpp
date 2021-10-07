@@ -2,10 +2,11 @@
 
 #include <xtensor-blas/xlinalg.hpp>
 
-#include "sphere.hpp"
-#include "superellipsoid.hpp"
-#include "globule.hpp"
-#include "plan.hpp"
+#include "../dispatch.hpp"
+#include "../types/sphere.hpp"
+#include "../types/superellipsoid.hpp"
+#include "../types/globule.hpp"
+#include "../types/plan.hpp"
 
 namespace scopi
 {
@@ -89,4 +90,33 @@ namespace scopi
         return 90;
     }
 
+    struct distance_functor
+    {
+        using return_type = double;
+
+        template <class T1, class T2>
+        return_type run(const T1& obj1, const T2& obj2) const
+        {
+            return distance(obj1, obj2);
+        }
+
+        template<std::size_t dim>
+        return_type on_error(const object<dim, false>&, const object<dim, false>&) const
+        {
+            return 0;
+        }
+    };
+
+    template <std::size_t dim>
+    using distance_dispatcher = double_static_dispatcher
+    <
+        distance_functor,
+        const object<dim, false>,
+        mpl::vector<const sphere<dim, false>,
+                    const superellipsoid<dim, false>,
+                    const globule<dim, false>,
+                    const plan<dim, false>>,
+        typename distance_functor::return_type,
+        symmetric_dispatch
+    >;
 }

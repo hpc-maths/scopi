@@ -1,7 +1,7 @@
 #pragma once
 
 #include "base.hpp"
-#include "../quaternion.hpp"
+#include "../../quaternion.hpp"
 
 namespace scopi
 {

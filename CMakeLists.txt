@@ -6,7 +6,7 @@ project(scopi)
 # ===========
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic ")
-set(CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 17)
 message(STATUS "CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
 
 
@@ -36,53 +36,13 @@ message(STATUS "Building scopi v${${PROJECT_NAME}_VERSION}")
 
 message(STATUS "CMAKE_MODULE_PATH:    " ${CMAKE_MODULE_PATH})
 
-
-find_package(OpenMP)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-
-
 find_package(xtensor REQUIRED)
-
-## MOSEK_DIR : /usr/local/mosek/9.2
-#
-# Compilation de mosek fusion :
-# Dans platform/osx64x86/src/fusion_cxx : make install
-# Dans exemples/fusion/cxx : make all
-# compilation d'un fichier sous macos :
-# clang++ -std=c++11 -stdlib=libc++ file.cc -o file -I<HEADERDIR> -L<LIBDIR> -Wl,-headerpad,128 -lmosek64 -lfusion64
-# install_name_tool -change libmosek64.9.2.dylib <LIBDIR>/libmosek64.9.2.dylib file    ## pour que les lib soient chargées au runtime
-# install_name_tool -change libfusion64.9.2.dylib <LIBDIR>/libfusion64.9.2.dylib file  ##
-# compilation d'un fichier sous linux :
-# cc -o file -I<HEADERDIR> -L<LIBDIR> -Wl,-rpath-link,<LIBDIR> -Wl,-rpath=<LIBDIR> -lmosek64 -lfusion64
-#
-# MOSEK_DIR                        /Users/faure/Dev/scopi-v2/dependances_scopi_dec_2020/mosek/9.2/tools/platform/osx64x86
-# MOSEK_INCLUDE_DIR                /Users/faure/Dev/scopi-v2/dependances_scopi_dec_2020/mosek/9.2/tools/platform/osx64x86/h
-# MOSEK_LIBRARY                    /Users/faure/Dev/scopi-v2/dependances_scopi_dec_2020/mosek/9.2/tools/platform/osx64x86/bin/libmosek64.9.2.dylib
-# MOSEK_FUSION_LIBRARY             /Users/faure/Dev/scopi-v2/dependances_scopi_dec_2020/mosek/9.2/tools/platform/osx64x86/bin/libfusion64.a
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
 find_package(MOSEK REQUIRED)
-set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
+find_package(CMinpack REQUIRED)
 
-
-############ PYTHON MODULES #################
-find_package (Python3 COMPONENTS Interpreter Development NumPy)
-# message(STATUS "PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
-# message(STATUS "PYTHON_LIBRARY=${PYTHON_LIBRARY}")
-# message(STATUS "Python3_EXECUTABLE=${Python3_EXECUTABLE}")
-# message(STATUS "Python3_INCLUDE_DIR=${Python3_INCLUDE_DIR}")
-# message(STATUS "Python3_LIBRARY_RELEASE=${Python3_LIBRARY_RELEASE}")
-# message(STATUS "Python3_INCLUDE_DIR=${Python3_INCLUDE_DIR}")
-# message(STATUS "Python3_NumPy_INCLUDE_DIR=${Python3_NumPy_INCLUDE_DIR}")
-message(STATUS "==> Python3_INCLUDE_DIRS=${Python3_INCLUDE_DIRS}")
-message(STATUS "==> Python3_NumPy_INCLUDE_DIRS=${Python3_NumPy_INCLUDE_DIRS}")
-find_package(pybind11 REQUIRED)
-set(PYBIND11_INCLUDE_DIR ${pybind11_INCLUDE_DIRS})
-# message(STATUS "PYBIND11_MODULE=${PYBIND11_MODULE}")
-# message(STATUS "PYBIND11_INCLUDE_DIR=${PYBIND11_INCLUDE_DIR}")
-# #message(STATUS "pybind11 module=${pybind11::module}")
-
+# set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
 
 message(STATUS "PROJECT_NAME:    " ${PROJECT_NAME})
 message(STATUS "CMAKE_INSTALL_NAME_TOOL:    " ${CMAKE_INSTALL_NAME_TOOL})
@@ -100,19 +60,18 @@ endif()
 message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
 message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
-set(MKL_THREAD_LAYER "TBB")
-find_package(MKL)
+set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 add_library(scopi_cpp INTERFACE)
+include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
-                                               $<BUILD_INTERFACE:${MOSEK_INCLUDE_DIR}>
-                                               $<INSTALL_INTERFACE:include>
-                                               ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS} )
+                                               $<INSTALL_INTERFACE:include>)
+                                    #  SYSTEM INTERFACE $<BUILD_INTERFACE:${MOSEK_INCLUDE_DIR}>)
 
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY} pybind11::embed OpenMP::OpenMP_CXX)
+target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt cminpack::cminpacks ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES})
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 

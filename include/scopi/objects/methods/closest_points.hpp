@@ -7,13 +7,14 @@
 #include <xtensor/xsort.hpp>
 #include <xtensor/xio.hpp>
 
-#include "../minpack.hpp"
+#include "../../minpack.hpp"
 
-#include "sphere.hpp"
-#include "superellipsoid.hpp"
-#include "globule.hpp"
-#include "plan.hpp"
-#include "neighbor.hpp"
+#include "../types/sphere.hpp"
+#include "../types/superellipsoid.hpp"
+#include "../types/globule.hpp"
+#include "../types/plan.hpp"
+#include "../neighbor.hpp"
+#include "../dispatch.hpp"
 
 namespace scopi
 {
@@ -1621,4 +1622,32 @@ namespace scopi
     {
         return neighbor<dim>();
     }
+
+    template <std::size_t dim>
+    struct closest_points_functor
+    {
+        using return_type = neighbor<dim>;
+         template <class T1, class T2>
+        return_type run(const T1& obj1, const T2& obj2) const
+        {
+            return closest_points(obj1, obj2);
+        }
+         return_type on_error(const object<dim, false>&, const object<dim, false>&) const
+        {
+            return {};
+        }
+    };
+
+    template <std::size_t dim>
+    using closest_points_dispatcher = double_static_dispatcher
+    <
+        closest_points_functor<dim>,
+        const object<dim, false>,
+        mpl::vector<const sphere<dim, false>,
+                    const superellipsoid<dim, false>,
+                    const globule<dim, false>,
+                    const plan<dim, false>>,
+        typename closest_points_functor<dim>::return_type,
+        symmetric_dispatch
+    >;
 }
