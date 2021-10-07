@@ -1,0 +1,13 @@
+name: scopi-env
+channels:
+  - conda-forge
+dependencies:
+  - cxx-compiler
+  - cmake
+  - xtensor
+  - xtensor-blas
+  - xtensor-io
+  - xsimd
+  - fmt
+  - nanoflann
+  - nlohmann_json
