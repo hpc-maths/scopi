@@ -422,7 +422,6 @@ namespace scopi
             // move the active particles
             ndarray<double, 1> Xlvl   = *(X->level());
 
-            using position_type = typename scopi::scopi_container<dim>::position_type;
             auto uadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1), {Nactive, 3UL});
             auto wadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1+3*Nactive), {Nactive, 3UL});
 

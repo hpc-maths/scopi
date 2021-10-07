@@ -39,7 +39,6 @@ namespace scopi
     auto closest_points(const superellipsoid<2, false>& s1, const superellipsoid<2, false>& s2)
     {
         // std::cout << "closest_points : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
-        double pi = 4*std::atan(1);
         neighbor<2> neigh;
         // xt::xtensor_fixed<double, xt::xshape<2*(2*dim+dim-1+dim*dim)>> args = xt::hstack(xt::xtuple(
         xt::xtensor_fixed<double, xt::xshape<18>> args = xt::hstack(xt::xtuple(
@@ -225,7 +224,6 @@ namespace scopi
     auto closest_points(const superellipsoid<3, false>& s1, const superellipsoid<3, false>& s2)
     {
         // std::cout << "closest_points : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
-        double pi = 4*std::atan(1);
         neighbor<3> neigh;
         // xt::xtensor_fixed<double, xt::xshape<2*(2*dim+dim-1+dim*dim)>> args = xt::hstack(xt::xtuple(
         xt::xtensor_fixed<double, xt::xshape<34>> args = xt::hstack(xt::xtuple(

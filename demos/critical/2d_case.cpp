@@ -34,7 +34,7 @@ int main()
 
     for (int i=0;i<n;++i){
 
-      double e = distrib_e(generator);
+      // double e = distrib_e(generator);
       double r = distrib_r(generator);
       double r2 = distrib_r2(generator);
       double x = distrib_x(generator);
@@ -45,7 +45,7 @@ int main()
       scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
       particles.push_back(s1, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
 
-      e = distrib_e(generator);
+      // e = distrib_e(generator);
       r = distrib_r(generator);
       r2 = distrib_r2(generator);
       x = distrib_x(generator);
