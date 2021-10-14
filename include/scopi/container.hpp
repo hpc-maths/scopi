@@ -8,7 +8,7 @@
 
 #include <xtensor/xadapt.hpp>
 
-#include "object/base.hpp"
+#include "objects/types/base.hpp"
 #include "types.hpp"
 
 namespace scopi

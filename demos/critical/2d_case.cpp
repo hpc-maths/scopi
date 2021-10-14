@@ -1,6 +1,7 @@
 #include <xtensor/xmath.hpp>
-#include <scopi/object/superellipsoid.hpp>
-#include "../mosek_solver.hpp"
+#include <scopi/objects/types/superellipsoid.hpp>
+#include <scopi/solvers/mosek.hpp>
+#include <scopi/container.hpp>
 #include <random>
 
 // cmake --build . --target critical_2d
@@ -23,17 +24,17 @@ int main()
     std::uniform_real_distribution<double> distrib_e(0.6,1.);
     std::uniform_real_distribution<double> distrib_r(0.2,1.0);
     std::uniform_real_distribution<double> distrib_r2(0.2,1.0);
-    std::uniform_real_distribution<double> distrib_x(-40.0,40.0);
-    std::uniform_real_distribution<double> distrib_y(-40.0,40.0);
+    std::uniform_real_distribution<double> distrib_x(-400.0,400.0);
+    std::uniform_real_distribution<double> distrib_y(-400.0,400.0);
     std::uniform_real_distribution<double> distrib_rot(0,PI);
     // std::uniform_real_distribution<double> distrib_rot(PI/4,PI/4);
 
-    int n = 60;
+    int n = 2000;
     // int n = 10;
 
     for (int i=0;i<n;++i){
 
-      double e = distrib_e(generator);
+      // double e = distrib_e(generator);
       double r = distrib_r(generator);
       double r2 = distrib_r2(generator);
       double x = distrib_x(generator);
@@ -44,7 +45,7 @@ int main()
       scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
       particles.push_back(s1, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
 
-      e = distrib_e(generator);
+      // e = distrib_e(generator);
       r = distrib_r(generator);
       r2 = distrib_r2(generator);
       x = distrib_x(generator);
@@ -104,6 +105,7 @@ int main()
     // std::size_t active_ptr = 1;
     std::size_t active_ptr = 0; // pas d'obstacles
 
+    // scopi::mosek_solver(particles, dt, total_it, active_ptr);
     mosek_solver(particles, dt, total_it, active_ptr);
 
     return 0;

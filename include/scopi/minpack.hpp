@@ -15,7 +15,7 @@ using namespace std;
 
 
 template<typename F, typename A>
-void fcn (int n, double x[], double fvec[], int &iflag, F f, A args) {
+void fcn (int n, double x[], double fvec[], int& , F f, A args) {
   if (n==4) { // n=4 dim=3
     xt::xtensor_fixed<double, xt::xshape<4>> u;
     for (int j = 0; j < n; j++ ) {
@@ -46,9 +46,9 @@ void fcn (int n, double x[], double fvec[], int &iflag, F f, A args) {
 //****************************************************************************80
 
 template<typename F, typename DF, typename A>
-void fdjac_analytic ( F f, DF grad_f, A args,
-  int n, double x[], double fvec[], double fjac[], int ldfjac, int &iflag,
-  int ml, int mu, double epsfcn, double wa1[], double wa2[] ) {
+void fdjac_analytic ( F , DF grad_f, A args,
+  int n, double x[], double[], double fjac[], int ldfjac, int &,
+  int , int , double, double[], double[] ) {
   if (n==4) { // n=4 dim=3
     xt::xtensor_fixed<double, xt::xshape<4>> u;
     for (int j = 0; j < n; j++ ) {
@@ -150,6 +150,7 @@ double r8_max ( double x, double y ) {
   }
   return value;
 }
+
 //****************************************************************************80
 
 double r8_min ( double x, double y ) {
@@ -165,246 +166,7 @@ double r8_min ( double x, double y ) {
 
 //****************************************************************************80
 
-double r8_tiny ( ) {
-  double value;
-  value = 0.4450147717014E-307;
-  return value;
-}
-
-//****************************************************************************80
-
-double r8_uniform_01 ( int &seed ) {
-  const int i4_huge = 2147483647;
-  int k;
-  double r;
-
-  if ( seed == 0 )
-  {
-    cerr << "\n";
-    cerr << "R8_UNIFORM_01 - Fatal error!\n";
-    cerr << "  Input value of SEED = 0.\n";
-    exit ( 1 );
-  }
-
-  k = seed / 127773;
-
-  seed = 16807 * ( seed - k * 127773 ) - k * 2836;
-
-  if ( seed < 0 )
-  {
-    seed = seed + i4_huge;
-  }
-  r = ( double ) ( seed ) * 4.656612875E-10;
-
-  return r;
-}
-
-//****************************************************************************80
-
-double *r8mat_mm_new ( int n1, int n2, int n3, double a[], double b[] ) {
-  double *c;
-  int i;
-  int j;
-  int k;
-
-  c = new double[n1*n3];
-
-  for ( i = 0; i < n1; i++ )
-  {
-    for ( j = 0; j < n3; j++ )
-    {
-      c[i+j*n1] = 0.0;
-      for ( k = 0; k < n2; k++ )
-      {
-        c[i+j*n1] = c[i+j*n1] + a[i+k*n1] * b[k+j*n2];
-      }
-    }
-  }
-
-  return c;
-}
-
-//****************************************************************************80
-
-void r8mat_print_some ( int m, int n, double a[], int ilo, int jlo, int ihi,
-                        int jhi, string title ) {
-  # define INCX 5
-
-  int i;
-  int i2hi;
-  int i2lo;
-  int j;
-  int j2hi;
-  int j2lo;
-
-  cout << "\n";
-  cout << title << "\n";
-  //
-  //  Print the columns of the matrix, in strips of 5.
-  //
-  for ( j2lo = jlo; j2lo <= jhi; j2lo = j2lo + INCX )
-  {
-    j2hi = j2lo + INCX - 1;
-    j2hi = i4_min ( j2hi, n );
-    j2hi = i4_min ( j2hi, jhi );
-
-    cout << "\n";
-    //
-    //  For each column J in the current range...
-    //
-    //  Write the header.
-    //
-    cout << "  Col:    ";
-    for ( j = j2lo; j <= j2hi; j++ )
-    {
-      cout << setw(7) << j << "       ";
-    }
-    cout << "\n";
-    cout << "  Row\n";
-    cout << "\n";
-    //
-    //  Determine the range of the rows in this strip.
-    //
-    i2lo = i4_max ( ilo, 1 );
-    i2hi = i4_min ( ihi, m );
-
-    for ( i = i2lo; i <= i2hi; i++ )
-    {
-      //
-      //  Print out (up to) 5 entries in row I, that lie in the current strip.
-      //
-      cout << setw(5) << i << "  ";
-      for ( j = j2lo; j <= j2hi; j++ )
-      {
-        cout << setw(12) << a[i-1+(j-1)*m] << "  ";
-      }
-      cout << "\n";
-    }
-  }
-
-  return;
-  # undef INCX
-}
-
-//****************************************************************************80
-
-void r8mat_print ( int m, int n, double a[], string title ) {
-  r8mat_print_some ( m, n, a, 1, 1, m, n, title );
-  return;
-}
-
-//****************************************************************************80
-
-void r8vec_print ( int n, double a[], string title ) {
-  int i;
-
-  cout << "\n";
-  cout << title << "\n";
-  cout << "\n";
-  for ( i = 0; i < n; i++ )
-  {
-    cout << "  " << setw(8)  << i
-    << "  " << setw(14) << a[i]  << "\n";
-  }
-
-  return;
-}
-
-//****************************************************************************80
-
-void timestamp ( ) {
-  # define TIME_SIZE 40
-
-  static char time_buffer[TIME_SIZE];
-  const struct std::tm *tm_ptr;
-  std::time_t now;
-
-  now = std::time ( NULL );
-  tm_ptr = std::localtime ( &now );
-
-  std::strftime ( time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm_ptr );
-
-  std::cout << time_buffer << "\n";
-
-  return;
-  # undef TIME_SIZE
-}
-
-//****************************************************************************80
-
-void chkder ( int m, int n, double x[], double fvec[], double fjac[],
-  int ldfjac, double xp[], double fvecp[], int mode, double err[] ) {
-  double eps;
-  double epsf;
-  double epslog;
-  double epsmch;
-  const double factor = 100.0;
-  int i;
-  int j;
-  double temp;
-  //
-  //  EPSMCH is the machine precision.
-  //
-  epsmch = r8_epsilon ( );
-  //
-  eps = sqrt ( epsmch );
-  //
-  //  MODE = 1.
-  //
-  if ( mode == 1 ) {
-    for ( j = 0; j < n; j++ ) {
-      if ( x[j] == 0.0 ) {
-        temp = eps;
-      }
-      else {
-        temp = eps * fabs ( x[j] );
-      }
-      xp[j] = x[j] + temp;
-    }
-  }
-  //
-  //  MODE = 2.
-  //
-  else {
-    epsf = factor * epsmch;
-    epslog = log10 ( eps );
-    for ( i = 0; i < m; i++ ) {
-      err[i] = 0.0;
-    }
-    for ( j = 0; j < n; j++ ) {
-      if ( x[j] == 0.0 ) {
-        temp = 1.0;
-      }
-      else {
-        temp = fabs ( x[j] );
-      }
-      for ( i = 0; i < m; i++ ) {
-        err[i] = err[i] + temp * fjac[i+j*ldfjac];
-      }
-    }
-
-    for ( i = 0; i < m; i++ ) {
-      temp = 1.0;
-      if ( fvec[i] != 0.0 && fvecp[i] != 0.0 && epsf * fabs ( fvec[i] ) <= fabs ( fvecp[i] - fvec[i] ) ) {
-        temp = eps * fabs ( ( fvecp[i] - fvec[i] ) / eps - err[i] ) / ( fabs ( fvec[i] ) + fabs ( fvecp[i] ) );
-        if ( temp <= epsmch ) {
-          err[i] = 1.0;
-        }
-        else if ( temp < eps ) {
-          err[i] = ( log10 ( temp ) - epslog ) / epslog;
-        }
-        else {
-          err[i] = 0.0;
-        }
-      }
-    }
-  }
-  return;
-}
-
-//****************************************************************************80
-
-void dogleg ( int n, double r[], int lr, double diag[], double qtb[],
+void dogleg ( int n, double r[], int , double diag[], double qtb[],
               double delta, double x[], double wa1[], double wa2[] ) {
   double alpha;
   double bnorm;
@@ -527,145 +289,6 @@ void dogleg ( int n, double r[], int lr, double diag[], double qtb[],
   temp = ( 1.0 - alpha ) * r8_min ( sgnorm, delta );
   for ( j = 0; j < n; j++ ) {
     x[j] = temp * wa1[j] + alpha * x[j];
-  }
-  return;
-}
-
-//****************************************************************************80
-
-
-template<typename F, typename DF, typename A>
-void fdjac1 ( F f, DF grad_f, A args,
-  int n, double x[], double fvec[], double fjac[], int ldfjac, int &iflag,
-  int ml, int mu, double epsfcn, double wa1[], double wa2[] ) {
-  double eps;
-  double epsmch;
-  double h;
-  int i;
-  int j;
-  int k;
-  int msum;
-  double temp;
-  //
-  //  EPSMCH is the machine precision.
-  //
-  epsmch = r8_epsilon ( );
-
-  eps = sqrt ( r8_max ( epsfcn, epsmch ) );
-  msum = ml + mu + 1;
-  //
-  //  Computation of dense approximate jacobian.
-  //
-  if ( n <= msum )
-  {
-    for ( j = 0; j < n; j++ )
-    {
-      temp = x[j];
-      h = eps * fabs ( temp );
-      if ( h == 0.0 )
-      {
-        h = eps;
-      }
-      x[j] = temp + h;
-      fcn ( n, x, wa1, iflag, f, args );
-      if ( iflag < 0 )
-      {
-        break;
-      }
-      x[j] = temp;
-      for ( i = 0; i < n; i++ )
-      {
-        fjac[i+j*ldfjac] = ( wa1[i] - fvec[i] ) / h;
-      }
-    }
-  }
-  //
-  //  Computation of a banded approximate jacobian.
-  //
-  else
-  {
-    for ( k = 0; k < msum; k++ )
-    {
-      for ( j = k; j < n; j = j + msum )
-      {
-        wa2[j] = x[j];
-        h = eps * fabs ( wa2[j] );
-        if ( h == 0.0 )
-        {
-          h = eps;
-        }
-        x[j] = wa2[j] + h;
-      }
-      fcn ( n, x, wa1, iflag, f, args );
-      if ( iflag < 0 )
-      {
-        break;
-      }
-      for ( j = k; j < n; j = j + msum )
-      {
-        x[j] = wa2[j];
-        h = eps * fabs ( wa2[j] );
-        if ( h == 0.0 )
-        {
-          h = eps;
-        }
-        for ( i = 0; i < n; i++ )
-        {
-          if ( j - mu <= i && i <= j + ml )
-          {
-            fjac[i+j*ldfjac] = ( wa1[i] - fvec[i] ) / h;
-          }
-          else
-          {
-            fjac[i+j*ldfjac] = 0.0;
-          }
-        }
-      }
-    }
-  }
-  return;
-}
-
-//****************************************************************************80
-
-template<typename F, typename A>
-void fdjac2 ( F f, A args,
-  int m, int n, double x[], double fvec[], double fjac[], int ldfjac,
-  int &iflag, double epsfcn, double wa[] ) {
-  double eps;
-  double epsmch;
-  double h;
-  int i;
-  int j;
-  double temp;
-  //
-  //  EPSMCH is the machine precision.
-  //
-  epsmch = r8_epsilon ( );
-  eps = sqrt ( r8_max ( epsfcn, epsmch ) );
-
-  for ( j = 0; j < n; j++ )
-  {
-    temp = x[j];
-    if ( temp == 0.0 )
-    {
-      h = eps;
-    }
-    else
-    {
-      h = eps * fabs ( temp );
-    }
-    x[j] = temp + h;
-    fcn ( m, n, x, wa, iflag, f, args );
-    if ( iflag < 0 )
-    {
-      break;
-    }
-    x[j] = temp;
-    for ( i = 0; i < m; i++ )
-    {
-      fjac[i+j*ldfjac] = ( wa[i] - fvec[i] ) / h;
-    }
   }
   return;
 }
@@ -800,7 +423,7 @@ void r1mpyq ( int m, int n, double a[], int lda, double v[], double w[] ) {
 
 //****************************************************************************80
 
-bool r1updt ( int m, int n, double s[], int ls, double u[], double v[],
+bool r1updt ( int m, int n, double s[], int , double u[], double v[],
               double w[] ) {
   double cotan;
   double cs;
@@ -975,7 +598,7 @@ bool r1updt ( int m, int n, double s[], int ls, double u[], double v[],
 //****************************************************************************80
 
 void qrfac ( int m, int n, double a[], int lda, bool pivot, int ipvt[],
-             int lipvt, double rdiag[], double acnorm[] ) {
+             int , double rdiag[], double acnorm[] ) {
   double ajnorm;
   double epsmch;
   int i;
@@ -1097,160 +720,6 @@ void qrfac ( int m, int n, double a[], int lda, bool pivot, int ipvt[],
 
 //****************************************************************************80
 
-void qrsolv ( int n, double r[], int ldr, int ipvt[], double diag[],
-              double qtb[], double x[], double sdiag[] ) {
-  double c;
-  double cotan;
-  int i;
-  int j;
-  int k;
-  int l;
-  int nsing;
-  double qtbpj;
-  double s;
-  double sum2;
-  double t;
-  double temp;
-  double *wa;
-  //
-  //  Copy R and Q'*B to preserve input and initialize S.
-  //
-  //  In particular, save the diagonal elements of R in X.
-  //
-  for ( j = 0; j < n; j++ )
-  {
-    for ( i = j; i < n; i++ )
-    {
-      r[i+j*ldr] = r[j+i*ldr];
-    }
-  }
-  for ( j = 0; j < n; j++ )
-  {
-    x[j]= r[j+j*ldr];
-  }
-
-  wa = new double[n];
-  for ( j = 0; j < n; j++ )
-  {
-    wa[j] = qtb[j];
-  }
-  //
-  //  Eliminate the diagonal matrix D using a Givens rotation.
-  //
-  for ( j = 0; j < n; j++ )
-  {
-    //
-    //  Prepare the row of D to be eliminated, locating the
-    //  diagonal element using P from the QR factorization.
-    //
-    l = ipvt[j];
-
-    if ( diag[l] != 0.0 )
-    {
-      sdiag[j] = diag[l];
-      for ( i = j + 1; i < n; i++ )
-      {
-        sdiag[i] = 0.0;
-      }
-      //
-      //  The transformations to eliminate the row of D
-      //  modify only a single element of Q'*B
-      //  beyond the first N, which is initially zero.
-      //
-      qtbpj = 0.0;
-
-      for ( k = j; k < n; k++ )
-      {
-        //
-        //  Determine a Givens rotation which eliminates the
-        //  appropriate element in the current row of D.
-        //
-        if ( sdiag[k] != 0.0 )
-        {
-          if ( fabs ( r[k+k*ldr] ) < fabs ( sdiag[k] ) )
-          {
-            cotan = r[k+k*ldr] / sdiag[k];
-            s = 0.5 / sqrt ( 0.25 + 0.25 * cotan * cotan );
-            c = s * cotan;
-          }
-          else
-          {
-            t = sdiag[k] / r[k+k*ldr];
-            c = 0.5 / sqrt ( 0.25 + 0.25 * t * t );
-            s = c * t;
-          }
-          //
-          //  Compute the modified diagonal element of R and
-          //  the modified element of (Q'*B,0).
-          //
-          r[k+k*ldr] = c * r[k+k*ldr] + s * sdiag[k];
-          temp = c * wa[k] + s * qtbpj;
-          qtbpj = - s * wa[k] + c * qtbpj;
-          wa[k] = temp;
-          //
-          //  Accumulate the tranformation in the row of S.
-          //
-          for ( i = k + 1; i < n; i++ )
-          {
-            temp = c * r[i+k*ldr] + s * sdiag[i];
-            sdiag[i] = - s * r[i+k*ldr] + c * sdiag[i];
-            r[i+k*ldr] = temp;
-          }
-        }
-      }
-    }
-    //
-    //  Store the diagonal element of S and restore
-    //  the corresponding diagonal element of R.
-    //
-    sdiag[j] = r[j+j*ldr];
-    r[j+j*ldr] = x[j];
-  }
-  //
-  //  Solve the triangular system for Z.  If the system is
-  //  singular, then obtain a least squares solution.
-  //
-  nsing = n;
-
-  for ( j = 0; j < n; j++ )
-  {
-    if ( sdiag[j] == 0.0 && nsing == n )
-    {
-      nsing = j;
-    }
-
-    if ( nsing < n )
-    {
-      wa[j] = 0.0;
-    }
-  }
-
-  for ( j = nsing - 1; 0 <= j; j-- )
-  {
-    sum2 = 0.0;
-    for ( i = j + 1; i < nsing; i++ )
-    {
-      sum2 = sum2 + wa[i] *r[i+j*ldr];
-    }
-    wa[j] = ( wa[j] - sum2 ) / sdiag[j];
-  }
-  //
-  //  Permute the components of Z back to components of X.
-  //
-  for ( j = 0; j < n; j++ )
-  {
-    l = ipvt[j];
-    x[l] = wa[j];
-  }
-  //
-  //  Free memory.
-  //
-  delete [] wa;
-
-  return;
-}
-
-//****************************************************************************80
 template<typename F, typename DF, typename A>
 int hybrd (F f, DF grad_f, A args,
   int n, double x[],
@@ -1259,7 +728,7 @@ int hybrd (F f, DF grad_f, A args,
   double fjac[], int ldfjac, double r[], int lr, double qtf[], double wa1[],
   double wa2[], double wa3[], double wa4[] ) {
   double actred;
-  double delta;
+  double delta = 0;
   double epsmch;
   double fnorm;
   double fnorm1;
@@ -1285,7 +754,7 @@ int hybrd (F f, DF grad_f, A args,
   double ratio;
   double sum;
   double temp;
-  double xnorm;
+  double xnorm = 0;
   //
   //  Certain loops in this function were kept closer to their original FORTRAN77
   //  format, to avoid confusing issues with the array index L.  These loops are
