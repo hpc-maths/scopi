@@ -228,8 +228,8 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
 
         xt::xtensor<double, 1> MU = xt::zeros<double>({3*Nactive});
         xt::xtensor<double, 1> JW = xt::zeros<double>({3*Nactive});
-        xt::xtensor<double, 2> sqrtM = mass*xt::eye<double>(3*Nactive);
-        xt::xtensor<double, 2> sqrtJ = moment*xt::eye<double>(3*Nactive);
+        xt::xtensor<double, 2> sqrtM = std::sqrt(mass)*xt::eye<double>(3*Nactive);
+        xt::xtensor<double, 2> sqrtJ = std::sqrt(moment)*xt::eye<double>(3*Nactive);
 
         for (std::size_t i=0; i<Nactive; ++i)
         {
@@ -318,12 +318,12 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
             if (c.i >= active_ptr)
             {
                 std::size_t ind_part = c.i - active_ptr;
-                auto dot = xt::eval(-xt::linalg::dot(ri_cross, Ri));
+                auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ip=0; ip<3; ++ip)
                 {
                     Aw_rows.push_back(ic);
                     Aw_cols.push_back(3*ind_part + ip);
-                    Aw_values.push_back(dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                    Aw_values.push_back(-dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                 }
                 // xt::view(Aw, xt::range(3*ic, 3*(ic+1)), xt::range(3*ind_part, 3*(ind_part+1))) = -xt::linalg::dot(ri_cross, Ri);
             }
@@ -433,8 +433,8 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
 
         auto uadapt = xt::adapt(reinterpret_cast<double*>(ulvl.raw()), {particles.size()-active_ptr, 3UL});
         auto wadapt = xt::adapt(reinterpret_cast<double*>(wlvl.raw()), {particles.size()-active_ptr, 3UL});
-        std::cout << "uadapt = " << uadapt << std::endl;
-        std::cout << "wadapt = " << wadapt << std::endl;
+        // std::cout << "uadapt = " << uadapt << std::endl;
+        // std::cout << "wadapt = " << wadapt << std::endl;
         // std::cout << "pos = " << particles.pos() << std::endl << std::endl;
 
         for (std::size_t i=0; i<Nactive; ++i)
@@ -457,8 +457,9 @@ void mosek_solver(scopi::scopi_container<dim>& particles, double dt, std::size_t
             // particles.q()(i) = scopi::quaternion(theta(i));
             // std::cout << expw << " " << particles.q()(i) << std::endl;
             particles.q()(i + active_ptr) = scopi::mult_quaternion(particles.q()(i + active_ptr), expw);
-            std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
-            std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
+            normalize(particles.q()(i + active_ptr));
+            // std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
+            // std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
 
         }
     }

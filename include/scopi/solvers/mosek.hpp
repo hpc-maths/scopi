@@ -308,12 +308,12 @@ namespace scopi
                 if (c.i >= active_ptr)
                 {
                     std::size_t ind_part = c.i - active_ptr;
-                    auto dot = xt::eval(-xt::linalg::dot(ri_cross, Ri));
+                    auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                     for (std::size_t ip=0; ip<3; ++ip)
                     {
                         A_rows.push_back(ic);
                         A_cols.push_back(1 + 3*Nactive + 3*ind_part + ip);
-                        A_values.push_back(-dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                        A_values.push_back(dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
 
@@ -405,7 +405,6 @@ namespace scopi
 
             Constraint::t qc1 = model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D_mosek));
             Constraint::t qc2 = model->constraint("qc2", Expr::mul(Az, X), Domain::equalsTo(0.));
-
             Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*Nactive, 1 + 6*Nactive + 6*Nactive)), Domain::inRotatedQCone());
             // model->setSolverParam("intpntCoTolPfeas", 1e-10);
             // model->setSolverParam("intpntTolPfeas", 1.e-10);
@@ -445,6 +444,7 @@ namespace scopi
                 // particles.q()(i) = scopi::quaternion(theta(i));
                 // std::cout << expw << " " << particles.q()(i) << std::endl;
                 particles.q()(i + active_ptr) = scopi::mult_quaternion(particles.q()(i + active_ptr), expw);
+                normalize(particles.q()(i + active_ptr));
                 // std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
                 // std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
 
