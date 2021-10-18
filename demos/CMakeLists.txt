@@ -36,3 +36,9 @@ target_link_libraries(two_ellipsoids scopi_cpp)
 #   ${MOSEK_LIBRARIES} two_ellipsoid
 #   )
 # endif(APPLE)
+
+add_executable(two_ellipsoids_spheres two_ellipsoids_spheres.cpp)
+target_link_libraries(two_ellipsoids_spheres scopi_cpp)
+
+add_executable(two_ellipsoids_asymmetrical two_ellipsoids_asymmetrical.cpp)
+target_link_libraries(two_ellipsoids_asymmetrical scopi_cpp)
