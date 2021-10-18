@@ -59,3 +59,17 @@ if (APPLE)
    ${MOSEK_LIBRARY} two_ellipsoids
    )
 endif(APPLE)
+# if (APPLE)
+#   add_custom_command(TARGET two_ellipsoid
+#   POST_BUILD COMMAND
+#   ${CMAKE_INSTALL_NAME_TOOL} -change
+#   `otool -L two_ellipsoid | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+#   ${MOSEK_LIBRARIES} two_ellipsoid
+#   )
+# endif(APPLE)
+
+add_executable(two_ellipsoids_spheres two_ellipsoids_spheres.cpp)
+target_link_libraries(two_ellipsoids_spheres scopi_cpp)
+
+add_executable(two_ellipsoids_asymmetrical two_ellipsoids_asymmetrical.cpp)
+target_link_libraries(two_ellipsoids_asymmetrical scopi_cpp)
