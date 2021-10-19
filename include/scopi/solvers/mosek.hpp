@@ -76,9 +76,9 @@ namespace scopi
               Variable::t callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite);
               void moveActiveParticles(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr, Variable::t& X);
 
-              std::size_t Nactive;
-              double mass = 1.;
-              double moment = .1;
+              std::size_t _Nactive;
+              double _mass = 1.;
+              double _moment = .1;
 
       };
 
@@ -90,7 +90,7 @@ namespace scopi
   template<std::size_t dim>
       void MosekSolver<dim>::solve(scopi::scopi_container<dim>& particles, double dt, std::size_t total_it, std::size_t active_ptr)
       {
-          Nactive = particles.size() - active_ptr;
+          _Nactive = particles.size() - active_ptr;
           // Time Loop
           for (std::size_t nite=0; nite<total_it; ++nite)
           {
@@ -109,7 +109,7 @@ namespace scopi
               writeOutputFiles(particles, contacts, nite);
 
 
-              // for (std::size_t i=0; i<Nactive; ++i)
+              // for (std::size_t i=0; i<_Nactive; ++i)
               // {
               //     for (std::size_t d=0; d<dim; ++d)
               //     {
@@ -289,17 +289,17 @@ namespace scopi
   template<std::size_t dim>
       xt::xtensor<double, 1> MosekSolver<dim>::createVectorC(scopi::scopi_container<dim>& particles, std::size_t active_ptr)
       {
-          xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*Nactive + 2*3*Nactive});
+          xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
           c(0) = 1;
           std::size_t Mdec = 1;
-          std::size_t Jdec = Mdec + 3*Nactive;
-          for (std::size_t i=0; i<Nactive; ++i)
+          std::size_t Jdec = Mdec + 3*_Nactive;
+          for (std::size_t i=0; i<_Nactive; ++i)
           {
               for (std::size_t d=0; d<dim; ++d)
               {
-                  c(Mdec + 3*i + d) = -mass*particles.vd()(active_ptr + i)[d]; // TODO: add mass into particles
+                  c(Mdec + 3*i + d) = -_mass*particles.vd()(active_ptr + i)[d]; // TODO: add mass into particles
               }
-              c(Jdec + 3*i + 2) = -moment*particles.desired_omega()(active_ptr + i);
+              c(Jdec + 3*i + 2) = -_moment*particles.desired_omega()(active_ptr + i);
           }
           return c;
       }
@@ -387,7 +387,7 @@ namespace scopi
                   for (std::size_t ip=0; ip<3; ++ip)
                   {
                       A_rows.push_back(ic);
-                      A_cols.push_back(1 + 3*Nactive + 3*ind_part + ip);
+                      A_cols.push_back(1 + 3*_Nactive + 3*ind_part + ip);
                       A_values.push_back(dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                   }
               }
@@ -399,7 +399,7 @@ namespace scopi
                   for (std::size_t ip=0; ip<3; ++ip)
                   {
                       A_rows.push_back(ic);
-                      A_cols.push_back(1 + 3*Nactive + 3*ind_part + ip);
+                      A_cols.push_back(1 + 3*_Nactive + 3*ind_part + ip);
                       A_values.push_back(-dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                   }
               }
@@ -407,7 +407,7 @@ namespace scopi
               ++ic;
           }
 
-          return Matrix::sparse(contacts.size(), 1 + 6*Nactive + 6*Nactive,
+          return Matrix::sparse(contacts.size(), 1 + 6*_Nactive + 6*_Nactive,
                   std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
                   std::make_shared<ndarray<int, 1>>(A_cols.data(), shape_t<1>({A_cols.size()})),
                   std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
@@ -420,47 +420,47 @@ namespace scopi
           std::vector<int> Az_cols;
           std::vector<double> Az_values;
 
-          Az_rows.reserve(6*Nactive*2);
-          Az_cols.reserve(6*Nactive*2);
-          Az_values.reserve(6*Nactive*2);
+          Az_rows.reserve(6*_Nactive*2);
+          Az_cols.reserve(6*_Nactive*2);
+          Az_values.reserve(6*_Nactive*2);
 
-          for (std::size_t i=0; i<Nactive; ++i)
+          for (std::size_t i=0; i<_Nactive; ++i)
           {
               for (std::size_t d=0; d<2; ++d)
               {
                   Az_rows.push_back(3*i + d);
                   Az_cols.push_back(1 + 3*i + d);
-                  Az_values.push_back(std::sqrt(mass)); // TODO: add mass into particles
+                  Az_values.push_back(std::sqrt(_mass)); // TODO: add mass into particles
                   // }
                   // for (std::size_t d=0; d<3; ++d)
                   // {
                   Az_rows.push_back(3*i + d);
-                  Az_cols.push_back(1 + 6*Nactive + 3*i + d);
+                  Az_cols.push_back(1 + 6*_Nactive + 3*i + d);
                   Az_values.push_back(-1.);
           }
 
           // for (std::size_t d=0; d<3; ++d)
           // {
-          //     Az_rows.push_back(3*Nactive + 3*i + d);
-          //     Az_cols.push_back(1 + 3*Nactive + 3*i + d);
+          //     Az_rows.push_back(3*_Nactive + 3*i + d);
+          //     Az_cols.push_back(1 + 3*_Nactive + 3*i + d);
           //     Az_values.push_back(std::sqrt(moment));
           // }
-          Az_rows.push_back(3*Nactive + 3*i + 2);
-          Az_cols.push_back(1 + 3*Nactive + 3*i + 2);
-          Az_values.push_back(std::sqrt(moment));
+          Az_rows.push_back(3*_Nactive + 3*i + 2);
+          Az_cols.push_back(1 + 3*_Nactive + 3*i + 2);
+          Az_values.push_back(std::sqrt(_moment));
 
           // for (std::size_t d=0; d<3; ++d)
           // {
-          //     Az_rows.push_back(3*Nactive + 3*i + d);
-          //     Az_cols.push_back( 1 + 6*Nactive + 3*Nactive + 3*i + d);
+          //     Az_rows.push_back(3*_Nactive + 3*i + d);
+          //     Az_cols.push_back( 1 + 6*_Nactive + 3*_Nactive + 3*i + d);
           //     Az_values.push_back(-1);
           // }
-          Az_rows.push_back(3*Nactive + 3*i + 2);
-          Az_cols.push_back( 1 + 6*Nactive + 3*Nactive + 3*i + 2);
+          Az_rows.push_back(3*_Nactive + 3*i + 2);
+          Az_cols.push_back( 1 + 6*_Nactive + 3*_Nactive + 3*i + 2);
           Az_values.push_back(-1);
           }
 
-          return Matrix::sparse(6*Nactive, 1 + 6*Nactive + 6*Nactive,
+          return Matrix::sparse(6*_Nactive, 1 + 6*_Nactive + 6*_Nactive,
                   std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>({Az_rows.size()})),
                   std::make_shared<ndarray<int, 1>>(Az_cols.data(), shape_t<1>({Az_cols.size()})),
                   std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>({Az_values.size()})));
@@ -473,7 +473,7 @@ namespace scopi
           tic();
           Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
           // variables
-          Variable::t X = model->variable("X", 1 + 6*Nactive + 6*Nactive);
+          Variable::t X = model->variable("X", 1 + 6*_Nactive + 6*_Nactive);
 
           // functional to minimize
           auto c_mosek = std::make_shared<ndarray<double, 1>>(c.data(), shape_t<1>({c.shape(0)}));
@@ -484,7 +484,7 @@ namespace scopi
 
           Constraint::t qc1 = model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D_mosek));
           Constraint::t qc2 = model->constraint("qc2", Expr::mul(Az, X), Domain::equalsTo(0.));
-          Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*Nactive, 1 + 6*Nactive + 6*Nactive)), Domain::inRotatedQCone());
+          Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*_Nactive, 1 + 6*_Nactive + 6*_Nactive)), Domain::inRotatedQCone());
           // model->setSolverParam("intpntCoTolPfeas", 1e-10);
           // model->setSolverParam("intpntTolPfeas", 1.e-10);
 
@@ -505,10 +505,10 @@ namespace scopi
       {
           ndarray<double, 1> Xlvl   = *(X->level());
 
-          auto uadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1), {Nactive, 3UL});
-          auto wadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1+3*Nactive), {Nactive, 3UL});
+          auto uadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1), {_Nactive, 3UL});
+          auto wadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1+3*_Nactive), {_Nactive, 3UL});
 
-          for (std::size_t i=0; i<Nactive; ++i)
+          for (std::size_t i=0; i<_Nactive; ++i)
           {
               xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, wadapt(i, 2)});
               double normw = xt::linalg::norm(w);
