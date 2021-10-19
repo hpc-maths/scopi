@@ -53,5 +53,4 @@ int main()
     std::size_t active_ptr = 0; // pas d'obstacles
 
     mosek_solver(particles, dt, total_it, active_ptr);
-
 }
