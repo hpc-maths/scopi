@@ -36,20 +36,23 @@ namespace scopi
       class MosekSolver
       {
           public:
-              MosekSolver();
-              void solve(scopi::scopi_container<dim>& particles, double dt, std::size_t total_it, std::size_t active_ptr);
+              MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr);
+              void solve(std::size_t total_it);
 
           private:
-              void displacementObstacles(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr);
-              std::vector<scopi::neighbor<dim>> createListContactsAndSort(scopi::scopi_container<dim>& particles, std::size_t active_ptr);
-              void writeOutputFiles(scopi::scopi_container<dim>& particles, std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
-              xt::xtensor<double, 1> createVectorC(scopi::scopi_container<dim>& particles, std::size_t active_ptr);
+              void displacementObstacles();
+              std::vector<scopi::neighbor<dim>> createListContactsAndSort();
+              void writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
+              xt::xtensor<double, 1> createVectorC();
               xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
-              Matrix::t createMatrixA(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr, std::vector<scopi::neighbor<dim>>& contacts);
+              Matrix::t createMatrixA(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixAz();
               Variable::t callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite);
-              void moveActiveParticles(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr, Variable::t& X);
+              void moveActiveParticles(Variable::t& X);
 
+              scopi::scopi_container<dim>& _particles;
+              double _dt;
+              std::size_t _active_ptr;
               std::size_t _Nactive;
               double _mass = 1.;
               double _moment = .1;
@@ -57,30 +60,30 @@ namespace scopi
       };
 
   template<std::size_t dim>
-      MosekSolver<dim>::MosekSolver()
+      MosekSolver<dim>::MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr) : _particles(particles), _dt(dt), _active_ptr(active_ptr)
   {
+      _Nactive = _particles.size() - _active_ptr;
   }
 
   template<std::size_t dim>
-      void MosekSolver<dim>::solve(scopi::scopi_container<dim>& particles, double dt, std::size_t total_it, std::size_t active_ptr)
+      void MosekSolver<dim>::solve(std::size_t total_it)
       {
-          _Nactive = particles.size() - active_ptr;
           // Time Loop
           for (std::size_t nite=0; nite<total_it; ++nite)
           {
               std::cout << "\n\n------------------- Time iteration ----------------> " << nite << std::endl;
 
               //displacement of obstacles
-              displacementObstacles(particles, dt, active_ptr);
+              displacementObstacles();
 
 
               // create list of contacts
               std::cout << "----> create list of contacts " << nite << std::endl;
-              auto contacts = createListContactsAndSort(particles, active_ptr);
+              auto contacts = createListContactsAndSort();
 
               // output files
               std::cout << "----> json output files " << nite << std::endl;
-              writeOutputFiles(particles, contacts, nite);
+              writeOutputFiles(contacts, nite);
 
 
               // for (std::size_t i=0; i<_Nactive; ++i)
@@ -95,9 +98,9 @@ namespace scopi
               // create mass and inertia matrices
               std::cout << "----> create mass and inertia matrices " << nite << std::endl;
               tic();
-              auto c = createVectorC(particles, active_ptr);
+              auto c = createVectorC();
               auto distances = createVectorDistances(contacts);
-              auto A = createMatrixA(particles, dt, active_ptr, contacts);
+              auto A = createMatrixA(contacts);
               auto Az = createMatrixAz();
 
               auto duration4 = toc();
@@ -108,37 +111,37 @@ namespace scopi
 
 
               // move the active particles
-              moveActiveParticles(particles, dt, active_ptr, X);
+              moveActiveParticles(X);
           }
       }
 
   template<std::size_t dim>
-      void MosekSolver<dim>::displacementObstacles(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr)
+      void MosekSolver<dim>::displacementObstacles()
       {
-          for (std::size_t i=0; i<active_ptr; ++i)
+          for (std::size_t i=0; i<_active_ptr; ++i)
           {
-              xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, particles.desired_omega()(i)});
+              xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, _particles.desired_omega()(i)});
               double normw = xt::linalg::norm(w);
               if (normw == 0)
               {
                   normw = 1;
               }
               scopi::type::quaternion expw;
-              expw(0) = std::cos(0.5*normw*dt);
-              xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*dt)/normw*w;
+              expw(0) = std::cos(0.5*normw*_dt);
+              xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*_dt)/normw*w;
 
               for (std::size_t d=0; d<dim; ++d)
               {
-                  particles.pos()(i)(d) += dt*particles.vd()(i)(d);
+                  _particles.pos()(i)(d) += _dt*_particles.vd()(i)(d);
               }
-              particles.q()(i) = scopi::mult_quaternion(particles.q()(i), expw);
+              _particles.q()(i) = scopi::mult_quaternion(_particles.q()(i), expw);
 
-              std::cout << "obstacle " << i << ": " << particles.pos()(0) << " " << particles.q()(0) << std::endl;
+              std::cout << "obstacle " << i << ": " << _particles.pos()(0) << " " << _particles.q()(0) << std::endl;
           }
       }
 
   template<std::size_t dim>
-      std::vector<scopi::neighbor<dim>> MosekSolver<dim>::createListContactsAndSort(scopi::scopi_container<dim>& particles, std::size_t active_ptr)
+      std::vector<scopi::neighbor<dim>> MosekSolver<dim>::createListContactsAndSort()
       {
           // create list of contacts
           std::cout << "----> create list of contacts " << nite << std::endl;
@@ -150,7 +153,7 @@ namespace scopi
       }
 
   template<std::size_t dim>
-      void MosekSolver<dim>::writeOutputFiles(scopi::scopi_container<dim>& particles, std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite)
+      void MosekSolver<dim>::writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite)
       {
           nl::json json_output;
 
@@ -158,9 +161,9 @@ namespace scopi
 
           json_output["objects"] = {};
 
-          for(std::size_t i = 0; i < particles.size(); ++i)
+          for(std::size_t i = 0; i < _particles.size(); ++i)
           {
-              json_output["objects"].push_back(scopi::write_objects_dispatcher<dim>::dispatch(*particles[i]));
+              json_output["objects"].push_back(scopi::write_objects_dispatcher<dim>::dispatch(*_particles[i]));
           }
 
           json_output["contacts"] = {};
@@ -182,7 +185,7 @@ namespace scopi
       }
 
   template<std::size_t dim>
-      xt::xtensor<double, 1> MosekSolver<dim>::createVectorC(scopi::scopi_container<dim>& particles, std::size_t active_ptr)
+      xt::xtensor<double, 1> MosekSolver<dim>::createVectorC()
       {
           xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
           c(0) = 1;
@@ -192,9 +195,9 @@ namespace scopi
           {
               for (std::size_t d=0; d<dim; ++d)
               {
-                  c(Mdec + 3*i + d) = -_mass*particles.vd()(active_ptr + i)[d]; // TODO: add mass into particles
+                  c(Mdec + 3*i + d) = -_mass*_particles.vd()(_active_ptr + i)[d]; // TODO: add mass into particles
               }
-              c(Jdec + 3*i + 2) = -_moment*particles.desired_omega()(active_ptr + i);
+              c(Jdec + 3*i + 2) = -_moment*_particles.desired_omega()(_active_ptr + i);
           }
           return c;
       }
@@ -213,7 +216,7 @@ namespace scopi
       }
 
   template<std::size_t dim>
-      Matrix::t MosekSolver<dim>::createMatrixA(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr, std::vector<scopi::neighbor<dim>>& contacts)
+      Matrix::t MosekSolver<dim>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts)
       {
           // Preallocate
           std::vector<int> A_rows;
@@ -232,22 +235,22 @@ namespace scopi
 
               for (std::size_t d=0; d<3; ++d)
               {
-                  if (c.i >= active_ptr)
+                  if (c.i >= _active_ptr)
                   {
                       A_rows.push_back(ic);
-                      A_cols.push_back(1 + (c.i - active_ptr)*3 + d);
-                      A_values.push_back(-dt*c.nij[d]);
+                      A_cols.push_back(1 + (c.i - _active_ptr)*3 + d);
+                      A_values.push_back(-_dt*c.nij[d]);
                   }
-                  if (c.j >= active_ptr)
+                  if (c.j >= _active_ptr)
                   {
                       A_rows.push_back(ic);
-                      A_cols.push_back(1 + (c.j - active_ptr)*3 + d);
-                      A_values.push_back(dt*c.nij[d]);
+                      A_cols.push_back(1 + (c.j - _active_ptr)*3 + d);
+                      A_values.push_back(_dt*c.nij[d]);
                   }
               }
 
-              auto r_i = c.pi - particles.pos()(c.i);
-              auto r_j = c.pj - particles.pos()(c.j);
+              auto r_i = c.pi - _particles.pos()(c.i);
+              auto r_j = c.pj - _particles.pos()(c.j);
 
               xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
 
@@ -272,30 +275,30 @@ namespace scopi
                       {-r_j(1),  r_j(0),       0}};
               }
 
-              auto Ri = scopi::rotation_matrix<3>(particles.q()(c.i));
-              auto Rj = scopi::rotation_matrix<3>(particles.q()(c.j));
+              auto Ri = scopi::rotation_matrix<3>(_particles.q()(c.i));
+              auto Rj = scopi::rotation_matrix<3>(_particles.q()(c.j));
 
-              if (c.i >= active_ptr)
+              if (c.i >= _active_ptr)
               {
-                  std::size_t ind_part = c.i - active_ptr;
+                  std::size_t ind_part = c.i - _active_ptr;
                   auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                   for (std::size_t ip=0; ip<3; ++ip)
                   {
                       A_rows.push_back(ic);
                       A_cols.push_back(1 + 3*_Nactive + 3*ind_part + ip);
-                      A_values.push_back(dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                      A_values.push_back(_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                   }
               }
 
-              if (c.j >= active_ptr)
+              if (c.j >= _active_ptr)
               {
-                  std::size_t ind_part = c.j - active_ptr;
+                  std::size_t ind_part = c.j - _active_ptr;
                   auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
                   for (std::size_t ip=0; ip<3; ++ip)
                   {
                       A_rows.push_back(ic);
                       A_cols.push_back(1 + 3*_Nactive + 3*ind_part + ip);
-                      A_values.push_back(-dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                      A_values.push_back(-_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                   }
               }
 
@@ -396,7 +399,7 @@ namespace scopi
       }
 
   template<std::size_t dim>
-      void MosekSolver<dim>::moveActiveParticles(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr, Variable::t& X)
+      void MosekSolver<dim>::moveActiveParticles(Variable::t& X)
       {
           ndarray<double, 1> Xlvl   = *(X->level());
 
@@ -412,18 +415,18 @@ namespace scopi
                   normw = 1;
               }
               scopi::type::quaternion expw;
-              expw(0) = std::cos(0.5*normw*dt);
-              xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*dt)/normw*w;
+              expw(0) = std::cos(0.5*normw*_dt);
+              xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*_dt)/normw*w;
               for (std::size_t d=0; d<dim; ++d)
               {
-                  particles.pos()(i + active_ptr)(d) += dt*uadapt(i, d);
+                  _particles.pos()(i + _active_ptr)(d) += _dt*uadapt(i, d);
               }
               // xt::view(particles.pos(), i) += dt*xt::view(uadapt, i);
 
               // particles.q()(i) = scopi::quaternion(theta(i));
               // std::cout << expw << " " << particles.q()(i) << std::endl;
-              particles.q()(i + active_ptr) = scopi::mult_quaternion(particles.q()(i + active_ptr), expw);
-              normalize(particles.q()(i + active_ptr));
+              _particles.q()(i + _active_ptr) = scopi::mult_quaternion(_particles.q()(i + _active_ptr), expw);
+              normalize(_particles.q()(i + _active_ptr));
               // std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
               // std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
 
