@@ -12,17 +12,17 @@ int main()
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .01;
-    std::size_t total_it = 1000;
+    std::size_t total_it = 100;
     scopi::scopi_container<dim> particles;
 
     std::default_random_engine generator;
-    std::uniform_real_distribution<double> distrib_r(0.2,1.);
-    std::uniform_real_distribution<double> distrib_r2(0.2,1.);
-    std::uniform_real_distribution<double> distrib_move_x(-0.8,0.8);
-    std::uniform_real_distribution<double> distrib_move_y(-0.8,0.8);
+    std::uniform_real_distribution<double> distrib_r(0.7,1.);
+    std::uniform_real_distribution<double> distrib_r2(0.7,1.);
+    std::uniform_real_distribution<double> distrib_move_x(-0.9,0.9);
+    std::uniform_real_distribution<double> distrib_move_y(-0.9,0.9);
     std::uniform_real_distribution<double> distrib_rot(0,PI);
 
-    int n = 150; // 2*n*n particles
+    int n = 100; // 2*n*n particles
 
     for(int i = 0; i < n; ++i)
     {
