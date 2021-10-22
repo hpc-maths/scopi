@@ -11,7 +11,7 @@ var clock = new THREE.Clock();
 
 var options = {
     "refresh": 0.2,
-    "pause": false,
+    "pause": true,
     "current_frame": 0,
 };
 
@@ -38,17 +38,24 @@ const sphereObject = function () {
     return function (obj, matrix) {
         position.x = obj.position[0];
         position.y = obj.position[1];
-        position.z = 0;
 
+        scale.x = obj.radius[0];
+        scale.y = obj.radius[1];
+
+        if (obj.position.length == 2) {
+            position.z = 0;
+            scale.z = 0.001;
+        }
+        else {
+            position.z = obj.position[2];
+            scale.z = obj.radius[2];
+        }
         quaternion.x = obj.quaternion[1];
         quaternion.y = obj.quaternion[2];
         quaternion.z = obj.quaternion[3];
         quaternion.w = obj.quaternion[0];
         quaternion.normalize();
 
-        scale.x = obj.radius[0];
-        scale.y = obj.radius[1];
-        scale.z = 0.001;
         matrix.compose(position, quaternion, scale);
     };
 }();
@@ -79,8 +86,14 @@ function drawObjects() {
 
             const points = [];
             contacts.forEach((obj, index) => {
-                points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], 0.));
-                points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], 0.));
+                if (obj.pi.length == 2) {
+                    points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], 0.));
+                    points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], 0.));
+                }
+                else {
+                    points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], obj.pi[2]));
+                    points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], obj.pi[2]));
+                }
             });
             const line_geometry = new THREE.BufferGeometry().setFromPoints(points);
             const line_material = new THREE.LineBasicMaterial({
@@ -147,7 +160,7 @@ function init() {
     controls = new OrbitControls(camera, renderer.domElement);
 
     gui = new GUI();
-    gui.add(options, 'refresh', 0.1, 5, 0.1);
+    gui.add(options, 'refresh', 0.01, 5, 0.01);
     guiFrame = gui.add(options, 'current_frame', 0, 0, 1).listen();
     guiFrame.onChange(
         function (value) {
