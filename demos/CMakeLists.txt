@@ -20,6 +20,9 @@ target_link_libraries(critical_3d scopi_cpp)
 #   )
 # endif(APPLE)
 
+add_executable(critical_2d_no_overlap critical/2d_case_no_overlap.cpp)
+target_link_libraries(critical_2d_no_overlap scopi_cpp)
+
 add_executable(two_spheres two_spheres.cpp)
 target_link_libraries(two_spheres scopi_cpp)
 
@@ -33,3 +36,9 @@ target_link_libraries(two_ellipsoids scopi_cpp)
 #   ${MOSEK_LIBRARIES} two_ellipsoid
 #   )
 # endif(APPLE)
+
+add_executable(two_ellipsoids_spheres two_ellipsoids_spheres.cpp)
+target_link_libraries(two_ellipsoids_spheres scopi_cpp)
+
+add_executable(two_ellipsoids_asymmetrical two_ellipsoids_asymmetrical.cpp)
+target_link_libraries(two_ellipsoids_asymmetrical scopi_cpp)
