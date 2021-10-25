@@ -49,8 +49,8 @@ namespace scopi
               xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixA(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixAz();
-              Variable::t callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite, useMosekSolver);
-              void moveActiveParticles(Variable::t& X);
+              ndarray<double, 1> callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite, useMosekSolver);
+              void moveActiveParticles(ndarray<double, 1> Xlvl);
 
               scopi::scopi_container<dim>& _particles;
               double _dt;
@@ -110,11 +110,10 @@ namespace scopi
               std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
 
               // Create and solve Mosek optimization problem
-              auto X = callMosekFunctions(c, distances, A, Az, nite, _solverType);
-
+              auto Xlvl = callMosekFunctions(c, distances, A, Az, nite, _solverType);
 
               // move the active particles
-              moveActiveParticles(X);
+              moveActiveParticles(Xlvl);
           }
       }
 
@@ -368,7 +367,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Variable::t MosekSolver<dim, SolverType>::callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite, useMosekSolver)
+      ndarray<double, 1> MosekSolver<dim, SolverType>::callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite, useMosekSolver)
       {
           std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
           tic();
@@ -398,13 +397,12 @@ namespace scopi
           std::cout << "----> CPUTIME : mosek = " << duration5 << std::endl;
           std::cout << "Mosek iterations : " << model->getSolverIntInfo("intpntIter") << std::endl;
 
-          return X;
+          return *(X->level());
       }
 
   template<std::size_t dim, typename SolverType>
-      void MosekSolver<dim, SolverType>::moveActiveParticles(Variable::t& X)
+      void MosekSolver<dim, SolverType>::moveActiveParticles(ndarray<double, 1> Xlvl)
       {
-          ndarray<double, 1> Xlvl   = *(X->level());
 
           auto uadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1), {_Nactive, 3UL});
           auto wadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1+3*_Nactive), {_Nactive, 3UL});
