@@ -98,8 +98,6 @@ namespace scopi
               double _mass = 1.;
               double _moment = .1;
               SolverType _solverType;
-              xt::xtensor<double, 2> _uadapt;
-              xt::xtensor<double, 2> _wadapt;
 
       };
 
@@ -119,15 +117,18 @@ namespace scopi
 
               //displacement of obstacles
               displacementObstacles();
+              std::cout << "displacementObstacles" << std::endl;
 
 
               // create list of contacts
               std::cout << "----> create list of contacts " << nite << std::endl;
               auto contacts = createListContactsAndSort();
+              std::cout << "createListContactsAndSort" << std::endl;
 
               // output files
               std::cout << "----> json output files " << nite << std::endl;
               writeOutputFiles(contacts, nite);
+              std::cout << "writeOutputFiles" << std::endl;
 
 
               // for (std::size_t i=0; i<_Nactive; ++i)
@@ -141,9 +142,11 @@ namespace scopi
 
               // Create and solve Mosek optimization problem
               auto sol = createMatricesAndSolve(contacts, nite, _solverType);
+              std::cout << "createMatricesAndSolve" << std::endl;
 
               // move the active particles
               moveActiveParticles(sol);
+              std::cout << "moveActiveParticles" << std::endl;
           }
       }
 
@@ -317,13 +320,12 @@ namespace scopi
       {
           xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
           c(0) = 1;
+          // TODO use xt functions
           auto tmp = createVectorC();
           for(std::size_t i = 0; i < 6*_Nactive; ++i)
           {
               c(1+i) = tmp(i);
           }
-          // c[1, 1 + 2*3*_Nactive + 2*3*_Nactive] = createVectorC();
-          // xt::xtensor<double, 1> c = xt::zeros<double>({1., createVectorC()});
           return c;
       }
 
@@ -683,7 +685,7 @@ namespace scopi
 
           for (std::size_t i=0; i<_Nactive; ++i)
           {
-              xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, _wadapt(i, 2)});
+              xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, wadapt(i, 2)});
               double normw = xt::linalg::norm(w);
               if (normw == 0)
               {
@@ -694,7 +696,7 @@ namespace scopi
               xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*_dt)/normw*w;
               for (std::size_t d=0; d<dim; ++d)
               {
-                  _particles.pos()(i + _active_ptr)(d) += _dt*_uadapt(i, d);
+                  _particles.pos()(i + _active_ptr)(d) += _dt*uadapt(i, d);
               }
               // xt::view(particles.pos(), i) += dt*xt::view(uadapt, i);
 
@@ -708,3 +710,4 @@ namespace scopi
           }
       }
 }
+
