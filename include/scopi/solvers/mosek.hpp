@@ -194,7 +194,7 @@ namespace scopi
   template<std::size_t dim, typename SolverType>
       xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC()
       {
-          xt::xtensor<double, 1> c = xt::zeros<double>({2*3*_Nactive + 2*3*_Nactive});
+          xt::xtensor<double, 1> c = xt::zeros<double>({2*3*_Nactive});
           std::size_t Mdec = 0;
           std::size_t Jdec = Mdec + 3*_Nactive;
           for (std::size_t i=0; i<_Nactive; ++i)
@@ -213,7 +213,13 @@ namespace scopi
       {
           xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
           c(0) = 1;
-          c[1, 1 + 2*3*_Nactive + 2*3*_Nactive] = createVectorC();
+          auto tmp = createVectorC();
+          for(std::size_t i = 0; i < 6*_Nactive; ++i)
+          {
+              c(1+i) = tmp(i);
+          }
+          // c[1, 1 + 2*3*_Nactive + 2*3*_Nactive] = createVectorC();
+          // xt::xtensor<double, 1> c = xt::zeros<double>({1., createVectorC()});
           return c;
       }
 
@@ -507,7 +513,7 @@ namespace scopi
           std::cout << "Mosek iterations : " << model->getSolverIntInfo("intpntIter") << std::endl;
 
           auto Xlvl = *(X->level());
-          std::vector<double> uw(6*_Nactive, Xlvl.raw()+1);
+          std::vector<double> uw(Xlvl.raw()+1,Xlvl.raw()+1 + 6*_Nactive);
           return uw;
 
       }
