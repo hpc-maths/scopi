@@ -47,7 +47,7 @@ namespace scopi
               void displacementObstacles();
               std::vector<scopi::neighbor<dim>> createListContactsAndSort();
               void writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
-              void moveActiveParticles(ndarray<double, 1> Xlvl);
+              void moveActiveParticles(std::vector<double> uw);
 
               xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
               xt::xtensor<double, 1> createVectorC();
@@ -55,14 +55,14 @@ namespace scopi
               xt::xtensor<double, 1> createVectorC_mosek();
               xt::xtensor<double, 1> createVectorC_scs();
 
-              void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values);
+              void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
               Matrix::t createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixAz_mosek();
-              ScsMatrix createMatrixA_scs();
+              ScsMatrix createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
               ScsMatrix createMatrixP_scs();
 
-              ndarray<double, 1> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
-              ndarray<double, 1> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
+              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
+              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
 
 
               scopi::scopi_container<dim>& _particles;
@@ -72,6 +72,8 @@ namespace scopi
               double _mass = 1.;
               double _moment = .1;
               SolverType _solverType;
+              xt::xtensor<double, 2> _uadapt;
+              xt::xtensor<double, 2> _wadapt;
 
       };
 
@@ -112,10 +114,10 @@ namespace scopi
 
 
               // Create and solve Mosek optimization problem
-              auto Xlvl = createMatricesAndSolve(contacts, nite, _solverType);
+              auto sol = createMatricesAndSolve(contacts, nite, _solverType);
 
               // move the active particles
-              moveActiveParticles(Xlvl);
+              moveActiveParticles(sol);
           }
       }
 
@@ -210,7 +212,7 @@ namespace scopi
       {
           xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
           c(0) = 1;
-          c[1:1 + 2*3*_Nactive + 2*3*_Nactive] = createVectorC();
+          c[1, 1 + 2*3*_Nactive + 2*3*_Nactive] = createVectorC();
           return c;
       }
 
@@ -266,13 +268,13 @@ namespace scopi
           std::vector<int> csc_cols(6*_Nactive + 1, 0);
           std::vector<double> csc_values(coo_rows.size(), 0);
 
-          for (int i = 0; i < coo_rows.size(); i++)
+          for (std::size_t i = 0; i < coo_rows.size(); i++)
           {
               csc_values[i] = coo_values[i];
               csc_rows[i] = coo_rows[i];
               csc_cols[coo_cols[i] + 1]++;
           }
-          for (int i = 0; i < 6*_Nactive; i++)
+          for (std::size_t i = 0; i < 6*_Nactive; i++)
           {
               csc_cols[i + 1] += csc_cols[i];
           }
@@ -433,8 +435,8 @@ namespace scopi
           std::vector<scs_int> col;
           std::vector<scs_float> val;
           row.reserve(6*_Nactive);
-          col.(6*_Nactive+1);
-          val.(6*_Nactive);
+          col.reserve(6*_Nactive+1);
+          val.reserve(6*_Nactive);
 
           for (std::size_t i=0; i<_Nactive; ++i)
           {
@@ -462,7 +464,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ndarray<double, 1> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver)
+      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver)
       {
           // create mass and inertia matrices
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
@@ -503,11 +505,14 @@ namespace scopi
           std::cout << "----> CPUTIME : mosek = " << duration5 << std::endl;
           std::cout << "Mosek iterations : " << model->getSolverIntInfo("intpntIter") << std::endl;
 
-          return *(X->level());
+          auto Xlvl = *(X->level());
+          std::vector<double> uw(6*_Nactive, Xlvl.raw()+1);
+          return uw;
+
       }
 
   template<std::size_t dim, typename SolverType>
-      ndarray<double, 1> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver)
+      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver)
       {
           // create mass and inertia matrices
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
@@ -515,7 +520,7 @@ namespace scopi
           auto c = createVectorC_scs();
           auto distances = createVectorDistances(contacts);
           auto A = createMatrixA_scs(contacts);
-          auto P = createMatrixA_scs(contacts);
+          auto P = createMatrixP_scs();
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
 
           auto duration4 = toc();
@@ -526,8 +531,8 @@ namespace scopi
           ScsData d;
           d.m = contacts.size();
           d.n = 6*_Nactive;
-          d.A = A;
-          d.P = P;
+          d.A = &A;
+          d.P = &P;
           d.b = distances.data();
           d.c = c.data();
 
@@ -536,7 +541,7 @@ namespace scopi
           k.l = contacts.size(); // s >= 0
           k.bu = NULL; 
           k.bl = NULL; 
-          k.bssize = 0;
+          k.bsize = 0;
           k.q = NULL;
           k.qsize = 0;
           k.s = NULL;
@@ -548,23 +553,26 @@ namespace scopi
 
           ScsSolution sol;
           ScsInfo info;
-          int scs_solve_type = scs(&d, &k, NULL, &sol, &info);
+          scs(&d, &k, NULL, &sol, &info);
 
           auto duration5 = toc();
           std::cout << "----> CPUTIME : SCS = " << duration5 << std::endl;
           std::cout << "SCS iterations : " << info.iter << std::endl;
+
+          std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
+          return uw;
       }
 
   template<std::size_t dim, typename SolverType>
-      void MosekSolver<dim, SolverType>::moveActiveParticles(ndarray<double, 1> Xlvl)
+      void MosekSolver<dim, SolverType>::moveActiveParticles(std::vector<double> uw)
       {
 
-          auto uadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1), {_Nactive, 3UL});
-          auto wadapt = xt::adapt(reinterpret_cast<double*>(Xlvl.raw()+1+3*_Nactive), {_Nactive, 3UL});
+          auto uadapt = xt::adapt(uw.data(), {_Nactive, 3UL});
+          auto wadapt = xt::adapt(uw.data()+3*_Nactive, {_Nactive, 3UL});
 
           for (std::size_t i=0; i<_Nactive; ++i)
           {
-              xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, wadapt(i, 2)});
+              xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, _wadapt(i, 2)});
               double normw = xt::linalg::norm(w);
               if (normw == 0)
               {
@@ -575,7 +583,7 @@ namespace scopi
               xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*_dt)/normw*w;
               for (std::size_t d=0; d<dim; ++d)
               {
-                  _particles.pos()(i + _active_ptr)(d) += _dt*uadapt(i, d);
+                  _particles.pos()(i + _active_ptr)(d) += _dt*_uadapt(i, d);
               }
               // xt::view(particles.pos(), i) += dt*xt::view(uadapt, i);
 
