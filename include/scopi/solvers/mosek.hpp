@@ -47,8 +47,8 @@ namespace scopi
               void writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
               xt::xtensor<double, 1> createVectorC();
               xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
-              Matrix::t createMatrixA(std::vector<scopi::neighbor<dim>>& contacts);
-              Matrix::t createMatrixAz();
+              Matrix::t createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver);
+              Matrix::t createMatrixAz(useMosekSolver);
               ndarray<double, 1> callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite, useMosekSolver);
               void moveActiveParticles(ndarray<double, 1> Xlvl);
 
@@ -103,8 +103,8 @@ namespace scopi
               tic();
               auto c = createVectorC();
               auto distances = createVectorDistances(contacts);
-              auto A = createMatrixA(contacts);
-              auto Az = createMatrixAz();
+              auto A = createMatrixA(contacts, _solverType);
+              auto Az = createMatrixAz(_solverType);
 
               auto duration4 = toc();
               std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
@@ -218,7 +218,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Matrix::t MosekSolver<dim, SolverType>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts)
+      Matrix::t MosekSolver<dim, SolverType>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver)
       {
           // Preallocate
           std::vector<int> A_rows;
@@ -314,7 +314,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Matrix::t MosekSolver<dim, SolverType>::createMatrixAz()
+      Matrix::t MosekSolver<dim, SolverType>::createMatrixAz(useMosekSolver)
       {
           std::vector<int> Az_rows;
           std::vector<int> Az_cols;
