@@ -58,7 +58,9 @@ namespace scopi
       std::size_t _actptr;
   };
 
-  template<std::size_t dim>
+  struct useMosekSolver{};
+
+  template<std::size_t dim, typename SolverType>
       class MosekSolver
       {
           public:
@@ -73,7 +75,7 @@ namespace scopi
               xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixA(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixAz();
-              Variable::t callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite);
+              Variable::t callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite, useMosekSolver);
               void moveActiveParticles(Variable::t& X);
 
               scopi::scopi_container<dim>& _particles;
@@ -82,17 +84,18 @@ namespace scopi
               std::size_t _Nactive;
               double _mass = 1.;
               double _moment = .1;
+              SolverType _solverType;
 
       };
 
-  template<std::size_t dim>
-      MosekSolver<dim>::MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr) : _particles(particles), _dt(dt), _active_ptr(active_ptr)
+  template<std::size_t dim, typename SolverType>
+      MosekSolver<dim, SolverType>::MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr) : _particles(particles), _dt(dt), _active_ptr(active_ptr)
   {
       _Nactive = _particles.size() - _active_ptr;
   }
 
-  template<std::size_t dim>
-      void MosekSolver<dim>::solve(std::size_t total_it)
+  template<std::size_t dim, typename SolverType>
+      void MosekSolver<dim, SolverType>::solve(std::size_t total_it)
       {
           // Time Loop
           for (std::size_t nite=0; nite<total_it; ++nite)
@@ -133,7 +136,7 @@ namespace scopi
               std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
 
               // Create and solve Mosek optimization problem
-              auto X = callMosekFunctions(c, distances, A, Az, nite);
+              auto X = callMosekFunctions(c, distances, A, Az, nite, _solverType);
 
 
               // move the active particles
@@ -141,8 +144,8 @@ namespace scopi
           }
       }
 
-  template<std::size_t dim>
-      void MosekSolver<dim>::displacementObstacles()
+  template<std::size_t dim, typename SolverType>
+      void MosekSolver<dim, SolverType>::displacementObstacles()
       {
           for (std::size_t i=0; i<_active_ptr; ++i)
           {
@@ -166,8 +169,8 @@ namespace scopi
           }
       }
 
-  template<std::size_t dim>
-      std::vector<scopi::neighbor<dim>> MosekSolver<dim>::createListContactsAndSort()
+  template<std::size_t dim, typename SolverType>
+      std::vector<scopi::neighbor<dim>> MosekSolver<dim, SolverType>::createListContactsAndSort()
       {
           double dmax = 2;
           std::vector<scopi::neighbor<dim>> contacts;
@@ -257,8 +260,8 @@ namespace scopi
           return contacts;
       }
 
-  template<std::size_t dim>
-      void MosekSolver<dim>::writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite)
+  template<std::size_t dim, typename SolverType>
+      void MosekSolver<dim, SolverType>::writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite)
       {
           nl::json json_output;
 
@@ -289,8 +292,8 @@ namespace scopi
           file.close();
       }
 
-  template<std::size_t dim>
-      xt::xtensor<double, 1> MosekSolver<dim>::createVectorC()
+  template<std::size_t dim, typename SolverType>
+      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC()
       {
           xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
           c(0) = 1;
@@ -307,8 +310,8 @@ namespace scopi
           return c;
       }
 
-  template<std::size_t dim>
-      xt::xtensor<double, 1> MosekSolver<dim>::createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts)
+  template<std::size_t dim, typename SolverType>
+      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts)
       {
           // fill vector with distances
           xt::xtensor<double, 1> distances = xt::zeros<double>({contacts.size()});
@@ -320,8 +323,8 @@ namespace scopi
           return distances;
       }
 
-  template<std::size_t dim>
-      Matrix::t MosekSolver<dim>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts)
+  template<std::size_t dim, typename SolverType>
+      Matrix::t MosekSolver<dim, SolverType>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts)
       {
           // Preallocate
           std::vector<int> A_rows;
@@ -416,8 +419,8 @@ namespace scopi
                   std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
       }
 
-  template<std::size_t dim>
-      Matrix::t MosekSolver<dim>::createMatrixAz()
+  template<std::size_t dim, typename SolverType>
+      Matrix::t MosekSolver<dim, SolverType>::createMatrixAz()
       {
           std::vector<int> Az_rows;
           std::vector<int> Az_cols;
@@ -469,8 +472,8 @@ namespace scopi
                   std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>({Az_values.size()})));
       }
 
-  template<std::size_t dim>
-      Variable::t MosekSolver<dim>::callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite)
+  template<std::size_t dim, typename SolverType>
+      Variable::t MosekSolver<dim, SolverType>::callMosekFunctions(xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, Matrix::t& A, Matrix::t& Az, std::size_t nite, useMosekSolver)
       {
           std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
           tic();
@@ -503,8 +506,8 @@ namespace scopi
           return X;
       }
 
-  template<std::size_t dim>
-      void MosekSolver<dim>::moveActiveParticles(Variable::t& X)
+  template<std::size_t dim, typename SolverType>
+      void MosekSolver<dim, SolverType>::moveActiveParticles(Variable::t& X)
       {
           ndarray<double, 1> Xlvl   = *(X->level());
 
