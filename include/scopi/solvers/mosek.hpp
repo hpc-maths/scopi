@@ -221,7 +221,6 @@ namespace scopi
   template<std::size_t dim, typename SolverType>
       xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_scs()
       {
-          // signs to be checked if needed
           return createVectorC();
       }
 
@@ -247,6 +246,19 @@ namespace scopi
           std::vector<double> A_values;
 
           createMatrixA_coo(contacts, A_rows, A_cols, A_values, 1);
+
+          /*
+          std::cout << "A_rows" << std::endl;
+          for(int i : A_rows)
+              std::cout << i << '\n';
+          std::cout << "A_cols" << std::endl;
+          for(int i : A_cols)
+              std::cout << i << '\n';
+          std::cout << "A_values" << std::endl;
+          for(double i : A_values)
+              std::cout << i << '\n';
+          std::cout << "" << std::endl;
+          */
 
           return Matrix::sparse(contacts.size(), 1 + 6*_Nactive + 6*_Nactive,
                   std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
@@ -283,7 +295,7 @@ namespace scopi
 
           std::vector<int> csc_rows(coo_rows.size(), 0);
           std::vector<int> csc_cols(6*_Nactive + 1, 0);
-          std::vector<double> csc_values(coo_rows.size(), 0);
+          std::vector<double> csc_values(coo_rows.size(), 0.);
 
           /*
           std::cout << "coo_rows" << std::endl;
@@ -320,7 +332,7 @@ namespace scopi
           std::cout << "csc_values" << std::endl;
           for(double i : csc_values)
               std::cout << i << '\n';
-          */
+              */
 
           ScsMatrix* A = new ScsMatrix;
           A->x = new double[csc_values.size()];
@@ -491,18 +503,33 @@ namespace scopi
           {
               for (std::size_t d=0; d<3; ++d)
               {
-                  row.push_back(6*i + d);
-                  col.push_back(6*i + d);
+                  row.push_back(3*i + d);
+                  col.push_back(3*i + d);
                   val.push_back(_mass); // TODO: add mass into particles
               }
+          }
+          for (std::size_t i=0; i<_Nactive; ++i)
+          {
               for (std::size_t d=0; d<3; ++d)
               {
-                  row.push_back(6*i + 3 + d);
-                  col.push_back(6*i + 3 + d);
+                  row.push_back(3*_Nactive + 3*i + d);
+                  col.push_back(3*_Nactive + 3*i + d);
                   val.push_back(_moment);
               }
           }
           col.push_back(6*_Nactive);
+
+          /*
+          std::cout << "row" << std::endl;
+          for(int i : row)
+              std::cout << i << '\n';
+          std::cout << "col" << std::endl;
+          for(int i : col)
+              std::cout << i << '\n';
+          std::cout << "val" << std::endl;
+          for(double i : val)
+              std::cout << i << '\n';
+          */
 
           ScsMatrix* P = new ScsMatrix;
           P->x = new double[val.size()];
@@ -562,6 +589,9 @@ namespace scopi
           std::cout << "Mosek iterations : " << model->getSolverIntInfo("intpntIter") << std::endl;
 
           auto Xlvl = *(X->level());
+          for(int i = 0; i < 1 + 6*_Nactive + 6*_Nactive; ++i)
+              std::cout << i << "     " << Xlvl[i] << std::endl;
+
           std::vector<double> uw(Xlvl.raw()+1,Xlvl.raw()+1 + 6*_Nactive);
           return uw;
 
@@ -640,6 +670,9 @@ namespace scopi
           std::cout << "SCS iterations : " << info.iter << std::endl;
           if(info.iter == -1)
               std::abort();
+
+          for(std::size_t i = 0; i < 6*_Nactive; ++i)
+              std::cout << i << "     " << sol.x[i] << std::endl;
 
           std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
 
