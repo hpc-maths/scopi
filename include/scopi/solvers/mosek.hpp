@@ -351,19 +351,6 @@ namespace scopi
 
           createMatrixA_coo(contacts, A_rows, A_cols, A_values, 1);
 
-          /*
-          std::cout << "A_rows" << std::endl;
-          for(int i : A_rows)
-              std::cout << i << '\n';
-          std::cout << "A_cols" << std::endl;
-          for(int i : A_cols)
-              std::cout << i << '\n';
-          std::cout << "A_values" << std::endl;
-          for(double i : A_values)
-              std::cout << i << '\n';
-          std::cout << "" << std::endl;
-          */
-
           return Matrix::sparse(contacts.size(), 1 + 6*_Nactive + 6*_Nactive,
                   std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
                   std::make_shared<ndarray<int, 1>>(A_cols.data(), shape_t<1>({A_cols.size()})),
@@ -401,20 +388,6 @@ namespace scopi
           std::vector<int> csc_cols(6*_Nactive + 1, 0);
           std::vector<double> csc_values(coo_rows.size(), 0.);
 
-          /*
-          std::cout << "coo_rows" << std::endl;
-          for(int i : coo_rows)
-              std::cout << i << '\n';
-          std::cout << "coo_cols" << std::endl;
-          for(int i : coo_cols)
-              std::cout << i << '\n';
-          std::cout << "coo_values" << std::endl;
-          for(double i : coo_values)
-              std::cout << i << '\n';
-          std::cout << "" << std::endl;
-          std::cout << "" << std::endl;
-          */
-
           for (std::size_t i = 0; i < coo_rows.size(); i++)
           {
               csc_values[i] = coo_values[i];
@@ -425,18 +398,6 @@ namespace scopi
           {
               csc_cols[i + 1] += csc_cols[i];
           }
-
-          /*
-          std::cout << "csc_rows" << std::endl;
-          for(int i : csc_rows)
-              std::cout << i << '\n';
-          std::cout << "csc_cols" << std::endl;
-          for(int i : csc_cols)
-              std::cout << i << '\n';
-          std::cout << "csc_values" << std::endl;
-          for(double i : csc_values)
-              std::cout << i << '\n';
-              */
 
           ScsMatrix* A = new ScsMatrix;
           A->x = new double[csc_values.size()];
@@ -623,18 +584,6 @@ namespace scopi
           }
           col.push_back(6*_Nactive);
 
-          /*
-          std::cout << "row" << std::endl;
-          for(int i : row)
-              std::cout << i << '\n';
-          std::cout << "col" << std::endl;
-          for(int i : col)
-              std::cout << i << '\n';
-          std::cout << "val" << std::endl;
-          for(double i : val)
-              std::cout << i << '\n';
-          */
-
           ScsMatrix* P = new ScsMatrix;
           P->x = new double[val.size()];
           P->i = new int[row.size()];
@@ -693,8 +642,6 @@ namespace scopi
           std::cout << "Mosek iterations : " << model->getSolverIntInfo("intpntIter") << std::endl;
 
           auto Xlvl = *(X->level());
-          for(int i = 0; i < 1 + 6*_Nactive + 6*_Nactive; ++i)
-              std::cout << i << "     " << Xlvl[i] << std::endl;
 
           std::vector<double> uw(Xlvl.raw()+1,Xlvl.raw()+1 + 6*_Nactive);
           return uw;
@@ -766,7 +713,6 @@ namespace scopi
           stgs.write_data_filename = NULL;
           stgs.log_csv_filename = NULL;
 
-          std::cout << stgs.normalize << std::endl;
           scs(&d, &k, &stgs, &sol, &info);
           
           auto duration5 = toc();
@@ -774,9 +720,6 @@ namespace scopi
           std::cout << "SCS iterations : " << info.iter << std::endl;
           if(info.iter == -1)
               std::abort();
-
-          for(std::size_t i = 0; i < 6*_Nactive; ++i)
-              std::cout << i << "     " << sol.x[i] << std::endl;
 
           std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
 
