@@ -266,9 +266,38 @@ namespace scopi
 
           createMatrixA_coo(contacts, coo_rows, coo_cols, coo_values, 0);
 
+          // cols values have to be sorted
+          // use inefficient bubble sort
+          for(std::size_t i = 0; i < coo_cols.size(); ++i)
+          {
+              for(std::size_t j = 0; j < coo_cols.size()-i-1; ++j)
+              {
+                  if(coo_cols[j] > coo_cols[j+1])
+                  {
+                      std::swap(coo_cols[j], coo_cols[j+1]);
+                      std::swap(coo_rows[j], coo_rows[j+1]);
+                      std::swap(coo_values[j], coo_values[j+1]);
+                  }
+              }
+          }
+
           std::vector<int> csc_rows(coo_rows.size(), 0);
           std::vector<int> csc_cols(6*_Nactive + 1, 0);
           std::vector<double> csc_values(coo_rows.size(), 0);
+
+          /*
+          std::cout << "coo_rows" << std::endl;
+          for(int i : coo_rows)
+              std::cout << i << '\n';
+          std::cout << "coo_cols" << std::endl;
+          for(int i : coo_cols)
+              std::cout << i << '\n';
+          std::cout << "coo_values" << std::endl;
+          for(double i : coo_values)
+              std::cout << i << '\n';
+          std::cout << "" << std::endl;
+          std::cout << "" << std::endl;
+          */
 
           for (std::size_t i = 0; i < coo_rows.size(); i++)
           {
@@ -291,7 +320,7 @@ namespace scopi
           std::cout << "csc_values" << std::endl;
           for(double i : csc_values)
               std::cout << i << '\n';
-          */
+              */
 
           ScsMatrix* A = new ScsMatrix;
           A->x = new double[csc_values.size()];
@@ -549,9 +578,6 @@ namespace scopi
           tic();
           auto c = createVectorC_scs();
           auto distances = createVectorDistances(contacts);
-          // ScsMatrix* A = createMatrixA_scs(contacts);
-          // std::cout << "A ok" << std::endl;
-          // auto P = createMatrixP_scs();
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
 
           auto duration4 = toc();
@@ -566,7 +592,6 @@ namespace scopi
           d.P = createMatrixP_scs();
           d.b = distances.data();
           d.c = c.data();
-          std::cout << "d ok" << std::endl;
 
           ScsCone k;
           k.z = 0; // 0 linear equality constraints
@@ -582,7 +607,6 @@ namespace scopi
           k.ed = 0;
           k.p = NULL;
           k.psize = 0;
-          std::cout << "k ok" << std::endl;
 
           ScsSolution sol;
           sol.x = new double[d.n];
@@ -612,13 +636,13 @@ namespace scopi
           stgs.log_csv_filename = NULL;
 
           std::cout << stgs.normalize << std::endl;
-          std::cout << "sol ok" << std::endl;
           scs(&d, &k, &stgs, &sol, &info);
-          std::cout << "solve done" << std::endl;
           
           auto duration5 = toc();
           std::cout << "----> CPUTIME : SCS = " << duration5 << std::endl;
           std::cout << "SCS iterations : " << info.iter << std::endl;
+          if(info.iter == -1)
+              std::abort();
 
           std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
 
