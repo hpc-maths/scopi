@@ -320,7 +320,7 @@ namespace scopi
           std::cout << "csc_values" << std::endl;
           for(double i : csc_values)
               std::cout << i << '\n';
-              */
+          */
 
           ScsMatrix* A = new ScsMatrix;
           A->x = new double[csc_values.size()];
@@ -332,9 +332,6 @@ namespace scopi
               A->i[i] = csc_rows[i];
           for(std::size_t i = 0; i < csc_cols.size(); ++i)
               A->p[i] = csc_cols[i];
-          // A->x = csc_values.data();
-          // A->i = csc_rows.data();
-          // A->p = csc_cols.data();
           A->m = contacts.size();
           A->n = 6*_Nactive;
           return A;
@@ -647,17 +644,17 @@ namespace scopi
           std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
 
           // free the memory
-          delete d.A->x;
-          delete d.A->i;
-          delete d.A->p;
+          delete[] d.A->x;
+          delete[] d.A->i;
+          delete[] d.A->p;
           delete d.A;
-          delete d.P->x;
-          delete d.P->i;
-          delete d.P->p;
+          delete[] d.P->x;
+          delete[] d.P->i;
+          delete[] d.P->p;
           delete d.P;
-          delete sol.x;
-          delete sol.y;
-          delete sol.s;
+          delete[] sol.x;
+          delete[] sol.y;
+          delete[] sol.s;
 
           return uw;
       }
