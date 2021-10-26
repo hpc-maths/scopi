@@ -84,8 +84,8 @@ namespace scopi
               void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
               Matrix::t createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixAz_mosek();
-              ScsMatrix createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
-              ScsMatrix createMatrixP_scs();
+              ScsMatrix* createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
+              ScsMatrix* createMatrixP_scs();
 
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
@@ -117,19 +117,14 @@ namespace scopi
 
               //displacement of obstacles
               displacementObstacles();
-              std::cout << "displacementObstacles" << std::endl;
-
 
               // create list of contacts
               std::cout << "----> create list of contacts " << nite << std::endl;
               auto contacts = createListContactsAndSort();
-              std::cout << "createListContactsAndSort" << std::endl;
 
               // output files
               std::cout << "----> json output files " << nite << std::endl;
               writeOutputFiles(contacts, nite);
-              std::cout << "writeOutputFiles" << std::endl;
-
 
               // for (std::size_t i=0; i<_Nactive; ++i)
               // {
@@ -142,11 +137,9 @@ namespace scopi
 
               // Create and solve Mosek optimization problem
               auto sol = createMatricesAndSolve(contacts, nite, _solverType);
-              std::cout << "createMatricesAndSolve" << std::endl;
 
               // move the active particles
               moveActiveParticles(sol);
-              std::cout << "moveActiveParticles" << std::endl;
           }
       }
 
@@ -366,7 +359,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ScsMatrix MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
+      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
       {
           // https://stackoverflow.com/questions/23583975/convert-coo-to-csr-format-in-c
 
@@ -392,12 +385,33 @@ namespace scopi
               csc_cols[i + 1] += csc_cols[i];
           }
 
-          ScsMatrix A;
-          A.x = csc_values.data();
-          A.i = csc_rows.data();
-          A.p = csc_cols.data();
-          A.m = contacts.size();
-          A.n = 6*_Nactive;
+          /*
+          std::cout << "csc_rows" << std::endl;
+          for(int i : csc_rows)
+              std::cout << i << '\n';
+          std::cout << "csc_cols" << std::endl;
+          for(int i : csc_cols)
+              std::cout << i << '\n';
+          std::cout << "csc_values" << std::endl;
+          for(double i : csc_values)
+              std::cout << i << '\n';
+          */
+
+          ScsMatrix* A = new ScsMatrix;
+          A->x = new double[csc_values.size()];
+          A->i = new int[csc_rows.size()];
+          A->p = new int[csc_cols.size()];
+          for(std::size_t i = 0; i < csc_values.size(); ++i)
+              A->x[i] = csc_values[i];
+          for(std::size_t i = 0; i < csc_rows.size(); ++i)
+              A->i[i] = csc_rows[i];
+          for(std::size_t i = 0; i < csc_cols.size(); ++i)
+              A->p[i] = csc_cols[i];
+          // A->x = csc_values.data();
+          // A->i = csc_rows.data();
+          // A->p = csc_cols.data();
+          A->m = contacts.size();
+          A->n = 6*_Nactive;
           return A;
       }
 
@@ -542,7 +556,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ScsMatrix MosekSolver<dim, SolverType>::createMatrixP_scs()
+      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixP_scs()
       {
           std::vector<scs_int> row;
           std::vector<scs_int> col;
@@ -555,24 +569,31 @@ namespace scopi
           {
               for (std::size_t d=0; d<3; ++d)
               {
-                  row.push_back(3*i + d);
-                  col.push_back(3*i + d);
+                  row.push_back(6*i + d);
+                  col.push_back(6*i + d);
                   val.push_back(_mass); // TODO: add mass into particles
               }
               for (std::size_t d=0; d<3; ++d)
               {
-                  row.push_back(3*i + 3 + d);
-                  col.push_back(3*i + 3 + d);
+                  row.push_back(6*i + 3 + d);
+                  col.push_back(6*i + 3 + d);
                   val.push_back(_moment);
               }
           }
+          col.push_back(6*_Nactive);
 
-          ScsMatrix P;
-          P.x = val.data();
-          P.i = row.data();
-          P.p = col.data();
-          P.m = 6*_Nactive;
-          P.n = 6*_Nactive;
+          ScsMatrix* P = new ScsMatrix;
+          P->x = new double[val.size()];
+          P->i = new int[row.size()];
+          P->p = new int[col.size()];
+          for(std::size_t i = 0; i < val.size(); ++i)
+              P->x[i] = val[i];
+          for(std::size_t i = 0; i < row.size(); ++i)
+              P->i[i] = row[i];
+          for(std::size_t i = 0; i < col.size(); ++i)
+              P->p[i] = col[i];
+          P->m = 6*_Nactive;
+          P->n = 6*_Nactive;
           return P;
       }
 
@@ -632,8 +653,9 @@ namespace scopi
           tic();
           auto c = createVectorC_scs();
           auto distances = createVectorDistances(contacts);
-          auto A = createMatrixA_scs(contacts);
-          auto P = createMatrixP_scs();
+          // ScsMatrix* A = createMatrixA_scs(contacts);
+          // std::cout << "A ok" << std::endl;
+          // auto P = createMatrixP_scs();
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
 
           auto duration4 = toc();
@@ -644,10 +666,11 @@ namespace scopi
           ScsData d;
           d.m = contacts.size();
           d.n = 6*_Nactive;
-          d.A = &A;
-          d.P = &P;
+          d.A = createMatrixA_scs(contacts);
+          d.P = createMatrixP_scs();
           d.b = distances.data();
           d.c = c.data();
+          std::cout << "d ok" << std::endl;
 
           ScsCone k;
           k.z = 0; // 0 linear equality constraints
@@ -663,16 +686,59 @@ namespace scopi
           k.ed = 0;
           k.p = NULL;
           k.psize = 0;
+          std::cout << "k ok" << std::endl;
 
           ScsSolution sol;
+          sol.x = new double[d.n];
+          sol.y = new double[d.m];
+          sol.s = new double[d.m];
           ScsInfo info;
-          scs(&d, &k, NULL, &sol, &info);
 
+          ScsSettings stgs;
+          // default values not set
+          // use values given by
+          // https://www.cvxgrp.org/scs/api/settings.html#settings
+          stgs.normalize = 1;
+          stgs.scale = 0.1;
+          stgs.adaptive_scale = 1;
+          stgs.rho_x = 1e-6;
+          stgs.max_iters = 1e5;
+          stgs.eps_abs = 1e-4;
+          stgs.eps_rel = 1e-4;
+          stgs.eps_infeas = 1e-7;
+          stgs.alpha = 1.5;
+          stgs.time_limit_secs = 0.;
+          stgs.verbose = 1;
+          stgs.warm_start = 0;
+          stgs.acceleration_lookback = 0;
+          stgs.acceleration_interval = 1;
+          stgs.write_data_filename = NULL;
+          stgs.log_csv_filename = NULL;
+
+          std::cout << stgs.normalize << std::endl;
+          std::cout << "sol ok" << std::endl;
+          scs(&d, &k, &stgs, &sol, &info);
+          std::cout << "solve done" << std::endl;
+          
           auto duration5 = toc();
           std::cout << "----> CPUTIME : SCS = " << duration5 << std::endl;
           std::cout << "SCS iterations : " << info.iter << std::endl;
 
           std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
+
+          // free the memory
+          delete d.A->x;
+          delete d.A->i;
+          delete d.A->p;
+          delete d.A;
+          delete d.P->x;
+          delete d.P->i;
+          delete d.P->p;
+          delete d.P;
+          delete sol.x;
+          delete sol.y;
+          delete sol.s;
+
           return uw;
       }
 
