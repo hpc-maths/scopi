@@ -288,9 +288,9 @@ namespace scopi
               }
           }
 
-          row.reserve(coo_rows.size());
-          col.reserve(6*_Nactive + 1);
-          val.reserve(coo_rows.size());
+          row.resize(coo_rows.size());
+          col.resize(6*_Nactive + 1);
+          val.resize(coo_rows.size());
           std::fill(col.begin(), col.end(), 0);
 
           for (std::size_t i = 0; i < coo_rows.size(); i++)
@@ -337,6 +337,7 @@ namespace scopi
           std::vector<double> csc_values;
 
           createMatrixA_cscStorage(contacts, csc_cols, csc_rows, csc_values);
+
           csc* A = new csc;
           double* A_x = new double[csc_values.size()];
           c_int* A_i = new c_int[csc_rows.size()];
@@ -714,6 +715,7 @@ namespace scopi
           auto c = createVectorC_scsOsqp();
           auto distances = createVectorDistances(contacts);
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
+          std::vector<double> l(contacts.size(), -std::numeric_limits<double>::max()); // no lower bound (I hope there is a cleaner way do to it)
 
           auto duration4 = toc();
           std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
@@ -733,9 +735,10 @@ namespace scopi
               data->P = createMatrixP_osqp();
               data->q = c.data();
               data->A = createMatrixA_osqp(contacts);
-              data->l = NULL;
+              data->l = l.data();
               data->u = distances.data();
           }
+
           // Define solver settings as default
           if (settings) {
               osqp_set_default_settings(settings);
@@ -748,7 +751,7 @@ namespace scopi
 
           std::vector<double> uw (work->solution->x, work->solution->x + 6*_Nactive);
           auto duration5 = toc();
-          std::cout << "----> CPUTIME : SCS = " << duration5 << std::endl;
+          std::cout << "----> CPUTIME : OSQP = " << duration5 << std::endl;
           std::cout << "OSQP iterations : " << work->info->iter << std::endl;
 
           // Cleanup
