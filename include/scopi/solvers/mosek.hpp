@@ -61,10 +61,12 @@ namespace scopi
               void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
               Matrix::t createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixAz_mosek();
-              void createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contactsstd::vector<int>& col, std::vector<int>& row, std::vector<double>& val);
+              template<typename ptrType>
+                  void createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
               ScsMatrix* createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
               csc* createMatrixA_osqp(std::vector<scopi::neighbor<dim>>& contacts);
-              void createMatrixP_cscStorage(std::vector<int>& col, std::vector<int>& row, std::vector<double>& val);
+              template<typename ptrType>
+                  void createMatrixP_cscStorage(std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
               ScsMatrix* createMatrixP_scs();
               csc* createMatrixP_osqp();
 
@@ -260,8 +262,8 @@ namespace scopi
                   std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
       }
 
-  template<std::size_t dim, typename SolverType>
-      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& col, std::vector<int>& row, std::vector<double>& val)
+  template<std::size_t dim, typename SolverType> template<typename ptrType>
+      void MosekSolver<dim, SolverType>::createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val)
       {
           // https://stackoverflow.com/questions/23583975/convert-coo-to-csr-format-in-c
           // Preallocate
@@ -328,7 +330,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
+      csc* MosekSolver<dim, SolverType>::createMatrixA_osqp(std::vector<scopi::neighbor<dim>>& contacts)
       {
           std::vector<int> csc_rows;
           std::vector<int> csc_cols;
@@ -480,8 +482,8 @@ namespace scopi
                   std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>({Az_values.size()})));
       }
 
-  template<std::size_t dim, typename SolverType>
-      void MosekSolver<dim, SolverType>::createMatrixP_cscStorage(std::vector<int>& col, std::vector<int>& row, std::vector<double>& val)
+  template<std::size_t dim, typename SolverType> template<typename ptrType>
+      void MosekSolver<dim, SolverType>::createMatrixP_cscStorage(std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val)
       {
           row.reserve(6*_Nactive);
           col.reserve(6*_Nactive+1);
@@ -534,9 +536,9 @@ namespace scopi
   template<std::size_t dim, typename SolverType>
       csc* MosekSolver<dim, SolverType>::createMatrixP_osqp()
       {
-          std::vector<scs_int> col;
-          std::vector<scs_int> row;
-          std::vector<scs_float> val;
+          std::vector<c_int> col;
+          std::vector<c_int> row;
+          std::vector<double> val;
           createMatrixP_cscStorage(col, row, val);
           csc* P = new csc;
           P = csc_matrix(6*_Nactive, 6*_Nactive, val.size(), val.data(), row.data(), col.data());
