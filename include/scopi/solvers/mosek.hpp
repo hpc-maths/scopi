@@ -332,14 +332,24 @@ namespace scopi
   template<std::size_t dim, typename SolverType>
       csc* MosekSolver<dim, SolverType>::createMatrixA_osqp(std::vector<scopi::neighbor<dim>>& contacts)
       {
-          std::vector<int> csc_rows;
-          std::vector<int> csc_cols;
+          std::vector<c_int> csc_rows;
+          std::vector<c_int> csc_cols;
           std::vector<double> csc_values;
 
           createMatrixA_cscStorage(contacts, csc_cols, csc_rows, csc_values);
           csc* A = new csc;
-          A = csc_matrix(contacts.size(), 6*_Nactive, csc_values.size(), csc_values.data(), csc_rows.data(), csc_cols.data());
+          double* A_x = new double[csc_values.size()];
+          c_int* A_i = new c_int[csc_rows.size()];
+          c_int* A_p = new c_int[csc_cols.size()];
+          for(std::size_t i = 0; i < csc_values.size(); ++i)
+              A_x[i] = csc_values[i];
+          for(std::size_t i = 0; i < csc_rows.size(); ++i)
+              A_i[i] = csc_rows[i];
+          for(std::size_t i = 0; i < csc_cols.size(); ++i)
+              A_p[i] = csc_cols[i];
+          A = csc_matrix(contacts.size(), 6*_Nactive, csc_values.size(), A_x, A_i, A_p);
           return A;
+          // I think the memory for A_x, A_i and A_p is freed in createMatricesAndSolve
       }
 
 
@@ -541,8 +551,18 @@ namespace scopi
           std::vector<double> val;
           createMatrixP_cscStorage(col, row, val);
           csc* P = new csc;
-          P = csc_matrix(6*_Nactive, 6*_Nactive, val.size(), val.data(), row.data(), col.data());
+          double* P_x = new double[val.size()];
+          c_int* P_i = new c_int[row.size()];
+          c_int* P_p = new c_int[col.size()];
+          for(std::size_t i = 0; i < val.size(); ++i)
+              P_x[i] = val[i];
+          for(std::size_t i = 0; i < row.size(); ++i)
+              P_i[i] = row[i];
+          for(std::size_t i = 0; i < col.size(); ++i)
+              P_p[i] = col[i];
+          P = csc_matrix(6*_Nactive, 6*_Nactive, val.size(), P_x, P_i, P_p);
           return P;
+          // I think the memory for P_x, P_i and P_p is freed in createMatricesAndSolve
       }
 
   template<std::size_t dim, typename SolverType>
@@ -734,6 +754,12 @@ namespace scopi
           // Cleanup
           osqp_cleanup(work);
           if (data) {
+              delete[] data->A->x;
+              delete[] data->A->i;
+              delete[] data->A->p;
+              delete[] data->P->x;
+              delete[] data->P->i;
+              delete[] data->P->p;
               if (data->A) c_free(data->A);
               if (data->P) c_free(data->P);
               c_free(data);
