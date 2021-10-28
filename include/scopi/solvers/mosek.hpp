@@ -11,6 +11,7 @@
 #include <fmt/format.h>
 #include <fusion.h>
 #include <scs.h>
+#include "osqp.h"
 #include <nlohmann/json.hpp>
 
 #include "../container.hpp"
@@ -61,6 +62,7 @@ namespace scopi
 
   struct useMosekSolver{};
   struct useScsSolver{};
+  struct useOsqpSolver{};
 
   template<std::size_t dim, typename SolverType>
       class MosekSolver
@@ -79,16 +81,21 @@ namespace scopi
               xt::xtensor<double, 1> createVectorC();
 
               xt::xtensor<double, 1> createVectorC_mosek();
-              xt::xtensor<double, 1> createVectorC_scs();
+              xt::xtensor<double, 1> createVectorC_scsOsqp();
 
               void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
               Matrix::t createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
               Matrix::t createMatrixAz_mosek();
+              void createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contactsstd::vector<int>& col, std::vector<int>& row, std::vector<double>& val);
               ScsMatrix* createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
+              csc* createMatrixA_osqp(std::vector<scopi::neighbor<dim>>& contacts);
+              void createMatrixP_cscStorage(std::vector<int>& col, std::vector<int>& row, std::vector<double>& val);
               ScsMatrix* createMatrixP_scs();
+              csc* createMatrixP_osqp();
 
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
+              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpSolver);
 
 
               scopi::scopi_container<dim>& _particles;
@@ -323,7 +330,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_scs()
+      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_scsOsqp()
       {
           return createVectorC();
       }
@@ -358,10 +365,9 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
+      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& col, std::vector<int>& row, std::vector<double>& val)
       {
           // https://stackoverflow.com/questions/23583975/convert-coo-to-csr-format-in-c
-
           // Preallocate
           std::vector<int> coo_rows;
           std::vector<int> coo_cols;
@@ -384,20 +390,31 @@ namespace scopi
               }
           }
 
-          std::vector<int> csc_rows(coo_rows.size(), 0);
-          std::vector<int> csc_cols(6*_Nactive + 1, 0);
-          std::vector<double> csc_values(coo_rows.size(), 0.);
+          row.reserve(coo_rows.size());
+          col.reserve(6*_Nactive + 1);
+          val.reserve(coo_rows.size());
+          std::fill(col.begin(), col.end(), 0);
 
           for (std::size_t i = 0; i < coo_rows.size(); i++)
           {
-              csc_values[i] = coo_values[i];
-              csc_rows[i] = coo_rows[i];
-              csc_cols[coo_cols[i] + 1]++;
+              val[i] = coo_values[i];
+              row[i] = coo_rows[i];
+              col[coo_cols[i] + 1]++;
           }
           for (std::size_t i = 0; i < 6*_Nactive; i++)
           {
-              csc_cols[i + 1] += csc_cols[i];
+              col[i + 1] += col[i];
           }
+      }
+
+  template<std::size_t dim, typename SolverType>
+      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
+      {
+          std::vector<int> csc_rows;
+          std::vector<int> csc_cols;
+          std::vector<double> csc_values;
+
+          createMatrixA_cscStorage(contacts, csc_cols, csc_rows, csc_values);
 
           ScsMatrix* A = new ScsMatrix;
           A->x = new double[csc_values.size()];
@@ -411,6 +428,19 @@ namespace scopi
               A->p[i] = csc_cols[i];
           A->m = contacts.size();
           A->n = 6*_Nactive;
+          return A;
+      }
+
+  template<std::size_t dim, typename SolverType>
+      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
+      {
+          std::vector<int> csc_rows;
+          std::vector<int> csc_cols;
+          std::vector<double> csc_values;
+
+          createMatrixA_cscStorage(contacts, csc_cols, csc_rows, csc_values);
+          csc* A = new csc;
+          A = csc_matrix(contacts.size(), 6*_Nactive, csc_values.size(), csc_values.data(), csc_rows.data(), csc_cols.data());
           return A;
       }
 
@@ -555,11 +585,8 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixP_scs()
+      void MosekSolver<dim, SolverType>::createMatrixP_cscStorage(std::vector<int>& col, std::vector<int>& row, std::vector<double>& val)
       {
-          std::vector<scs_int> row;
-          std::vector<scs_int> col;
-          std::vector<scs_float> val;
           row.reserve(6*_Nactive);
           col.reserve(6*_Nactive+1);
           val.reserve(6*_Nactive);
@@ -583,6 +610,15 @@ namespace scopi
               }
           }
           col.push_back(6*_Nactive);
+      }
+
+  template<std::size_t dim, typename SolverType>
+      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixP_scs()
+      {
+          std::vector<scs_int> col;
+          std::vector<scs_int> row;
+          std::vector<scs_float> val;
+          createMatrixP_cscStorage(col, row, val);
 
           ScsMatrix* P = new ScsMatrix;
           P->x = new double[val.size()];
@@ -596,6 +632,18 @@ namespace scopi
               P->p[i] = col[i];
           P->m = 6*_Nactive;
           P->n = 6*_Nactive;
+          return P;
+      }
+
+  template<std::size_t dim, typename SolverType>
+      csc* MosekSolver<dim, SolverType>::createMatrixP_osqp()
+      {
+          std::vector<scs_int> col;
+          std::vector<scs_int> row;
+          std::vector<scs_float> val;
+          createMatrixP_cscStorage(col, row, val);
+          csc* P = new csc;
+          P = csc_matrix(6*_Nactive, 6*_Nactive, val.size(), val.data(), row.data(), col.data());
           return P;
       }
 
@@ -654,7 +702,7 @@ namespace scopi
           // create mass and inertia matrices
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
           tic();
-          auto c = createVectorC_scs();
+          auto c = createVectorC_scsOsqp();
           auto distances = createVectorDistances(contacts);
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
 
@@ -718,8 +766,8 @@ namespace scopi
           auto duration5 = toc();
           std::cout << "----> CPUTIME : SCS = " << duration5 << std::endl;
           std::cout << "SCS iterations : " << info.iter << std::endl;
-          if(info.iter == -1)
-              std::abort();
+          // if(info.iter == -1)
+          //     std::abort();
 
           std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
 
@@ -735,6 +783,64 @@ namespace scopi
           delete[] sol.x;
           delete[] sol.y;
           delete[] sol.s;
+
+          return uw;
+      }
+
+  template<std::size_t dim, typename SolverType>
+      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpSolver)
+      {
+          // create mass and inertia matrices
+          std::cout << "----> create mass and inertia matrices " << nite << std::endl;
+          tic();
+          auto c = createVectorC_scsOsqp();
+          auto distances = createVectorDistances(contacts);
+          xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
+
+          auto duration4 = toc();
+          std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
+
+          std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
+          tic();
+          // Exitflag
+          c_int exitflag = 0;
+          // Workspace structures
+          OSQPWorkspace *work;
+          OSQPSettings  *settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
+          OSQPData      *data     = (OSQPData *)c_malloc(sizeof(OSQPData));
+          // Populate data
+          if (data) {
+              data->n = 6*_Nactive;
+              data->m = contacts.size();
+              data->P = createMatrixP_osqp();
+              data->q = c.data();
+              data->A = createMatrixA_osqp(contacts);
+              data->l = NULL;
+              data->u = distances.data();
+          }
+          // Define solver settings as default
+          if (settings) {
+              osqp_set_default_settings(settings);
+              // settings->alpha = 1.0; // Change alpha parameter
+          }
+          // Setup workspace
+          exitflag = osqp_setup(&work, data, settings);
+          // Solve Problem
+          osqp_solve(work);
+
+          std::vector<double> uw (work->solution->x, work->solution->x + 6*_Nactive);
+          auto duration5 = toc();
+          std::cout << "----> CPUTIME : SCS = " << duration5 << std::endl;
+          std::cout << "OSQP iterations : " << work->info->iter << std::endl;
+
+          // Cleanup
+          osqp_cleanup(work);
+          if (data) {
+              if (data->A) c_free(data->A);
+              if (data->P) c_free(data->P);
+              c_free(data);
+          }
+          if (settings) c_free(settings);
 
           return uw;
       }
