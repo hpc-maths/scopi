@@ -65,6 +65,7 @@ namespace scopi
   struct useScsSolver{};
   struct useOsqpSolver{};
   struct useEcosSolver{};
+  struct useOsqpCppSolver{};
 
   template<std::size_t dim, typename SolverType>
       class MosekSolver
@@ -84,6 +85,8 @@ namespace scopi
 
               xt::xtensor<double, 1> createVectorC_mosek();
               xt::xtensor<double, 1> createVectorC_scsOsqp();
+              Eigen::VectorXd createVectorC_osqpCpp();
+              Eigen::VectorXd createVectorDistances_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts);
 
               void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
               Matrix::t createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
@@ -92,15 +95,18 @@ namespace scopi
                   void createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
               ScsMatrix* createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
               csc* createMatrixA_osqp(std::vector<scopi::neighbor<dim>>& contacts);
+              Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> createMatrixA_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts);
               template<typename ptrType>
                   void createMatrixP_cscStorage(std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
               ScsMatrix* createMatrixP_scs();
               csc* createMatrixP_osqp();
+              Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> createMatrixP_osqpCpp();
 
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useEcosSolver);
+              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpCppSolver);
 
 
               scopi::scopi_container<dim>& _particles;
@@ -335,6 +341,18 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
+      Eigen::VectorXd MosekSolver<dim, SolverType>::createVectorC_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts)
+      {
+          auto c_xt = createVectorC();
+          Eigen::VectorXd c_eigen(c_xt.size());
+          for(std::size_t i=0; i<c_xt.size(); ++i)
+          {
+              c_eigen[i] = c_xt[i];
+          }
+          return c_eigen;
+      }
+
+  template<std::size_t dim, typename SolverType>
       xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_scsOsqp()
       {
           return createVectorC();
@@ -354,6 +372,18 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
+      Eigen::VectorXd MosekSolver<dim, SolverType>::createVectorDistances_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts)
+      {
+          auto distances_xt = createVectorDistances(contacts);
+          Eigen::VectorXd distances_eigen(contacts.size());
+          for(std::size_t i=0; i<contacts.size(); ++i)
+          {
+              distances_eigen[i] = distances_xt[i];
+          }
+          return distances_eigen;
+      }
+
+  template<std::size_t dim, typename SolverType>
       Matrix::t MosekSolver<dim, SolverType>::createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts)
       {
           // Preallocate
@@ -367,6 +397,26 @@ namespace scopi
                   std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
                   std::make_shared<ndarray<int, 1>>(A_cols.data(), shape_t<1>({A_cols.size()})),
                   std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
+      }
+
+  template<std::size_t dim, typename SolverType>
+      Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> MosekSolver<dim, SolverType>::createMatrixA_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts)
+      {
+          std::vector<int> rows;
+          std::vector<int> cols;
+          std::vector<double> values;
+          createMatrixA_coo(contacts, coo_rows, coo_cols, coo_values, 0);
+
+          using tripletType = Eigen::Triplet<double>;
+          std::vector<tripletType> tripletList;
+          tripletList.reserve(val.size());
+          for(std::size_t i = 0; i < val.size(); ++i)
+          {
+              tripletList.push_back(tripletType(rows[i], cols[i], values[i]));
+          }
+          SparseMatrixType mat(6*_Nactive, 6*_Nactive);
+          mat.setFromTriplets(tripletList.begin(), tripletList.end());
+          return mat;
       }
 
   template<std::size_t dim, typename SolverType> template<typename ptrType>
@@ -674,6 +724,26 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
+      Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> MosekSolver<dim, SolverType>::createMatrixP_osqpCpp()
+      {
+          std::vector<c_int> col;
+          std::vector<c_int> row;
+          std::vector<double> val;
+          createMatrixP_cscStorage(col, row, val);
+
+          using tripletType = Eigen::Triplet<double>;
+          std::vector<tripletType> tripletList;
+          tripletList.reserve(val.size());
+          for(std::size_t i = 0; i < val.size(); ++i)
+          {
+              tripletList.push_back(tripletType(i,i,val[i]));
+          }
+          SparseMatrixType mat(val.size(), val.size());
+          mat.setFromTriplets(tripletList.begin(), tripletList.end());
+          return mat;
+      }
+
+  template<std::size_t dim, typename SolverType>
       std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver)
       {
           // create mass and inertia matrices
@@ -908,6 +978,49 @@ namespace scopi
 
           ECOS_cleanup(mywork, 0);
           */
+      }
+
+  template<std::size_t dim, typename SolverType>
+      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpCppSolver)
+      {
+          const double kInfinity = std::numeric_limits<double>::infinity();
+          // create mass and inertia matrices
+          std::cout << "----> create mass and inertia matrices " << nite << std::endl;
+          tic();
+
+          auto A = createMatrixA_osqpCpp(contact);
+          auto P = createMatrixP_osqpCpp();
+          auto c = createVectorC_osqpCpp();
+          auto distances = createVectorDistances_osqpCpp(contacts);
+
+          auto duration4 = toc();
+          std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
+
+          std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
+          tic();
+
+          OsqpInstance instance;
+          instance.objective_matrix = P;
+          instance.objective_vector = c;
+          instance.constraint_matrix = A;
+          instance.lower_bounds.resize(1);
+          instance.lower_bounds << - kInfinity;
+          instance.upper_bounds = distances;
+
+          OsqpSolver solver;
+          OsqpSettings settings;
+          auto status = solver.Init(instance, settings);
+          OsqpExitCode exit_code = solver.Solve();
+          Eigen::VectorXd optimal_solution = solver.primal_solution();
+          
+          std::vector<double> uw(6*_Nactive);
+          for(std::size_t i = 0; i < 6*_Nactive; ++i)
+              uw[i] = optimal_solution[i];
+
+          auto duration5 = toc();
+          std::cout << "----> CPUTIME : osqp-cpp = " << duration5 << std::endl;
+          std::cout << "ospq-cpp iterations : " << work->info->iter << std::endl;
+          return uw;
       }
 
   template<std::size_t dim, typename SolverType>
