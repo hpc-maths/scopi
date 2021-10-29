@@ -62,16 +62,19 @@ message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
+add_subdirectory(include/ecos)
+
 add_library(scopi_cpp INTERFACE)
 include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
-                                               $<INSTALL_INTERFACE:include>)
+                                               $<INSTALL_INTERFACE:include>
+                                               ${ecos_INCLUDE_DIRS_RET})
                                     #  SYSTEM INTERFACE $<BUILD_INTERFACE:${MOSEK_INCLUDE_DIR}>)
 
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir osqp::osqp)
+target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir osqp::osqp ecos)
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 

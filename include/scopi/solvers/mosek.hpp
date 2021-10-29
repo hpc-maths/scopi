@@ -21,6 +21,7 @@
 #include "../quaternion.hpp"
 
 #include <nanoflann.hpp>
+#include "ecos.h" // need to include after nanoflann
 
 using namespace mosek::fusion;
 using namespace monty;
@@ -63,6 +64,7 @@ namespace scopi
   struct useMosekSolver{};
   struct useScsSolver{};
   struct useOsqpSolver{};
+  struct useEcosSolver{};
 
   template<std::size_t dim, typename SolverType>
       class MosekSolver
@@ -98,6 +100,7 @@ namespace scopi
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpSolver);
+              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useEcosSolver);
 
 
               scopi::scopi_container<dim>& _particles;
@@ -874,6 +877,11 @@ namespace scopi
           if (settings) c_free(settings);
 
           return uw;
+      }
+
+  template<std::size_t dim, typename SolverType>
+      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useEcosSolver)
+      {
       }
 
   template<std::size_t dim, typename SolverType>
