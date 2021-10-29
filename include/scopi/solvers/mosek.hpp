@@ -823,6 +823,8 @@ namespace scopi
           auto distances = createVectorDistances(contacts);
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
           std::vector<double> l(contacts.size(), -std::numeric_limits<double>::max()); // no lower bound (I hope there is a cleaner way do to it)
+          auto P = createMatrixP_osqp();
+          auto A = createMatrixA_osqp(contacts);
 
           auto duration4 = toc();
           std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
@@ -839,9 +841,9 @@ namespace scopi
           if (data) {
               data->n = 6*_Nactive;
               data->m = contacts.size();
-              data->P = createMatrixP_osqp();
+              data->P = P;
               data->q = c.data();
-              data->A = createMatrixA_osqp(contacts);
+              data->A = A;
               data->l = l.data();
               data->u = distances.data();
           }
@@ -882,6 +884,30 @@ namespace scopi
   template<std::size_t dim, typename SolverType>
       std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useEcosSolver)
       {
+          /*
+          // create mass and inertia matrices
+          std::cout << "----> create mass and inertia matrices " << nite << std::endl;
+          tic();
+          pwork* mywork = ECOS_setup(idxint n, idxint m, idxint p, idxint l, idxint
+                  ncones, idxint* q, idxint e,  
+                  pfloat* Gpr, idxint* Gjc, idxint* Gir,  
+                  pfloat* Apr, idxint* Ajc, idxint* Air,  
+                  pfloat* c, pfloat* h, pfloat* b);;
+          auto duration4 = toc();
+          std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
+
+          std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
+          tic();
+
+          ECOS_solve(mywork);
+
+          std::vector<double> uw (work->solution->x, work->solution->x + 6*_Nactive);
+          auto duration5 = toc();
+          std::cout << "----> CPUTIME : OSQP = " << duration5 << std::endl;
+          std::cout << "ECOS iterations : " << work->info->iter << std::endl;
+
+          ECOS_cleanup(mywork, 0);
+          */
       }
 
   template<std::size_t dim, typename SolverType>
