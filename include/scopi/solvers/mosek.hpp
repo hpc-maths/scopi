@@ -474,8 +474,8 @@ namespace scopi
 
           ScsMatrix* A = new ScsMatrix;
           A->x = new double[csc_values.size()];
-          A->i = new int[csc_rows.size()];
-          A->p = new int[csc_cols.size()];
+          A->i = new scs_int[csc_rows.size()];
+          A->p = new scs_int[csc_cols.size()];
           for(std::size_t i = 0; i < csc_values.size(); ++i)
               A->x[i] = csc_values[i];
           for(std::size_t i = 0; i < csc_rows.size(); ++i)
@@ -689,8 +689,8 @@ namespace scopi
 
           ScsMatrix* P = new ScsMatrix;
           P->x = new double[val.size()];
-          P->i = new int[row.size()];
-          P->p = new int[col.size()];
+          P->i = new scs_int[row.size()];
+          P->p = new scs_int[col.size()];
           for(std::size_t i = 0; i < val.size(); ++i)
               P->x[i] = val[i];
           for(std::size_t i = 0; i < row.size(); ++i)
@@ -799,6 +799,8 @@ namespace scopi
           // create mass and inertia matrices
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
           tic();
+          auto A = createMatrixA_scs(contacts);
+          auto P = createMatrixP_scs();
           auto c = createVectorC_scsOsqp();
           auto distances = createVectorDistances(contacts);
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
@@ -811,8 +813,8 @@ namespace scopi
           ScsData d;
           d.m = contacts.size();
           d.n = 6*_Nactive;
-          d.A = createMatrixA_scs(contacts);
-          d.P = createMatrixP_scs();
+          d.A = A;
+          d.P = P;
           d.b = distances.data();
           d.c = c.data();
 
@@ -867,6 +869,16 @@ namespace scopi
           //     std::abort();
 
           std::vector<double> uw (sol.x, sol.x + 6*_Nactive);
+          int nbActiveContatcs = 0;
+          for(std::size_t i = 0; i < contacts.size(); ++i)
+          {
+              if(std::abs(sol.y[i]) < 1e-10)
+              {
+                  std::cout << i << "    " << sol.y[i] << '\n';
+                  nbActiveContatcs++;
+              }
+          }
+          std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
 
           // free the memory
           delete[] d.A->x;
