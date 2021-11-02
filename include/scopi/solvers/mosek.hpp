@@ -27,7 +27,6 @@
 // #include <scopi/contact/contact_brute_force.hpp>
 
 #include <nanoflann.hpp>
-// #include "ecos.h" // need to include after nanoflann
 
 using namespace mosek::fusion;
 using namespace monty;
@@ -40,7 +39,6 @@ namespace scopi
   struct useMosekSolver{};
   struct useScsSolver{};
   struct useOsqpSolver{};
-  struct useEcosSolver{};
   struct useOsqpCppSolver{};
 
   template<std::size_t dim, typename SolverType>
@@ -81,7 +79,6 @@ namespace scopi
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpSolver);
-              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useEcosSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpCppSolver);
 
 
@@ -858,35 +855,6 @@ namespace scopi
           if (settings) c_free(settings);
 
           return uw;
-      }
-
-  template<std::size_t dim, typename SolverType>
-      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useEcosSolver)
-      {
-          /*
-          // create mass and inertia matrices
-          std::cout << "----> create mass and inertia matrices " << nite << std::endl;
-          tic();
-          pwork* mywork = ECOS_setup(idxint n, idxint m, idxint p, idxint l, idxint
-                  ncones, idxint* q, idxint e,  
-                  pfloat* Gpr, idxint* Gjc, idxint* Gir,  
-                  pfloat* Apr, idxint* Ajc, idxint* Air,  
-                  pfloat* c, pfloat* h, pfloat* b);;
-          auto duration4 = toc();
-          std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
-
-          std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
-          tic();
-
-          ECOS_solve(mywork);
-
-          std::vector<double> uw (work->solution->x, work->solution->x + 6*_Nactive);
-          auto duration5 = toc();
-          std::cout << "----> CPUTIME : OSQP = " << duration5 << std::endl;
-          std::cout << "ECOS iterations : " << work->info->iter << std::endl;
-
-          ECOS_cleanup(mywork, 0);
-          */
       }
 
   template<std::size_t dim, typename SolverType>
