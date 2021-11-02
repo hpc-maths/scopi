@@ -15,14 +15,16 @@ int main()
     std::size_t total_it = 100;
     scopi::scopi_container<dim> particles;
 
-    std::default_random_engine generator;
-    std::uniform_real_distribution<double> distrib_r(0.7,1.);
-    std::uniform_real_distribution<double> distrib_r2(0.7,1.);
+    std::seed_seq seed;
+    std::default_random_engine generator(seed);
+    std::uniform_real_distribution<double> distrib_r(0.8,1.);
+    std::uniform_real_distribution<double> distrib_r2(0.8,1.);
     std::uniform_real_distribution<double> distrib_move_x(-0.9,0.9);
     std::uniform_real_distribution<double> distrib_move_y(-0.9,0.9);
     std::uniform_real_distribution<double> distrib_rot(0,PI);
 
-    int n = 100; // 2*n*n particles
+    int n = 200; // 2*n*n particles
+    double velocity = 2.0;
 
     for(int i = 0; i < n; ++i)
     {
@@ -31,16 +33,16 @@ int main()
             double rot = distrib_rot(generator);
             double r = distrib_r(generator);
             double r2 = distrib_r2(generator);
-            double x = (i + 0.5)*3 + distrib_move_x(generator);
-            double y = (j + 0.5)*3 + distrib_move_y(generator);
+            double x = (i + 0.5)*velocity + distrib_move_x(generator);
+            double y = (j + 0.5)*velocity + distrib_move_y(generator);
             scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
             particles.push_back(s1, {{0, 0}}, {{1., 0.}}, 0, 0, {{0, 0}});
 
             rot = distrib_rot(generator);
             r = distrib_r(generator);
             r2 = distrib_r2(generator);
-            x = (n + i + 0.5)*3 + distrib_move_x(generator);
-            y = (j + 0.5)*3 + distrib_move_y(generator);
+            x = (n + i + 0.5)*velocity + distrib_move_x(generator);
+            y = (j + 0.5)*velocity + distrib_move_y(generator);
             scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
             particles.push_back(s2, {{0, 0}}, {{-1., 0.}}, 0, 0, {{0, 0}});
         }
@@ -48,6 +50,6 @@ int main()
  
     std::size_t active_ptr = 0; // pas d'obstacles
 
-    scopi::MosekSolver<dim> mosek_solver(particles, dt, active_ptr);
+    scopi::MosekSolver<dim, scopi::useOsqpCppSolver> mosek_solver(particles, dt, active_ptr);
     mosek_solver.solve(total_it);
 }
