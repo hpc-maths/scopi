@@ -311,7 +311,6 @@ namespace scopi
           {
               tripletList.push_back(tripletType(rows[i], cols[i], values[i]));
           }
-          std::cout << "**********************  " << values.size() << std::endl;
           Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> mat(contacts.size(), 6*_Nactive);
           mat.setFromTriplets(tripletList.begin(), tripletList.end());
           return mat;
@@ -890,8 +889,6 @@ namespace scopi
           auto P = createMatrixP_osqpCpp();
           auto c = createVectorC_osqpCpp();
           auto distances = createVectorDistances_osqpCpp(contacts);
-          // std::cout << "*************** distances  " << distances.nonZeros() << std::endl;
-          // std::cout << "***************  " << c.nonZeros() << std::endl;
 
           auto duration4 = toc();
           std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
@@ -907,8 +904,6 @@ namespace scopi
           for(std::size_t i = 0; i < contacts.size(); ++i)
               instance.lower_bounds[i] = - kInfinity;
           instance.upper_bounds = distances;
-          // for(std::size_t i = 0; i < contacts.size(); ++i)
-          //     std::cout << instance.lower_bounds[i] << std::endl;
 
           osqp::OsqpSolver solver;
           osqp::OsqpSettings settings;
@@ -917,13 +912,7 @@ namespace scopi
           // settings.eps_prim_inf = 1e-10;
           // settings.eps_dual_inf = 1e-10;
           auto status = solver.Init(instance, settings);
-          // if(!status.ok())
-              std::cout << "status.ok = " << status.ok() << std::endl;
           osqp::OsqpExitCode exit_code = solver.Solve();
-          if(exit_code != osqp::OsqpExitCode::kOptimal)
-          {
-              std::cout << "exit_code = " << osqp::ToString(exit_code) << std::endl;
-          }
           Eigen::VectorXd optimal_solution = solver.primal_solution();
           
           std::vector<double> uw(6*_Nactive);
