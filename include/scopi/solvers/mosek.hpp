@@ -12,6 +12,7 @@
 #include <fusion.h>
 #include <scs.h>
 #include "osqp.h"
+#include "osqp++.h"
 #include <nlohmann/json.hpp>
 
 #include "../container.hpp"
@@ -21,7 +22,7 @@
 #include "../quaternion.hpp"
 
 #include <nanoflann.hpp>
-#include "ecos.h" // need to include after nanoflann
+// #include "ecos.h" // need to include after nanoflann
 
 using namespace mosek::fusion;
 using namespace monty;
@@ -341,7 +342,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Eigen::VectorXd MosekSolver<dim, SolverType>::createVectorC_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts)
+      Eigen::VectorXd MosekSolver<dim, SolverType>::createVectorC_osqpCpp()
       {
           auto c_xt = createVectorC();
           Eigen::VectorXd c_eigen(c_xt.size());
@@ -405,16 +406,17 @@ namespace scopi
           std::vector<int> rows;
           std::vector<int> cols;
           std::vector<double> values;
-          createMatrixA_coo(contacts, coo_rows, coo_cols, coo_values, 0);
+          createMatrixA_coo(contacts, rows, cols, values, 0);
 
           using tripletType = Eigen::Triplet<double>;
           std::vector<tripletType> tripletList;
-          tripletList.reserve(val.size());
-          for(std::size_t i = 0; i < val.size(); ++i)
+          tripletList.reserve(values.size());
+          for(std::size_t i = 0; i < values.size(); ++i)
           {
               tripletList.push_back(tripletType(rows[i], cols[i], values[i]));
           }
-          SparseMatrixType mat(6*_Nactive, 6*_Nactive);
+          std::cout << "**********************  " << values.size() << std::endl;
+          Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> mat(contacts.size(), 6*_Nactive);
           mat.setFromTriplets(tripletList.begin(), tripletList.end());
           return mat;
       }
@@ -738,7 +740,7 @@ namespace scopi
           {
               tripletList.push_back(tripletType(i,i,val[i]));
           }
-          SparseMatrixType mat(val.size(), val.size());
+          Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> mat(val.size(), val.size());
           mat.setFromTriplets(tripletList.begin(), tripletList.end());
           return mat;
       }
@@ -988,10 +990,12 @@ namespace scopi
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
           tic();
 
-          auto A = createMatrixA_osqpCpp(contact);
+          auto A = createMatrixA_osqpCpp(contacts);
           auto P = createMatrixP_osqpCpp();
           auto c = createVectorC_osqpCpp();
           auto distances = createVectorDistances_osqpCpp(contacts);
+          // std::cout << "*************** distances  " << distances.nonZeros() << std::endl;
+          // std::cout << "***************  " << c.nonZeros() << std::endl;
 
           auto duration4 = toc();
           std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
@@ -999,18 +1003,31 @@ namespace scopi
           std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
           tic();
 
-          OsqpInstance instance;
+          osqp::OsqpInstance instance;
           instance.objective_matrix = P;
           instance.objective_vector = c;
           instance.constraint_matrix = A;
-          instance.lower_bounds.resize(1);
-          instance.lower_bounds << - kInfinity;
+          instance.lower_bounds.resize(contacts.size());
+          for(std::size_t i = 0; i < contacts.size(); ++i)
+              instance.lower_bounds[i] = - kInfinity;
           instance.upper_bounds = distances;
+          // for(std::size_t i = 0; i < contacts.size(); ++i)
+          //     std::cout << instance.lower_bounds[i] << std::endl;
 
-          OsqpSolver solver;
-          OsqpSettings settings;
+          osqp::OsqpSolver solver;
+          osqp::OsqpSettings settings;
+          // settings.eps_abs = 1e-10;
+          // settings.eps_rel = 1e-10;
+          // settings.eps_prim_inf = 1e-10;
+          // settings.eps_dual_inf = 1e-10;
           auto status = solver.Init(instance, settings);
-          OsqpExitCode exit_code = solver.Solve();
+          // if(!status.ok())
+              std::cout << "status.ok = " << status.ok() << std::endl;
+          osqp::OsqpExitCode exit_code = solver.Solve();
+          if(exit_code != osqp::OsqpExitCode::kOptimal)
+          {
+              std::cout << "exit_code = " << osqp::ToString(exit_code) << std::endl;
+          }
           Eigen::VectorXd optimal_solution = solver.primal_solution();
           
           std::vector<double> uw(6*_Nactive);
@@ -1019,7 +1036,7 @@ namespace scopi
 
           auto duration5 = toc();
           std::cout << "----> CPUTIME : osqp-cpp = " << duration5 << std::endl;
-          std::cout << "ospq-cpp iterations : " << work->info->iter << std::endl;
+          std::cout << "ospq-cpp iterations : " << solver.iterations() << std::endl;
           return uw;
       }
 
