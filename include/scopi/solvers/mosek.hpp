@@ -11,8 +11,6 @@
 #include <fmt/format.h>
 #include <fusion.h>
 #include <scs.h>
-#include "osqp.h"
-#include "osqp++.h"
 #include <nlohmann/json.hpp>
 
 #include "../container.hpp"
@@ -38,8 +36,6 @@ namespace scopi
 {
   struct useMosekSolver{};
   struct useScsSolver{};
-  struct useOsqpSolver{};
-  struct useOsqpCppSolver{};
 
   template<std::size_t dim, typename SolverType>
       class MosekSolver
@@ -58,9 +54,7 @@ namespace scopi
               xt::xtensor<double, 1> createVectorC();
 
               xt::xtensor<double, 1> createVectorC_mosek();
-              xt::xtensor<double, 1> createVectorC_scsOsqp();
-              Eigen::VectorXd createVectorC_osqpCpp();
-              Eigen::VectorXd createVectorDistances_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts);
+              xt::xtensor<double, 1> createVectorC_scs();
 
               void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
               Matrix::t createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
@@ -68,18 +62,12 @@ namespace scopi
               template<typename ptrType>
                   void createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
               ScsMatrix* createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
-              csc* createMatrixA_osqp(std::vector<scopi::neighbor<dim>>& contacts);
-              Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> createMatrixA_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts);
               template<typename ptrType>
                   void createMatrixP_cscStorage(std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
               ScsMatrix* createMatrixP_scs();
-              csc* createMatrixP_osqp();
-              Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> createMatrixP_osqpCpp();
 
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
-              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpSolver);
-              std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpCppSolver);
 
 
               scopi::scopi_container<dim>& _particles;
@@ -235,19 +223,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Eigen::VectorXd MosekSolver<dim, SolverType>::createVectorC_osqpCpp()
-      {
-          auto c_xt = createVectorC();
-          Eigen::VectorXd c_eigen(c_xt.size());
-          for(std::size_t i=0; i<c_xt.size(); ++i)
-          {
-              c_eigen[i] = c_xt[i];
-          }
-          return c_eigen;
-      }
-
-  template<std::size_t dim, typename SolverType>
-      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_scsOsqp()
+      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_scs()
       {
           return createVectorC();
       }
@@ -266,18 +242,6 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Eigen::VectorXd MosekSolver<dim, SolverType>::createVectorDistances_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts)
-      {
-          auto distances_xt = createVectorDistances(contacts);
-          Eigen::VectorXd distances_eigen(contacts.size());
-          for(std::size_t i=0; i<contacts.size(); ++i)
-          {
-              distances_eigen[i] = distances_xt[i];
-          }
-          return distances_eigen;
-      }
-
-  template<std::size_t dim, typename SolverType>
       Matrix::t MosekSolver<dim, SolverType>::createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts)
       {
           // Preallocate
@@ -291,26 +255,6 @@ namespace scopi
                   std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
                   std::make_shared<ndarray<int, 1>>(A_cols.data(), shape_t<1>({A_cols.size()})),
                   std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
-      }
-
-  template<std::size_t dim, typename SolverType>
-      Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> MosekSolver<dim, SolverType>::createMatrixA_osqpCpp(std::vector<scopi::neighbor<dim>>& contacts)
-      {
-          std::vector<int> rows;
-          std::vector<int> cols;
-          std::vector<double> values;
-          createMatrixA_coo(contacts, rows, cols, values, 0);
-
-          using tripletType = Eigen::Triplet<double>;
-          std::vector<tripletType> tripletList;
-          tripletList.reserve(values.size());
-          for(std::size_t i = 0; i < values.size(); ++i)
-          {
-              tripletList.push_back(tripletType(rows[i], cols[i], values[i]));
-          }
-          Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> mat(contacts.size(), 6*_Nactive);
-          mat.setFromTriplets(tripletList.begin(), tripletList.end());
-          return mat;
       }
 
   template<std::size_t dim, typename SolverType> template<typename ptrType>
@@ -378,30 +322,6 @@ namespace scopi
           A->m = contacts.size();
           A->n = 6*_Nactive;
           return A;
-      }
-
-  template<std::size_t dim, typename SolverType>
-      csc* MosekSolver<dim, SolverType>::createMatrixA_osqp(std::vector<scopi::neighbor<dim>>& contacts)
-      {
-          std::vector<c_int> csc_rows;
-          std::vector<c_int> csc_cols;
-          std::vector<double> csc_values;
-
-          createMatrixA_cscStorage(contacts, csc_cols, csc_rows, csc_values);
-
-          csc* A = new csc;
-          double* A_x = new double[csc_values.size()];
-          c_int* A_i = new c_int[csc_rows.size()];
-          c_int* A_p = new c_int[csc_cols.size()];
-          for(std::size_t i = 0; i < csc_values.size(); ++i)
-              A_x[i] = csc_values[i];
-          for(std::size_t i = 0; i < csc_rows.size(); ++i)
-              A_i[i] = csc_rows[i];
-          for(std::size_t i = 0; i < csc_cols.size(); ++i)
-              A_p[i] = csc_cols[i];
-          A = csc_matrix(contacts.size(), 6*_Nactive, csc_values.size(), A_x, A_i, A_p);
-          return A;
-          // I think the memory for A_x, A_i and A_p is freed in createMatricesAndSolve
       }
 
 
@@ -596,48 +516,6 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      csc* MosekSolver<dim, SolverType>::createMatrixP_osqp()
-      {
-          std::vector<c_int> col;
-          std::vector<c_int> row;
-          std::vector<double> val;
-          createMatrixP_cscStorage(col, row, val);
-          csc* P = new csc;
-          double* P_x = new double[val.size()];
-          c_int* P_i = new c_int[row.size()];
-          c_int* P_p = new c_int[col.size()];
-          for(std::size_t i = 0; i < val.size(); ++i)
-              P_x[i] = val[i];
-          for(std::size_t i = 0; i < row.size(); ++i)
-              P_i[i] = row[i];
-          for(std::size_t i = 0; i < col.size(); ++i)
-              P_p[i] = col[i];
-          P = csc_matrix(6*_Nactive, 6*_Nactive, val.size(), P_x, P_i, P_p);
-          return P;
-          // I think the memory for P_x, P_i and P_p is freed in createMatricesAndSolve
-      }
-
-  template<std::size_t dim, typename SolverType>
-      Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> MosekSolver<dim, SolverType>::createMatrixP_osqpCpp()
-      {
-          std::vector<c_int> col;
-          std::vector<c_int> row;
-          std::vector<double> val;
-          createMatrixP_cscStorage(col, row, val);
-
-          using tripletType = Eigen::Triplet<double>;
-          std::vector<tripletType> tripletList;
-          tripletList.reserve(val.size());
-          for(std::size_t i = 0; i < val.size(); ++i)
-          {
-              tripletList.push_back(tripletType(i,i,val[i]));
-          }
-          Eigen::SparseMatrix<double, Eigen::ColMajor, c_int> mat(val.size(), val.size());
-          mat.setFromTriplets(tripletList.begin(), tripletList.end());
-          return mat;
-      }
-
-  template<std::size_t dim, typename SolverType>
       std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver)
       {
           // create mass and inertia matrices
@@ -702,7 +580,9 @@ namespace scopi
           // create mass and inertia matrices
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
           tic();
-          auto c = createVectorC_scsOsqp();
+          auto A = createMatrixA_scs(contacts);
+          auto P = createMatrixP_scs();
+          auto c = createVectorC_scs();
           auto distances = createVectorDistances(contacts);
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
 
@@ -797,124 +677,6 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpSolver)
-      {
-          // create mass and inertia matrices
-          std::cout << "----> create mass and inertia matrices " << nite << std::endl;
-          tic();
-          auto A = createMatrixA_scs(contacts);
-          auto P = createMatrixP_scs();
-          auto c = createVectorC_scsOsqp();
-          auto distances = createVectorDistances(contacts);
-          xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
-          std::vector<double> l(contacts.size(), -std::numeric_limits<double>::max()); // no lower bound (I hope there is a cleaner way do to it)
-          auto P = createMatrixP_osqp();
-          auto A = createMatrixA_osqp(contacts);
-
-          auto duration4 = toc();
-          std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
-
-          std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
-          tic();
-          // Exitflag
-          c_int exitflag = 0;
-          // Workspace structures
-          OSQPWorkspace *work;
-          OSQPSettings  *settings = (OSQPSettings *)c_malloc(sizeof(OSQPSettings));
-          OSQPData      *data     = (OSQPData *)c_malloc(sizeof(OSQPData));
-          // Populate data
-          if (data) {
-              data->n = 6*_Nactive;
-              data->m = contacts.size();
-              data->P = P;
-              data->q = c.data();
-              data->A = A;
-              data->l = l.data();
-              data->u = distances.data();
-          }
-
-          // Define solver settings as default
-          if (settings) {
-              osqp_set_default_settings(settings);
-              // settings->alpha = 1.0; // Change alpha parameter
-          }
-          // Setup workspace
-          exitflag = osqp_setup(&work, data, settings);
-          // Solve Problem
-          osqp_solve(work);
-
-          std::vector<double> uw (work->solution->x, work->solution->x + 6*_Nactive);
-          auto duration5 = toc();
-          std::cout << "----> CPUTIME : OSQP = " << duration5 << std::endl;
-          std::cout << "OSQP iterations : " << work->info->iter << std::endl;
-
-          // Cleanup
-          osqp_cleanup(work);
-          if (data) {
-              delete[] data->A->x;
-              delete[] data->A->i;
-              delete[] data->A->p;
-              delete[] data->P->x;
-              delete[] data->P->i;
-              delete[] data->P->p;
-              if (data->A) c_free(data->A);
-              if (data->P) c_free(data->P);
-              c_free(data);
-          }
-          if (settings) c_free(settings);
-
-          return uw;
-      }
-
-  template<std::size_t dim, typename SolverType>
-      std::vector<double> MosekSolver<dim, SolverType>::createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useOsqpCppSolver)
-      {
-          const double kInfinity = std::numeric_limits<double>::infinity();
-          // create mass and inertia matrices
-          std::cout << "----> create mass and inertia matrices " << nite << std::endl;
-          tic();
-
-          auto A = createMatrixA_osqpCpp(contacts);
-          auto P = createMatrixP_osqpCpp();
-          auto c = createVectorC_osqpCpp();
-          auto distances = createVectorDistances_osqpCpp(contacts);
-
-          auto duration4 = toc();
-          std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
-
-          std::cout << "----> Create Mosek optimization problem " << nite << std::endl;
-          tic();
-
-          osqp::OsqpInstance instance;
-          instance.objective_matrix = P;
-          instance.objective_vector = c;
-          instance.constraint_matrix = A;
-          instance.lower_bounds.resize(contacts.size());
-          for(std::size_t i = 0; i < contacts.size(); ++i)
-              instance.lower_bounds[i] = - kInfinity;
-          instance.upper_bounds = distances;
-
-          osqp::OsqpSolver solver;
-          osqp::OsqpSettings settings;
-          // settings.eps_abs = 1e-10;
-          // settings.eps_rel = 1e-10;
-          // settings.eps_prim_inf = 1e-10;
-          // settings.eps_dual_inf = 1e-10;
-          auto status = solver.Init(instance, settings);
-          osqp::OsqpExitCode exit_code = solver.Solve();
-          Eigen::VectorXd optimal_solution = solver.primal_solution();
-          
-          std::vector<double> uw(6*_Nactive);
-          for(std::size_t i = 0; i < 6*_Nactive; ++i)
-              uw[i] = optimal_solution[i];
-
-          auto duration5 = toc();
-          std::cout << "----> CPUTIME : osqp-cpp = " << duration5 << std::endl;
-          std::cout << "ospq-cpp iterations : " << solver.iterations() << std::endl;
-          return uw;
-      }
-
-  template<std::size_t dim, typename SolverType>
       void MosekSolver<dim, SolverType>::moveActiveParticles(std::vector<double> uw)
       {
 
@@ -947,6 +709,5 @@ namespace scopi
 
           }
       }
->>>>>>> MosekSolver::createMatrix* also depends on the tag
 }
 
