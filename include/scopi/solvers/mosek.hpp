@@ -263,12 +263,11 @@ namespace scopi
           // COO storage to CSR storage is easy to write, e.g.
           // https://www-users.cse.umn.edu/~saad/software/SPARSKIT/
           // The CSC storage of A is the CSR storage of A^T
-          // Swap row and column pointers to have the transpose
+          // reverse the role of row and column pointers to have the transpose
           std::vector<int> coo_rows;
           std::vector<int> coo_cols;
           std::vector<double> coo_values;
           createMatrixA_coo(contacts, coo_rows, coo_cols, coo_values, 0);
-          std::swap(coo_rows, coo_cols);
 
           std::size_t nrow = 6*_Nactive;
           std::size_t nnz = coo_values.size();
@@ -277,19 +276,10 @@ namespace scopi
           csc_row.resize(nnz);
           csc_val.resize(nnz);
 
-          /*
-           * iao <-> csc_col
-           * jao <-> csc_row
-           * ao <-> csc_val
-           * ir <-> coo_rows
-           * jc <-> coo_cols
-           * a <-> coo_values
-           */
-
           // determine row-lengths.
           for(std::size_t k = 0; k < nnz; ++k)
           {
-              csc_col[coo_rows[k]]++;
+              csc_col[coo_cols[k]]++;
           }
 
           // starting position of each row..
@@ -306,8 +296,8 @@ namespace scopi
           // go through the structure  once more. Fill in output matrix.
           for(std::size_t k = 0; k < nnz; ++k)
           {
-              int i = coo_rows[k];
-              int j = coo_cols[k];
+              int i = coo_cols[k];
+              int j = coo_rows[k];
               double x = coo_values[k];
               int iad = csc_col[i];
               csc_val[iad] = x;
@@ -321,75 +311,6 @@ namespace scopi
               csc_col[j] = csc_col[j-1];
           }
           csc_col[0] = 0;
-
-
-          /*
-c------------- end of coocsr ------------------------------------------- 
-
-c-----------------------------------------------------------------------
-c  Coordinate     to   Compressed Sparse Row 
-c----------------------------------------------------------------------- 
-c converts a matrix that is stored in coordinate format
-c  a, ir, jc into a row general sparse ao, jao, iao format.
-c
-c on entry:
-c--------- 
-c nrow	= dimension of the matrix 
-c nnz	= number of nonzero elements in matrix
-c a,
-c ir, 
-c jc    = matrix in coordinate format. a(k), ir(k), jc(k) store the nnz
-c         nonzero elements of the matrix with a(k) = actual real value of
-c 	  the elements, ir(k) = its row number and jc(k) = its column 
-c	  number. The order of the elements is arbitrary. 
-c
-c on return:
-c----------- 
-c ir 	is destroyed
-c
-c ao, jao, iao = matrix in general sparse matrix format with ao 
-c 	continung the real values, jao containing the column indices, 
-c	and iao being the pointer to the beginning of the row, 
-c	in arrays ao, jao.
-c
-c Notes:
-c------ This routine is NOT in place.  See coicsr
-c       On return the entries  of each row are NOT sorted by increasing 
-c       column number
-c
-c------------------------------------------------------------------------
-*/
-      // do 1 k=1,nrow+1
-      //    iao(k) = 0
- // 1    continue
-// c determine row-lengths.
-      // do 2 k=1, nnz
-      //    iao(ir(k)) = iao(ir(k))+1
- // 2    continue
-// c starting position of each row..
-      // k = 1
-      // do 3 j=1,nrow+1
-      //    k0 = iao(j)
-      //    iao(j) = k
-      //    k = k+k0
- // 3    continue
-// c go through the structure  once more. Fill in output matrix.
-      // do 4 k=1, nnz
-      //    i = ir(k)
-      //    j = jc(k)
-      //    x = a(k)
-      //    iad = iao(i)
-      //    ao(iad) =  x
-      //    jao(iad) = j
-      //    iao(i) = iad+1
- // 4    continue
-// c shift back iao
-      // do 5 j=nrow,1,-1
-      //    iao(j+1) = iao(j)
- // 5    continue
-      // iao(1) = 1
-      // return
-// c------------- end of coocsr ------------------------------------------- 
       }
 
   template<std::size_t dim, typename SolverType>
