@@ -274,6 +274,8 @@ namespace scopi
           std::size_t nnz = coo_values.size();
           csc_col.resize(nrow+1);
           std::fill(csc_col.begin(), csc_col.end(), 0.);
+          csc_row.resize(nnz);
+          csc_val.resize(nnz);
 
           /*
            * iao <-> csc_col
@@ -314,7 +316,7 @@ namespace scopi
           }
 
           // shift back iao
-          for(std::size_t j = nrow-1; j >= 1; --j)
+          for(std::size_t j = nrow; j >= 1; --j)
           {
               csc_col[j] = csc_col[j-1];
           }
@@ -398,9 +400,6 @@ c------------------------------------------------------------------------
           std::vector<double> csc_values;
 
           createMatrixA_cscStorage(contacts, csc_cols, csc_rows, csc_values);
-          std::cout << "csc_cols  " << csc_cols.size() << std::endl;
-          std::cout << "csc_rows  " << csc_rows.size() << std::endl;
-          std::cout << "csc_values  " << csc_values.size() << std::endl;
 
           ScsMatrix* A = new ScsMatrix;
           A->x = new double[csc_values.size()];
