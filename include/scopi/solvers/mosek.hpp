@@ -786,6 +786,16 @@ namespace scopi
           auto Xlvl = *(X->level());
 
           std::vector<double> uw(Xlvl.raw()+1,Xlvl.raw()+1 + 6*_Nactive);
+
+          auto dual = *(qc1->dual());
+          int nbActiveContatcs = 0;
+          for(auto x : dual) 
+          {
+              if(std::abs(x) > 1e-3)
+                  nbActiveContatcs++;
+          }
+          std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
+
           return uw;
 
       }
@@ -869,9 +879,8 @@ namespace scopi
           int nbActiveContatcs = 0;
           for(std::size_t i = 0; i < contacts.size(); ++i)
           {
-              if(std::abs(sol.y[i]) < 1e-10)
+              if(sol.y[i] > 0.)
               {
-                  std::cout << i << "    " << sol.y[i] << '\n';
                   nbActiveContatcs++;
               }
           }
