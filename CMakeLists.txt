@@ -40,8 +40,6 @@ find_package(fmt REQUIRED)
 find_package(MOSEK REQUIRED)
 find_package(OpenMP)
 find_package(scs REQUIRED)
-find_package(absl REQUIRED)
-find_package(osqp REQUIRED)
 
 # set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
 
@@ -63,11 +61,6 @@ message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
-add_library(osqp-cpp STATIC IMPORTED)
-set_target_properties(osqp-cpp PROPERTIES IMPORTED_LOCATION /local/home/hbloch/Work/install/osqp-cpp/build/libosqp-cpp.a)
-set_target_properties(osqp-cpp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /local/home/hbloch/Work/install/osqp-cpp/include)
-target_link_libraries(osqp-cpp INTERFACE osqp::osqp absl::base absl::status)
-
 add_library(scopi_cpp INTERFACE)
 include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
@@ -78,7 +71,7 @@ target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir osqp::osqp osqp-cpp )
+target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir)
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 
