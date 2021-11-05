@@ -36,6 +36,21 @@ namespace scopi
 {
   struct useMosekSolver{};
   struct useScsSolver{};
+  // https://stackoverflow.com/questions/46939699/how-can-i-use-c-template-argument-to-decide-which-type-of-member-is-in-a-class
+  template <typename SolverType>
+      struct matrixType_selector {};
+  template <>
+      struct matrixType_selector<useMosekSolver>
+      {
+          using matrixType = Matrix::t;
+      };
+  template <>
+      struct matrixType_selector<useScsSolver>
+      {
+          using matrixType = ScsMatrix*;
+      };
+  template <typename SolverType>
+      using matrixType = typename matrixType_selector<SolverType>::matrixType;
 
   template<std::size_t dim, typename SolverType>
       class MosekSolver
@@ -57,14 +72,14 @@ namespace scopi
               xt::xtensor<double, 1> createVectorC_scs();
 
               void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
-              Matrix::t createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
-              Matrix::t createMatrixAz_mosek();
+              matrixType<SolverType> createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
+              matrixType<SolverType> createMatrixAz_mosek();
               template<typename ptrType>
                   void createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
-              ScsMatrix* createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
+              matrixType<SolverType> createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
               template<typename ptrType>
                   void createMatrixP_cscStorage(std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
-              ScsMatrix* createMatrixP_scs();
+              matrixType<SolverType> createMatrixP_scs();
 
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useMosekSolver);
               std::vector<double> createMatricesAndSolve(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite, useScsSolver);
@@ -242,7 +257,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Matrix::t MosekSolver<dim, SolverType>::createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts)
+      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts)
       {
           // Preallocate
           std::vector<int> A_rows;
@@ -314,7 +329,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
+      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
       {
           std::vector<int> csc_rows;
           std::vector<int> csc_cols;
@@ -425,7 +440,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      Matrix::t MosekSolver<dim, SolverType>::createMatrixAz_mosek()
+      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixAz_mosek()
       {
           std::vector<int> Az_rows;
           std::vector<int> Az_cols;
@@ -506,7 +521,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      ScsMatrix* MosekSolver<dim, SolverType>::createMatrixP_scs()
+      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixP_scs()
       {
           std::vector<scs_int> col;
           std::vector<scs_int> row;
