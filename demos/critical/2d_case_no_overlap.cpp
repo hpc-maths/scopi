@@ -12,11 +12,11 @@ int main()
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .01;
-    std::size_t total_it = 100;
+    std::size_t total_it = 1000;
     scopi::scopi_container<dim> particles;
 
     int n = 20; // 2*n*n particles
-    double spaceBetweenParticles = 3.;
+    double spaceBetweenParticles = 2.1;
 
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distrib_r(0.8,1.);
@@ -33,16 +33,18 @@ int main()
             double rot = distrib_rot(generator);
             double r = distrib_r(generator);
             double r2 = distrib_r2(generator);
-            double x = (i + 0.5)*velocity + distrib_move_x(generator);
-            double y = (j + 0.5)*velocity + distrib_move_y(generator);
+            double x = (i + 0.5)*spaceBetweenParticles + distrib_move_x(generator);
+            double y = (j + 0.5)*spaceBetweenParticles + distrib_move_y(generator);
+            double velocity = distrib_velocity(generator);
             scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
             particles.push_back(s1, {{0, 0}}, {{velocity, 0.}}, 0, 0, {{0, 0}});
 
             rot = distrib_rot(generator);
             r = distrib_r(generator);
             r2 = distrib_r2(generator);
-            x = (n + i + 0.5)*velocity + distrib_move_x(generator);
-            y = (j + 0.5)*velocity + distrib_move_y(generator);
+            x = (n + i + 0.5)*spaceBetweenParticles + distrib_move_x(generator);
+            y = (j + 0.5)*spaceBetweenParticles + distrib_move_y(generator);
+            velocity = distrib_velocity(generator);
             scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
             particles.push_back(s2, {{0, 0}}, {{-velocity, 0.}}, 0, 0, {{0, 0}});
         }
@@ -50,6 +52,7 @@ int main()
  
     std::size_t active_ptr = 0; // pas d'obstacles
 
-    scopi::MosekSolver<dim, scopi::useOsqpCppSolver> mosek_solver(particles, dt, active_ptr);
+    scopi::MosekSolver<dim, scopi::useMosekSolver> mosek_solver(particles, dt, active_ptr);
     mosek_solver.solve(total_it);
+
 }
