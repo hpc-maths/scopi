@@ -70,12 +70,10 @@ namespace scopi
               xt::xtensor<double, 1> createVectorC(useMosekSolver);
               xt::xtensor<double, 1> createVectorC(useScsSolver);
 
-              void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
-              matrixType<SolverType> createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
+              void createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
+              matrixType<SolverType> createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver);
               matrixType<SolverType> createMatrixAz_mosek();
-              template<typename ptrType>
-                  void createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
-              matrixType<SolverType> createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts);
+              matrixType<SolverType> createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, useScsSolver);
               template<typename ptrType>
                   void createMatrixP_cscStorage(std::vector<ptrType>& col, std::vector<ptrType>& row, std::vector<double>& val);
               matrixType<SolverType> createMatrixP_scs();
@@ -256,14 +254,14 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts)
+      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver)
       {
           // Preallocate
           std::vector<int> A_rows;
           std::vector<int> A_cols;
           std::vector<double> A_values;
 
-          createMatrixA_coo(contacts, A_rows, A_cols, A_values, 1);
+          createMatrixA(contacts, A_rows, A_cols, A_values, 1);
 
           return Matrix::sparse(contacts.size(), 1 + 6*_Nactive + 6*_Nactive,
                   std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
@@ -271,9 +269,10 @@ namespace scopi
                   std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
       }
 
-  template<std::size_t dim, typename SolverType> template<typename ptrType>
-      void MosekSolver<dim, SolverType>::createMatrixA_cscStorage(std::vector<scopi::neighbor<dim>>& contacts, std::vector<ptrType>& csc_col, std::vector<ptrType>& csc_row, std::vector<double>& csc_val)
+  template<std::size_t dim, typename SolverType>
+      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, useScsSolver)
       {
+
           // COO storage to CSR storage is easy to write, e.g.
           // https://www-users.cse.umn.edu/~saad/software/SPARSKIT/
           // The CSC storage of A is the CSR storage of A^T
@@ -281,14 +280,13 @@ namespace scopi
           std::vector<int> coo_rows;
           std::vector<int> coo_cols;
           std::vector<double> coo_values;
-          createMatrixA_coo(contacts, coo_rows, coo_cols, coo_values, 0);
+          createMatrixA(contacts, coo_rows, coo_cols, coo_values, 0);
 
           std::size_t nrow = 6*_Nactive;
           std::size_t nnz = coo_values.size();
-          csc_col.resize(nrow+1);
-          std::fill(csc_col.begin(), csc_col.end(), 0.);
-          csc_row.resize(nnz);
-          csc_val.resize(nnz);
+          std::vector<int> csc_col(nrow+1, 0);
+          std::vector<int> csc_row(nnz);
+          std::vector<double> csc_val(nnz);
 
           // determine row-lengths.
           for(std::size_t k = 0; k < nnz; ++k)
@@ -325,27 +323,17 @@ namespace scopi
               csc_col[j] = csc_col[j-1];
           }
           csc_col[0] = 0;
-      }
-
-  template<std::size_t dim, typename SolverType>
-      matrixType<SolverType> MosekSolver<dim, SolverType>::createMatrixA_scs(std::vector<scopi::neighbor<dim>>& contacts)
-      {
-          std::vector<int> csc_rows;
-          std::vector<int> csc_cols;
-          std::vector<double> csc_values;
-
-          createMatrixA_cscStorage(contacts, csc_cols, csc_rows, csc_values);
 
           ScsMatrix* A = new ScsMatrix;
-          A->x = new double[csc_values.size()];
-          A->i = new scs_int[csc_rows.size()];
-          A->p = new scs_int[csc_cols.size()];
-          for(std::size_t i = 0; i < csc_values.size(); ++i)
-              A->x[i] = csc_values[i];
-          for(std::size_t i = 0; i < csc_rows.size(); ++i)
-              A->i[i] = csc_rows[i];
-          for(std::size_t i = 0; i < csc_cols.size(); ++i)
-              A->p[i] = csc_cols[i];
+          A->x = new double[csc_val.size()];
+          A->i = new scs_int[csc_row.size()];
+          A->p = new scs_int[csc_col.size()];
+          for(std::size_t i = 0; i < csc_val.size(); ++i)
+              A->x[i] = csc_val[i];
+          for(std::size_t i = 0; i < csc_row.size(); ++i)
+              A->i[i] = csc_row[i];
+          for(std::size_t i = 0; i < csc_col.size(); ++i)
+              A->p[i] = csc_col[i];
           A->m = contacts.size();
           A->n = 6*_Nactive;
           return A;
@@ -353,7 +341,7 @@ namespace scopi
 
 
   template<std::size_t dim, typename SolverType>
-      void MosekSolver<dim, SolverType>::createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol)
+      void MosekSolver<dim, SolverType>::createMatrixA(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol)
       {
           std::size_t u_size = 3*contacts.size()*2;
           std::size_t w_size = 3*contacts.size()*2;
@@ -550,7 +538,7 @@ namespace scopi
           tic();
           auto c = createVectorC(_solverType);
           auto distances = createVectorDistances(contacts);
-          auto A = createMatrixA_mosek(contacts);
+          auto A = createMatrixA(contacts, _solverType);
           auto Az = createMatrixAz_mosek();
 
           auto duration4 = toc();
@@ -607,7 +595,7 @@ namespace scopi
           // create mass and inertia matrices
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
           tic();
-          auto A = createMatrixA_scs(contacts);
+          auto A = createMatrixA(contacts, _solverType);
           auto P = createMatrixP_scs();
           auto c = createVectorC(_solverType);
           auto distances = createVectorDistances(contacts);
