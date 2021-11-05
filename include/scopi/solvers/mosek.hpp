@@ -92,9 +92,8 @@ namespace scopi
 
               xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
               xt::xtensor<double, 1> createVectorC();
-
-              xt::xtensor<double, 1> createVectorC_mosek();
-              xt::xtensor<double, 1> createVectorC_scs();
+              xt::xtensor<double, 1> createVectorC(useMosekSolver);
+              xt::xtensor<double, 1> createVectorC(useScsSolver);
 
               void createMatrixA_coo(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
               matrixType<SolverType> createMatrixA_mosek(std::vector<scopi::neighbor<dim>>& contacts);
@@ -328,7 +327,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_mosek()
+      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC(useMosekSolver)
       {
           xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
           c(0) = 1;
@@ -342,7 +341,7 @@ namespace scopi
       }
 
   template<std::size_t dim, typename SolverType>
-      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC_scs()
+      xt::xtensor<double, 1> MosekSolver<dim, SolverType>::createVectorC(useScsSolver)
       {
           return createVectorC();
       }
@@ -653,7 +652,7 @@ namespace scopi
           // create mass and inertia matrices
           std::cout << "----> create mass and inertia matrices " << nite << std::endl;
           tic();
-          auto c = createVectorC_mosek();
+          auto c = createVectorC(_solverType);
           auto distances = createVectorDistances(contacts);
           auto A = createMatrixA_mosek(contacts);
           auto Az = createMatrixAz_mosek();
@@ -714,7 +713,7 @@ namespace scopi
           tic();
           auto A = createMatrixA_scs(contacts);
           auto P = createMatrixP_scs();
-          auto c = createVectorC_scs();
+          auto c = createVectorC(_solverType);
           auto distances = createVectorDistances(contacts);
           xt::xtensor<double, 1> b = xt::zeros<double>({6*_Nactive});
 
