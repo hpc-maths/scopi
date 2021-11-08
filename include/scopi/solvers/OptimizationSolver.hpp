@@ -5,10 +5,10 @@ namespace scopi{
         class OptimizationSolver
         {
             public:
-                OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
                 xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
 
             protected:
+                OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize);
                 xt::xtensor<double, 1> createVectorC();
                 void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
 
@@ -18,17 +18,18 @@ namespace scopi{
                 std::size_t _active_ptr;
                 double _mass = 1.;
                 double _moment = .1;
+                xt::xtensor<double, 1> _c;
         };
 
     template<std::size_t dim>
-        OptimizationSolver<dim>::OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+        OptimizationSolver<dim>::OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize) : 
             _particles(particles),
             _dt(dt),
             _Nactive(Nactive),
-            _active_ptr(active_ptr)
+            _active_ptr(active_ptr),
+            _c(xt::zeros<double>({cSize}))
     {
     }
-
 
     template<std::size_t dim>
         xt::xtensor<double, 1> OptimizationSolver<dim>::createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts)
