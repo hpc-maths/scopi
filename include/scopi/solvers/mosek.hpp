@@ -9,8 +9,6 @@
 #include <xtensor/xfixed.hpp>
 
 #include <fmt/format.h>
-#include <fusion.h>
-#include <scs.h>
 #include <nlohmann/json.hpp>
 
 #include "../container.hpp"
