@@ -20,7 +20,7 @@ namespace scopi{
     template<std::size_t dim>
         xt::xtensor<double, 1> ScsSolver<dim>::createVectorC()
         {
-            return createVectorC();
+            return OptimizationSolver<dim>::createVectorC();
         }
 
     template<std::size_t dim>

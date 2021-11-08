@@ -26,7 +26,7 @@ namespace scopi{
             xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*this->_Nactive + 2*3*this->_Nactive});
             c(0) = 1;
             // TODO use xt functions
-            auto tmp = createVectorC();
+            auto tmp = OptimizationSolver<dim>::createVectorC();
             for(std::size_t i = 0; i < 6*this->_Nactive; ++i)
             {
                 c(1+i) = tmp(i);
