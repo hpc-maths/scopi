@@ -8,19 +8,25 @@ namespace scopi{
         class ScsSolver : public OptimizationSolver<dim>
         {
             public:
-                using matrixType = ScsMatrix*;
-                xt::xtensor<double, 1> createVectorC();
-                matrixType createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
-                matrixType createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut);
+                ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+                void createVectorC();
+                ScsMatrix* createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
+                ScsMatrix* createMatrixMass();
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& distances, std::vector<double>& solOut);
             private:
-                using OptimizationSolver<dim>::OptimizationSolver;
         };
 
     template<std::size_t dim>
-        xt::xtensor<double, 1> ScsSolver<dim>::createVectorC()
+        ScsSolver<dim>::ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive + 2*3*Nactive)
+    {
+    }
+
+
+    template<std::size_t dim>
+        void ScsSolver<dim>::createVectorC()
         {
-            return OptimizationSolver<dim>::createVectorC();
+            this->_c = OptimizationSolver<dim>::createVectorC();
         }
 
     template<std::size_t dim>
@@ -139,7 +145,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut)
+        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& distances, std::vector<double>& solOut)
         {
             ScsData d;
             d.m = contacts.size();
@@ -147,7 +153,7 @@ namespace scopi{
             d.A = A;
             d.P = P;
             d.b = distances.data();
-            d.c = c.data();
+            d.c = this->_c.data();
 
             ScsCone k;
             k.z = 0; // 0 linear equality constraints
