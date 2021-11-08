@@ -9,8 +9,6 @@
 #include <xtensor/xfixed.hpp>
 
 #include <fmt/format.h>
-#include <fusion.h>
-#include <scs.h>
 #include <nlohmann/json.hpp>
 
 #include "../container.hpp"
@@ -18,6 +16,8 @@
 #include "../objects/methods/write_objects.hpp"
 #include "../objects/neighbor.hpp"
 #include "../quaternion.hpp"
+#include "MosekSolver.hpp"
+#include "ScsSolver.hpp"
 
 #include <scopi/contact/contact_kdtree.hpp>
 // #include <scopi/contact/contact_brute_force.hpp>
