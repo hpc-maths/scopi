@@ -59,24 +59,6 @@ namespace scopi
                 std::size_t _actptr;
         };
 
-    struct useMosekSolver{};
-    struct useScsSolver{};
-    // https://stackoverflow.com/questions/46939699/how-can-i-use-c-template-argument-to-decide-which-type-of-member-is-in-a-class
-    template <typename SolverType>
-        struct matrixType_selector {};
-    template <>
-        struct matrixType_selector<useMosekSolver>
-        {
-            using matrixType = Matrix::t;
-        };
-    template <>
-        struct matrixType_selector<useScsSolver>
-        {
-            using matrixType = ScsMatrix*;
-        };
-    template <typename SolverType>
-        using matrixType = typename matrixType_selector<SolverType>::matrixType;
-
     template<std::size_t dim, typename SolverType>
         class ScopiSolver
         {
@@ -94,18 +76,18 @@ namespace scopi
 
                 xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
                 xt::xtensor<double, 1> createVectorC();
-                xt::xtensor<double, 1> createVectorC(useMosekSolver);
-                xt::xtensor<double, 1> createVectorC(useScsSolver);
+                xt::xtensor<double, 1> createVectorC(MosekSolver);
+                xt::xtensor<double, 1> createVectorC(ScsSolver);
 
                 void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
-                matrixType<SolverType> createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver);
-                matrixType<SolverType> createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, useScsSolver);
+                MosekSolver::matrixType createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, MosekSolver);
+                ScsSolver::matrixType createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, ScsSolver);
 
-                matrixType<SolverType> createMatrixMass(useMosekSolver);
-                matrixType<SolverType> createMatrixMass(useScsSolver);
+                MosekSolver::matrixType createMatrixMass(MosekSolver);
+                ScsSolver::matrixType createMatrixMass(ScsSolver);
 
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver, Matrix::t& A, Matrix::t& Az, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut);
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, useScsSolver, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut);
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, MosekSolver, Matrix::t& A, Matrix::t& Az, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut);
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsSolver, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut);
 
 
                 scopi::scopi_container<dim>& _particles;
@@ -346,7 +328,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        xt::xtensor<double, 1> ScopiSolver<dim, SolverType>::createVectorC(useMosekSolver)
+        xt::xtensor<double, 1> ScopiSolver<dim, SolverType>::createVectorC(MosekSolver)
         {
             xt::xtensor<double, 1> c = xt::zeros<double>({1 + 2*3*_Nactive + 2*3*_Nactive});
             c(0) = 1;
@@ -360,7 +342,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        xt::xtensor<double, 1> ScopiSolver<dim, SolverType>::createVectorC(useScsSolver)
+        xt::xtensor<double, 1> ScopiSolver<dim, SolverType>::createVectorC(ScsSolver)
         {
             return createVectorC();
         }
@@ -379,7 +361,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        matrixType<SolverType> ScopiSolver<dim, SolverType>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver)
+        MosekSolver::matrixType ScopiSolver<dim, SolverType>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, MosekSolver)
         {
             // Preallocate
             std::vector<int> A_rows;
@@ -395,7 +377,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        matrixType<SolverType> ScopiSolver<dim, SolverType>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, useScsSolver)
+        ScsSolver::matrixType ScopiSolver<dim, SolverType>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, ScsSolver)
         {
 
             // COO storage to CSR storage is easy to write, e.g.
@@ -552,7 +534,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        matrixType<SolverType> ScopiSolver<dim, SolverType>::createMatrixMass(useMosekSolver)
+        MosekSolver::matrixType ScopiSolver<dim, SolverType>::createMatrixMass(MosekSolver)
         {
             std::vector<int> Az_rows;
             std::vector<int> Az_cols;
@@ -605,7 +587,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        matrixType<SolverType> ScopiSolver<dim, SolverType>::createMatrixMass(useScsSolver)
+        ScsSolver::matrixType ScopiSolver<dim, SolverType>::createMatrixMass(ScsSolver)
         {
             std::vector<scs_int> col;
             std::vector<scs_int> row;
@@ -650,7 +632,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        int ScopiSolver<dim, SolverType>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, useMosekSolver, Matrix::t& A, Matrix::t& Az, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut)
+        int ScopiSolver<dim, SolverType>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, MosekSolver, Matrix::t& A, Matrix::t& Az, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut)
         {
             Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
             // variables
@@ -692,7 +674,7 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        int ScopiSolver<dim, SolverType>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, useScsSolver, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut)
+        int ScopiSolver<dim, SolverType>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsSolver, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& distances, std::vector<double>& solOut)
         {
             ScsData d;
             d.m = contacts.size();
