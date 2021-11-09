@@ -144,6 +144,9 @@ namespace scopi
 
                 // move the active particles
                 moveActiveParticles();
+
+                // free the memory for next solve
+                _solver.freeMemory();
             }
         }
 
