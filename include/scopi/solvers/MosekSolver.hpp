@@ -12,11 +12,12 @@ namespace scopi{
         {
             public:
                 MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-                Matrix::t createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
+                void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
                 void createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, Matrix::t& A, std::vector<double>& solOut);
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut);
             private:
                 Matrix::t _Az;
+                Matrix::t _A;
         };
 
     template<std::size_t dim>
@@ -28,7 +29,7 @@ namespace scopi{
 
 
     template<std::size_t dim>
-        Matrix::t MosekSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
+        void MosekSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
         {
             // Preallocate
             std::vector<int> A_rows;
@@ -37,7 +38,7 @@ namespace scopi{
 
             OptimizationSolver<dim>::createMatrixConstraint(contacts, A_rows, A_cols, A_values, 1);
 
-            return Matrix::sparse(contacts.size(), 1 + 6*this->_Nactive + 6*this->_Nactive,
+            _A = Matrix::sparse(contacts.size(), 1 + 6*this->_Nactive + 6*this->_Nactive,
                     std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
                     std::make_shared<ndarray<int, 1>>(A_cols.data(), shape_t<1>({A_cols.size()})),
                     std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
@@ -97,7 +98,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int MosekSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, Matrix::t& A, std::vector<double>& solOut)
+        int MosekSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut)
         {
             Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
             // variables
@@ -110,7 +111,7 @@ namespace scopi{
             // constraints
             auto D_mosek = std::make_shared<ndarray<double, 1>>(this->_distances.data(), shape_t<1>({this->_distances.shape(0)}));
 
-            Constraint::t qc1 = model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D_mosek));
+            Constraint::t qc1 = model->constraint("qc1", Expr::mul(_A, X), Domain::lessThan(D_mosek));
             Constraint::t qc2 = model->constraint("qc2", Expr::mul(_Az, X), Domain::equalsTo(0.));
             Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->_Nactive, 1 + 6*this->_Nactive + 6*this->_Nactive)), Domain::inRotatedQCone());
             // model->setSolverParam("intpntCoTolPfeas", 1e-10);

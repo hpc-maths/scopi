@@ -10,11 +10,12 @@ namespace scopi{
             public:
                 ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
                 ~ScsSolver();
-                ScsMatrix* createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
+                void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
                 void createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, std::vector<double>& solOut);
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut);
             private:
                 ScsMatrix* _P = NULL;
+                ScsMatrix* _A = NULL;
                 ScsSolver(const ScsSolver &);
                 ScsSolver & operator=(const ScsSolver &);
         };
@@ -24,16 +25,18 @@ namespace scopi{
             OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
             _P = new ScsMatrix;
+            _A = new ScsMatrix;
     }
 
     template<std::size_t dim>
         ScsSolver<dim>::~ScsSolver()
         {
             delete _P;
+            delete _A;
         }
 
     template<std::size_t dim>
-        ScsMatrix* ScsSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
+        void ScsSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
         {
 
             // COO storage to CSR storage is easy to write, e.g.
@@ -87,19 +90,17 @@ namespace scopi{
             }
             csc_col[0] = 0;
 
-            ScsMatrix* A = new ScsMatrix;
-            A->x = new double[csc_val.size()];
-            A->i = new scs_int[csc_row.size()];
-            A->p = new scs_int[csc_col.size()];
+            _A->x = new double[csc_val.size()];
+            _A->i = new scs_int[csc_row.size()];
+            _A->p = new scs_int[csc_col.size()];
             for(std::size_t i = 0; i < csc_val.size(); ++i)
-                A->x[i] = csc_val[i];
+                _A->x[i] = csc_val[i];
             for(std::size_t i = 0; i < csc_row.size(); ++i)
-                A->i[i] = csc_row[i];
+                _A->i[i] = csc_row[i];
             for(std::size_t i = 0; i < csc_col.size(); ++i)
-                A->p[i] = csc_col[i];
-            A->m = contacts.size();
-            A->n = 6*this->_Nactive;
-            return A;
+                _A->p[i] = csc_col[i];
+            _A->m = contacts.size();
+            _A->n = 6*this->_Nactive;
         }
 
     template<std::size_t dim>
@@ -148,12 +149,12 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, std::vector<double>& solOut)
+        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut)
         {
             ScsData d;
             d.m = contacts.size();
             d.n = 6*this->_Nactive;
-            d.A = A;
+            d.A = _A;
             d.P = _P;
             d.b = this->_distances.data();
             d.c = this->_c.data();
@@ -218,10 +219,9 @@ namespace scopi{
             std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
 
             // free the memory
-            delete[] d.A->x;
-            delete[] d.A->i;
-            delete[] d.A->p;
-            delete d.A;
+            delete[] _A->x;
+            delete[] _A->i;
+            delete[] _A->p;
             delete[] _P->x;
             delete[] _P->i;
             delete[] _P->p;
