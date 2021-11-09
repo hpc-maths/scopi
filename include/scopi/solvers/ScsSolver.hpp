@@ -19,6 +19,11 @@ namespace scopi{
             private:
                 ScsMatrix* _P = NULL;
                 ScsMatrix* _A = NULL;
+                ScsData _d;
+                ScsCone _k;
+                ScsSolution _sol;
+                ScsInfo _info;
+                ScsSettings _stgs;
                 ScsSolver(const ScsSolver &);
                 ScsSolver & operator=(const ScsSolver &);
         };
@@ -29,6 +34,26 @@ namespace scopi{
     {
             _P = new ScsMatrix;
             _A = new ScsMatrix;
+            // default values not set
+            // use values given by
+            // https://www.cvxgrp.org/scs/api/settings.html#settings
+            _stgs.normalize = 1;
+            _stgs.scale = 0.1;
+            _stgs.adaptive_scale = 1;
+            _stgs.rho_x = 1e-6;
+            _stgs.max_iters = 1e5;
+            _stgs.eps_abs = 1e-4;
+            _stgs.eps_rel = 1e-4;
+            _stgs.eps_infeas = 1e-7;
+            _stgs.alpha = 1.5;
+            _stgs.time_limit_secs = 0.;
+            _stgs.verbose = 1;
+            _stgs.warm_start = 0;
+            _stgs.acceleration_lookback = 0;
+            _stgs.acceleration_interval = 1;
+            _stgs.write_data_filename = NULL;
+            _stgs.log_csv_filename = NULL;
+
     }
 
     template<std::size_t dim>
@@ -154,68 +179,43 @@ namespace scopi{
     template<std::size_t dim>
         int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts)
         {
-            ScsData d;
-            d.m = contacts.size();
-            d.n = 6*this->_Nactive;
-            d.A = _A;
-            d.P = _P;
-            d.b = this->_distances.data();
-            d.c = this->_c.data();
+            _d.m = contacts.size();
+            _d.n = 6*this->_Nactive;
+            _d.A = _A;
+            _d.P = _P;
+            _d.b = this->_distances.data();
+            _d.c = this->_c.data();
 
-            ScsCone k;
-            k.z = 0; // 0 linear equality constraints
-            k.l = contacts.size(); // s >= 0
-            k.bu = NULL; 
-            k.bl = NULL; 
-            k.bsize = 0;
-            k.q = NULL;
-            k.qsize = 0;
-            k.s = NULL;
-            k.ssize = 0;
-            k.ep = 0;
-            k.ed = 0;
-            k.p = NULL;
-            k.psize = 0;
+            _k.z = 0; // 0 linear equality constraints
+            _k.l = contacts.size(); // s >= 0
+            _k.bu = NULL; 
+            _k.bl = NULL; 
+            _k.bsize = 0;
+            _k.q = NULL;
+            _k.qsize = 0;
+            _k.s = NULL;
+            _k.ssize = 0;
+            _k.ep = 0;
+            _k.ed = 0;
+            _k.p = NULL;
+            _k.psize = 0;
 
-            ScsSolution sol;
-            sol.x = new double[d.n];
-            sol.y = new double[d.m];
-            sol.s = new double[d.m];
-            ScsInfo info;
+            _sol.x = new double[_d.n];
+            _sol.y = new double[_d.m];
+            _sol.s = new double[_d.m];
 
-            ScsSettings stgs;
-            // default values not set
-            // use values given by
-            // https://www.cvxgrp.org/scs/api/settings.html#settings
-            stgs.normalize = 1;
-            stgs.scale = 0.1;
-            stgs.adaptive_scale = 1;
-            stgs.rho_x = 1e-6;
-            stgs.max_iters = 1e5;
-            stgs.eps_abs = 1e-4;
-            stgs.eps_rel = 1e-4;
-            stgs.eps_infeas = 1e-7;
-            stgs.alpha = 1.5;
-            stgs.time_limit_secs = 0.;
-            stgs.verbose = 1;
-            stgs.warm_start = 0;
-            stgs.acceleration_lookback = 0;
-            stgs.acceleration_interval = 1;
-            stgs.write_data_filename = NULL;
-            stgs.log_csv_filename = NULL;
-
-            scs(&d, &k, &stgs, &sol, &info);
+            scs(&_d, &_k, &_stgs, &_sol, &_info);
 
             // if(info.iter == -1)
             //     std::abort();
 
-            this->_uw = std::vector<double>(sol.x, sol.x + 6*this->_Nactive);
+            this->_uw = std::vector<double>(_sol.x, _sol.x + 6*this->_Nactive);
 
-            auto nbIter = info.iter;
+            auto nbIter = _info.iter;
             int nbActiveContatcs = 0;
             for(std::size_t i = 0; i < contacts.size(); ++i)
             {
-                if(sol.y[i] > 0.)
+                if(_sol.y[i] > 0.)
                 {
                     nbActiveContatcs++;
                 }
@@ -229,9 +229,9 @@ namespace scopi{
             delete[] _P->x;
             delete[] _P->i;
             delete[] _P->p;
-            delete[] sol.x;
-            delete[] sol.y;
-            delete[] sol.s;
+            delete[] _sol.x;
+            delete[] _sol.y;
+            delete[] _sol.s;
 
             return nbIter;
         }
