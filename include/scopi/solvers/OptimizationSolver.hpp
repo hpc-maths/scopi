@@ -6,10 +6,10 @@ namespace scopi{
         {
             public:
                 void createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
+                void createVectorC();
 
             protected:
-                OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize);
-                xt::xtensor<double, 1> createVectorC();
+                OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec);
                 void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
 
                 scopi::scopi_container<dim>& _particles;
@@ -19,16 +19,18 @@ namespace scopi{
                 double _mass = 1.;
                 double _moment = .1;
                 xt::xtensor<double, 1> _c;
+                std::size_t _cDec;
                 xt::xtensor<double, 1> _distances;
         };
 
     template<std::size_t dim>
-        OptimizationSolver<dim>::OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize) : 
+        OptimizationSolver<dim>::OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec) : 
             _particles(particles),
             _dt(dt),
             _Nactive(Nactive),
             _active_ptr(active_ptr),
-            _c(xt::zeros<double>({cSize}))
+            _c(xt::zeros<double>({cSize})),
+            _cDec(cDec)
     {
     }
 
@@ -46,20 +48,18 @@ namespace scopi{
 
 
     template<std::size_t dim>
-        xt::xtensor<double, 1> OptimizationSolver<dim>::createVectorC()
+        void OptimizationSolver<dim>::createVectorC()
         {
-            xt::xtensor<double, 1> c = xt::zeros<double>({2*3*_Nactive});
-            std::size_t Mdec = 0;
+            std::size_t Mdec = _cDec;
             std::size_t Jdec = Mdec + 3*_Nactive;
             for (std::size_t i=0; i<_Nactive; ++i)
             {
                 for (std::size_t d=0; d<dim; ++d)
                 {
-                    c(Mdec + 3*i + d) = -_mass*_particles.vd()(_active_ptr + i)[d]; // TODO: add mass into particles
+                    _c(Mdec + 3*i + d) = -_mass*_particles.vd()(_active_ptr + i)[d]; // TODO: add mass into particles
                 }
-                c(Jdec + 3*i + 2) = -_moment*_particles.desired_omega()(_active_ptr + i);
+                _c(Jdec + 3*i + 2) = -_moment*_particles.desired_omega()(_active_ptr + i);
             }
-            return c;
         }
 
     template<std::size_t dim>

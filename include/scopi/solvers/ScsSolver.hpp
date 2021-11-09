@@ -9,7 +9,6 @@ namespace scopi{
         {
             public:
                 ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-                void createVectorC();
                 ScsMatrix* createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
                 ScsMatrix* createMatrixMass();
                 int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, std::vector<double>& solOut);
@@ -18,16 +17,9 @@ namespace scopi{
 
     template<std::size_t dim>
         ScsSolver<dim>::ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive + 2*3*Nactive)
+            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
     }
-
-
-    template<std::size_t dim>
-        void ScsSolver<dim>::createVectorC()
-        {
-            this->_c = OptimizationSolver<dim>::createVectorC();
-        }
 
     template<std::size_t dim>
         ScsMatrix* ScsSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
