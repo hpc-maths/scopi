@@ -305,8 +305,6 @@ namespace scopi
 
             auto uadapt = _solver.getUadapt();
             auto wadapt = _solver.getWadapt();
-            // auto uadapt = xt::adapt(uw.data(), {_Nactive, 3UL});
-            // auto wadapt = xt::adapt(uw.data()+3*_Nactive, {_Nactive, 3UL});
 
             for (std::size_t i=0; i<_Nactive; ++i)
             {
