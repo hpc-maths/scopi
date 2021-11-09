@@ -72,57 +72,18 @@ namespace scopi{
     template<std::size_t dim>
         void ScsSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
         {
-
             // COO storage to CSR storage is easy to write, e.g.
-            // https://www-users.cse.umn.edu/~saad/software/SPARSKIT/
             // The CSC storage of A is the CSR storage of A^T
             // reverse the role of row and column pointers to have the transpose
             std::vector<int> coo_rows;
             std::vector<int> coo_cols;
-            std::vector<double> coo_values;
-            OptimizationSolver<dim>::createMatrixConstraint(contacts, coo_rows, coo_cols, coo_values, 0);
+            std::vector<double> coo_vals;
+            OptimizationSolver<dim>::createMatrixConstraint(contacts, coo_rows, coo_cols, coo_vals, 0);
 
-            std::size_t nrow = 6*this->_Nactive;
-            std::size_t nnz = coo_values.size();
-            std::vector<int> csc_col(nrow+1, 0);
-            std::vector<int> csc_row(nnz);
-            std::vector<double> csc_val(nnz);
-
-            // determine row-lengths.
-            for(std::size_t k = 0; k < nnz; ++k)
-            {
-                csc_col[coo_cols[k]]++;
-            }
-
-            // starting position of each row..
-            {
-                int k = 0;
-                for(std::size_t j = 0; j < nrow+1; ++j)
-                {
-                    int k0 = csc_col[j];
-                    csc_col[j] = k;
-                    k += k0;
-                }
-            }
-
-            // go through the structure  once more. Fill in output matrix.
-            for(std::size_t k = 0; k < nnz; ++k)
-            {
-                int i = coo_cols[k];
-                int j = coo_rows[k];
-                double x = coo_values[k];
-                int iad = csc_col[i];
-                csc_val[iad] = x;
-                csc_row[iad] = j;
-                csc_col[i] = iad+1;
-            }
-
-            // shift back iao
-            for(std::size_t j = nrow; j >= 1; --j)
-            {
-                csc_col[j] = csc_col[j-1];
-            }
-            csc_col[0] = 0;
+            std::vector<int> csc_row;
+            std::vector<int> csc_col;
+            std::vector<double> csc_val;
+            OptimizationSolver<dim>::cooToCsr(coo_cols, coo_rows, coo_vals, csc_col, csc_row, csc_val);
 
             for(std::size_t i = 0; i < csc_val.size(); ++i)
                 _A.x[i] = csc_val[i];
