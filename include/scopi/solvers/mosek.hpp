@@ -104,7 +104,7 @@ namespace scopi
                 auto constraintMatrix = _solver.createMatrixConstraint(contacts);
                 auto massMatrix = _solver.createMatrixMass();
                 _solver.createVectorC();
-                auto distances = _solver.createVectorDistances(contacts);
+                _solver.createVectorDistances(contacts);
                 auto duration4 = toc();
                 std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
 
@@ -112,7 +112,7 @@ namespace scopi
                 std::cout << "----> Create optimization problem " << nite << std::endl;
                 tic();
                 std::vector<double> sol;
-                auto nbIter = _solver.solveOptimizationProbelm(contacts, constraintMatrix, massMatrix, distances, sol);
+                auto nbIter = _solver.solveOptimizationProbelm(contacts, constraintMatrix, massMatrix, sol);
                 auto duration5 = toc();
                 std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
                 std::cout << "iterations : " << nbIter << std::endl;
