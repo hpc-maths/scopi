@@ -15,6 +15,7 @@ namespace scopi{
                 int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
                 auto getUadapt();
                 auto getWadapt();
+                void freeMemory();
 
             private:
                 ScsMatrix* _P = NULL;
@@ -118,7 +119,7 @@ namespace scopi{
             }
             csc_col[0] = 0;
 
-            _A->x = new double[csc_val.size()];
+            _A->x = new scs_float[csc_val.size()];
             _A->i = new scs_int[csc_row.size()];
             _A->p = new scs_int[csc_col.size()];
             for(std::size_t i = 0; i < csc_val.size(); ++i)
@@ -205,13 +206,16 @@ namespace scopi{
             _sol.s = new double[_d.m];
 
             scs(&_d, &_k, &_stgs, &_sol, &_info);
+            std::cout << "solve ok" << std::endl;
 
             // if(info.iter == -1)
             //     std::abort();
 
             this->_uw = std::vector<double>(_sol.x, _sol.x + 6*this->_Nactive);
+            std::cout << "get solution ok" << std::endl;
 
             auto nbIter = _info.iter;
+            std::cout << "get nb iter ok" << std::endl;
             int nbActiveContatcs = 0;
             for(std::size_t i = 0; i < contacts.size(); ++i)
             {
@@ -222,16 +226,6 @@ namespace scopi{
             }
             std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
 
-            // free the memory
-            delete[] _A->x;
-            delete[] _A->i;
-            delete[] _A->p;
-            delete[] _P->x;
-            delete[] _P->i;
-            delete[] _P->p;
-            delete[] _sol.x;
-            delete[] _sol.y;
-            delete[] _sol.s;
 
             return nbIter;
         }
@@ -246,6 +240,21 @@ namespace scopi{
         auto ScsSolver<dim>::getWadapt()
         {
             return xt::adapt(this->_uw.data()+3*this->_Nactive, {this->_Nactive, 3UL});
+        }
+
+    template<std::size_t dim>
+        void ScsSolver<dim>::freeMemory()
+        {
+            // TODO check that the memory was indeed allocated before freeing it
+            delete[] _A->x;
+            delete[] _A->i;
+            delete[] _A->p;
+            delete[] _P->x;
+            delete[] _P->i;
+            delete[] _P->p;
+            delete[] _sol.x;
+            delete[] _sol.y;
+            delete[] _sol.s;
         }
 
 }

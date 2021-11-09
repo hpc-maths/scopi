@@ -12,6 +12,7 @@ namespace scopi{
                 virtual int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts) = 0;
                 auto getUadapt();
                 auto getWadapt();
+                virtual void freeMemory() = 0;
 
             protected:
                 OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec);
