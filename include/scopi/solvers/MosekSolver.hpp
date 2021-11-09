@@ -12,7 +12,6 @@ namespace scopi{
         {
             public:
                 MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-                void createVectorC();
                 Matrix::t createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
                 Matrix::t createMatrixMass();
                 int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, Matrix::t& A, Matrix::t& Az, std::vector<double>& solOut);
@@ -21,22 +20,11 @@ namespace scopi{
 
     template<std::size_t dim>
         MosekSolver<dim>::MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 1 + 2*3*Nactive + 2*3*Nactive)
+            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 1 + 2*3*Nactive + 2*3*Nactive, 1)
     {
         this->_c(0) = 1;
     }
 
-
-    template<std::size_t dim>
-        void MosekSolver<dim>::createVectorC()
-        {
-            // TODO use xt functions
-            auto tmp = OptimizationSolver<dim>::createVectorC();
-            for(std::size_t i = 0; i < 6*this->_Nactive; ++i)
-            {
-                this->_c(1+i) = tmp(i);
-            }
-        }
 
     template<std::size_t dim>
         Matrix::t MosekSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
