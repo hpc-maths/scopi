@@ -7,6 +7,9 @@ namespace scopi{
             public:
                 void createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
                 void createVectorC();
+                virtual void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts) = 0;
+                virtual void createMatrixMass() = 0;
+                virtual int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut) = 0;
 
             protected:
                 OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec);
