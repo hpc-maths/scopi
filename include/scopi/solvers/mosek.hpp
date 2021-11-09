@@ -72,7 +72,7 @@ namespace scopi
                 std::vector<scopi::neighbor<dim>> computeContacts();
                 void sortContacts(std::vector<scopi::neighbor<dim>>& contacts);
                 void writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
-                void moveActiveParticles(std::vector<double> uw);
+                void moveActiveParticles();
 
                 scopi::scopi_container<dim>& _particles;
                 double _dt;
@@ -137,14 +137,13 @@ namespace scopi
                 // Solve optimization problem
                 std::cout << "----> Create optimization problem " << nite << std::endl;
                 tic();
-                std::vector<double> sol;
-                auto nbIter = _solver.solveOptimizationProbelm(contacts, sol);
+                auto nbIter = _solver.solveOptimizationProbelm(contacts);
                 auto duration5 = toc();
                 std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
                 std::cout << "iterations : " << nbIter << std::endl;
 
                 // move the active particles
-                moveActiveParticles(sol);
+                moveActiveParticles();
             }
         }
 
@@ -297,11 +296,13 @@ namespace scopi
         }
 
     template<std::size_t dim, typename SolverType>
-        void ScopiSolver<dim, SolverType>::moveActiveParticles(std::vector<double> uw)
+        void ScopiSolver<dim, SolverType>::moveActiveParticles()
         {
 
-            auto uadapt = xt::adapt(uw.data(), {_Nactive, 3UL});
-            auto wadapt = xt::adapt(uw.data()+3*_Nactive, {_Nactive, 3UL});
+            auto uadapt = _solver.getUadapt();
+            auto wadapt = _solver.getWadapt();
+            // auto uadapt = xt::adapt(uw.data(), {_Nactive, 3UL});
+            // auto wadapt = xt::adapt(uw.data()+3*_Nactive, {_Nactive, 3UL});
 
             for (std::size_t i=0; i<_Nactive; ++i)
             {

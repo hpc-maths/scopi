@@ -14,7 +14,10 @@ namespace scopi{
                 MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
                 void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
                 void createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut);
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
+                auto getUadapt();
+                auto getWadapt();
+
             private:
                 Matrix::t _Az;
                 Matrix::t _A;
@@ -98,7 +101,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int MosekSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut)
+        int MosekSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts)
         {
             Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
             // variables
@@ -124,7 +127,7 @@ namespace scopi{
 
             auto Xlvl = *(X->level());
 
-            solOut = std::vector<double>(Xlvl.raw()+1,Xlvl.raw()+1 + 6*this->_Nactive);
+            this->_uw = std::vector<double>(Xlvl.raw()+1,Xlvl.raw()+1 + 6*this->_Nactive);
             int nbIter = model->getSolverIntInfo("intpntIter");
 
             auto dual = *(qc1->dual());
@@ -137,6 +140,18 @@ namespace scopi{
             std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
 
             return nbIter;
+        }
+
+    template<std::size_t dim>
+        auto MosekSolver<dim>::getUadapt()
+        {
+            return xt::adapt(this->_uw.data(), {this->_Nactive, 3UL});
+        }
+
+    template<std::size_t dim>
+        auto MosekSolver<dim>::getWadapt()
+        {
+            return xt::adapt(this->_uw.data()+3*this->_Nactive, {this->_Nactive, 3UL});
         }
 
 }

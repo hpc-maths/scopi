@@ -9,7 +9,9 @@ namespace scopi{
                 void createVectorC();
                 virtual void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts) = 0;
                 virtual void createMatrixMass() = 0;
-                virtual int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut) = 0;
+                virtual int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts) = 0;
+                auto getUadapt();
+                auto getWadapt();
 
             protected:
                 OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec);
@@ -24,6 +26,7 @@ namespace scopi{
                 xt::xtensor<double, 1> _c;
                 std::size_t _cDec;
                 xt::xtensor<double, 1> _distances;
+                std::vector<double> _uw;
         };
 
     template<std::size_t dim>
