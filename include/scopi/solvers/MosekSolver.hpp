@@ -21,6 +21,7 @@ namespace scopi{
             private:
                 Matrix::t _Az;
                 Matrix::t _A;
+                shared_ptr<ndarray<double,1>> _Xlvl;
         };
 
     template<std::size_t dim>
@@ -125,9 +126,8 @@ namespace scopi{
             //solve
             model->solve();
 
-            auto Xlvl = *(X->level());
+            _Xlvl = X->level();
 
-            this->_uw = std::vector<double>(Xlvl.raw()+1,Xlvl.raw()+1 + 6*this->_Nactive);
             int nbIter = model->getSolverIntInfo("intpntIter");
 
             auto dual = *(qc1->dual());
@@ -145,13 +145,13 @@ namespace scopi{
     template<std::size_t dim>
         auto MosekSolver<dim>::getUadapt()
         {
-            return xt::adapt(this->_uw.data(), {this->_Nactive, 3UL});
+            return xt::adapt(reinterpret_cast<double*>(_Xlvl->raw()+1), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
         auto MosekSolver<dim>::getWadapt()
         {
-            return xt::adapt(this->_uw.data()+3*this->_Nactive, {this->_Nactive, 3UL});
+            return xt::adapt(reinterpret_cast<double*>(_Xlvl->raw()+1+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
 }
