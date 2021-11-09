@@ -9,17 +9,28 @@ namespace scopi{
         {
             public:
                 ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+                ~ScsSolver();
                 ScsMatrix* createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
-                ScsMatrix* createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, std::vector<double>& solOut);
+                void createMatrixMass();
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, std::vector<double>& solOut);
             private:
+                ScsMatrix* _P = NULL;
+                ScsSolver(const ScsSolver &);
+                ScsSolver & operator=(const ScsSolver &);
         };
 
     template<std::size_t dim>
         ScsSolver<dim>::ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
+            _P = new ScsMatrix;
     }
+
+    template<std::size_t dim>
+        ScsSolver<dim>::~ScsSolver()
+        {
+            delete _P;
+        }
 
     template<std::size_t dim>
         ScsMatrix* ScsSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
@@ -92,7 +103,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        ScsMatrix* ScsSolver<dim>::createMatrixMass()
+        void ScsSolver<dim>::createMatrixMass()
         {
             std::vector<scs_int> col;
             std::vector<scs_int> row;
@@ -121,29 +132,29 @@ namespace scopi{
             }
             col.push_back(6*this->_Nactive);
 
-            ScsMatrix* P = new ScsMatrix;
-            P->x = new double[val.size()];
-            P->i = new scs_int[row.size()];
-            P->p = new scs_int[col.size()];
+            // TODO allocation in constructor
+            // There is a segfault if the memory is allocated in the constructor
+            _P->x = new scs_float[6*this->_Nactive];
+            _P->i = new scs_int[6*this->_Nactive];
+            _P->p = new scs_int[6*this->_Nactive+1];
             for(std::size_t i = 0; i < val.size(); ++i)
-                P->x[i] = val[i];
+                _P->x[i] = val[i];
             for(std::size_t i = 0; i < row.size(); ++i)
-                P->i[i] = row[i];
+                _P->i[i] = row[i];
             for(std::size_t i = 0; i < col.size(); ++i)
-                P->p[i] = col[i];
-            P->m = 6*this->_Nactive;
-            P->n = 6*this->_Nactive;
-            return P;
+                _P->p[i] = col[i];
+            _P->m = 6*this->_Nactive;
+            _P->n = 6*this->_Nactive;
         }
 
     template<std::size_t dim>
-        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, std::vector<double>& solOut)
+        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, std::vector<double>& solOut)
         {
             ScsData d;
             d.m = contacts.size();
             d.n = 6*this->_Nactive;
             d.A = A;
-            d.P = P;
+            d.P = _P;
             d.b = this->_distances.data();
             d.c = this->_c.data();
 
@@ -211,10 +222,9 @@ namespace scopi{
             delete[] d.A->i;
             delete[] d.A->p;
             delete d.A;
-            delete[] d.P->x;
-            delete[] d.P->i;
-            delete[] d.P->p;
-            delete d.P;
+            delete[] _P->x;
+            delete[] _P->i;
+            delete[] _P->p;
             delete[] sol.x;
             delete[] sol.y;
             delete[] sol.s;

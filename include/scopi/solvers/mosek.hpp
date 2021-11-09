@@ -128,7 +128,7 @@ namespace scopi
                 // create mass and inertia matrices
                 tic();
                 auto constraintMatrix = _solver.createMatrixConstraint(contacts);
-                auto massMatrix = _solver.createMatrixMass();
+                _solver.createMatrixMass();
                 _solver.createVectorC();
                 _solver.createVectorDistances(contacts);
                 auto duration4 = toc();
@@ -138,7 +138,7 @@ namespace scopi
                 std::cout << "----> Create optimization problem " << nite << std::endl;
                 tic();
                 std::vector<double> sol;
-                auto nbIter = _solver.solveOptimizationProbelm(contacts, constraintMatrix, massMatrix, sol);
+                auto nbIter = _solver.solveOptimizationProbelm(contacts, constraintMatrix, sol);
                 auto duration5 = toc();
                 std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
                 std::cout << "iterations : " << nbIter << std::endl;
