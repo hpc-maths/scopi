@@ -206,16 +206,11 @@ namespace scopi{
             _sol.s = new double[_d.m];
 
             scs(&_d, &_k, &_stgs, &_sol, &_info);
-            std::cout << "solve ok" << std::endl;
 
             // if(info.iter == -1)
             //     std::abort();
 
-            this->_uw = std::vector<double>(_sol.x, _sol.x + 6*this->_Nactive);
-            std::cout << "get solution ok" << std::endl;
-
             auto nbIter = _info.iter;
-            std::cout << "get nb iter ok" << std::endl;
             int nbActiveContatcs = 0;
             for(std::size_t i = 0; i < contacts.size(); ++i)
             {
@@ -226,20 +221,19 @@ namespace scopi{
             }
             std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
 
-
             return nbIter;
         }
 
     template<std::size_t dim>
         auto ScsSolver<dim>::getUadapt()
         {
-            return xt::adapt(this->_uw.data(), {this->_Nactive, 3UL});
+            return xt::adapt(reinterpret_cast<double*>(_sol.x), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
         auto ScsSolver<dim>::getWadapt()
         {
-            return xt::adapt(this->_uw.data()+3*this->_Nactive, {this->_Nactive, 3UL});
+            return xt::adapt(reinterpret_cast<double*>(_sol.x+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
