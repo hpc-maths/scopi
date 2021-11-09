@@ -12,7 +12,10 @@ namespace scopi{
                 ~ScsSolver();
                 void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
                 void createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut);
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
+                auto getUadapt();
+                auto getWadapt();
+
             private:
                 ScsMatrix* _P = NULL;
                 ScsMatrix* _A = NULL;
@@ -149,7 +152,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, std::vector<double>& solOut)
+        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts)
         {
             ScsData d;
             d.m = contacts.size();
@@ -206,7 +209,8 @@ namespace scopi{
             // if(info.iter == -1)
             //     std::abort();
 
-            solOut = std::vector<double> (sol.x, sol.x + 6*this->_Nactive);
+            this->_uw = std::vector<double>(sol.x, sol.x + 6*this->_Nactive);
+
             auto nbIter = info.iter;
             int nbActiveContatcs = 0;
             for(std::size_t i = 0; i < contacts.size(); ++i)
@@ -230,6 +234,18 @@ namespace scopi{
             delete[] sol.s;
 
             return nbIter;
+        }
+
+    template<std::size_t dim>
+        auto ScsSolver<dim>::getUadapt()
+        {
+            return xt::adapt(this->_uw.data(), {this->_Nactive, 3UL});
+        }
+
+    template<std::size_t dim>
+        auto ScsSolver<dim>::getWadapt()
+        {
+            return xt::adapt(this->_uw.data()+3*this->_Nactive, {this->_Nactive, 3UL});
         }
 
 }
