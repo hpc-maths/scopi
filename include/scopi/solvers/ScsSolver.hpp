@@ -12,7 +12,7 @@ namespace scopi{
                 void createVectorC();
                 ScsMatrix* createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
                 ScsMatrix* createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& distances, std::vector<double>& solOut);
+                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, std::vector<double>& solOut);
             private:
         };
 
@@ -145,14 +145,14 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, xt::xtensor<double, 1>& distances, std::vector<double>& solOut)
+        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts, ScsMatrix* A, ScsMatrix* P, std::vector<double>& solOut)
         {
             ScsData d;
             d.m = contacts.size();
             d.n = 6*this->_Nactive;
             d.A = A;
             d.P = P;
-            d.b = distances.data();
+            d.b = this->_distances.data();
             d.c = this->_c.data();
 
             ScsCone k;

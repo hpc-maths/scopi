@@ -5,7 +5,7 @@ namespace scopi{
         class OptimizationSolver
         {
             public:
-                xt::xtensor<double, 1> createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
+                void createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts);
 
             protected:
                 OptimizationSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize);
@@ -19,6 +19,7 @@ namespace scopi{
                 double _mass = 1.;
                 double _moment = .1;
                 xt::xtensor<double, 1> _c;
+                xt::xtensor<double, 1> _distances;
         };
 
     template<std::size_t dim>
@@ -32,16 +33,15 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-        xt::xtensor<double, 1> OptimizationSolver<dim>::createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimizationSolver<dim>::createVectorDistances(std::vector<scopi::neighbor<dim>>& contacts)
         {
             // fill vector with distances
-            xt::xtensor<double, 1> distances = xt::zeros<double>({contacts.size()});
+            _distances = xt::zeros<double>({contacts.size()});
             for(std::size_t i=0; i<contacts.size(); ++i)
             {
-                distances[i] = contacts[i].dij;
+                _distances[i] = contacts[i].dij;
             }
             // std::cout << "distances " << distances << std::endl;
-            return distances;
         }
 
 
