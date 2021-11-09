@@ -101,6 +101,7 @@ namespace scopi
 
                 // create mass and inertia matrices
                 tic();
+                _solver.allocateMemory(contacts.size());
                 _solver.createMatrixConstraint(contacts);
                 _solver.createMatrixMass();
                 _solver.createVectorC();
