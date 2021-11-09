@@ -15,6 +15,7 @@ namespace scopi{
                 int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
                 auto getUadapt();
                 auto getWadapt();
+                void allocateMemory(std::size_t nc);
                 void freeMemory();
 
             private:
@@ -36,6 +37,8 @@ namespace scopi{
             _P.x = new scs_float[6*this->_Nactive];
             _P.i = new scs_int[6*this->_Nactive];
             _P.p = new scs_int[6*this->_Nactive+1];
+            _sol.x = new double[6*this->_Nactive];
+            _A.p = new scs_int[6*this->_Nactive+1];
             // default values not set
             // use values given by
             // https://www.cvxgrp.org/scs/api/settings.html#settings
@@ -121,9 +124,6 @@ namespace scopi{
             }
             csc_col[0] = 0;
 
-            _A.x = new scs_float[csc_val.size()];
-            _A.i = new scs_int[csc_row.size()];
-            _A.p = new scs_int[csc_col.size()];
             for(std::size_t i = 0; i < csc_val.size(); ++i)
                 _A.x[i] = csc_val[i];
             for(std::size_t i = 0; i < csc_row.size(); ++i)
@@ -200,10 +200,6 @@ namespace scopi{
             _k.p = NULL;
             _k.psize = 0;
 
-            _sol.x = new double[_d.n];
-            _sol.y = new double[_d.m];
-            _sol.s = new double[_d.m];
-
             scs(&_d, &_k, &_stgs, &_sol, &_info);
 
             // if(info.iter == -1)
@@ -236,13 +232,20 @@ namespace scopi{
         }
 
     template<std::size_t dim>
+        void ScsSolver<dim>::allocateMemory(std::size_t nc)
+        {
+            _A.x = new scs_float[2*6*nc];
+            _A.i = new scs_int[2*6*nc];
+            _sol.y = new scs_float[nc];
+            _sol.s = new scs_float[nc];
+        }
+
+    template<std::size_t dim>
         void ScsSolver<dim>::freeMemory()
         {
             // TODO check that the memory was indeed allocated before freeing it
             delete[] _A.x;
             delete[] _A.i;
-            delete[] _A.p;
-            delete[] _sol.x;
             delete[] _sol.y;
             delete[] _sol.s;
         }

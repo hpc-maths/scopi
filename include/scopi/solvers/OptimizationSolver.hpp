@@ -12,6 +12,7 @@ namespace scopi{
                 virtual int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts) = 0;
                 auto getUadapt();
                 auto getWadapt();
+                virtual void allocateMemory(std::size_t nc) = 0;
                 virtual void freeMemory() = 0;
 
             protected:

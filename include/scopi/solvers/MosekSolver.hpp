@@ -17,6 +17,7 @@ namespace scopi{
                 int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
                 auto getUadapt();
                 auto getWadapt();
+                void allocateMemory(std::size_t nc);
                 void freeMemory();
 
             private:
@@ -153,6 +154,12 @@ namespace scopi{
         auto MosekSolver<dim>::getWadapt()
         {
             return xt::adapt(reinterpret_cast<double*>(_Xlvl->raw()+1+3*this->_Nactive), {this->_Nactive, 3UL});
+        }
+
+    template<std::size_t dim>
+        void MosekSolver<dim>::allocateMemory(std::size_t nc)
+        {
+            std::ignore = nc;
         }
 
     template<std::size_t dim>
