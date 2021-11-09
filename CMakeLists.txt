@@ -39,6 +39,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
 find_package(MOSEK REQUIRED)
 find_package(OpenMP)
+find_package(scs REQUIRED)
 
 # set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
 
@@ -63,13 +64,14 @@ set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 add_library(scopi_cpp INTERFACE)
 include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
-                                               $<INSTALL_INTERFACE:include>)
+                                               $<INSTALL_INTERFACE:include>
+                                               )
                                     #  SYSTEM INTERFACE $<BUILD_INTERFACE:${MOSEK_INCLUDE_DIR}>)
 
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES})
+target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir)
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 
