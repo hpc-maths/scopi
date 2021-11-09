@@ -18,8 +18,8 @@ namespace scopi{
                 void freeMemory();
 
             private:
-                ScsMatrix* _P = NULL;
-                ScsMatrix* _A = NULL;
+                ScsMatrix _P;
+                ScsMatrix _A;
                 ScsData _d;
                 ScsCone _k;
                 ScsSolution _sol;
@@ -33,8 +33,9 @@ namespace scopi{
         ScsSolver<dim>::ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
-            _P = new ScsMatrix;
-            _A = new ScsMatrix;
+            _P.x = new scs_float[6*this->_Nactive];
+            _P.i = new scs_int[6*this->_Nactive];
+            _P.p = new scs_int[6*this->_Nactive+1];
             // default values not set
             // use values given by
             // https://www.cvxgrp.org/scs/api/settings.html#settings
@@ -60,8 +61,9 @@ namespace scopi{
     template<std::size_t dim>
         ScsSolver<dim>::~ScsSolver()
         {
-            delete _P;
-            delete _A;
+            delete[] _P.x;
+            delete[] _P.i;
+            delete[] _P.p;
         }
 
     template<std::size_t dim>
@@ -119,17 +121,17 @@ namespace scopi{
             }
             csc_col[0] = 0;
 
-            _A->x = new scs_float[csc_val.size()];
-            _A->i = new scs_int[csc_row.size()];
-            _A->p = new scs_int[csc_col.size()];
+            _A.x = new scs_float[csc_val.size()];
+            _A.i = new scs_int[csc_row.size()];
+            _A.p = new scs_int[csc_col.size()];
             for(std::size_t i = 0; i < csc_val.size(); ++i)
-                _A->x[i] = csc_val[i];
+                _A.x[i] = csc_val[i];
             for(std::size_t i = 0; i < csc_row.size(); ++i)
-                _A->i[i] = csc_row[i];
+                _A.i[i] = csc_row[i];
             for(std::size_t i = 0; i < csc_col.size(); ++i)
-                _A->p[i] = csc_col[i];
-            _A->m = contacts.size();
-            _A->n = 6*this->_Nactive;
+                _A.p[i] = csc_col[i];
+            _A.m = contacts.size();
+            _A.n = 6*this->_Nactive;
         }
 
     template<std::size_t dim>
@@ -164,17 +166,14 @@ namespace scopi{
 
             // TODO allocation in constructor
             // There is a segfault if the memory is allocated in the constructor
-            _P->x = new scs_float[6*this->_Nactive];
-            _P->i = new scs_int[6*this->_Nactive];
-            _P->p = new scs_int[6*this->_Nactive+1];
             for(std::size_t i = 0; i < val.size(); ++i)
-                _P->x[i] = val[i];
+                _P.x[i] = val[i];
             for(std::size_t i = 0; i < row.size(); ++i)
-                _P->i[i] = row[i];
+                _P.i[i] = row[i];
             for(std::size_t i = 0; i < col.size(); ++i)
-                _P->p[i] = col[i];
-            _P->m = 6*this->_Nactive;
-            _P->n = 6*this->_Nactive;
+                _P.p[i] = col[i];
+            _P.m = 6*this->_Nactive;
+            _P.n = 6*this->_Nactive;
         }
 
     template<std::size_t dim>
@@ -182,8 +181,8 @@ namespace scopi{
         {
             _d.m = contacts.size();
             _d.n = 6*this->_Nactive;
-            _d.A = _A;
-            _d.P = _P;
+            _d.A = &_A;
+            _d.P = &_P;
             _d.b = this->_distances.data();
             _d.c = this->_c.data();
 
@@ -240,12 +239,9 @@ namespace scopi{
         void ScsSolver<dim>::freeMemory()
         {
             // TODO check that the memory was indeed allocated before freeing it
-            delete[] _A->x;
-            delete[] _A->i;
-            delete[] _A->p;
-            delete[] _P->x;
-            delete[] _P->i;
-            delete[] _P->p;
+            delete[] _A.x;
+            delete[] _A.i;
+            delete[] _A.p;
             delete[] _sol.x;
             delete[] _sol.y;
             delete[] _sol.s;
