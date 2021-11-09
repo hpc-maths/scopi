@@ -27,7 +27,6 @@ namespace scopi{
                 xt::xtensor<double, 1> _c;
                 std::size_t _cDec;
                 xt::xtensor<double, 1> _distances;
-                std::vector<double> _uw;
         };
 
     template<std::size_t dim>

@@ -119,7 +119,7 @@ namespace scopi
                 // move the active particles
                 moveActiveParticles();
 
-                // free the memory for next solve
+                // free the memory for the next solve
                 _solver.freeMemory();
             }
         }
