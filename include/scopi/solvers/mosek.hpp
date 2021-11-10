@@ -18,6 +18,7 @@
 #include "../quaternion.hpp"
 #include "MosekSolver.hpp"
 #include "ScsSolver.hpp"
+#include "UzawaSolver.hpp"
 
 #include <scopi/contact/contact_kdtree.hpp>
 // #include <scopi/contact/contact_brute_force.hpp>
