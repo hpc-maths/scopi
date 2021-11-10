@@ -1,6 +1,6 @@
 #include <xtensor/xmath.hpp>
-#include <scopi/object/superellipsoid.hpp>
-#include "../mosek_solver.hpp"
+#include <scopi/objects/types/superellipsoid.hpp>
+#include <scopi/solvers/mosek.hpp>
 
 int main()
 {
@@ -56,8 +56,8 @@ int main()
     scopi::superellipsoid<dim> s0({{0., 0., 0.}}, {scopi::quaternion(-PI/4)}, {{.02, .02, .02}}, {{1.0, 1.0}});
     // scopi::superellipsoid<dim> s1({{-0.2, 0., 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05, .05}}, {{1, 1}});
     // scopi::superellipsoid<dim> s2({{0.2, 0., 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05, .05}}, {{1, 1}});
-    scopi::superellipsoid<dim> s1({{-0.2, 0., 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05, .05}}, {{0.6, 0.6}});
-    scopi::superellipsoid<dim> s2({{0.2, 0., 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05, .05}}, {{0.2, 0.2}});
+    scopi::superellipsoid<dim> s1({{-0.2, 0., 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05, .05}}, {{1., 1.}});
+    scopi::superellipsoid<dim> s2({{0.2, 0., 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05, .05}}, {{1., 1.}});
     particles.push_back(s0, {{0, 0, 0}}, {{0., 0, 0}}, 0, 0, {{0, 0, 0}});
     particles.push_back(s1, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
     particles.push_back(s2, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
