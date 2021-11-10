@@ -18,6 +18,7 @@
 #include "../quaternion.hpp"
 #include "MosekSolver.hpp"
 #include "ScsSolver.hpp"
+#include "UzawaSolver.hpp"
 
 #include <nanoflann.hpp>
 
