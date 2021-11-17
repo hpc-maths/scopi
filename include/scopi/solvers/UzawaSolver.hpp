@@ -161,9 +161,9 @@ namespace scopi{
 
             // TODO update comment
             // while (( dt*R.max()>tol*2*people[:,2].min()) and (k<nb_iter_max)):
-            //    U[:] = V[:] - dt M^{-1} B.transpose()@L[:]
-            //    R[:] = dt B@U[:] - (D[:]-dmin)
-            //    L[:] = sp.maximum(L[:] + rho*R[:], 0)
+            //    U = P^{-1} (c - A^T L)
+            //    R = A U - D
+            //    L = sp.maximum(L + rho*R, 0)
             //    k += 1
 
             // The mkl_sparse_?_mv routine computes a sparse matrix-vector product defined as
@@ -178,75 +178,43 @@ namespace scopi{
             //    double *y
             // );
 
-            /*
-            // TODO use xt functions
-            // xt::view(_U, xt::range(0, 3*this->_Nactive+1)) = xt::flatten(this->_particles.v());
-            for (std::size_t i=0; i<this->_Nactive; ++i)
-            {
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    _U(3*i + d) = this->_particles.v()(i)(d);
-                }
-            }
-            for (std::size_t i=0; i<this->_Nactive; ++i)
-            {
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    _U(3*this->_Nactive + 3*i + d) = this->_particles.vd()(i)(d);
-                }
-            }
-            std::cout << "_U" << std::endl;
-            */
-
             auto L = xt::zeros_like(this->_distances);
             auto R = xt::zeros_like(this->_distances);
-            std::cout << "declaration L et R" << std::endl;
 
             std::size_t cc = 0;
             double cmax = -1000.0;
             while ( (cmax<=-_tol)&&(cc <= _maxiter) )
             {
-                std::cout << "debut while" << std::endl;
                 _U = this->_c;
-                std::cout << "U = c" << std::endl;
 
                 // I'm not sure about the -1
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, -1., _A, _descrA, &L[0], 1., &_U[0]); // U = - A^T * L + U
-                std::cout << "mkl_sparse_d_mv 1 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv U = A^T L + U: %d \n", _status);
                     return -1;
                 }
-                std::cout << "mkl_sparse_d_mv 1 après if" << std::endl;
 
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = P^-1 * U
-                std::cout << "mkl_sparse_d_mv 2 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv U = P^-1 U: %d \n", _status);
                     return -1;
                 }
-                std::cout << "mkl_sparse_d_mv 2 après if" << std::endl;
 
                 R = this->_distances;
-                std::cout << "R = D" << std::endl;
 
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &_U[0], -1., &R[0]); // R = A * U - R
-                std::cout << "mkl_sparse_d_mv 3 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
                     return -1;
                 }
-                std::cout << "mkl_sparse_d_mv 3 après if" << std::endl;
 
                 L = xt::maximum( L-_rho*R, 0);
-                std::cout << "L = max(L-rho*R)" << std::endl;
 
                 cmax = double((xt::amin(R))(0));
                 cc += 1;
-                std::cout << "cc++" << std::endl;
             }
 
             if (cc>=_maxiter)
