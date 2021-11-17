@@ -17,7 +17,7 @@ int main()
 
     std::size_t active_ptr = 0; // without obstacles
 
-    scopi::ScopiSolver<dim, scopi::MosekSolver<dim>> mosek_solver(particles, dt, active_ptr);
+    scopi::ScopiSolver<dim, scopi::UzawaSolver<dim>> mosek_solver(particles, dt, active_ptr);
     mosek_solver.solve(total_it);
 
     return 0;
