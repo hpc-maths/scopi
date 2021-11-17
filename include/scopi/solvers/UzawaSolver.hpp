@@ -41,7 +41,7 @@ namespace scopi{
     template<std::size_t dim>
         UzawaSolver<dim>::UzawaSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-2), _maxiter(4), _rho(0.2),
+            _tol(1.0e-2), _maxiter(40000), _rho(0.2),
             _U(xt::zeros<double>({6*Nactive}))
     {
     }
@@ -74,6 +74,24 @@ namespace scopi{
 
             _descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
             _descrA.diag = SPARSE_DIAG_NON_UNIT;
+
+            _status = mkl_sparse_set_mv_hint(_A, SPARSE_OPERATION_NON_TRANSPOSE, _descrA, 1 );
+            if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
+            {
+                printf(" Error in set hints for A: mkl_sparse_set_mv_hint: %d \n", _status);
+            }
+
+            _status = mkl_sparse_set_mv_hint(_A, SPARSE_OPERATION_TRANSPOSE, _descrA, 1 );
+            if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
+            {
+                printf(" Error in set hints for A^T: mkl_sparse_set_mv_hint: %d \n", _status);
+            }
+
+            _status = mkl_sparse_optimize ( _A );
+            if (_status != SPARSE_STATUS_SUCCESS)
+            {
+                printf(" Error in mkl_sparse_optimize for A: %d \n", _status);
+            }
         }
 
     template<std::size_t dim>
@@ -119,9 +137,20 @@ namespace scopi{
                 printf(" Error in mkl_sparse_d_create_csc for matrix P^-1: %d \n", _status);
             }
 
-            // _descrInvP.type = SPARSE_MATRIX_TYPE_DIAGONAL;
-            _descrInvP.type = SPARSE_MATRIX_TYPE_GENERAL;
+            _descrInvP.type = SPARSE_MATRIX_TYPE_DIAGONAL;
             _descrInvP.diag = SPARSE_DIAG_NON_UNIT;
+
+            _status = mkl_sparse_set_mv_hint(_invP, SPARSE_OPERATION_NON_TRANSPOSE, _descrInvP, 1 );
+            if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
+            {
+                printf(" Error in set hints for P^-1: mkl_sparse_set_mv_hint: %d \n", _status);
+            }
+
+            _status = mkl_sparse_optimize ( _invP );
+            if (_status != SPARSE_STATUS_SUCCESS)
+            {
+                printf(" Error in mkl_sparse_optimize for P^-1: %d \n", _status);
+            }
         }
 
     template<std::size_t dim>
