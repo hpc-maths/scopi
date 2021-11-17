@@ -35,13 +35,12 @@ namespace scopi{
             struct matrix_descr _descrInvP;
             sparse_matrix_t _A;
             struct matrix_descr _descrA;
-            sparse_matrix_t _matMatProd;
 
     };
 
     template<std::size_t dim>
         UzawaSolver<dim>::UzawaSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive + 2*3*Nactive, 0),
+            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
             _tol(1.0e-2), _maxiter(40000), _rho(0.2),
             _U(xt::zeros<double>({6*Nactive}))
     {
@@ -60,7 +59,7 @@ namespace scopi{
             std::vector<double> csr_val;
             OptimizationSolver<dim>::cooToCsr(coo_rows, coo_cols, coo_vals, csr_row, csr_col, csr_val);
 
-            _status = mkl_sparse_d_create_csc( &_A,
+            _status = mkl_sparse_d_create_csr( &_A,
                     SPARSE_INDEX_BASE_ZERO,
                     contacts.size(),    // number of rows
                     6*this->_Nactive,    // number of cols
@@ -104,7 +103,7 @@ namespace scopi{
             }
             col.push_back(6*this->_Nactive);
 
-            _status = mkl_sparse_d_create_csc( &_invP,
+            _status = mkl_sparse_d_create_csr( &_invP,
                     SPARSE_INDEX_BASE_ZERO,
                     6*this->_Nactive,    // number of rows
                     6*this->_Nactive,    // number of cols
@@ -161,47 +160,55 @@ namespace scopi{
                     _U(3*this->_Nactive + 3*i + d) = this->_particles.vd()(i)(d);
                 }
             }
+            std::cout << "_U" << std::endl;
 
             auto L = xt::zeros_like(this->_distances);
             auto R = xt::zeros_like(this->_distances);
+            std::cout << "declaration L et R" << std::endl;
 
             std::size_t cc = 0;
             double cmax = -1000.0;
             while ( (cmax<=-_tol)&&(cc <= _maxiter) )
             {
-                _status = mkl_sparse_spmm(SPARSE_OPERATION_TRANSPOSE, _A, _invP, &_matMatProd); // matMatProd = A^T * P^-1
-                if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-                {
-                    printf(" Error in mkl_sparse_spmm: %d \n", _status);
-                    return -1;
-                }
+                std::cout << "debut while" << std::endl;
+                _U = this->_c;
+                std::cout << "U = c" << std::endl;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _matMatProd, _descrA, &L[0], 0., &_U[0]); // U = (A^T * P^-1) * L
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, -1., _A, _descrA, &L[0], 1., &_U[0]); // U = - A^T * L + U
+                std::cout << "mkl_sparse_d_mv 1 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
-                    printf(" Error in mkl_sparse_d_mv U = (P^-1 A) L: %d \n", _status);
+                    printf(" Error in mkl_sparse_d_mv U = A^T L + U: %d \n", _status);
                     return -1;
                 }
+                std::cout << "mkl_sparse_d_mv 1 après if" << std::endl;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _invP, _descrInvP, &this->_c[0], 1., &_U[0]); // U = P^-1 * c + U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = P^-1 * U
+                std::cout << "mkl_sparse_d_mv 2 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
-                    printf(" Error in mkl_sparse_d_mv U = P^-1 c + U: %d \n", _status);
+                    printf(" Error in mkl_sparse_d_mv U = P^-1 U: %d \n", _status);
                     return -1;
                 }
+                std::cout << "mkl_sparse_d_mv 2 après if" << std::endl;
 
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &_U[0], 0., &R[0]); // R = A * U
+                std::cout << "mkl_sparse_d_mv 3 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
                     return -1;
                 }
+                std::cout << "mkl_sparse_d_mv 3 après if" << std::endl;
 
                 R = R - this->_distances;
+                std::cout << "R = R - D" << std::endl;
                 L = xt::maximum( L-_rho*R, 0);
+                std::cout << "L = max(L-rho*R)" << std::endl;
 
                 cmax = double((xt::amin(R))(0));
                 cc += 1;
+                std::cout << "cc++" << std::endl;
             }
 
             if (cc>=_maxiter)
@@ -371,6 +378,5 @@ exit:
         {
             mkl_sparse_destroy ( _invP );
             mkl_sparse_destroy ( _A );
-            mkl_sparse_destroy ( _matMatProd );
         }
 }
