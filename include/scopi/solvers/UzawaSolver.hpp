@@ -41,7 +41,7 @@ namespace scopi{
     template<std::size_t dim>
         UzawaSolver<dim>::UzawaSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-2), _maxiter(40000), _rho(0.2),
+            _tol(1.0e-2), _maxiter(4), _rho(0.2),
             _U(xt::zeros<double>({6*Nactive}))
     {
     }
@@ -79,9 +79,12 @@ namespace scopi{
     template<std::size_t dim>
         void UzawaSolver<dim>::createMatrixMass()
         {
-            std::vector<MKL_INT> col(6*this->_Nactive+1);
-            std::vector<MKL_INT> row(6*this->_Nactive);
-            std::vector<double> val(6*this->_Nactive);
+            std::vector<scs_int> col;
+            std::vector<scs_int> row;
+            std::vector<scs_float> val;
+            row.reserve(6*this->_Nactive);
+            col.reserve(6*this->_Nactive+1);
+            val.reserve(6*this->_Nactive);
 
             for (std::size_t i=0; i<this->_Nactive; ++i)
             {
@@ -116,7 +119,9 @@ namespace scopi{
                 printf(" Error in mkl_sparse_d_create_csc for matrix P^-1: %d \n", _status);
             }
 
-            _descrInvP.type = SPARSE_MATRIX_TYPE_DIAGONAL;
+            // _descrInvP.type = SPARSE_MATRIX_TYPE_DIAGONAL;
+            _descrInvP.type = SPARSE_MATRIX_TYPE_GENERAL;
+            _descrInvP.diag = SPARSE_DIAG_NON_UNIT;
         }
 
     template<std::size_t dim>
@@ -144,6 +149,7 @@ namespace scopi{
             //    double *y
             // );
 
+            /*
             // TODO use xt functions
             // xt::view(_U, xt::range(0, 3*this->_Nactive+1)) = xt::flatten(this->_particles.v());
             for (std::size_t i=0; i<this->_Nactive; ++i)
@@ -161,6 +167,7 @@ namespace scopi{
                 }
             }
             std::cout << "_U" << std::endl;
+            */
 
             auto L = xt::zeros_like(this->_distances);
             auto R = xt::zeros_like(this->_distances);
@@ -174,6 +181,7 @@ namespace scopi{
                 _U = this->_c;
                 std::cout << "U = c" << std::endl;
 
+                // I'm not sure about the -1
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, -1., _A, _descrA, &L[0], 1., &_U[0]); // U = - A^T * L + U
                 std::cout << "mkl_sparse_d_mv 1 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
@@ -192,7 +200,10 @@ namespace scopi{
                 }
                 std::cout << "mkl_sparse_d_mv 2 après if" << std::endl;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &_U[0], 0., &R[0]); // R = A * U
+                R = this->_distances;
+                std::cout << "R = D" << std::endl;
+
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &_U[0], -1., &R[0]); // R = A * U - R
                 std::cout << "mkl_sparse_d_mv 3 avant if" << std::endl;
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
@@ -201,8 +212,6 @@ namespace scopi{
                 }
                 std::cout << "mkl_sparse_d_mv 3 après if" << std::endl;
 
-                R = R - this->_distances;
-                std::cout << "R = R - D" << std::endl;
                 L = xt::maximum( L-_rho*R, 0);
                 std::cout << "L = max(L-rho*R)" << std::endl;
 
