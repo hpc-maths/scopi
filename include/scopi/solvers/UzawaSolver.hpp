@@ -1,8 +1,12 @@
 #pragma once
 
+#include "OptimizationSolver.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
 #include <stdio.h>
+
+#include <xtensor/xadapt.hpp>
+#include <xtensor/xview.hpp>
 
 namespace scopi{
     template<std::size_t dim>
@@ -24,6 +28,7 @@ namespace scopi{
             const double _tol;
             const std::size_t _maxiter;
             const double _rho;
+            xt::xtensor<double, 1> _U;
 
             sparse_status_t _status;
             sparse_matrix_t _invP;
@@ -37,7 +42,8 @@ namespace scopi{
     template<std::size_t dim>
         UzawaSolver<dim>::UzawaSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive + 2*3*Nactive, 0),
-            _tol(1.0e-2), _maxiter(40000), _rho(0.2)
+            _tol(1.0e-2), _maxiter(40000), _rho(0.2),
+            _U(xt::zeros<double>({6*Nactive}))
     {
     }
 
@@ -74,9 +80,6 @@ namespace scopi{
     template<std::size_t dim>
         void UzawaSolver<dim>::createMatrixMass()
         {
-            // !!!!!!!
-            // auto invM = xt::ones<double>({3*p.size(), });
-            // !!!!!!!
             std::vector<MKL_INT> col(6*this->_Nactive+1);
             std::vector<MKL_INT> row(6*this->_Nactive);
             std::vector<double> val(6*this->_Nactive);
@@ -120,8 +123,10 @@ namespace scopi{
     template<std::size_t dim>
         int UzawaSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts)
         {
+            std::ignore = contacts;
             // Uzawa algorithm
 
+            // TODO update comment
             // while (( dt*R.max()>tol*2*people[:,2].min()) and (k<nb_iter_max)):
             //    U[:] = V[:] - dt M^{-1} B.transpose()@L[:]
             //    R[:] = dt B@U[:] - (D[:]-dmin)
@@ -140,8 +145,23 @@ namespace scopi{
             //    double *y
             // );
 
-            auto U = xt::adapt(reinterpret_cast<double*>(this->_particles.v().data()), {3*this->_particles.size(), });
-            auto V = xt::adapt(reinterpret_cast<double*>(this->_particles.vd().data()), {3*this->_particles.size(), });
+            // TODO use xt functions
+            // xt::view(_U, xt::range(0, 3*this->_Nactive+1)) = xt::flatten(this->_particles.v());
+            for (std::size_t i=0; i<this->_Nactive; ++i)
+            {
+                for (std::size_t d=0; d<3; ++d)
+                {
+                    _U(3*i + d) = this->_particles.v()(i)(d);
+                }
+            }
+            for (std::size_t i=0; i<this->_Nactive; ++i)
+            {
+                for (std::size_t d=0; d<3; ++d)
+                {
+                    _U(3*this->_Nactive + 3*i + d) = this->_particles.vd()(i)(d);
+                }
+            }
+
             auto L = xt::zeros_like(this->_distances);
             auto R = xt::zeros_like(this->_distances);
 
@@ -156,21 +176,21 @@ namespace scopi{
                     return -1;
                 }
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _matMatProd, _descrA, &L[0], 0., &U[0]); // U = (A^T * P^-1) * L
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _matMatProd, _descrA, &L[0], 0., &_U[0]); // U = (A^T * P^-1) * L
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv U = (P^-1 A) L: %d \n", _status);
                     return -1;
                 }
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _invP, _descrInvP, &this->_c[0], 1., &U[0]); // U = P^-1 * c + U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _invP, _descrInvP, &this->_c[0], 1., &_U[0]); // U = P^-1 * c + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv U = P^-1 c + U: %d \n", _status);
                     return -1;
                 }
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &U[0], 0., &R[0]); // R = A * U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &_U[0], 0., &R[0]); // R = A * U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
@@ -331,15 +351,13 @@ exit:
     template<std::size_t dim>
         auto UzawaSolver<dim>::getUadapt()
         {
-            std::vector<double> v(this->_Nactive * 3UL, 0.);
-            return xt::adapt(v, {this->_Nactive, 3UL});
+            return xt::adapt(reinterpret_cast<double*>(_U.data()), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
         auto UzawaSolver<dim>::getWadapt()
         {
-            std::vector<double> v(this->_Nactive * 3UL, 0.);
-            return xt::adapt(v, {this->_Nactive, 3UL});
+            return xt::adapt(reinterpret_cast<double*>(_U.data()+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
