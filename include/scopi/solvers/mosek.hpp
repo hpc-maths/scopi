@@ -17,8 +17,8 @@
 #include "../objects/neighbor.hpp"
 #include "../quaternion.hpp"
 #include "MosekSolver.hpp"
-#include "ScsSolver.hpp"
-#include "UzawaSolver.hpp"
+// #include "ScsSolver.hpp"
+// #include "UzawaSolver.hpp"
 
 #include <nanoflann.hpp>
 
@@ -126,23 +126,8 @@ namespace scopi
                 // }
                 //
 
-                // create mass and inertia matrices
-                tic();
-                _solver.allocateMemory(contacts.size());
-                _solver.createMatrixConstraint(contacts);
-                _solver.createMatrixMass();
-                _solver.createVectorC();
-                _solver.createVectorDistances(contacts);
-                auto duration4 = toc();
-                std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
-
-                // Solve optimization problem
-                std::cout << "----> Create optimization problem " << nite << std::endl;
-                tic();
-                auto nbIter = _solver.solveOptimizationProbelm(contacts);
-                auto duration5 = toc();
-                std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
-                std::cout << "iterations : " << nbIter << std::endl;
+                // solver optimization problem
+                _solver.run(contacts, nite);
 
                 // move the active particles
                 moveActiveParticles();
