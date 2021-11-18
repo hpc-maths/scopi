@@ -9,6 +9,9 @@ target_link_libraries(critical_2d scopi_cpp)
 #   )
 # endif(APPLE)
 
+add_executable(critical_2d_no_overlap critical/2d_case_no_overlap.cpp)
+target_link_libraries(critical_2d_no_overlap scopi_cpp)
+
 add_executable(critical_3d critical/3d_case.cpp)
 target_link_libraries(critical_3d scopi_cpp)
 # if (APPLE)
@@ -19,9 +22,6 @@ target_link_libraries(critical_3d scopi_cpp)
 #   ${MOSEK_LIBRARIES} critical_3d
 #   )
 # endif(APPLE)
-
-add_executable(critical_2d_no_overlap critical/2d_case_no_overlap.cpp)
-target_link_libraries(critical_2d_no_overlap scopi_cpp)
 
 add_executable(two_spheres two_spheres.cpp)
 target_link_libraries(two_spheres scopi_cpp)

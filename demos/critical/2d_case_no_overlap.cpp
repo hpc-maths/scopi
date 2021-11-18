@@ -54,5 +54,4 @@ int main()
 
     scopi::ScopiSolver<dim, scopi::MosekSolver<dim>> solver(particles, dt, active_ptr);
     solver.solve(total_it);
-
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OptimizationSolver.hpp"
+#include "OptimBase.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
 #include <stdio.h>
@@ -10,17 +10,19 @@
 
 namespace scopi{
     template<std::size_t dim>
-        class UzawaSolver : public OptimizationSolver<dim>
+        class OptimUzawa : public OptimBase<OptimUzawa<dim>, dim>
     {
         public:
-            UzawaSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-            void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
-            void createMatrixMass();
-            int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
-            auto getUadapt();
-            auto getWadapt();
-            void allocateMemory(std::size_t nc);
-            void freeMemory();
+            using base_type = OptimBase<OptimUzawa<dim>, dim>;
+
+            OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+            void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            void createMatrixMass_impl();
+            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            auto getUadapt_impl();
+            auto getWadapt_impl();
+            void allocateMemory_impl(const std::size_t nc);
+            void freeMemory_impl();
 
         private:
             int testMkl();
@@ -39,25 +41,25 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        UzawaSolver<dim>::UzawaSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
+        OptimUzawa<dim>::OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+            OptimBase<OptimUzawa<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
             _tol(1.0e-2), _maxiter(40000), _rho(0.2),
             _U(xt::zeros<double>({6*Nactive}))
-    {
-    }
+            {
+            }
 
     template<std::size_t dim>
-        void UzawaSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawa<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             std::vector<MKL_INT> coo_rows;
             std::vector<MKL_INT> coo_cols;
             std::vector<double> coo_vals;
-            OptimizationSolver<dim>::createMatrixConstraint(contacts, coo_rows, coo_cols, coo_vals, 0);
+            this->createMatrixConstraintCoo(contacts, coo_rows, coo_cols, coo_vals, 0);
 
             std::vector<MKL_INT> csr_row;
             std::vector<MKL_INT> csr_col;
             std::vector<double> csr_val;
-            OptimizationSolver<dim>::cooToCsr(coo_rows, coo_cols, coo_vals, csr_row, csr_col, csr_val);
+            this->cooToCsr(coo_rows, coo_cols, coo_vals, csr_row, csr_col, csr_val);
 
             _status = mkl_sparse_d_create_csr( &_A,
                     SPARSE_INDEX_BASE_ZERO,
@@ -95,7 +97,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void UzawaSolver<dim>::createMatrixMass()
+        void OptimUzawa<dim>::createMatrixMass_impl()
         {
             std::vector<scs_int> col;
             std::vector<scs_int> row;
@@ -154,12 +156,11 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int UzawaSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimUzawa<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             std::ignore = contacts;
             // Uzawa algorithm
 
-            // TODO update comment
             // while (( dt*R.max()>tol*2*people[:,2].min()) and (k<nb_iter_max)):
             //    U = P^{-1} (c - A^T L)
             //    R = A U - D
@@ -227,7 +228,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int UzawaSolver<dim>::testMkl()
+        int OptimUzawa<dim>::testMkl()
         {
 #ifdef MKL_ILP64
 #define INT_PRINT_FORMAT "%lld"
@@ -362,25 +363,25 @@ exit:
         }
 
     template<std::size_t dim>
-        auto UzawaSolver<dim>::getUadapt()
+        auto OptimUzawa<dim>::getUadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_U.data()), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        auto UzawaSolver<dim>::getWadapt()
+        auto OptimUzawa<dim>::getWadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_U.data()+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        void UzawaSolver<dim>::allocateMemory(std::size_t nc)
+        void OptimUzawa<dim>::allocateMemory_impl(const std::size_t nc)
         {
             std::ignore = nc;
         }
 
     template<std::size_t dim>
-        void UzawaSolver<dim>::freeMemory()
+        void OptimUzawa<dim>::freeMemory_impl()
         {
             mkl_sparse_destroy ( _invP );
             mkl_sparse_destroy ( _A );
