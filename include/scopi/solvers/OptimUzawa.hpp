@@ -30,6 +30,7 @@ namespace scopi{
             const double _tol;
             const std::size_t _maxiter;
             const double _rho;
+            const double _dmin;
             xt::xtensor<double, 1> _U;
 
             sparse_status_t _status;
@@ -43,7 +44,7 @@ namespace scopi{
     template<std::size_t dim>
         OptimUzawa<dim>::OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimBase<OptimUzawa<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-2), _maxiter(40000), _rho(0.2),
+            _tol(1.0e-2), _maxiter(40000), _rho(0.2), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
@@ -203,7 +204,7 @@ namespace scopi{
                     return -1;
                 }
 
-                R = this->_distances;
+                R = this->_distances - _dmin;
 
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &_U[0], -1., &R[0]); // R = A * U - R
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
