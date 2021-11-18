@@ -216,6 +216,7 @@ namespace scopi{
 
                 cmax = double((xt::amin(R))(0));
                 cc += 1;
+                std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
             }
 
             if (cc>=_maxiter)
