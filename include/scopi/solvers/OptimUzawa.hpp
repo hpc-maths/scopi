@@ -189,15 +189,16 @@ namespace scopi{
             {
                 _U = this->_c;
 
-                // I'm not sure about the -1
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, -1., _A, _descrA, &L[0], 1., &_U[0]); // U = - A^T * L + U
+                // std::cout << "before " << _U(0) << std::endl;
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv U = A^T L + U: %d \n", _status);
                     return -1;
                 }
+                // std::cout << "after  " << _U(0) << std::endl;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = P^-1 * U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = - P^-1 * U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv U = P^-1 U: %d \n", _status);
@@ -206,14 +207,19 @@ namespace scopi{
 
                 R = this->_distances - _dmin;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., _A, _descrA, &_U[0], -1., &R[0]); // R = A * U - R
+                // std::cout << "before " << R(0) << std::endl;
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, &_U[0], 1., &R[0]); // R = - A * U + R
+                // double beta = -1.;
+                // _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 0., _A, _descrA, &_U[0], beta, &R[0]); // R = - A * U + R
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
                     return -1;
                 }
+                // std::cout << "after  " << R(0) << std::endl;
 
                 L = xt::maximum( L-_rho*R, 0);
+                // L = xt::maximum( L+_rho*R, 0);
 
                 cmax = double((xt::amin(R))(0));
                 cc += 1;
