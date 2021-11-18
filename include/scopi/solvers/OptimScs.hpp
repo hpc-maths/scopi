@@ -6,58 +6,60 @@
 namespace scopi{
     template<std::size_t dim>
         class OptimScs: public OptimBase<OptimScs<dim>, dim>
-        {
-            public:
-                OptimScs(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-                ~OptimScs();
-                void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
-                void createMatrixMass_impl();
-                int solveOptimizationProbelm_impl(const std::vector<scopi::neighbor<dim>>& contacts);
-                auto getUadapt_impl();
-                auto getWadapt_impl();
-                void allocateMemory_impl(const std::size_t nc);
-                void freeMemory_impl();
+    {
+        public:
+            using base_type = OptimBase<OptimScs<dim>, dim>;
 
-            private:
-                ScsMatrix _P;
-                ScsMatrix _A;
-                ScsData _d;
-                ScsCone _k;
-                ScsSolution _sol;
-                ScsInfo _info;
-                ScsSettings _stgs;
-                OptimScs(const OptimScs &);
-                OptimScs & operator=(const OptimScs &);
-        };
+            OptimScs(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+            ~OptimScs();
+            void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            void createMatrixMass_impl();
+            int solveOptimizationProbelm_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            auto getUadapt_impl();
+            auto getWadapt_impl();
+            void allocateMemory_impl(const std::size_t nc);
+            void freeMemory_impl();
+
+        private:
+            ScsMatrix _P;
+            ScsMatrix _A;
+            ScsData _d;
+            ScsCone _k;
+            ScsSolution _sol;
+            ScsInfo _info;
+            ScsSettings _stgs;
+            OptimScs(const OptimScs &);
+            OptimScs & operator=(const OptimScs &);
+    };
 
     template<std::size_t dim>
         OptimScs<dim>::OptimScs(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimBase<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
-            _P.x = new scs_float[6*this->_Nactive];
-            _P.i = new scs_int[6*this->_Nactive];
-            _P.p = new scs_int[6*this->_Nactive+1];
-            _sol.x = new double[6*this->_Nactive];
-            _A.p = new scs_int[6*this->_Nactive+1];
-            // default values not set
-            // use values given by
-            // https://www.cvxgrp.org/scs/api/settings.html#settings
-            _stgs.normalize = 1;
-            _stgs.scale = 0.1;
-            _stgs.adaptive_scale = 1;
-            _stgs.rho_x = 1e-6;
-            _stgs.max_iters = 1e5;
-            _stgs.eps_abs = 1e-4;
-            _stgs.eps_rel = 1e-4;
-            _stgs.eps_infeas = 1e-7;
-            _stgs.alpha = 1.5;
-            _stgs.time_limit_secs = 0.;
-            _stgs.verbose = 1;
-            _stgs.warm_start = 0;
-            _stgs.acceleration_lookback = 0;
-            _stgs.acceleration_interval = 1;
-            _stgs.write_data_filename = NULL;
-            _stgs.log_csv_filename = NULL;
+        _P.x = new scs_float[6*this->_Nactive];
+        _P.i = new scs_int[6*this->_Nactive];
+        _P.p = new scs_int[6*this->_Nactive+1];
+        _sol.x = new double[6*this->_Nactive];
+        _A.p = new scs_int[6*this->_Nactive+1];
+        // default values not set
+        // use values given by
+        // https://www.cvxgrp.org/scs/api/settings.html#settings
+        _stgs.normalize = 1;
+        _stgs.scale = 0.1;
+        _stgs.adaptive_scale = 1;
+        _stgs.rho_x = 1e-6;
+        _stgs.max_iters = 1e5;
+        _stgs.eps_abs = 1e-4;
+        _stgs.eps_rel = 1e-4;
+        _stgs.eps_infeas = 1e-7;
+        _stgs.alpha = 1.5;
+        _stgs.time_limit_secs = 0.;
+        _stgs.verbose = 1;
+        _stgs.warm_start = 0;
+        _stgs.acceleration_lookback = 0;
+        _stgs.acceleration_interval = 1;
+        _stgs.write_data_filename = NULL;
+        _stgs.log_csv_filename = NULL;
 
     }
 
