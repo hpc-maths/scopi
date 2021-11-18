@@ -19,7 +19,7 @@
 
 #include "OptimMosek.hpp"
 #include "OptimScs.hpp"
-// #include "UzawaSolver.hpp"
+#include "OptimUzawa.hpp"
 
 #include <nanoflann.hpp>
 
