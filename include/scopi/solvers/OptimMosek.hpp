@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OptimizationSolver.hpp"
+#include "OptimBase.hpp"
 #include <fusion.h>
 
 namespace scopi{

@@ -16,7 +16,7 @@
 #include "../objects/methods/write_objects.hpp"
 #include "../objects/neighbor.hpp"
 #include "../quaternion.hpp"
-#include "MosekSolver.hpp"
+#include "OptimMosek.hpp"
 // #include "ScsSolver.hpp"
 // #include "UzawaSolver.hpp"
 
