@@ -16,7 +16,7 @@ namespace scopi{
             OptimMosek(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
             void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             void createMatrixMass_impl();
-            int solveOptimizationProbelm_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             auto getUadapt_impl();
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
@@ -107,7 +107,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int OptimMosek<dim>::solveOptimizationProbelm_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimMosek<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
             // variables
