@@ -16,8 +16,9 @@
 #include "../objects/methods/write_objects.hpp"
 #include "../objects/neighbor.hpp"
 #include "../quaternion.hpp"
+
 #include "OptimMosek.hpp"
-// #include "ScsSolver.hpp"
+#include "OptimScs.hpp"
 // #include "UzawaSolver.hpp"
 
 #include <scopi/contact/contact_kdtree.hpp>
