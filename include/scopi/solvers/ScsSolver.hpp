@@ -1,22 +1,22 @@
 #pragma once
 
-#include "OptimizationSolver.hpp"
+#include "OptimBase.hpp"
 #include <scs.h>
 
 namespace scopi{
     template<std::size_t dim>
-        class ScsSolver : public OptimizationSolver<dim>
+        class OptimScs: public OptimBase<OptimScs<dim>, dim>
         {
             public:
-                ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-                ~ScsSolver();
-                void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
-                void createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
-                auto getUadapt();
-                auto getWadapt();
-                void allocateMemory(std::size_t nc);
-                void freeMemory();
+                OptimScs(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+                ~OptimScs();
+                void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+                void createMatrixMass_impl();
+                int solveOptimizationProbelm_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+                auto getUadapt_impl();
+                auto getWadapt_impl();
+                void allocateMemory_impl(const std::size_t nc);
+                void freeMemory_impl();
 
             private:
                 ScsMatrix _P;
@@ -26,13 +26,13 @@ namespace scopi{
                 ScsSolution _sol;
                 ScsInfo _info;
                 ScsSettings _stgs;
-                ScsSolver(const ScsSolver &);
-                ScsSolver & operator=(const ScsSolver &);
+                OptimScs(const OptimScs &);
+                OptimScs & operator=(const OptimScs &);
         };
 
     template<std::size_t dim>
-        ScsSolver<dim>::ScsSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
+        OptimScs<dim>::OptimScs(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+            OptimBase<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
             _P.x = new scs_float[6*this->_Nactive];
             _P.i = new scs_int[6*this->_Nactive];
@@ -62,7 +62,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-        ScsSolver<dim>::~ScsSolver()
+        OptimScs<dim>::~OptimScs()
         {
             delete[] _P.x;
             delete[] _P.i;
@@ -70,7 +70,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void ScsSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimScs<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             // COO storage to CSR storage is easy to write, e.g.
             // The CSC storage of A is the CSR storage of A^T
@@ -78,12 +78,12 @@ namespace scopi{
             std::vector<int> coo_rows;
             std::vector<int> coo_cols;
             std::vector<double> coo_vals;
-            OptimizationSolver<dim>::createMatrixConstraint(contacts, coo_rows, coo_cols, coo_vals, 0);
+            this->createMatrixConstraintCoo(contacts, coo_rows, coo_cols, coo_vals, 0);
 
             std::vector<int> csc_row;
             std::vector<int> csc_col;
             std::vector<double> csc_val;
-            OptimizationSolver<dim>::cooToCsr(coo_cols, coo_rows, coo_vals, csc_col, csc_row, csc_val);
+            this->cooToCsr(coo_cols, coo_rows, coo_vals, csc_col, csc_row, csc_val);
 
             for(std::size_t i = 0; i < csc_val.size(); ++i)
                 _A.x[i] = csc_val[i];
@@ -96,7 +96,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void ScsSolver<dim>::createMatrixMass()
+        void OptimScs<dim>::createMatrixMass_impl()
         {
             std::vector<scs_int> col;
             std::vector<scs_int> row;
@@ -138,7 +138,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int ScsSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimScs<dim>::solveOptimizationProbelm_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             _d.m = contacts.size();
             _d.n = 6*this->_Nactive;
@@ -181,19 +181,19 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        auto ScsSolver<dim>::getUadapt()
+        auto OptimScs<dim>::getUadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_sol.x), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        auto ScsSolver<dim>::getWadapt()
+        auto OptimScs<dim>::getWadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_sol.x+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        void ScsSolver<dim>::allocateMemory(std::size_t nc)
+        void OptimScs<dim>::allocateMemory_impl(const std::size_t nc)
         {
             _A.x = new scs_float[2*6*nc];
             _A.i = new scs_int[2*6*nc];
@@ -202,7 +202,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void ScsSolver<dim>::freeMemory()
+        void OptimScs<dim>::freeMemory_impl()
         {
             // TODO check that the memory was indeed allocated before freeing it
             delete[] _A.x;
