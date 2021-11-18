@@ -19,7 +19,7 @@
 
 #include "OptimMosek.hpp"
 #include "OptimScs.hpp"
-// #include "UzawaSolver.hpp"
+#include "OptimUzawa.hpp"
 
 #include <scopi/contact/contact_kdtree.hpp>
 // #include <scopi/contact/contact_brute_force.hpp>
