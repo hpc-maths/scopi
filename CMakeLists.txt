@@ -64,7 +64,8 @@ set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 add_library(scopi_cpp INTERFACE)
 include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
-                                               $<INSTALL_INTERFACE:include>)
+                                               $<INSTALL_INTERFACE:include>
+                                               )
                                     #  SYSTEM INTERFACE $<BUILD_INTERFACE:${MOSEK_INCLUDE_DIR}>)
 
 

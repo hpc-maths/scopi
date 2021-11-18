@@ -16,7 +16,7 @@ int main()
     scopi::scopi_container<dim> particles;
 
     int n = 20; // 2*n*n particles
-    double spaceBetweenParticles = 3.;
+    double spaceBetweenParticles = 2.1;
 
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distrib_r(0.8,1.);
@@ -52,6 +52,6 @@ int main()
  
     std::size_t active_ptr = 0; // pas d'obstacles
 
-    mosek_solver(particles, dt, total_it, active_ptr);
-
+    scopi::ScopiSolver<dim, scopi::MosekSolver<dim>> solver(particles, dt, active_ptr);
+    solver.solve(total_it);
 }
