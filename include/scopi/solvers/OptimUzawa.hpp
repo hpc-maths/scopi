@@ -103,8 +103,8 @@ namespace scopi{
             std::vector<scs_int> col;
             std::vector<scs_int> row;
             std::vector<scs_float> val;
-            row.reserve(6*this->_Nactive);
-            col.reserve(6*this->_Nactive+1);
+            col.reserve(6*this->_Nactive);
+            row.reserve(6*this->_Nactive+1);
             val.reserve(6*this->_Nactive);
 
             for (std::size_t i=0; i<this->_Nactive; ++i)
@@ -125,15 +125,15 @@ namespace scopi{
                     val.push_back(1./this->_moment);
                 }
             }
-            col.push_back(6*this->_Nactive);
+            row.push_back(6*this->_Nactive);
 
             _status = mkl_sparse_d_create_csr( &_invP,
                     SPARSE_INDEX_BASE_ZERO,
                     6*this->_Nactive,    // number of rows
                     6*this->_Nactive,    // number of cols
-                    col.data(),
-                    col.data()+1,
                     row.data(),
+                    row.data()+1,
+                    col.data(),
                     val.data() );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
