@@ -43,11 +43,11 @@ namespace scopi{
         {
             // create mass and inertia matrices
             tic();
+            createVectorC();
+            createVectorDistances(contacts);
             allocateMemory(contacts.size());
             createMatrixConstraint(contacts);
             createMatrixMass();
-            createVectorC();
-            createVectorDistances(contacts);
             auto duration4 = toc();
             std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
 

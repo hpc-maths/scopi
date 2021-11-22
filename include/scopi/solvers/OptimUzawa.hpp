@@ -23,6 +23,7 @@ namespace scopi{
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
             void freeMemory_impl();
+            int getNbActiveContacts_impl();
 
         private:
             int testMkl();
@@ -397,5 +398,11 @@ exit:
             _csr_val.clear();
             std::cout << "std::vector::clear freeMemory_impl" << std::endl;
 #endif
+        }
+
+    template<std::size_t dim>
+        int OptimUzawa<dim>::getNbActiveContacts_impl()
+        {
+            return 0;
         }
 }
