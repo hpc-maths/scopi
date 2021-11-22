@@ -33,6 +33,7 @@ namespace scopi{
             const double _rho;
             const double _dmin;
             xt::xtensor<double, 1> _U;
+            int _nbActiveContacts;
 
     };
 
@@ -213,15 +214,17 @@ namespace scopi{
                 std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
             }
 
-            int nbActiveContatcs = 0;
+            // TODO use xt functions such as xt::where
+            _nbActiveContacts = 0;
             for(std::size_t i = 0; i < contacts.size(); ++i)
             {
                 if(L(i) > 0.)
                 {
-                    nbActiveContatcs++;
+                    _nbActiveContacts++;
                 }
             }
-            std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
+
+
             return cc;
         }
 
@@ -403,6 +406,7 @@ exit:
     template<std::size_t dim>
         int OptimUzawa<dim>::getNbActiveContacts_impl()
         {
-            return 0;
+            // TODO L as a member of the class and do the computation here
+            return _nbActiveContacts;
         }
 }
