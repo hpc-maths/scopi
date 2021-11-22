@@ -19,6 +19,7 @@ namespace scopi{
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
             void freeMemory_impl();
+            int getNbActiveContacts_impl();
 
         private:
             ScsMatrix _P;
@@ -169,16 +170,6 @@ namespace scopi{
             //     std::abort();
 
             auto nbIter = _info.iter;
-            int nbActiveContatcs = 0;
-            for(std::size_t i = 0; i < contacts.size(); ++i)
-            {
-                if(_sol.y[i] > 0.)
-                {
-                    nbActiveContatcs++;
-                }
-            }
-            std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
-
             return nbIter;
         }
 
@@ -211,6 +202,20 @@ namespace scopi{
             delete[] _A.i;
             delete[] _sol.y;
             delete[] _sol.s;
+        }
+
+    template<std::size_t dim>
+        int OptimScs<dim>::getNbActiveContacts_impl()
+        {
+            int nbActiveContacts = 0;
+            for(std::size_t i = 0; i < this->_distances.size(); ++i)
+            {
+                if(_sol.y[i] > 0.)
+                {
+                    nbActiveContacts++;
+                }
+            }
+            return nbActiveContacts;
         }
 
 }

@@ -21,11 +21,13 @@ namespace scopi{
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
             void freeMemory_impl();
+            int getNbActiveContacts_impl();
 
         private:
             Matrix::t _Az;
             Matrix::t _A;
             shared_ptr<ndarray<double,1>> _Xlvl;
+            shared_ptr<ndarray<double,1>> _dual;
 
     };
 
@@ -132,17 +134,9 @@ namespace scopi{
             model->solve();
 
             _Xlvl = X->level();
+            _dual = qc1->dual();
 
             int nbIter = model->getSolverIntInfo("intpntIter");
-
-            auto dual = *(qc1->dual());
-            int nbActiveContatcs = 0;
-            for(auto x : dual) 
-            {
-                if(std::abs(x) > 1e-3)
-                    nbActiveContatcs++;
-            }
-            std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
 
             return nbIter;
         }
@@ -169,4 +163,17 @@ namespace scopi{
         void OptimMosek<dim>::freeMemory_impl()
         {
         }
+
+    template<std::size_t dim>
+        int OptimMosek<dim>::getNbActiveContacts_impl()
+        {
+            int nbActiveContacts = 0;
+            for(auto x : *_dual) 
+            {
+                if(std::abs(x) > 1e-3)
+                    nbActiveContacts++;
+            }
+            return nbActiveContacts;
+        }
+
 }

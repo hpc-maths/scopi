@@ -35,6 +35,7 @@ namespace scopi{
             void createMatrixMass();
             int solveOptimizationProblem(const std::vector<scopi::neighbor<dim>>& contacts);
             void allocateMemory(const std::size_t nc);
+            int getNbActiveContacts();
     };
 
     template<class D, std::size_t dim>
@@ -57,7 +58,7 @@ namespace scopi{
             auto duration5 = toc();
             std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
             std::cout << "iterations : " << nbIter << std::endl;
-
+            std::cout << "Contacts: " << contacts.size() << "  active contacts " << getNbActiveContacts() << std::endl;
         }
 
 
@@ -272,6 +273,12 @@ namespace scopi{
         void OptimBase<D, dim>::freeMemory()
         {
             this->derived_cast().freeMemory_impl();
+        }
+
+    template<class D, std::size_t dim>
+        int OptimBase<D, dim>::getNbActiveContacts()
+        {
+            return this->derived_cast().getNbActiveContacts_impl();
         }
 }
 
