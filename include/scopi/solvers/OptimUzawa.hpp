@@ -33,25 +33,6 @@ namespace scopi{
             const double _dmin;
             xt::xtensor<double, 1> _U;
 
-#if 0
-            sparse_status_t _status;
-            sparse_matrix_t _invP;
-            struct matrix_descr _descrInvP;
-            sparse_matrix_t _A;
-            struct matrix_descr _descrA;
-
-            std::vector<MKL_INT> _col;
-            std::vector<MKL_INT> _row;
-            std::vector<double> _val;
-            std::vector<MKL_INT> _coo_rows;
-            std::vector<MKL_INT> _coo_cols;
-            std::vector<double> _coo_vals;
-            std::vector<MKL_INT> _csr_row;
-            std::vector<MKL_INT> _csr_col;
-            std::vector<double> _csr_val;
-#endif
-
-
     };
 
     template<std::size_t dim>
@@ -65,103 +46,11 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawa<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-#if 0
-            this->createMatrixConstraintCoo(contacts, _coo_rows, _coo_cols, _coo_vals, 0);
-
-            this->cooToCsr(_coo_rows, _coo_cols, _coo_vals, _csr_row, _csr_col, _csr_val);
-
-            _status = mkl_sparse_d_create_csr( &_A,
-                    SPARSE_INDEX_BASE_ZERO,
-                    contacts.size(),    // number of rows
-                    6*this->_Nactive,    // number of cols
-                    _csr_row.data(),
-                    _csr_row.data()+1,
-                    _csr_col.data(),
-                    _csr_val.data() );
-            if (_status != SPARSE_STATUS_SUCCESS)
-            {
-                printf(" Error in mkl_sparse_d_create_csc for matrix A: %d \n", _status);
-            }
-
-            _descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
-            _descrA.diag = SPARSE_DIAG_NON_UNIT;
-
-            _status = mkl_sparse_set_mv_hint(_A, SPARSE_OPERATION_NON_TRANSPOSE, _descrA, 1 );
-            if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-            {
-                printf(" Error in set hints for A: mkl_sparse_set_mv_hint: %d \n", _status);
-            }
-
-            _status = mkl_sparse_set_mv_hint(_A, SPARSE_OPERATION_TRANSPOSE, _descrA, 1 );
-            if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-            {
-                printf(" Error in set hints for A^T: mkl_sparse_set_mv_hint: %d \n", _status);
-            }
-
-            _status = mkl_sparse_optimize ( _A );
-            if (_status != SPARSE_STATUS_SUCCESS)
-            {
-                printf(" Error in mkl_sparse_optimize for A: %d \n", _status);
-            }
-#endif
         }
 
     template<std::size_t dim>
         void OptimUzawa<dim>::createMatrixMass_impl()
         {
-#if 0
-            _col.reserve(6*this->_Nactive);
-            _row.reserve(6*this->_Nactive+1);
-            _val.reserve(6*this->_Nactive);
-
-            for (std::size_t i=0; i<this->_Nactive; ++i)
-            {
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    _row.push_back(3*i + d);
-                    _col.push_back(3*i + d);
-                    _val.push_back(1./this->_mass); // TODO: add mass into particles
-                }
-            }
-            for (std::size_t i=0; i<this->_Nactive; ++i)
-            {
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    _row.push_back(3*this->_Nactive + 3*i + d);
-                    _col.push_back(3*this->_Nactive + 3*i + d);
-                    _val.push_back(1./this->_moment);
-                }
-            }
-            _row.push_back(6*this->_Nactive);
-
-            _status = mkl_sparse_d_create_csr( &_invP,
-                    SPARSE_INDEX_BASE_ZERO,
-                    6*this->_Nactive,    // number of rows
-                    6*this->_Nactive,    // number of cols
-                    _row.data(),
-                    _row.data()+1,
-                    _col.data(),
-                    _val.data() );
-            if (_status != SPARSE_STATUS_SUCCESS)
-            {
-                printf(" Error in mkl_sparse_d_create_csc for matrix P^-1: %d \n", _status);
-            }
-
-            _descrInvP.type = SPARSE_MATRIX_TYPE_DIAGONAL;
-            _descrInvP.diag = SPARSE_DIAG_NON_UNIT;
-
-            _status = mkl_sparse_set_mv_hint(_invP, SPARSE_OPERATION_NON_TRANSPOSE, _descrInvP, 1 );
-            if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-            {
-                printf(" Error in set hints for P^-1: mkl_sparse_set_mv_hint: %d \n", _status);
-            }
-
-            _status = mkl_sparse_optimize ( _invP );
-            if (_status != SPARSE_STATUS_SUCCESS)
-            {
-                printf(" Error in mkl_sparse_optimize for P^-1: %d \n", _status);
-            }
-#endif
         }
 
     template<std::size_t dim>
@@ -279,23 +168,19 @@ namespace scopi{
 
             auto L = xt::zeros_like(this->_distances);
             auto R = xt::zeros_like(this->_distances);
-            // */
 
             std::size_t cc = 0;
             double cmax = -1000.0;
-            // /*
             while ( (cmax<=-_tol)&&(cc <= _maxiter) )
             {
                 _U = this->_c;
 
-                // std::cout << "before " << _U(0) << std::endl;
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv U = A^T L + U: %d \n", _status);
                     return -1;
                 }
-                // std::cout << "after  " << _U(0) << std::endl;
 
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = - P^-1 * U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
@@ -306,19 +191,14 @@ namespace scopi{
 
                 R = this->_distances - _dmin;
 
-                // std::cout << "before " << R(0) << std::endl;
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, &_U[0], 1., &R[0]); // R = - A * U + R
-                // double beta = -1.;
-                // _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 0., _A, _descrA, &_U[0], beta, &R[0]); // R = - A * U + R
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
                     return -1;
                 }
-                // std::cout << "after  " << R(0) << std::endl;
 
                 L = xt::maximum( L-_rho*R, 0);
-                // L = xt::maximum( L+_rho*R, 0);
 
                 cmax = double((xt::amin(R))(0));
                 cc += 1;
@@ -341,96 +221,8 @@ namespace scopi{
                 }
             }
             std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
-            // */
             return cc;
         }
-
-#if 0
-    template<std::size_t dim>
-        int OptimUzawa<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            std::ignore = contacts;
-            // Uzawa algorithm
-
-            // while (( dt*R.max()>tol*2*people[:,2].min()) and (k<nb_iter_max)):
-            //    U = P^{-1} (c - A^T L)
-            //    R = A U - D
-            //    L = sp.maximum(L + rho*R, 0)
-            //    k += 1
-
-            // The mkl_sparse_?_mv routine computes a sparse matrix-vector product defined as
-            //              y := alpha*op(A)*x + beta*y
-            // sparse_status_t mkl_sparse_d_mv (
-            //    sparse_operation_t operation,
-            //    double alpha,
-            //    const sparse_matrix_t A,
-            //    struct matrix_descr descr,
-            //    const double *x,
-            //    double beta,
-            //    double *y
-            // );
-
-            auto L = xt::zeros_like(this->_distances);
-            auto R = xt::zeros_like(this->_distances);
-
-            std::size_t cc = 0;
-            double cmax = -1000.0;
-            while ( (cmax<=-_tol)&&(cc <= _maxiter) )
-            {
-                _U = this->_c;
-
-                // std::cout << "before " << _U(0) << std::endl;
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
-                if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-                {
-                    printf(" Error in mkl_sparse_d_mv U = A^T L + U: %d \n", _status);
-                    return -1;
-                }
-                // std::cout << "after  " << _U(0) << std::endl;
-
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = - P^-1 * U
-                if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-                {
-                    printf(" Error in mkl_sparse_d_mv U = P^-1 U: %d \n", _status);
-                    return -1;
-                }
-
-                R = this->_distances - _dmin;
-
-                // std::cout << "before " << R(0) << std::endl;
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, &_U[0], 1., &R[0]); // R = - A * U + R
-                // double beta = -1.;
-                // _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 0., _A, _descrA, &_U[0], beta, &R[0]); // R = - A * U + R
-                if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-                {
-                    printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
-                    return -1;
-                }
-                // std::cout << "after  " << R(0) << std::endl;
-
-                L = xt::maximum( L-_rho*R, 0);
-                // L = xt::maximum( L+_rho*R, 0);
-
-                cmax = double((xt::amin(R))(0));
-                cc += 1;
-                std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
-            }
-
-            if (cc>=_maxiter)
-            {
-                std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
-                std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
-                std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
-            }
-
-            std::cout << "start freeMemory_impl" << std::endl;
-            mkl_sparse_destroy ( _invP );
-            mkl_sparse_destroy ( _A );
-            std::cout << "mkl_sparse_destroy freeMemory_impl" << std::endl;
-
-            return cc;
-        }
-#endif
 
     template<std::size_t dim>
         int OptimUzawa<dim>::testMkl()
