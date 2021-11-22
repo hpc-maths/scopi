@@ -57,7 +57,7 @@ namespace scopi{
     template<std::size_t dim>
         OptimUzawa<dim>::OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimBase<OptimUzawa<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-4), _maxiter(400000), _rho(20000.), _dmin(0.),
+            _tol(1.0e-4), _maxiter(400000), _rho(200.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
@@ -331,6 +331,16 @@ namespace scopi{
                 std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
                 std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
             }
+
+            int nbActiveContatcs = 0;
+            for(std::size_t i = 0; i < contacts.size(); ++i)
+            {
+                if(L(i) > 0.)
+                {
+                    nbActiveContatcs++;
+                }
+            }
+            std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
             // */
             return cc;
         }
