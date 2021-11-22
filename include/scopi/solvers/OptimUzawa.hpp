@@ -39,6 +39,17 @@ namespace scopi{
             sparse_matrix_t _A;
             struct matrix_descr _descrA;
 
+            std::vector<MKL_INT> _col;
+            std::vector<MKL_INT> _row;
+            std::vector<double> _val;
+            std::vector<MKL_INT> _coo_rows;
+            std::vector<MKL_INT> _coo_cols;
+            std::vector<double> _coo_vals;
+            std::vector<MKL_INT> _csr_row;
+            std::vector<MKL_INT> _csr_col;
+            std::vector<double> _csr_val;
+
+
     };
 
     template<std::size_t dim>
@@ -52,24 +63,18 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawa<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-            std::vector<MKL_INT> coo_rows;
-            std::vector<MKL_INT> coo_cols;
-            std::vector<double> coo_vals;
-            this->createMatrixConstraintCoo(contacts, coo_rows, coo_cols, coo_vals, 0);
+            this->createMatrixConstraintCoo(contacts, _coo_rows, _coo_cols, _coo_vals, 0);
 
-            std::vector<MKL_INT> csr_row;
-            std::vector<MKL_INT> csr_col;
-            std::vector<double> csr_val;
-            this->cooToCsr(coo_rows, coo_cols, coo_vals, csr_row, csr_col, csr_val);
+            this->cooToCsr(_coo_rows, _coo_cols, _coo_vals, _csr_row, _csr_col, _csr_val);
 
             _status = mkl_sparse_d_create_csr( &_A,
                     SPARSE_INDEX_BASE_ZERO,
                     contacts.size(),    // number of rows
                     6*this->_Nactive,    // number of cols
-                    csr_row.data(),
-                    csr_row.data()+1,
-                    csr_col.data(),
-                    csr_val.data() );
+                    _csr_row.data(),
+                    _csr_row.data()+1,
+                    _csr_col.data(),
+                    _csr_val.data() );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
                 printf(" Error in mkl_sparse_d_create_csc for matrix A: %d \n", _status);
@@ -100,41 +105,38 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawa<dim>::createMatrixMass_impl()
         {
-            std::vector<scs_int> col;
-            std::vector<scs_int> row;
-            std::vector<scs_float> val;
-            col.reserve(6*this->_Nactive);
-            row.reserve(6*this->_Nactive+1);
-            val.reserve(6*this->_Nactive);
+            _col.reserve(6*this->_Nactive);
+            _row.reserve(6*this->_Nactive+1);
+            _val.reserve(6*this->_Nactive);
 
             for (std::size_t i=0; i<this->_Nactive; ++i)
             {
                 for (std::size_t d=0; d<3; ++d)
                 {
-                    row.push_back(3*i + d);
-                    col.push_back(3*i + d);
-                    val.push_back(1./this->_mass); // TODO: add mass into particles
+                    _row.push_back(3*i + d);
+                    _col.push_back(3*i + d);
+                    _val.push_back(1./this->_mass); // TODO: add mass into particles
                 }
             }
             for (std::size_t i=0; i<this->_Nactive; ++i)
             {
                 for (std::size_t d=0; d<3; ++d)
                 {
-                    row.push_back(3*this->_Nactive + 3*i + d);
-                    col.push_back(3*this->_Nactive + 3*i + d);
-                    val.push_back(1./this->_moment);
+                    _row.push_back(3*this->_Nactive + 3*i + d);
+                    _col.push_back(3*this->_Nactive + 3*i + d);
+                    _val.push_back(1./this->_moment);
                 }
             }
-            row.push_back(6*this->_Nactive);
+            _row.push_back(6*this->_Nactive);
 
             _status = mkl_sparse_d_create_csr( &_invP,
                     SPARSE_INDEX_BASE_ZERO,
                     6*this->_Nactive,    // number of rows
                     6*this->_Nactive,    // number of cols
-                    row.data(),
-                    row.data()+1,
-                    col.data(),
-                    val.data() );
+                    _row.data(),
+                    _row.data()+1,
+                    _col.data(),
+                    _val.data() );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
                 printf(" Error in mkl_sparse_d_create_csc for matrix P^-1: %d \n", _status);
@@ -154,6 +156,7 @@ namespace scopi{
             {
                 printf(" Error in mkl_sparse_optimize for P^-1: %d \n", _status);
             }
+
         }
 
     template<std::size_t dim>
@@ -391,7 +394,20 @@ exit:
     template<std::size_t dim>
         void OptimUzawa<dim>::freeMemory_impl()
         {
+            std::cout << "start freeMemory_impl" << std::endl;
             mkl_sparse_destroy ( _invP );
             mkl_sparse_destroy ( _A );
+            std::cout << "mkl_sparse_destroy freeMemory_impl" << std::endl;
+
+            _row.clear();
+            _col.clear();
+            _val.clear();
+            _coo_rows.clear();
+            _coo_cols.clear();
+            _coo_vals.clear();
+            _csr_row.clear();
+            _csr_col.clear();
+            _csr_val.clear();
+            std::cout << "std::vector::clear freeMemory_impl" << std::endl;
         }
 }
