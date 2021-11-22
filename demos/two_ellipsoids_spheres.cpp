@@ -17,7 +17,7 @@ int main()
 
     std::size_t active_ptr = 0; // without obstacles
 
-    scopi::ScopiSolver<dim, scopi::ScsSolver<dim>> solver(particles, dt, active_ptr);
+    scopi::ScopiSolver<dim> solver(particles, dt, active_ptr);
     solver.solve(total_it);
 
     return 0;
