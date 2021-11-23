@@ -27,6 +27,7 @@ namespace scopi{
 
         private:
             int testMkl();
+            void printCrsMatrix(const sparse_matrix_t);
 
             const double _tol;
             const std::size_t _maxiter;
@@ -116,44 +117,8 @@ namespace scopi{
                 printf(" Error in mkl_sparse_optimize for A: %d \n", _status);
             }
 
+            printCrsMatrix(_A);
             
-            MKL_INT* csr_row_begin_ptr = NULL;
-            MKL_INT* csr_row_end_ptr = NULL;
-            MKL_INT* csr_col_ptr = NULL;
-            double* csr_val_ptr = NULL;
-            sparse_index_base_t indexing;
-            MKL_INT nbRows;
-            MKL_INT nbCols;
-            mkl_sparse_d_export_csr
-                (
-                 _A,
-                 &indexing,
-                 &nbRows,
-                 &nbCols,
-                 &csr_row_begin_ptr,
-                 &csr_row_end_ptr,
-                 &csr_col_ptr,
-                 &csr_val_ptr
-                );
-            // std::cout << csr_row_end_ptr[0] << std::endl;
-            // std::abort();
-            for( int i = 0; i < nbRows; i++ )
-                std::cout << csr_row_begin_ptr[i] << "    " << csr_row_end_ptr[i] << std::endl;
-
-            std::cout << "Matrix with " << nbRows << " rows and " << nbCols << " columns\n";
-            std::cout << "RESULTANT MATRIX:\nrow# : (value, column) (value, column)\n";
-            int ii = 0;
-            for( int i = 0; i < nbRows; i++ )
-            {
-                std::cout << "row#" << i << ": ";
-                for(MKL_INT j = csr_row_begin_ptr[i]; j < csr_row_end_ptr[i]; j++ )
-                {
-                    std::cout << " (" << csr_val_ptr[ii] << ", " << csr_col_ptr[ii] << ")";
-                    ii++;
-                }
-                printf( "\n" );
-            }
-            printf( "_____________________________________________________________________  \n" );
 // #endif
 
 // #if 0
@@ -480,5 +445,48 @@ exit:
         {
             // TODO L as a member of the class and do the computation here
             return _nbActiveContacts;
+        }
+
+    template<std::size_t dim>
+        void OptimUzawa<dim>::printCrsMatrix(const sparse_matrix_t A)
+        {
+            MKL_INT* csr_row_begin_ptr = NULL;
+            MKL_INT* csr_row_end_ptr = NULL;
+            MKL_INT* csr_col_ptr = NULL;
+            double* csr_val_ptr = NULL;
+            sparse_index_base_t indexing;
+            MKL_INT nbRows;
+            MKL_INT nbCols;
+            auto status = mkl_sparse_d_export_csr
+                (
+                 A,
+                 &indexing,
+                 &nbRows,
+                 &nbCols,
+                 &csr_row_begin_ptr,
+                 &csr_row_end_ptr,
+                 &csr_col_ptr,
+                 &csr_val_ptr
+                );
+
+            if (status != SPARSE_STATUS_SUCCESS)
+            {
+                printf(" Error in mkl_sparse_d_export_csr: %d \n", status);
+            }
+
+            std::cout << "\nMatrix with " << nbRows << " rows and " << nbCols << " columns\n";
+            std::cout << "RESULTANT MATRIX:\nrow# : (column, value) (column, value)\n";
+            int ii = 0;
+            for( int i = 0; i < nbRows; i++ )
+            {
+                std::cout << "row#" << i << ": ";
+                for(MKL_INT j = csr_row_begin_ptr[i]; j < csr_row_end_ptr[i]; j++ )
+                {
+                    std::cout << " (" << csr_col_ptr[ii] << ", " << csr_val_ptr[ii] << ")";
+                    ii++;
+                }
+                printf( "\n" );
+            }
+            printf( "_____________________________________________________________________  \n" );
         }
 }
