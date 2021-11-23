@@ -40,7 +40,7 @@ find_package(fmt REQUIRED)
 find_package(MOSEK REQUIRED)
 find_package(OpenMP)
 find_package(scs REQUIRED)
-find_package(MKL CONFIG REQUIRED)
+find_package(MKL REQUIRED)
 
 # set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
 
