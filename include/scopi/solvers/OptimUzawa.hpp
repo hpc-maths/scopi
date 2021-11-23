@@ -40,7 +40,7 @@ namespace scopi{
     template<std::size_t dim>
         OptimUzawa<dim>::OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimBase<OptimUzawa<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-4), _maxiter(400000), _rho(200.), _dmin(0.),
+            _tol(1.0e-2), _maxiter(400000), _rho(2000.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
@@ -63,6 +63,32 @@ namespace scopi{
             std::vector<double> _coo_vals;
             this->createMatrixConstraintCoo(contacts, _coo_rows, _coo_cols, _coo_vals, 0);
 
+            sparse_matrix_t A_coo;
+            auto _status =  mkl_sparse_d_create_coo
+                (&A_coo,
+                 SPARSE_INDEX_BASE_ZERO,
+                 contacts.size(),    // number of rows
+                 6*this->_Nactive,    // number of cols
+                 _coo_vals.size(), // non-zero elements
+                 _coo_rows.data(),
+                 _coo_cols.data(),
+                 _coo_vals.data()
+                );
+            if (_status != SPARSE_STATUS_SUCCESS)
+            {
+                printf(" Error in mkl_sparse_d_create_coo for matrix A: %d \n", _status);
+            }
+
+            sparse_matrix_t _A;
+            struct matrix_descr _descrA;
+            mkl_sparse_convert_csr
+                (A_coo,
+                 SPARSE_OPERATION_NON_TRANSPOSE,
+                 &_A
+                );
+
+
+#if 0
             std::vector<MKL_INT> _csr_row;
             std::vector<MKL_INT> _csr_col;
             std::vector<double> _csr_val;
@@ -82,6 +108,7 @@ namespace scopi{
             {
                 printf(" Error in mkl_sparse_d_create_csc for matrix A: %d \n", _status);
             }
+#endif
 
             _descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
             _descrA.diag = SPARSE_DIAG_NON_UNIT;
@@ -106,6 +133,7 @@ namespace scopi{
             }
             */
 
+            
 
             std::vector<MKL_INT> _row;
             std::vector<MKL_INT> _col;
@@ -133,6 +161,7 @@ namespace scopi{
                 }
             }
             _row.push_back(6*this->_Nactive);
+
 
             sparse_matrix_t _invP;
             struct matrix_descr _descrInvP;
@@ -165,8 +194,6 @@ namespace scopi{
                 printf(" Error in mkl_sparse_optimize for P^-1: %d \n", _status);
             }
             */
-
-
 
             auto L = xt::zeros_like(this->_distances);
             auto R = xt::zeros_like(this->_distances);
