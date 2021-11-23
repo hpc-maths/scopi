@@ -77,7 +77,7 @@ namespace scopi{
                 );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
-                printf(" Error in mkl_sparse_d_create_coo for matrix A: %d \n", _status);
+                std::cout << " Error in mkl_sparse_d_create_coo for matrix A: " << _status << std::endl;
             }
 
             sparse_matrix_t _A;
@@ -89,7 +89,7 @@ namespace scopi{
                 );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
-                printf(" Error in mkl_sparse_convert_csr for matrix A: %d \n", _status);
+                std::cout << " Error in mkl_sparse_convert_csr for matrix A: " << _status << std::endl;
             }
 
             _descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
@@ -97,23 +97,21 @@ namespace scopi{
             _status = mkl_sparse_set_mv_hint(_A, SPARSE_OPERATION_NON_TRANSPOSE, _descrA, 1 );
             if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
             {
-                printf(" Error in set hints for A: mkl_sparse_set_mv_hint: %d \n", _status);
+                std::cout << " Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_NON_TRANSPOSE: " << _status << std::endl;
             }
 
             _status = mkl_sparse_set_mv_hint(_A, SPARSE_OPERATION_TRANSPOSE, _descrA, 1 );
             if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
             {
-                printf(" Error in set hints for A^T: mkl_sparse_set_mv_hint: %d \n", _status);
+                std::cout << " Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_TRANSPOSE: " << _status << std::endl;
             }
 
             _status = mkl_sparse_optimize ( _A );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
-                printf(" Error in mkl_sparse_optimize for A: %d \n", _status);
+                std::cout << " Error in mkl_sparse_optimize for matrix A: " << _status << std::endl;
             }
 
-            printCrsMatrix(_A);
-            
             std::vector<MKL_INT> _row;
             std::vector<MKL_INT> _col;
             std::vector<double> _val;
@@ -154,7 +152,7 @@ namespace scopi{
                     _val.data() );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
-                printf(" Error in mkl_sparse_d_create_csc for matrix P^-1: %d \n", _status);
+                std::cout << " Error in mkl_sparse_d_create_csr for matrix invP: " << _status << std::endl;
             }
 
             _descrInvP.type = SPARSE_MATRIX_TYPE_DIAGONAL;
@@ -163,13 +161,13 @@ namespace scopi{
             _status = mkl_sparse_set_mv_hint(_invP, SPARSE_OPERATION_NON_TRANSPOSE, _descrInvP, 1 );
             if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
             {
-                printf(" Error in set hints for P^-1: mkl_sparse_set_mv_hint: %d \n", _status);
+                std::cout << " Error in mkl_sparse_set_mv_hint for matrix invP: " << _status << std::endl;
             }
 
             _status = mkl_sparse_optimize ( _invP );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
-                printf(" Error in mkl_sparse_optimize for P^-1: %d \n", _status);
+                std::cout << " Error in mkl_sparse_optimize for matrix invP: " << _status << std::endl;
             }
 
             auto L = xt::zeros_like(this->_distances);
@@ -184,14 +182,14 @@ namespace scopi{
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
-                    printf(" Error in mkl_sparse_d_mv U = A^T L + U: %d \n", _status);
+                    std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << _status << std::endl;
                     return -1;
                 }
 
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = - P^-1 * U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
-                    printf(" Error in mkl_sparse_d_mv U = P^-1 U: %d \n", _status);
+                    std::cout << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << _status << std::endl;
                     return -1;
                 }
 
@@ -201,6 +199,7 @@ namespace scopi{
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
+                    std::cout << " Error in mkl_sparse_d_mv for R = - A * U + R: " << _status << std::endl;
                     return -1;
                 }
 
@@ -423,7 +422,7 @@ exit:
 
             if (status != SPARSE_STATUS_SUCCESS)
             {
-                printf(" Error in mkl_sparse_d_export_csr: %d \n", status);
+                std::cout << " Error in mkl_sparse_d_export_csr: " << status << std::endl;
             }
 
             std::cout << "\nMatrix with " << nbRows << " rows and " << nbCols << " columns\n";
@@ -437,8 +436,8 @@ exit:
                     std::cout << " (" << csr_col_ptr[ii] << ", " << csr_val_ptr[ii] << ")";
                     ii++;
                 }
-                printf( "\n" );
+                std::cout << std::endl;
             }
-            printf( "_____________________________________________________________________  \n" );
+            std::cout << "_____________________________________________________________________  \n" ;
         }
 }
