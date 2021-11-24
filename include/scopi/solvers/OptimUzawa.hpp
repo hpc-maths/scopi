@@ -179,14 +179,14 @@ namespace scopi{
             {
                 _U = this->_c;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &_L[0], 1., &_U[0]); // U = A^T * L + U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, _L.data(), 1., _U.data()); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << _status << std::endl;
                     return -1;
                 }
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, &_U[0], 0., &_U[0]); // U = - P^-1 * U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, _U.data(), 0., _U.data()); // U = - P^-1 * U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     std::cout << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << _status << std::endl;
@@ -195,7 +195,7 @@ namespace scopi{
 
                 _R = this->_distances - _dmin;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, &_U[0], 1., &_R[0]); // R = - A * U + R
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, _U.data(), 1., _R.data()); // R = - A * U + R
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
