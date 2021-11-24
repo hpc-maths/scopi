@@ -1,48 +1,53 @@
 #pragma once
 
-#include "OptimizationSolver.hpp"
+#include "OptimBase.hpp"
 #include <fusion.h>
 
 namespace scopi{
     using namespace mosek::fusion;
     using namespace monty;
 
-    template<std::size_t dim>
-        class MosekSolver : public OptimizationSolver<dim>
-        {
-            public:
-                MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-                void createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts);
-                void createMatrixMass();
-                int solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts);
-                auto getUadapt();
-                auto getWadapt();
-                void allocateMemory(std::size_t nc);
-                void freeMemory();
+    template <std::size_t dim>
+        class OptimMosek: public OptimBase<OptimMosek<dim>, dim>
+    {
+        public:
+            using base_type = OptimBase<OptimMosek<dim>, dim>;
 
-            private:
-                Matrix::t _Az;
-                Matrix::t _A;
-                shared_ptr<ndarray<double,1>> _Xlvl;
-        };
+            OptimMosek(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+            void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            void createMatrixMass_impl();
+            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            auto getUadapt_impl();
+            auto getWadapt_impl();
+            void allocateMemory_impl(const std::size_t nc);
+            void freeMemory_impl();
+            int getNbActiveContacts_impl();
+
+        private:
+            Matrix::t _Az;
+            Matrix::t _A;
+            shared_ptr<ndarray<double,1>> _Xlvl;
+            shared_ptr<ndarray<double,1>> _dual;
+
+    };
 
     template<std::size_t dim>
-        MosekSolver<dim>::MosekSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimizationSolver<dim>(particles, dt, Nactive, active_ptr, 1 + 2*3*Nactive + 2*3*Nactive, 1)
+        OptimMosek<dim>::OptimMosek(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+            base_type(particles, dt, Nactive, active_ptr, 1 + 2*3*Nactive + 2*3*Nactive, 1)
     {
         this->_c(0) = 1;
     }
 
 
     template<std::size_t dim>
-        void MosekSolver<dim>::createMatrixConstraint(std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimMosek<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             // Preallocate
             std::vector<int> A_rows;
             std::vector<int> A_cols;
             std::vector<double> A_values;
 
-            OptimizationSolver<dim>::createMatrixConstraint(contacts, A_rows, A_cols, A_values, 1);
+            this->createMatrixConstraintCoo(contacts, A_rows, A_cols, A_values, 1);
 
             _A = Matrix::sparse(contacts.size(), 1 + 6*this->_Nactive + 6*this->_Nactive,
                     std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
@@ -51,7 +56,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void MosekSolver<dim>::createMatrixMass()
+        void OptimMosek<dim>::createMatrixMass_impl()
         {
             std::vector<int> Az_rows;
             std::vector<int> Az_cols;
@@ -104,7 +109,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int MosekSolver<dim>::solveOptimizationProbelm(std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimMosek<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
             // variables
@@ -129,41 +134,46 @@ namespace scopi{
             model->solve();
 
             _Xlvl = X->level();
+            _dual = qc1->dual();
 
             int nbIter = model->getSolverIntInfo("intpntIter");
-
-            auto dual = *(qc1->dual());
-            int nbActiveContatcs = 0;
-            for(auto x : dual) 
-            {
-                if(std::abs(x) > 1e-3)
-                    nbActiveContatcs++;
-            }
-            std::cout << "Contacts: " << contacts.size() << "  active contacts " << nbActiveContatcs << std::endl;
 
             return nbIter;
         }
 
     template<std::size_t dim>
-        auto MosekSolver<dim>::getUadapt()
+        auto OptimMosek<dim>::getUadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_Xlvl->raw()+1), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        auto MosekSolver<dim>::getWadapt()
+        auto OptimMosek<dim>::getWadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_Xlvl->raw()+1+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        void MosekSolver<dim>::allocateMemory(std::size_t nc)
+        void OptimMosek<dim>::allocateMemory_impl(const std::size_t nc)
         {
             std::ignore = nc;
         }
 
     template<std::size_t dim>
-        void MosekSolver<dim>::freeMemory()
+        void OptimMosek<dim>::freeMemory_impl()
         {
         }
+
+    template<std::size_t dim>
+        int OptimMosek<dim>::getNbActiveContacts_impl()
+        {
+            int nbActiveContacts = 0;
+            for(auto x : *_dual) 
+            {
+                if(std::abs(x) > 1e-3)
+                    nbActiveContacts++;
+            }
+            return nbActiveContacts;
+        }
+
 }
