@@ -15,7 +15,6 @@ namespace scopi{
         protected:
             OptimBase(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec);
             void createMatrixConstraintCoo(const std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
-            void cooToCsr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
             scopi::scopi_container<dim>& _particles;
             double _dt;
@@ -184,54 +183,6 @@ namespace scopi{
 
                 ++ic;
             }
-        }
-
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::cooToCsr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals)
-        {
-            // https://www-users.cse.umn.edu/~saad/software/SPARSKIT/
-            std::size_t nrow = 6*this->_Nactive;
-            std::size_t nnz = coo_vals.size();
-            csr_rows.resize(nrow+1);
-            std::fill(csr_rows.begin(), csr_rows.end(), 0);
-            csr_cols.resize(nnz);
-            csr_vals.resize(nnz);
-
-            // determine row-lengths.
-            for(std::size_t k = 0; k < nnz; ++k)
-            {
-                csr_rows[coo_rows[k]]++;
-            }
-
-            // starting position of each row..
-            {
-                int k = 0;
-                for(std::size_t j = 0; j < nrow+1; ++j)
-                {
-                    int k0 = csr_rows[j];
-                    csr_rows[j] = k;
-                    k += k0;
-                }
-            }
-
-            // go through the structure  once more. Fill in output matrix.
-            for(std::size_t k = 0; k < nnz; ++k)
-            {
-                int i = coo_rows[k];
-                int j = coo_cols[k];
-                double x = coo_vals[k];
-                int iad = csr_rows[i];
-                csr_vals[iad] = x;
-                csr_cols[iad] = j;
-                csr_rows[i] = iad+1;
-            }
-
-            // shift back iao
-            for(std::size_t j = nrow; j >= 1; --j)
-            {
-                csr_rows[j] = csr_rows[j-1];
-            }
-            csr_rows[0] = 0;
         }
 
     template<class D, std::size_t dim>
