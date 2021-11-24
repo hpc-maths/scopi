@@ -35,6 +35,10 @@ namespace scopi{
             const double _dmin;
             xt::xtensor<double, 1> _U;
             int _nbActiveContacts = 0;
+            sparse_matrix_t _A;
+            struct matrix_descr _descrA;
+            sparse_matrix_t _invP;
+            struct matrix_descr _descrInvP;
 
     };
 
@@ -48,16 +52,6 @@ namespace scopi{
 
     template<std::size_t dim>
         void OptimUzawa<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-        }
-
-    template<std::size_t dim>
-        void OptimUzawa<dim>::createMatrixMass_impl()
-        {
-        }
-
-    template<std::size_t dim>
-        int OptimUzawa<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             std::vector<MKL_INT> _coo_rows;
             std::vector<MKL_INT> _coo_cols;
@@ -80,8 +74,6 @@ namespace scopi{
                 std::cout << " Error in mkl_sparse_d_create_coo for matrix A: " << _status << std::endl;
             }
 
-            sparse_matrix_t _A;
-            struct matrix_descr _descrA;
             _status = mkl_sparse_convert_csr
                 (A_coo,
                  SPARSE_OPERATION_NON_TRANSPOSE,
@@ -111,7 +103,11 @@ namespace scopi{
             {
                 std::cout << " Error in mkl_sparse_optimize for matrix A: " << _status << std::endl;
             }
+        }
 
+    template<std::size_t dim>
+        void OptimUzawa<dim>::createMatrixMass_impl()
+        {
             std::vector<MKL_INT> _row;
             std::vector<MKL_INT> _col;
             std::vector<double> _val;
@@ -139,10 +135,7 @@ namespace scopi{
             }
             _row.push_back(6*this->_Nactive);
 
-
-            sparse_matrix_t _invP;
-            struct matrix_descr _descrInvP;
-            _status = mkl_sparse_d_create_csr( &_invP,
+            auto _status = mkl_sparse_d_create_csr( &_invP,
                     SPARSE_INDEX_BASE_ZERO,
                     6*this->_Nactive,    // number of rows
                     6*this->_Nactive,    // number of cols
@@ -169,7 +162,11 @@ namespace scopi{
             {
                 std::cout << " Error in mkl_sparse_optimize for matrix invP: " << _status << std::endl;
             }
+        }
 
+    template<std::size_t dim>
+        int OptimUzawa<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        {
             auto L = xt::zeros_like(this->_distances);
             auto R = xt::zeros_like(this->_distances);
 
@@ -179,7 +176,7 @@ namespace scopi{
             {
                 _U = this->_c;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
+                auto _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << _status << std::endl;
