@@ -37,6 +37,9 @@ namespace scopi{
             int _nbActiveContacts = 0;
             sparse_matrix_t _A;
             struct matrix_descr _descrA;
+            std::vector<MKL_INT> _A_coo_row;
+            std::vector<MKL_INT> _A_coo_col;
+            std::vector<double> _A_coo_val;
             sparse_matrix_t _invP;
             struct matrix_descr _descrInvP;
             sparse_status_t _status;
@@ -54,10 +57,7 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawa<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-            std::vector<MKL_INT> _coo_rows;
-            std::vector<MKL_INT> _coo_cols;
-            std::vector<double> _coo_vals;
-            this->createMatrixConstraintCoo(contacts, _coo_rows, _coo_cols, _coo_vals, 0);
+            this->createMatrixConstraintCoo(contacts, _A_coo_row, _A_coo_col, _A_coo_val, 0);
 
             sparse_matrix_t A_coo;
             _status =  mkl_sparse_d_create_coo
@@ -65,10 +65,10 @@ namespace scopi{
                  SPARSE_INDEX_BASE_ZERO,
                  contacts.size(),    // number of rows
                  6*this->_Nactive,   // number of cols
-                 _coo_vals.size(),   // number of non-zero elements
-                 _coo_rows.data(),
-                 _coo_cols.data(),
-                 _coo_vals.data()
+                 _A_coo_val.size(),   // number of non-zero elements
+                 _A_coo_row.data(),
+                 _A_coo_col.data(),
+                 _A_coo_val.data()
                 );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
@@ -109,41 +109,41 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawa<dim>::createMatrixMass_impl()
         {
-            std::vector<MKL_INT> _row;
-            std::vector<MKL_INT> _col;
-            std::vector<double> _val;
-            _col.reserve(6*this->_Nactive);
-            _row.reserve(6*this->_Nactive+1);
-            _val.reserve(6*this->_Nactive);
+            std::vector<MKL_INT> invP_csr_row;
+            std::vector<MKL_INT> invP_csr_col;
+            std::vector<double> invP_csr_val;
+            invP_csr_col.reserve(6*this->_Nactive);
+            invP_csr_row.reserve(6*this->_Nactive+1);
+            invP_csr_val.reserve(6*this->_Nactive);
 
             for (std::size_t i=0; i<this->_Nactive; ++i)
             {
                 for (std::size_t d=0; d<3; ++d)
                 {
-                    _row.push_back(3*i + d);
-                    _col.push_back(3*i + d);
-                    _val.push_back(1./this->_mass); // TODO: add mass into particles
+                    invP_csr_row.push_back(3*i + d);
+                    invP_csr_col.push_back(3*i + d);
+                    invP_csr_val.push_back(1./this->_mass); // TODO: add mass into particles
                 }
             }
             for (std::size_t i=0; i<this->_Nactive; ++i)
             {
                 for (std::size_t d=0; d<3; ++d)
                 {
-                    _row.push_back(3*this->_Nactive + 3*i + d);
-                    _col.push_back(3*this->_Nactive + 3*i + d);
-                    _val.push_back(1./this->_moment);
+                    invP_csr_row.push_back(3*this->_Nactive + 3*i + d);
+                    invP_csr_col.push_back(3*this->_Nactive + 3*i + d);
+                    invP_csr_val.push_back(1./this->_moment);
                 }
             }
-            _row.push_back(6*this->_Nactive);
+            invP_csr_row.push_back(6*this->_Nactive);
 
             _status = mkl_sparse_d_create_csr( &_invP,
                     SPARSE_INDEX_BASE_ZERO,
                     6*this->_Nactive,    // number of rows
                     6*this->_Nactive,    // number of cols
-                    _row.data(),
-                    _row.data()+1,
-                    _col.data(),
-                    _val.data() );
+                    invP_csr_row.data(),
+                    invP_csr_row.data()+1,
+                    invP_csr_col.data(),
+                    invP_csr_val.data() );
             if (_status != SPARSE_STATUS_SUCCESS)
             {
                 std::cout << " Error in mkl_sparse_d_create_csr for matrix invP: " << _status << std::endl;
@@ -386,6 +386,9 @@ exit:
         {
             mkl_sparse_destroy ( _invP );
             mkl_sparse_destroy ( _A );
+            _A_coo_row.clear();
+            _A_coo_col.clear();
+            _A_coo_val.clear();
         }
 
     template<std::size_t dim>
