@@ -50,7 +50,7 @@ namespace scopi{
     template<std::size_t dim>
         OptimUzawa<dim>::OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimBase<OptimUzawa<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-2), _maxiter(40000), _rho(2000.), _dmin(0.),
+            _tol(1.0e-2), _maxiter(40000), _rho(200.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
@@ -250,7 +250,7 @@ namespace scopi{
     template<std::size_t dim>
         int OptimUzawa<dim>::getNbActiveContacts_impl()
         {
-            return xt::sum(xt::where(_L >= 0., xt::ones_like(_L), xt::zeros_like(_L)))();
+            return xt::sum(xt::where(_L > 0., xt::ones_like(_L), xt::zeros_like(_L)))();
         }
 
     template<std::size_t dim>
