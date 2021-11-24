@@ -34,6 +34,8 @@ namespace scopi{
             const double _rho;
             const double _dmin;
             xt::xtensor<double, 1> _U;
+            xt::xtensor<double, 1> _L;
+            xt::xtensor<double, 1> _R;
             int _nbActiveContacts = 0;
             sparse_matrix_t _A;
             struct matrix_descr _descrA;
@@ -168,8 +170,8 @@ namespace scopi{
     template<std::size_t dim>
         int OptimUzawa<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-            auto L = xt::zeros_like(this->_distances);
-            auto R = xt::zeros_like(this->_distances);
+            _L = xt::zeros_like(this->_distances);
+            _R = xt::zeros_like(this->_distances);
 
             std::size_t cc = 0;
             double cmax = -1000.0;
@@ -177,7 +179,7 @@ namespace scopi{
             {
                 _U = this->_c;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &_L[0], 1., &_U[0]); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << _status << std::endl;
@@ -191,9 +193,9 @@ namespace scopi{
                     return -1;
                 }
 
-                R = this->_distances - _dmin;
+                _R = this->_distances - _dmin;
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, &_U[0], 1., &R[0]); // R = - A * U + R
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, &_U[0], 1., &_R[0]); // R = - A * U + R
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
@@ -201,9 +203,9 @@ namespace scopi{
                     return -1;
                 }
 
-                L = xt::maximum( L-_rho*R, 0);
+                _L = xt::maximum( _L-_rho*_R, 0);
 
-                cmax = double((xt::amin(R))(0));
+                cmax = double((xt::amin(_R))(0));
                 cc += 1;
                 // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
             }
@@ -219,7 +221,7 @@ namespace scopi{
             _nbActiveContacts = 0;
             for(std::size_t i = 0; i < contacts.size(); ++i)
             {
-                if(L(i) > 0.)
+                if(_L(i) > 0.)
                 {
                     _nbActiveContacts++;
                 }
