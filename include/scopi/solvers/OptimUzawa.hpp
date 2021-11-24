@@ -217,16 +217,6 @@ namespace scopi{
                 std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
             }
 
-            // TODO use xt functions such as xt::where
-            _nbActiveContacts = 0;
-            for(std::size_t i = 0; i < contacts.size(); ++i)
-            {
-                if(_L(i) > 0.)
-                {
-                    _nbActiveContacts++;
-                }
-            }
-
             return cc;
         }
 
@@ -396,7 +386,15 @@ exit:
     template<std::size_t dim>
         int OptimUzawa<dim>::getNbActiveContacts_impl()
         {
-            // TODO L as a member of the class and do the computation here
+            // TODO use xt functions such as xt::where
+            _nbActiveContacts = 0;
+            for(std::size_t i = 0; i < _L.size(); ++i)
+            {
+                if(_L(i) > 0.)
+                {
+                    _nbActiveContacts++;
+                }
+            }
             return _nbActiveContacts;
         }
 
