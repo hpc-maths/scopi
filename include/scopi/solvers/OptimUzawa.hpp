@@ -39,6 +39,7 @@ namespace scopi{
             struct matrix_descr _descrA;
             sparse_matrix_t _invP;
             struct matrix_descr _descrInvP;
+            sparse_status_t _status;
 
     };
 
@@ -59,7 +60,7 @@ namespace scopi{
             this->createMatrixConstraintCoo(contacts, _coo_rows, _coo_cols, _coo_vals, 0);
 
             sparse_matrix_t A_coo;
-            auto _status =  mkl_sparse_d_create_coo
+            _status =  mkl_sparse_d_create_coo
                 (&A_coo,
                  SPARSE_INDEX_BASE_ZERO,
                  contacts.size(),    // number of rows
@@ -135,7 +136,7 @@ namespace scopi{
             }
             _row.push_back(6*this->_Nactive);
 
-            auto _status = mkl_sparse_d_create_csr( &_invP,
+            _status = mkl_sparse_d_create_csr( &_invP,
                     SPARSE_INDEX_BASE_ZERO,
                     6*this->_Nactive,    // number of rows
                     6*this->_Nactive,    // number of cols
@@ -176,7 +177,7 @@ namespace scopi{
             {
                 _U = this->_c;
 
-                auto _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
+                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, &L[0], 1., &_U[0]); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << _status << std::endl;
@@ -223,9 +224,6 @@ namespace scopi{
                     _nbActiveContacts++;
                 }
             }
-
-            mkl_sparse_destroy ( _invP );
-            mkl_sparse_destroy ( _A );
 
             return cc;
         }
@@ -386,6 +384,8 @@ exit:
     template<std::size_t dim>
         void OptimUzawa<dim>::freeMemory_impl()
         {
+            mkl_sparse_destroy ( _invP );
+            mkl_sparse_destroy ( _A );
         }
 
     template<std::size_t dim>
