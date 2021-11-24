@@ -386,16 +386,7 @@ exit:
     template<std::size_t dim>
         int OptimUzawa<dim>::getNbActiveContacts_impl()
         {
-            // TODO use xt functions such as xt::where
-            _nbActiveContacts = 0;
-            for(std::size_t i = 0; i < _L.size(); ++i)
-            {
-                if(_L(i) > 0.)
-                {
-                    _nbActiveContacts++;
-                }
-            }
-            return _nbActiveContacts;
+            return xt::sum(xt::where(_L >= 0., xt::ones_like(_L), xt::zeros_like(_L)))();
         }
 
     template<std::size_t dim>
