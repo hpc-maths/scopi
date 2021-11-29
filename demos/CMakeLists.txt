@@ -44,6 +44,9 @@ endif(APPLE)
 add_executable(two_spheres_periodic two_spheres_periodic.cpp)
 target_link_libraries(two_spheres_periodic scopi_cpp)
 
+add_executable(two_spheres_periodic two_spheres_periodic.cpp)
+target_link_libraries(two_spheres_periodic scopi_cpp)
+
 add_executable(two_ellipsoids two_ellipsoids.cpp)
 target_link_libraries(two_ellipsoids scopi_cpp)
 if (APPLE)

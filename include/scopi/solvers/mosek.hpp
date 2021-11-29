@@ -48,7 +48,6 @@ namespace scopi
                 std::vector<scopi::neighbor<dim>> computeContacts();
                 void writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
                 void moveActiveParticles();
-
                 scopi::scopi_container<dim>& _particles;
                 double _dt;
                 std::size_t _active_ptr;
