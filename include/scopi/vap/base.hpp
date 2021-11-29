@@ -1,4 +1,3 @@
-#include "../crtp.hpp"
 #include "../container.hpp"
 
 namespace scopi
@@ -29,5 +28,5 @@ namespace scopi
             std::cout << "run implementation" << std::endl;
         }
     };
-}
 
+}

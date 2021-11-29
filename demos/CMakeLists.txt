@@ -18,6 +18,14 @@ endif(APPLE)
 
 add_executable(critical_2d_no_overlap critical/2d_case_no_overlap.cpp)
 target_link_libraries(critical_2d_no_overlap scopi_cpp)
+if (APPLE)
+  add_custom_command(TARGET critical_2d_no_overlap
+  POST_BUILD COMMAND
+  ${CMAKE_INSTALL_NAME_TOOL} -change
+  `otool -L critical_2d_no_overlap | sed -n -e \""s/.*\\(libmosek.*dylib\\).*/\\1/p"\"`
+  ${MOSEK_LIBRARY} critical_2d_no_overlap
+  )
+endif(APPLE)
 
 add_executable(critical_3d critical/3d_case.cpp)
 target_link_libraries(critical_3d scopi_cpp)

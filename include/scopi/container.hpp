@@ -10,6 +10,7 @@
 
 #include "objects/types/base.hpp"
 #include "types.hpp"
+#include "crtp.hpp"
 
 namespace scopi
 {
