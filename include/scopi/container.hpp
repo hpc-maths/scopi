@@ -30,6 +30,8 @@ namespace scopi
         using force_type = default_container_type;
         using quaternion_type = type::quaternion;
 
+        scopi_container();
+
         std::unique_ptr<object<dim, false>> operator[](std::size_t i);
 
         void push_back(const object<dim>& s,
@@ -38,6 +40,9 @@ namespace scopi
                        const rotation_type& omega,
                        const rotation_type& domega,
                        const force_type& f);
+
+        void push_back(std::size_t i,
+                        const position_type& pos);
 
         void reserve(std::size_t size);
 
@@ -64,6 +69,8 @@ namespace scopi
 
         std::size_t size() const;
 
+        void reset_periodic();
+
     private:
 
         std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
@@ -76,7 +83,16 @@ namespace scopi
         std::vector<rotation_type> m_desired_omega;  // desired_omega()
         std::vector<std::size_t> m_shapes_id;
         std::vector<std::size_t> m_offset;
+        std::vector<std::size_t> m_periodic_indices;
+        std::size_t m_periodic_ptr;
+        bool m_periodic_added;
     };
+
+    template<std::size_t dim>
+    scopi_container<dim>::scopi_container() 
+    : m_periodic_ptr(0)
+    , m_periodic_added(false)
+    {}
 
     template<std::size_t dim>
     std::unique_ptr<object<dim, false>> scopi_container<dim>::operator[](std::size_t i)
@@ -92,6 +108,8 @@ namespace scopi
                                          const rotation_type& domega,
                                          const force_type& f)
     {
+        assert(!m_periodic_added);
+
         if (m_offset.empty())
         {
             m_offset = {0, s.size()};
@@ -119,6 +137,28 @@ namespace scopi
         }
 
         m_shapes_id.push_back(s.hash());
+        m_periodic_ptr++;
+    }
+
+    template<std::size_t dim>
+    void scopi_container<dim>::push_back(std::size_t i,
+                                         const position_type& pos)
+    {
+        assert(i >= 0 && i < m_positions.size());
+        m_periodic_added = true;
+        m_offset.push_back(m_offset.back() + m_offset[i+1] - m_offset[i]);
+
+        m_positions.push_back(pos);
+        m_quaternions.push_back(m_quaternions[i]);
+        m_velocities.push_back(m_velocities[i]);
+        m_omega.push_back(m_omega[i]);
+        m_desired_omega.push_back(m_desired_omega[i]);
+        m_desired_velocities.push_back(m_desired_velocities[i]);
+        m_forces.push_back(m_forces[i]);
+
+        m_shapes_id.push_back(m_shapes_id[i]);
+
+        m_periodic_indices.push_back(i);
     }
 
     template<std::size_t dim>
@@ -237,6 +277,25 @@ namespace scopi
     auto scopi_container<dim>::f()
     {
         return xt::adapt(reinterpret_cast<force_type*>(m_forces.data()), {m_forces.size()});
+    }
+
+    template<std::size_t dim>
+    void scopi_container<dim>::reset_periodic()
+    {
+        m_periodic_indices.clear();
+        std::size_t size = m_periodic_ptr;
+        m_positions.resize(size);
+        m_quaternions.resize(size);
+        m_velocities.resize(size);
+        m_desired_velocities.resize(size);
+        m_omega.resize(size);
+        m_desired_omega.resize(size);
+        m_forces.resize(size);
+        m_offset.resize(size+1);
+        m_shapes_id.resize(size);
+
+        m_periodic_added = false;
+        m_periodic_ptr = size;
     }
 
 }
