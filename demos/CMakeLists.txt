@@ -26,6 +26,9 @@ target_link_libraries(critical_3d scopi_cpp)
 add_executable(two_spheres two_spheres.cpp)
 target_link_libraries(two_spheres scopi_cpp)
 
+add_executable(two_spheres_periodic two_spheres_periodic.cpp)
+target_link_libraries(two_spheres_periodic scopi_cpp)
+
 add_executable(two_ellipsoids two_ellipsoids.cpp)
 target_link_libraries(two_ellipsoids scopi_cpp)
 # if (APPLE)
