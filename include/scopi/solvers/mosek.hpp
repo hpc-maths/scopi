@@ -46,7 +46,6 @@ namespace scopi
                 void displacementObstacles();
 
                 std::vector<scopi::neighbor<dim>> computeContacts();
-                void sortContacts(std::vector<scopi::neighbor<dim>>& contacts);
                 void writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
                 void moveActiveParticles();
 
@@ -82,11 +81,6 @@ namespace scopi
                 // create list of contacts
                 std::cout << "----> create list of contacts " << nite << std::endl;
                 auto contacts = computeContacts();
-
-                tic();
-                sortContacts(contacts);
-                auto duration = toc();
-                std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 
                 // output files
                 std::cout << "----> json output files " << nite << std::endl;
@@ -140,23 +134,11 @@ namespace scopi
     template<std::size_t dim>
         std::vector<scopi::neighbor<dim>> ScopiSolver<dim>::computeContacts()
         {
-            // create list of contacts
-            std::cout << "----> create list of contacts " << nite << std::endl;
             // // scopi::contact_brute_force cont(2);
             scopi::contact_kdtree cont(2, 10);
-            auto contacts = cont.run(particles, active_ptr);
+            auto contacts = cont.run(_particles, _active_ptr);
             std::cout << "----> MOSEK : contacts.size() = " << contacts.size() << std::endl;
             return contacts;
-        }
-
-    template<std::size_t dim>
-        void ScopiSolver<dim>::sortContacts(std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
-                    {
-                    return a.i < b.i && a.j < b.j;
-                    });
-            //exit(0);
         }
 
     template<std::size_t dim>
@@ -224,6 +206,5 @@ namespace scopi
 
             }
         }
->>>>>>> Clean functions
 }
 

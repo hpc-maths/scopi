@@ -1,3 +1,5 @@
+#pragma once 
+
 namespace scopi
 {
     template <class D>

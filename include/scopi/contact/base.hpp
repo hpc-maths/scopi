@@ -1,3 +1,5 @@
+#pragma once 
+
 #include "../container.hpp"
 #include "../objects/methods/closest_points.hpp"
 #include "../objects/neighbor.hpp"
