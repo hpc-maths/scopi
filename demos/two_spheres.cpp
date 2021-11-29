@@ -16,7 +16,8 @@ int main()
     particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
 
     std::size_t active_ptr = 0; // without obstacles
-    scopi::mosek_solver(particles, dt, total_it, active_ptr);
+    scopi::ScopiSolver<dim> solver(particles, dt, active_ptr);
+    solver.solve(total_it);
 
     return 0;
 }
