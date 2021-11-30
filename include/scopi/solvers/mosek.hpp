@@ -24,6 +24,8 @@
 #include <scopi/contact/contact_kdtree.hpp>
 // #include <scopi/contact/contact_brute_force.hpp>
 
+#include "../vap/vap_fixed.hpp"
+
 #include <nanoflann.hpp>
 
 using namespace mosek::fusion;
@@ -53,6 +55,7 @@ namespace scopi
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
                 OptimUzawa<dim> _solver;
+                vap_fixed _vap;
 
         };
 
@@ -93,12 +96,15 @@ namespace scopi
                 //     }
                 // }
                 //
+                _vap.aPrioriVelocity(_particles);
 
                 // solver optimization problem
                 _solver.run(contacts, nite);
 
                 // move the active particles
                 moveActiveParticles();
+
+                _vap.updateVelocity(_particles);
 
                 // free the memory for the next solve
                 _solver.freeMemory();

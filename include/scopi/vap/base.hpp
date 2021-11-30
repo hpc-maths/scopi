@@ -9,13 +9,22 @@ namespace scopi
     {
         public:
             template <std::size_t dim>
-                void run(const scopi_container<dim>& particles);
+                void aPrioriVelocity(const scopi_container<dim>& particles);
+            template <std::size_t dim>
+                void updateVelocity(const scopi_container<dim>& particles);
     };
 
     template <class D>
         template <std::size_t dim>
-        void vap_base<D>::run(const scopi_container<dim>& particles)
+        void vap_base<D>::aPrioriVelocity(const scopi_container<dim>& particles)
         {
-            this->derived_cast().run_impl(particles);
+            this->derived_cast().aPrioriVelocity_impl(particles);
+        }
+
+    template <class D>
+        template <std::size_t dim>
+        void vap_base<D>::updateVelocity(const scopi_container<dim>& particles)
+        {
+            this->derived_cast().updateVelocity_impl(particles);
         }
 }
