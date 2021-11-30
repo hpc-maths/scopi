@@ -65,7 +65,8 @@ namespace scopi
             _dt(dt),
             _active_ptr(active_ptr),
             _Nactive(_particles.size() - _active_ptr),
-            _solver(_particles, _dt, _Nactive, _active_ptr)
+            _solver(_particles, _dt, _Nactive, _active_ptr),
+            _vap(_Nactive, _active_ptr, _dt)
     {
     }
 

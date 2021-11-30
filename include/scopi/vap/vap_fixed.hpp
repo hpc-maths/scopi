@@ -14,7 +14,13 @@ namespace scopi
             template <std::size_t dim>
                 void updateVelocity_impl(const scopi_container<dim>& particles);
 
+            vap_fixed(std::size_t Nactive, std::size_t active_ptr, double dt);
+
     };
+
+    vap_fixed::vap_fixed(std::size_t Nactive, std::size_t active_ptr, double dt)
+        : base_type(Nactive, active_ptr, dt)
+    {}
 
     template <std::size_t dim>
         void vap_fixed::aPrioriVelocity_impl(const scopi_container<dim>& particles)
