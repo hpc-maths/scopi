@@ -9,11 +9,12 @@ namespace scopi
     {
         public:
             template <std::size_t dim>
-                void aPrioriVelocity(const scopi_container<dim>& particles);
+                void aPrioriVelocity(scopi_container<dim>& particles);
             template <std::size_t dim>
-                void updateVelocity(const scopi_container<dim>& particles);
+                void updateVelocity(scopi_container<dim>& particles);
             vap_base(std::size_t Nactive, std::size_t active_ptr, double dt);
-        private:
+
+        protected:
                 std::size_t _Nactive;
                 std::size_t _active_ptr;
                 double _dt;
@@ -29,14 +30,14 @@ namespace scopi
 
     template <class D>
         template <std::size_t dim>
-        void vap_base<D>::aPrioriVelocity(const scopi_container<dim>& particles)
+        void vap_base<D>::aPrioriVelocity(scopi_container<dim>& particles)
         {
             this->derived_cast().aPrioriVelocity_impl(particles);
         }
 
     template <class D>
         template <std::size_t dim>
-        void vap_base<D>::updateVelocity(const scopi_container<dim>& particles)
+        void vap_base<D>::updateVelocity(scopi_container<dim>& particles)
         {
             this->derived_cast().updateVelocity_impl(particles);
         }

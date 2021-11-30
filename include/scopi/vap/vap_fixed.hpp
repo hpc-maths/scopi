@@ -9,10 +9,10 @@ namespace scopi
         public:
             using base_type = vap_base<vap_fixed>;
             template <std::size_t dim>
-                void aPrioriVelocity_impl(const scopi_container<dim>& particles);
+                void aPrioriVelocity_impl(scopi_container<dim>& particles);
 
             template <std::size_t dim>
-                void updateVelocity_impl(const scopi_container<dim>& particles);
+                void updateVelocity_impl(scopi_container<dim>& particles);
 
             vap_fixed(std::size_t Nactive, std::size_t active_ptr, double dt);
 
@@ -23,13 +23,13 @@ namespace scopi
     {}
 
     template <std::size_t dim>
-        void vap_fixed::aPrioriVelocity_impl(const scopi_container<dim>& particles)
+        void vap_fixed::aPrioriVelocity_impl(scopi_container<dim>& particles)
         {
             std::ignore = particles;
         }
 
     template <std::size_t dim>
-        void vap_fixed::updateVelocity_impl(const scopi_container<dim>& particles)
+        void vap_fixed::updateVelocity_impl(scopi_container<dim>& particles)
         {
             std::ignore = particles;
         }
