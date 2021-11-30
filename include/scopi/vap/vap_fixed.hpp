@@ -16,15 +16,15 @@ namespace scopi
 
     };
 
-            template <std::size_t dim>
-                void vap_fixed::aPrioriVelocity_impl(const scopi_container<dim>& particles)
-                {
-                    std::cout << "aPrioriVelocity implementation" << std::endl;
-                }
+    template <std::size_t dim>
+        void vap_fixed::aPrioriVelocity_impl(const scopi_container<dim>& particles)
+        {
+            std::ignore = particles;
+        }
 
-            template <std::size_t dim>
-                void vap_fixed::updateVelocity_impl(const scopi_container<dim>& particles)
-                {
-                    std::cout << "updateVelocity implementation" << std::endl;
-                }
+    template <std::size_t dim>
+        void vap_fixed::updateVelocity_impl(const scopi_container<dim>& particles)
+        {
+            std::ignore = particles;
+        }
 }
