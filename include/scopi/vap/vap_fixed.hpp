@@ -4,10 +4,10 @@
 
 namespace scopi
 {
-    class vap_case_1: public vap_base<vap_case_1>
+    class vap_fixed: public vap_base<vap_fixed>
     {
         public:
-            using base_type = vap_base<vap_case_1>;
+            using base_type = vap_base<vap_fixed>;
 
             template <std::size_t dim>
                 void run_impl(const scopi_container<dim>& particles)
