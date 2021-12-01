@@ -20,17 +20,22 @@ namespace scopi
             double f_ext();
             double t_ext();
 
+            double _mass;
+            double _moment;
+
     };
 
     vap_pfd::vap_pfd(std::size_t Nactive, std::size_t active_ptr, double dt)
         : base_type(Nactive, active_ptr, dt)
+          , _mass(1.)
+          , _moment(0.1)
     {}
 
     template <std::size_t dim>
         void vap_pfd::aPrioriVelocity_impl(scopi_container<dim>& particles)
         {
             // TODO what if f_ext and t_ext depends on the particule ?
-            particles.vd() = particles.v() + _dt*f_ext(); // TODO mass is missing
+            particles.vd() = particles.v() + _dt*f_ext()/_mass; // TODO mass is missing
             // TODO should be dt * (R_i * t_i^{ext , n} - omega'_i * (J_i omega'_i)
             particles.desired_omega() = particles.omega() + _dt*t_ext(); // TODO momentum is missing
         }
