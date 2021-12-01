@@ -25,7 +25,7 @@
 // #include <scopi/contact/contact_brute_force.hpp>
 
 #include "../vap/vap_fixed.hpp"
-#include "../vap/vap_pfd.hpp"
+#include "../vap/vap_fpd.hpp"
 
 #include <nanoflann.hpp>
 
@@ -56,7 +56,7 @@ namespace scopi
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
                 OptimUzawa<dim> _solver;
-                vap_fixed _vap;
+                vap_fpd _vap;
 
         };
 

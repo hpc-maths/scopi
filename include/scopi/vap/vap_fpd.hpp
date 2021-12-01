@@ -4,17 +4,17 @@
 
 namespace scopi
 {
-    class vap_pfd: public vap_base<vap_pfd>
+    class vap_fpd: public vap_base<vap_fpd>
     {
         public:
-            using base_type = vap_base<vap_pfd>;
+            using base_type = vap_base<vap_fpd>;
             template <std::size_t dim>
                 void aPrioriVelocity_impl(scopi_container<dim>& particles);
 
             template <std::size_t dim>
                 void updateVelocity_impl(scopi_container<dim>& particles);
 
-            vap_pfd(std::size_t Nactive, std::size_t active_ptr, double dt);
+            vap_fpd(std::size_t Nactive, std::size_t active_ptr, double dt);
 
         private:
             double f_ext();
@@ -25,14 +25,14 @@ namespace scopi
 
     };
 
-    vap_pfd::vap_pfd(std::size_t Nactive, std::size_t active_ptr, double dt)
+    vap_fpd::vap_fpd(std::size_t Nactive, std::size_t active_ptr, double dt)
         : base_type(Nactive, active_ptr, dt)
           , _mass(1.)
           , _moment(0.1)
     {}
 
     template <std::size_t dim>
-        void vap_pfd::aPrioriVelocity_impl(scopi_container<dim>& particles)
+        void vap_fpd::aPrioriVelocity_impl(scopi_container<dim>& particles)
         {
             // TODO what if f_ext and t_ext depends on the particule ?
             particles.vd() = particles.v() + _dt*f_ext()/_mass; // TODO mass is missing
@@ -41,7 +41,7 @@ namespace scopi
         }
 
     template <std::size_t dim>
-        void vap_pfd::updateVelocity_impl(scopi_container<dim>& particles)
+        void vap_fpd::updateVelocity_impl(scopi_container<dim>& particles)
         {
             for (std::size_t i=0; i<_Nactive; ++i)
             {
@@ -53,12 +53,12 @@ namespace scopi
             }
         }
 
-    double vap_pfd::f_ext()
+    double vap_fpd::f_ext()
     {
         return 0.;
     }
 
-    double vap_pfd::t_ext()
+    double vap_fpd::t_ext()
     {
         return 0.;
     }
