@@ -11,7 +11,7 @@ namespace scopi
             template <std::size_t dim>
                 void aPrioriVelocity(scopi_container<dim>& particles);
             template <std::size_t dim>
-                void updateVelocity(scopi_container<dim>& particles);
+                void updateVelocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
             vap_base(std::size_t Nactive, std::size_t active_ptr, double dt);
 
         protected:
@@ -37,8 +37,8 @@ namespace scopi
 
     template <class D>
         template <std::size_t dim>
-        void vap_base<D>::updateVelocity(scopi_container<dim>& particles)
+        void vap_base<D>::updateVelocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt)
         {
-            this->derived_cast().updateVelocity_impl(particles);
+            this->derived_cast().updateVelocity_impl(particles, uadapt, wadapt);
         }
 }

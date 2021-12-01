@@ -56,7 +56,7 @@ namespace scopi
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
                 OptimUzawa<dim> _solver;
-                vap_fpd _vap;
+                vap_fixed _vap;
 
         };
 
@@ -106,7 +106,7 @@ namespace scopi
                 // move the active particles
                 moveActiveParticles();
 
-                _vap.updateVelocity(_particles);
+                _vap.updateVelocity(_particles, _solver.getUadapt(), _solver.getWadapt());
 
                 // free the memory for the next solve
                 _solver.freeMemory();
