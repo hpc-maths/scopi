@@ -25,6 +25,7 @@
 // #include <scopi/contact/contact_brute_force.hpp>
 
 #include "../vap/vap_fixed.hpp"
+#include "../vap/vap_pfd.hpp"
 
 #include <nanoflann.hpp>
 
