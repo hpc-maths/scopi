@@ -17,7 +17,8 @@ namespace scopi
             vap_fpd(std::size_t Nactive, std::size_t active_ptr, double dt);
 
         private:
-            double f_ext();
+            template <std::size_t dim>
+                auto f_ext(scopi_container<dim>& particles, std::size_t i);
             double t_ext();
 
             double _mass;
@@ -35,9 +36,18 @@ namespace scopi
         void vap_fpd::aPrioriVelocity_impl(scopi_container<dim>& particles)
         {
             // TODO what if f_ext and t_ext depends on the particule ?
-            particles.vd() = particles.v() + _dt*f_ext()/_mass; // TODO mass is missing
+            for (std::size_t i=0; i<_Nactive; ++i)
+            {
+                // auto tmp = f_ext(particles, i);
+                // std::cout << tmp << std::endl;
+                auto pos = particles.pos()(i + _active_ptr);
+                double radius = 0.4;//xt::amax(particles[i]->radius()); // TODO radius for test critical_2d_no_velocity, shoud depend on the particle
+                double dist = xt::linalg::norm(pos) + radius;
+                auto fExt = - 10.*_mass/(dist*dist)*pos/dist;
+                particles.vd()(_active_ptr + i) = particles.v()(_active_ptr + i) + _dt*fExt/_mass; // TODO: add mass into particles
+            }
             // TODO should be dt * (R_i * t_i^{ext , n} - omega'_i * (J_i omega'_i)
-            particles.desired_omega() = particles.omega() + _dt*t_ext(); // TODO momentum is missing
+            particles.desired_omega() = particles.omega() + _dt*t_ext();
         }
 
     template <std::size_t dim>
@@ -53,10 +63,15 @@ namespace scopi
             }
         }
 
-    double vap_fpd::f_ext()
-    {
-        return 0.;
-    }
+    template <std::size_t dim>
+        auto vap_fpd::f_ext(scopi_container<dim>& particles, std::size_t i)
+        {
+            auto pos = particles.pos()(i + _active_ptr);
+            double dist = xt::linalg::norm(pos);
+            auto res = _mass/(dist*dist)*pos/dist;
+            std::cout << res << std::endl;
+            return res;
+        }
 
     double vap_fpd::t_ext()
     {

@@ -56,7 +56,7 @@ namespace scopi
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
                 OptimUzawa<dim> _solver;
-                vap_fixed _vap;
+                vap_fpd _vap;
 
         };
 
@@ -142,7 +142,7 @@ namespace scopi
         std::vector<scopi::neighbor<dim>> ScopiSolver<dim>::computeContacts()
         {
             // // scopi::contact_brute_force cont(2);
-            scopi::contact_kdtree cont(2, 10);
+            scopi::contact_kdtree cont(2., 10.);
             auto contacts = cont.run(_particles, _active_ptr);
             std::cout << "----> MOSEK : contacts.size() = " << contacts.size() << std::endl;
             return contacts;
