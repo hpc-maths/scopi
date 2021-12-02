@@ -21,6 +21,9 @@ int main()
     std::uniform_real_distribution<double> distrib_move_x(-0.1, 0.1);
     std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
 
+    scopi::sphere<dim> s({ {0., 0.}}, 0.01);
+    particles.push_back(s, {{0, 0}}, {{0., 0.}}, 0, 0, {{0, 0}});
+
     for(int i = 0; i < n; ++i)
     {
         for(int j = 0; j < n; ++j)
@@ -39,7 +42,7 @@ int main()
         }
     }
  
-    std::size_t active_ptr = 0; // pas d'obstacles
+    std::size_t active_ptr = 1;
 
     scopi::ScopiSolver<dim> solver(particles, dt, active_ptr);
     solver.solve(total_it);

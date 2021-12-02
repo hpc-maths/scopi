@@ -35,19 +35,15 @@ namespace scopi
     template <std::size_t dim>
         void vap_fpd::aPrioriVelocity_impl(scopi_container<dim>& particles)
         {
-            // TODO what if f_ext and t_ext depends on the particule ?
             for (std::size_t i=0; i<_Nactive; ++i)
             {
-                // auto tmp = f_ext(particles, i);
-                // std::cout << tmp << std::endl;
                 auto pos = particles.pos()(i + _active_ptr);
-                double radius = 0.4;//xt::amax(particles[i]->radius()); // TODO radius for test critical_2d_no_velocity, shoud depend on the particle
-                double dist = xt::linalg::norm(pos) + radius;
-                auto fExt = - 10.*_mass/(dist*dist)*pos/dist;
+                double dist = xt::linalg::norm(pos);
+                auto fExt = - _mass*_mass/(dist*dist)*pos/dist;
                 particles.vd()(_active_ptr + i) = particles.v()(_active_ptr + i) + _dt*fExt/_mass; // TODO: add mass into particles
             }
             // TODO should be dt * (R_i * t_i^{ext , n} - omega'_i * (J_i omega'_i)
-            particles.desired_omega() = particles.omega() + _dt*t_ext();
+            particles.desired_omega() = particles.omega();
         }
 
     template <std::size_t dim>
@@ -69,7 +65,6 @@ namespace scopi
             auto pos = particles.pos()(i + _active_ptr);
             double dist = xt::linalg::norm(pos);
             auto res = _mass/(dist*dist)*pos/dist;
-            std::cout << res << std::endl;
             return res;
         }
 
