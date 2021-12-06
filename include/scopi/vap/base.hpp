@@ -5,30 +5,40 @@
 namespace scopi
 {
     template <class D>
-    class vap_base: public crtp_base<D>
+        class vap_base: public crtp_base<D>
     {
-    public:
-        template <std::size_t dim>
-        void run(const scopi_container<dim>& particles);
+        public:
+            template <std::size_t dim>
+                void aPrioriVelocity(scopi_container<dim>& particles);
+            template <std::size_t dim>
+                void updateVelocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
+            vap_base(std::size_t Nactive, std::size_t active_ptr, double dt);
+
+        protected:
+                std::size_t _Nactive;
+                std::size_t _active_ptr;
+                double _dt;
     };
 
     template <class D>
-    template <std::size_t dim>
-    void vap_base<D>::run(const scopi_container<dim>& particles)
+        vap_base<D>::vap_base(std::size_t Nactive, std::size_t active_ptr, double dt)
+        : _Nactive(Nactive)
+          , _active_ptr(active_ptr),
+          _dt(dt)
     {
-        this->derived_cast().run_impl(particles);
     }
 
-    class vap_case_1: public vap_base<vap_case_1>
-    {
-    public:
-        using base_type = vap_base<vap_case_1>;
-
+    template <class D>
         template <std::size_t dim>
-        void run_impl(const scopi_container<dim>& particles)
+        void vap_base<D>::aPrioriVelocity(scopi_container<dim>& particles)
         {
-            std::cout << "run implementation" << std::endl;
+            this->derived_cast().aPrioriVelocity_impl(particles);
         }
-    };
 
+    template <class D>
+        template <std::size_t dim>
+        void vap_base<D>::updateVelocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt)
+        {
+            this->derived_cast().updateVelocity_impl(particles, uadapt, wadapt);
+        }
 }

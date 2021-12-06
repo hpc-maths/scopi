@@ -20,8 +20,8 @@ namespace scopi{
             double _dt;
             std::size_t _Nactive;
             std::size_t _active_ptr;
-            double _mass = 1.;
-            double _moment = .1;
+            double _mass;
+            double _moment;
             xt::xtensor<double, 1> _c;
             std::size_t _cDec;
             xt::xtensor<double, 1> _distances;
@@ -67,6 +67,8 @@ namespace scopi{
             _dt(dt),
             _Nactive(Nactive),
             _active_ptr(active_ptr),
+            _mass(1.),
+            _moment(0.1),
             _c(xt::zeros<double>({cSize})),
             _cDec(cDec)
             {
