@@ -63,7 +63,7 @@ namespace scopi
 
             tic();
 
-            #pragma omp parallel for num_threads(8)
+            #pragma omp parallel for //num_threads(8)
 
             for(std::size_t i = active_ptr; i < particles.size() - 1; ++i)
             {
@@ -119,6 +119,21 @@ namespace scopi
 
             }
 
+            // obstacles
+            for(std::size_t i = 0; i < active_ptr; ++i)
+            {
+                for(std::size_t j = active_ptr; j < particles.size(); ++j)
+                {
+                    auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+                    if (neigh.dij < _dmax)
+                    {
+                        neigh.i = i;
+                        neigh.j = j;
+                        contacts.emplace_back(std::move(neigh));
+                    }
+                }
+            }
+
             duration = toc();
             std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
 
@@ -140,11 +155,13 @@ namespace scopi
             duration = toc();
             std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 
+            /*
             for(std::size_t ic=0; ic<contacts.size(); ++ic)
             {
                 std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
                 // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
             }
+            */
 
             return contacts;
 

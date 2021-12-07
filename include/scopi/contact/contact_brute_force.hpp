@@ -44,6 +44,21 @@ namespace scopi
               }
             }
 
+            // obstacles
+            for(std::size_t i = 0; i < active_ptr; ++i)
+            {
+                for(std::size_t j = active_ptr; j < particles.size(); ++j)
+                {
+                    auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+                    if (neigh.dij < _dmax)
+                    {
+                        neigh.i = i;
+                        neigh.j = j;
+                        contacts.emplace_back(std::move(neigh));
+                    }
+                }
+            }
+
             auto duration = toc();
             std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
 
