@@ -39,8 +39,14 @@ const sphereObject = function () {
         position.x = obj.position[0];
         position.y = obj.position[1];
 
-        scale.x = obj.radius[0];
-        scale.y = obj.radius[1];
+        if (typeof obj.radius === "number") {
+            scale.x = obj.radius;
+            scale.y = obj.radius;
+        }
+        else { // obj.radius === "object"
+            scale.x = obj.radius[0];
+            scale.y = obj.radius[1];
+        }
 
         if (obj.position.length == 2) {
             position.z = 0;

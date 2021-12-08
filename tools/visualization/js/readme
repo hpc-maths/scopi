@@ -1,0 +1,4 @@
+cd tools/visualization/js
+npm install
+npm run build
+open tools/visualization/js/dist/index.html
