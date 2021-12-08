@@ -1,0 +1,4 @@
+aller dans le répertoire tools/visualization/js
+faire npm install
+puis npm run build
+et enfin ouvrir tools/visualization/js/dist/index.html
