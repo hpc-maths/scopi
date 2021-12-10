@@ -33,6 +33,9 @@ target_link_libraries(critical_2d_no_overlap scopi_cpp)
 add_executable(critical_2d_no_velocity critical/2d_case_no_velocity.cpp)
 target_link_libraries(critical_2d_no_velocity scopi_cpp)
 
+add_executable(critical_2d_spheres critical/2d_case_spheres.cpp)
+target_link_libraries(critical_2d_spheres scopi_cpp)
+
 add_executable(two_spheres two_spheres.cpp)
 target_link_libraries(two_spheres scopi_cpp)
 if (APPLE)
