@@ -10,12 +10,12 @@
 
 namespace scopi{
     template<std::size_t dim>
-        class OptimUzawa : public OptimBase<OptimUzawa<dim>, dim>
+        class OptimUzawaMkl : public OptimBase<OptimUzawaMkl<dim>, dim>
     {
         public:
-            using base_type = OptimBase<OptimUzawa<dim>, dim>;
+            using base_type = OptimBase<OptimUzawaMkl<dim>, dim>;
 
-            OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+            OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
             void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             void createMatrixMass_impl();
             int solveOptimizationProblem_impl();
@@ -48,15 +48,15 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        OptimUzawa<dim>::OptimUzawa(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimBase<OptimUzawa<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
+        OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+            OptimBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
             _tol(1.0e-2), _maxiter(40000), _rho(200.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
 
     template<std::size_t dim>
-        void OptimUzawa<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawaMkl<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             this->createMatrixConstraintCoo(contacts, _A_coo_row, _A_coo_col, _A_coo_val, 0);
 
@@ -108,7 +108,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void OptimUzawa<dim>::createMatrixMass_impl()
+        void OptimUzawaMkl<dim>::createMatrixMass_impl()
         {
             std::vector<MKL_INT> invP_csr_row;
             std::vector<MKL_INT> invP_csr_col;
@@ -167,7 +167,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int OptimUzawa<dim>::solveOptimizationProblem_impl()
+        int OptimUzawaMkl<dim>::solveOptimizationProblem_impl()
         {
             _L = xt::zeros_like(this->_distances);
             _R = xt::zeros_like(this->_distances);
@@ -220,25 +220,25 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        auto OptimUzawa<dim>::getUadapt_impl()
+        auto OptimUzawaMkl<dim>::getUadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_U.data()), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        auto OptimUzawa<dim>::getWadapt_impl()
+        auto OptimUzawaMkl<dim>::getWadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_U.data()+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        void OptimUzawa<dim>::allocateMemory_impl(const std::size_t nc)
+        void OptimUzawaMkl<dim>::allocateMemory_impl(const std::size_t nc)
         {
             std::ignore = nc;
         }
 
     template<std::size_t dim>
-        void OptimUzawa<dim>::freeMemory_impl()
+        void OptimUzawaMkl<dim>::freeMemory_impl()
         {
             mkl_sparse_destroy ( _invP );
             mkl_sparse_destroy ( _A );
@@ -248,13 +248,13 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int OptimUzawa<dim>::getNbActiveContacts_impl()
+        int OptimUzawaMkl<dim>::getNbActiveContacts_impl()
         {
             return xt::sum(xt::where(_L > 0., xt::ones_like(_L), xt::zeros_like(_L)))();
         }
 
     template<std::size_t dim>
-        void OptimUzawa<dim>::printCrsMatrix(const sparse_matrix_t A)
+        void OptimUzawaMkl<dim>::printCrsMatrix(const sparse_matrix_t A)
         {
             MKL_INT* csr_row_begin_ptr = NULL;
             MKL_INT* csr_row_end_ptr = NULL;
