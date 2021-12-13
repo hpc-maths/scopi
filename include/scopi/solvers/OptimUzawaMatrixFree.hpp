@@ -27,6 +27,7 @@ namespace scopi{
 
         private:
             void printCrsMatrix(const sparse_matrix_t);
+            void gemv_invP();
 
             const double _tol;
             const std::size_t _maxiter;
@@ -185,12 +186,7 @@ namespace scopi{
                     return -1;
                 }
 
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, _U.data(), 0., _U.data()); // U = - P^-1 * U
-                if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-                {
-                    std::cout << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << _status << std::endl;
-                    return -1;
-                }
+                gemv_invP();  // U = - P^-1 * U
 
                 _R = this->_distances - _dmin;
 
@@ -294,5 +290,20 @@ namespace scopi{
                 std::cout << std::endl;
             }
             std::cout << "_____________________________________________________________________  \n" ;
+        }
+
+    template<std::size_t dim>
+        void OptimUzawaMatrixFree<dim>::gemv_invP()
+        {
+            // loops instead of xtensor functions used here to control exactly the parallelism
+#pragma omp parallel for
+            for(std::size_t i = 0; i < this->_Nactive; ++i)
+            {
+                for (std::size_t d=0; d<3; ++d)
+                {
+                    _U(3*i + d) /= (-1. * this->_mass); // TODO: add mass into particles
+                    _U(3*this->_Nactive + 3*i + d) /= (-1. * this->_moment);
+                }
+            }
         }
 }
