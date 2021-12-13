@@ -18,7 +18,7 @@ namespace scopi{
             OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
             void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             void createMatrixMass_impl();
-            int solveOptimizationProblem_impl();
+            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             auto getUadapt_impl();
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
@@ -167,8 +167,10 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int OptimUzawaMkl<dim>::solveOptimizationProblem_impl()
+        int OptimUzawaMkl<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
+            std::ignore = contacts;
+
             _L = xt::zeros_like(this->_distances);
             _R = xt::zeros_like(this->_distances);
 
