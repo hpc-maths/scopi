@@ -29,6 +29,7 @@ namespace scopi{
             void printCrsMatrix(const sparse_matrix_t);
             void gemv_invP();
             void gemv_A(const std::vector<scopi::neighbor<dim>>& contacts);
+            void gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts);
 
             const double _tol;
             const std::size_t _maxiter;
@@ -179,31 +180,11 @@ namespace scopi{
             while ( (cmax<=-_tol)&&(cc <= _maxiter) )
             {
                 _U = this->_c;
-
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, _L.data(), 1., _U.data()); // U = A^T * L + U
-                if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-                {
-                    std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << _status << std::endl;
-                    return -1;
-                }
-
+                gemv_transposeA(contacts); // U = A^T * L + U
                 gemv_invP();  // U = - P^-1 * U
-
                 _R = this->_distances - _dmin;
-
                 gemv_A(contacts); // R = - A * U + R
-                /*
-                _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, _U.data(), 1., _R.data()); // R = - A * U + R
-                if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
-                {
-                    printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
-                    std::cout << " Error in mkl_sparse_d_mv for R = - A * U + R: " << _status << std::endl;
-                    return -1;
-                }
-                */
-
                 _L = xt::maximum( _L-_rho*_R, 0);
-
                 cmax = double((xt::amin(_R))(0));
                 cc += 1;
                 // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
@@ -322,16 +303,10 @@ namespace scopi{
                 {
                     if (c.i >= this->_active_ptr)
                     {
-                        // A_rows.push_back(ic);
-                        // A_cols.push_back(firstCol + (c.i - _active_ptr)*3 + d);
-                        // A_values.push_back(-_dt*c.nij[d]);
                         _R(ic) -= (-this->_dt*c.nij[d]) * _U((c.i - this->_active_ptr)*3 + d);
                     }
                     if (c.j >= this->_active_ptr)
                     {
-                        // A_rows.push_back(ic);
-                        // A_cols.push_back(firstCol + (c.j - _active_ptr)*3 + d);
-                        // A_values.push_back(_dt*c.nij[d]);
                         _R(ic) -= (this->_dt*c.nij[d]) * _U((c.j - this->_active_ptr)*3 + d);
                     }
                 }
@@ -371,9 +346,6 @@ namespace scopi{
                     auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                     for (std::size_t ip=0; ip<3; ++ip)
                     {
-                        // A_rows.push_back(ic);
-                        // A_cols.push_back(firstCol + 3*_Nactive + 3*ind_part + ip);
-                        // A_values.push_back(_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                         _R(ic) -= (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
                     }
                 }
@@ -384,13 +356,81 @@ namespace scopi{
                     auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
                     for (std::size_t ip=0; ip<3; ++ip)
                     {
-                        // A_rows.push_back(ic);
-                        // A_cols.push_back(firstCol + 3*_Nactive + 3*ind_part + ip);
-                        // A_values.push_back(-_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                         _R(ic) -= (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
                     }
                 }
 
+            }
+        }
+
+    template<std::size_t dim>
+        void OptimUzawaMatrixFree<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
+        {
+// #pragma omp parallel for
+            for(std::size_t ic = 0; ic < contacts.size(); ++ic)
+            {
+                auto &c = contacts[ic];
+
+                for (std::size_t d=0; d<3; ++d)
+                {
+                    if (c.i >= this->_active_ptr)
+                    {
+                         _U((c.i - this->_active_ptr)*3 + d) += _L(ic) * (-this->_dt*c.nij[d]);
+                    }
+                    if (c.j >= this->_active_ptr)
+                    {
+                        _U((c.j - this->_active_ptr)*3 + d) += _L(ic) * (this->_dt*c.nij[d]);
+                    }
+                }
+
+                auto r_i = c.pi - this->_particles.pos()(c.i);
+                auto r_j = c.pj - this->_particles.pos()(c.j);
+
+                xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
+
+                if (dim == 2)
+                {
+                    ri_cross = {{      0,      0, r_i(1)},
+                        {      0,      0, -r_i(0)},
+                        {-r_i(1), r_i(0),       0}};
+
+                    rj_cross = {{      0,      0,  r_j(1)},
+                        {      0,      0, -r_j(0)},
+                        {-r_j(1), r_j(0),       0}};
+                }
+                else
+                {
+                    ri_cross = {{      0, -r_i(2),  r_i(1)},
+                        { r_i(2),       0, -r_i(0)},
+                        {-r_i(1),  r_i(0),       0}};
+
+                    rj_cross = {{      0, -r_j(2),  r_j(1)},
+                        { r_j(2),       0, -r_j(0)},
+                        {-r_j(1),  r_j(0),       0}};
+                }
+
+                auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
+                auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
+
+                if (c.i >= this->_active_ptr)
+                {
+                    std::size_t ind_part = c.i - this->_active_ptr;
+                    auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+                    for (std::size_t ip=0; ip<3; ++ip)
+                    {
+                        _U(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                    }
+                }
+
+                if (c.j >= this->_active_ptr)
+                {
+                    std::size_t ind_part = c.j - this->_active_ptr;
+                    auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+                    for (std::size_t ip=0; ip<3; ++ip)
+                    {
+                        _U(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                    }
+                }
             }
         }
 }
