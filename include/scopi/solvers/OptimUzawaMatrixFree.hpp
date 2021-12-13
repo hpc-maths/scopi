@@ -208,7 +208,7 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawaMatrixFree<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-// #pragma omp parallel for
+#pragma omp parallel for
             for(std::size_t ic = 0; ic < contacts.size(); ++ic)
             {
                 auto &c = contacts[ic];
@@ -217,10 +217,12 @@ namespace scopi{
                 {
                     if (c.i >= this->_active_ptr)
                     {
+#pragma omp atomic
                          _U((c.i - this->_active_ptr)*3 + d) += _L(ic) * (-this->_dt*c.nij[d]);
                     }
                     if (c.j >= this->_active_ptr)
                     {
+#pragma omp atomic
                         _U((c.j - this->_active_ptr)*3 + d) += _L(ic) * (this->_dt*c.nij[d]);
                     }
                 }
@@ -260,6 +262,7 @@ namespace scopi{
                     auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                     for (std::size_t ip=0; ip<3; ++ip)
                     {
+#pragma omp atomic
                         _U(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
@@ -270,6 +273,7 @@ namespace scopi{
                     auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
                     for (std::size_t ip=0; ip<3; ++ip)
                     {
+#pragma omp atomic
                         _U(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
