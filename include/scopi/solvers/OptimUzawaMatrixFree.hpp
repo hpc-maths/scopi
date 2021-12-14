@@ -69,13 +69,26 @@ namespace scopi{
             double cmax = -1000.0;
             while ( (cmax<=-_tol)&&(cc <= _maxiter) )
             {
-                _U = this->_c;
+                // _U = this->_c;
+#pragma omp parallel for
+                for(std::size_t i = 0; i < this->_c.size(); ++i)
+                    _U(i) = this->_c(i);
                 gemv_transposeA(contacts); // U = A^T * L + U
                 gemv_invP();  // U = - P^-1 * U
-                _R = this->_distances - _dmin;
+                // _R = this->_distances - _dmin;
+#pragma omp parallel for
+                for(std::size_t i = 0; i < this->_distances.size(); ++i)
+                    _R(i) = this->_distances(i) - _dmin;
                 gemv_A(contacts); // R = - A * U + R
-                _L = xt::maximum( _L-_rho*_R, 0);
-                cmax = double((xt::amin(_R))(0));
+                // _L = xt::maximum( _L-_rho*_R, 0);
+#pragma omp parallel for
+                for(std::size_t i = 0; i < this->_L.size(); ++i)
+                    _L(i) = std::max(_L(i)-_rho*_R(i), 0.);
+                // cmax = double((xt::amin(_R))(0));
+                cmax = std::numeric_limits<double>::max();
+#pragma omp parallel for reduction(min:cmax)
+                for(std::size_t i = 0; i < this->_R.size(); ++i)
+                    cmax = std::min(cmax, _R(i));
                 cc += 1;
                 // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
             }
