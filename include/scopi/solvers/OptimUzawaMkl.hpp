@@ -50,7 +50,7 @@ namespace scopi{
     template<std::size_t dim>
         OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
             OptimBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-2), _maxiter(40000), _rho(200.), _dmin(0.),
+            _tol(1.0e-6), _maxiter(40000), _rho(2000.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
@@ -174,52 +174,60 @@ namespace scopi{
             _L = xt::zeros_like(this->_distances);
             _R = xt::zeros_like(this->_distances);
 
+            double timeAssignU = 0.;
+            double timeGemvTransposeA = 0.;
+            double timeGemvInvP = 0.;
+            double timeAssignR = 0.;
+            double timeGemvA = 0.;
+            double timeAssignL = 0.;
+            double timeComputeCmax = 0.;
+
             std::size_t cc = 0;
             double cmax = -1000.0;
             while ( (cmax<=-_tol)&&(cc <= _maxiter) )
             {
-                // _U = this->_c;
-#pragma omp parallel for
-                for(std::size_t i = 0; i < this->_c.size(); ++i)
-                    _U(i) = this->_c(i);
+                tic();
+                _U = this->_c;
+                timeAssignU += toc();
 
+                tic();
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., _A, _descrA, _L.data(), 1., _U.data()); // U = A^T * L + U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << _status << std::endl;
                     return -1;
                 }
+                timeGemvTransposeA += toc();
 
+                tic();
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _invP, _descrInvP, _U.data(), 0., _U.data()); // U = - P^-1 * U
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
                     std::cout << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << _status << std::endl;
                     return -1;
                 }
+                timeGemvInvP += toc();
 
-                // _R = this->_distances - _dmin;
-#pragma omp parallel for
-                for(std::size_t i = 0; i < this->_distances.size(); ++i)
-                    _R(i) = this->_distances(i) - _dmin;
+                tic();
+                _R = this->_distances - _dmin;
+                timeAssignR += toc();
 
+                tic();
                 _status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., _A, _descrA, _U.data(), 1., _R.data()); // R = - A * U + R
                 if (_status != SPARSE_STATUS_SUCCESS && _status != SPARSE_STATUS_NOT_SUPPORTED)
                 {
-                    printf(" Error in mkl_sparse_d_mv R = A U: %d \n", _status);
                     std::cout << " Error in mkl_sparse_d_mv for R = - A * U + R: " << _status << std::endl;
                     return -1;
                 }
+                timeGemvA += toc();
 
-                // _L = xt::maximum( _L-_rho*_R, 0);
-#pragma omp parallel for
-                for(std::size_t i = 0; i < this->_L.size(); ++i)
-                    _L(i) = std::max(_L(i)-_rho*_R(i), 0.);
+                tic();
+                _L = xt::maximum( _L-_rho*_R, 0);
+                timeAssignL += toc();
 
-                // cmax = double((xt::amin(_R))(0));
-                cmax = std::numeric_limits<double>::max();
-#pragma omp parallel for reduction(min:cmax)
-                for(std::size_t i = 0; i < this->_R.size(); ++i)
-                    cmax = std::min(cmax, _R(i));
+                tic();
+                cmax = double((xt::amin(_R))(0));
+                timeComputeCmax += toc();
                 cc += 1;
                 // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
             }
@@ -230,6 +238,14 @@ namespace scopi{
                 std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
                 std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
             }
+
+            std::cout << "----> CPUTIME : solve (U = c) = " << timeAssignU << std::endl;
+            std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvTransposeA << std::endl;
+            std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << timeGemvInvP << std::endl;
+            std::cout << "----> CPUTIME : solve (R = d) = " << timeAssignR << std::endl;
+            std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvA << std::endl;
+            std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << timeAssignL << std::endl;
+            std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << timeComputeCmax << std::endl;
 
             return cc;
         }

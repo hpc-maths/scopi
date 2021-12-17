@@ -51,11 +51,11 @@ namespace scopi{
             std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
 
             // Solve optimization problem
-            std::cout << "----> Create optimization problem " << nite << std::endl;
-            tic();
+            // std::cout << "----> Create optimization problem " << nite << std::endl;
+            // tic();
             auto nbIter = solveOptimizationProblem(contacts);
-            auto duration5 = toc();
-            std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
+            // auto duration5 = toc();
+            // std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
             std::cout << "iterations : " << nbIter << std::endl;
             std::cout << "Contacts: " << contacts.size() << "  active contacts " << getNbActiveContacts() << std::endl;
         }
