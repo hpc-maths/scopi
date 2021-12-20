@@ -172,9 +172,7 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawaMatrixFreeTbb<dim>::gemv_A(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-#pragma omp parallel for
-            for(std::size_t ic = 0; ic < contacts.size(); ++ic)
-            {
+            tbb::parallel_for(std::size_t(0), contacts.size(), [=](std::size_t ic) {
                 auto &c = contacts[ic];
                 for (std::size_t d=0; d<3; ++d)
                 {
@@ -237,7 +235,7 @@ namespace scopi{
                     }
                 }
 
-            }
+            });
         }
 
     template<std::size_t dim>
