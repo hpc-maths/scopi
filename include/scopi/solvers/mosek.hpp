@@ -20,7 +20,8 @@
 #include "OptimMosek.hpp"
 #include "OptimScs.hpp"
 #include "OptimUzawaMkl.hpp"
-#include "OptimUzawaMatrixFree.hpp"
+#include "OptimUzawaMatrixFreeOmp.hpp"
+#include "OptimUzawaMatrixFreeTbb.hpp"
 
 #include <scopi/contact/contact_kdtree.hpp>
 // #include <scopi/contact/contact_brute_force.hpp>
@@ -56,7 +57,7 @@ namespace scopi
                 double _dt;
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
-                OptimUzawaMatrixFree<dim> _solver;
+                OptimUzawaMatrixFreeTbb<dim> _solver;
                 vap_fixed _vap;
 
         };
