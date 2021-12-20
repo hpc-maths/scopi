@@ -3,6 +3,7 @@
 #include "OptimBase.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
+#include "tbb/tbb.h"
 #include <stdio.h>
 
 #include <xtensor/xadapt.hpp>
@@ -159,15 +160,13 @@ namespace scopi{
         void OptimUzawaMatrixFreeTbb<dim>::gemv_invP()
         {
             // for loops instead of xtensor functions to control exactly the parallelism
-#pragma omp parallel for
-            for(std::size_t i = 0; i < this->_Nactive; ++i)
-            {
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    _U(3*i + d) /= (-1. * this->_mass); // TODO: add mass into particles
-                    _U(3*this->_Nactive + 3*i + d) /= (-1. * this->_moment);
-                }
-            }
+            tbb::parallel_for(std::size_t(0), this->_Nactive, [=](std::size_t i) {
+                    for (std::size_t d=0; d<3; ++d)
+                    {
+                        _U(3*i + d) /= (-1. * this->_mass); // TODO: add mass into particles
+                        _U(3*this->_Nactive + 3*i + d) /= (-1. * this->_moment);
+                    }
+                });
         }
 
     template<std::size_t dim>
