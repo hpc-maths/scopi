@@ -32,7 +32,7 @@ namespace scopi{
 
             void createMatrixConstraint(const std::vector<scopi::neighbor<dim>>& contacts);
             void createMatrixMass();
-            int solveOptimizationProblem();
+            int solveOptimizationProblem(const std::vector<scopi::neighbor<dim>>& contacts);
             void allocateMemory(const std::size_t nc);
             int getNbActiveContacts();
     };
@@ -51,11 +51,11 @@ namespace scopi{
             std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
 
             // Solve optimization problem
-            std::cout << "----> Create optimization problem " << nite << std::endl;
-            tic();
-            auto nbIter = solveOptimizationProblem();
-            auto duration5 = toc();
-            std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
+            // std::cout << "----> Create optimization problem " << nite << std::endl;
+            // tic();
+            auto nbIter = solveOptimizationProblem(contacts);
+            // auto duration5 = toc();
+            // std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
             std::cout << "iterations : " << nbIter << std::endl;
             std::cout << "Contacts: " << contacts.size() << "  active contacts " << getNbActiveContacts() << std::endl;
         }
@@ -199,9 +199,9 @@ namespace scopi{
         }
 
     template<class D, std::size_t dim>
-        int OptimBase<D, dim>::solveOptimizationProblem()
+        int OptimBase<D, dim>::solveOptimizationProblem(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-            return this->derived_cast().solveOptimizationProblem_impl();
+            return this->derived_cast().solveOptimizationProblem_impl(contacts);
         }
 
     template<class D, std::size_t dim>
