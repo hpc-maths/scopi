@@ -16,7 +16,7 @@ namespace scopi{
             OptimMosek(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
             void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             void createMatrixMass_impl();
-            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            int solveOptimizationProblem_impl();
             auto getUadapt_impl();
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
@@ -109,9 +109,8 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int OptimMosek<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimMosek<dim>::solveOptimizationProblem_impl()
         {
-            std::ignore = contacts;
             Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
             // variables
             Variable::t X = model->variable("X", 1 + 6*this->_Nactive + 6*this->_Nactive);
@@ -126,8 +125,6 @@ namespace scopi{
             Constraint::t qc1 = model->constraint("qc1", Expr::mul(_A, X), Domain::lessThan(D_mosek));
             Constraint::t qc2 = model->constraint("qc2", Expr::mul(_Az, X), Domain::equalsTo(0.));
             Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->_Nactive, 1 + 6*this->_Nactive + 6*this->_Nactive)), Domain::inRotatedQCone());
-            // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
-            // model->setSolverParam("numThreads", thread_qty);
             // model->setSolverParam("intpntCoTolPfeas", 1e-10);
             // model->setSolverParam("intpntTolPfeas", 1.e-10);
 

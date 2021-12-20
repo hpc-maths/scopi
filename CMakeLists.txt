@@ -74,7 +74,7 @@ target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} MKL::MKL ${MOSEK_LIBRARIES} scs::scsindir)
+target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir)
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 

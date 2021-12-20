@@ -14,7 +14,7 @@ namespace scopi{
             ~OptimScs();
             void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             void createMatrixMass_impl();
-            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            int solveOptimizationProblem_impl();
             auto getUadapt_impl();
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
@@ -143,9 +143,8 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int OptimScs<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimScs<dim>::solveOptimizationProblem_impl()
         {
-            std::ignore = contacts;
             _d.m = this->_distances.size();
             _d.n = 6*this->_Nactive;
             _d.A = &_A;
