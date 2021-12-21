@@ -1,10 +1,8 @@
 #pragma once
 
 #include "OptimBase.hpp"
-#include "mkl_service.h"
-#include "mkl_spblas.h"
+#include <omp.h>
 #include "tbb/tbb.h"
-#include <stdio.h>
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
@@ -241,9 +239,7 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawaMatrixFreeTbb<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-#pragma omp parallel for
-            for(std::size_t ic = 0; ic < contacts.size(); ++ic)
-            {
+            tbb::parallel_for(std::size_t(0), contacts.size(), [=](std::size_t ic) {
                 auto &c = contacts[ic];
 
                 for (std::size_t d=0; d<3; ++d)
@@ -310,6 +306,6 @@ namespace scopi{
                         _U(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
-            }
+            });
         }
 }

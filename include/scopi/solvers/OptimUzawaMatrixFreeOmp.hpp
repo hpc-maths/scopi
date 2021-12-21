@@ -1,9 +1,7 @@
 #pragma once
 
 #include "OptimBase.hpp"
-#include "mkl_service.h"
-#include "mkl_spblas.h"
-#include <stdio.h>
+#include <omp.h>
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
