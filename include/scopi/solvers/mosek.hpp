@@ -31,8 +31,6 @@
 
 #include <nanoflann.hpp>
 
-using namespace mosek::fusion;
-using namespace monty;
 namespace nl = nlohmann;
 
 using namespace xt::placeholders;
