@@ -161,77 +161,77 @@ namespace scopi{
             tbb::parallel_for(std::size_t(0), this->_Nactive, [=](std::size_t i) {
                     for (std::size_t d=0; d<3; ++d)
                     {
-                        _U(3*i + d) /= (-1. * this->_mass); // TODO: add mass into particles
-                        _U(3*this->_Nactive + 3*i + d) /= (-1. * this->_moment);
+                    _U(3*i + d) /= (-1. * this->_mass); // TODO: add mass into particles
+                    _U(3*this->_Nactive + 3*i + d) /= (-1. * this->_moment);
                     }
-                });
+                    });
         }
 
     template<std::size_t dim>
         void OptimUzawaMatrixFreeTbb<dim>::gemv_A(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             tbb::parallel_for(std::size_t(0), contacts.size(), [=](std::size_t ic) {
-                auto &c = contacts[ic];
-                for (std::size_t d=0; d<3; ++d)
-                {
+                    auto &c = contacts[ic];
+                    for (std::size_t d=0; d<3; ++d)
+                    {
                     if (c.i >= this->_active_ptr)
                     {
-                        _R(ic) -= (-this->_dt*c.nij[d]) * _U((c.i - this->_active_ptr)*3 + d);
+                    _R(ic) -= (-this->_dt*c.nij[d]) * _U((c.i - this->_active_ptr)*3 + d);
                     }
                     if (c.j >= this->_active_ptr)
                     {
-                        _R(ic) -= (this->_dt*c.nij[d]) * _U((c.j - this->_active_ptr)*3 + d);
+                    _R(ic) -= (this->_dt*c.nij[d]) * _U((c.j - this->_active_ptr)*3 + d);
                     }
-                }
+                    }
 
-                auto r_i = c.pi - this->_particles.pos()(c.i);
-                auto r_j = c.pj - this->_particles.pos()(c.j);
+                    auto r_i = c.pi - this->_particles.pos()(c.i);
+                    auto r_j = c.pj - this->_particles.pos()(c.j);
 
-                xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
+                    xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
 
-                if (dim == 2)
-                {
-                    ri_cross = {{      0,      0, r_i(1)},
-                        {      0,      0, -r_i(0)},
-                        {-r_i(1), r_i(0),       0}};
-
-                    rj_cross = {{      0,      0,  r_j(1)},
-                        {      0,      0, -r_j(0)},
-                        {-r_j(1), r_j(0),       0}};
-                }
-                else
-                {
-                    ri_cross = {{      0, -r_i(2),  r_i(1)},
-                        { r_i(2),       0, -r_i(0)},
-                        {-r_i(1),  r_i(0),       0}};
-
-                    rj_cross = {{      0, -r_j(2),  r_j(1)},
-                        { r_j(2),       0, -r_j(0)},
-                        {-r_j(1),  r_j(0),       0}};
-                }
-
-                auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
-                auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
-
-                if (c.i >= this->_active_ptr)
-                {
-                    std::size_t ind_part = c.i - this->_active_ptr;
-                    auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                    for (std::size_t ip=0; ip<3; ++ip)
+                    if (dim == 2)
                     {
-                        _R(ic) -= (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
-                    }
-                }
+                        ri_cross = {{      0,      0, r_i(1)},
+                            {      0,      0, -r_i(0)},
+                            {-r_i(1), r_i(0),       0}};
 
-                if (c.j >= this->_active_ptr)
-                {
-                    std::size_t ind_part = c.j - this->_active_ptr;
-                    auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                    for (std::size_t ip=0; ip<3; ++ip)
-                    {
-                        _R(ic) -= (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
+                        rj_cross = {{      0,      0,  r_j(1)},
+                            {      0,      0, -r_j(0)},
+                            {-r_j(1), r_j(0),       0}};
                     }
-                }
+                    else
+                    {
+                        ri_cross = {{      0, -r_i(2),  r_i(1)},
+                            { r_i(2),       0, -r_i(0)},
+                            {-r_i(1),  r_i(0),       0}};
+
+                        rj_cross = {{      0, -r_j(2),  r_j(1)},
+                            { r_j(2),       0, -r_j(0)},
+                            {-r_j(1),  r_j(0),       0}};
+                    }
+
+                    auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
+                    auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
+
+                    if (c.i >= this->_active_ptr)
+                    {
+                        std::size_t ind_part = c.i - this->_active_ptr;
+                        auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+                        for (std::size_t ip=0; ip<3; ++ip)
+                        {
+                            _R(ic) -= (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
+                        }
+                    }
+
+                    if (c.j >= this->_active_ptr)
+                    {
+                        std::size_t ind_part = c.j - this->_active_ptr;
+                        auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+                        for (std::size_t ip=0; ip<3; ++ip)
+                        {
+                            _R(ic) -= (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
+                        }
+                    }
 
             });
         }
@@ -239,73 +239,78 @@ namespace scopi{
     template<std::size_t dim>
         void OptimUzawaMatrixFreeTbb<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
         {
-            tbb::parallel_for(std::size_t(0), contacts.size(), [=](std::size_t ic) {
-                auto &c = contacts[ic];
-
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    if (c.i >= this->_active_ptr)
+            _U = _U + tbb::parallel_reduce(tbb::blocked_range<std::size_t>(0, contacts.size()),
+                    xt::zeros_like(_U),
+                    [=](tbb::blocked_range<std::size_t>& r, xt::xtensor<double, 1> partialSum) -> xt::xtensor<double, 1> {
+                    for(std::size_t ic=r.begin(); ic!=r.end(); ++ic)
                     {
-#pragma omp atomic
-                         _U((c.i - this->_active_ptr)*3 + d) += _L(ic) * (-this->_dt*c.nij[d]);
+                        auto &c = contacts[ic];
+
+                        for (std::size_t d=0; d<3; ++d)
+                        {
+                            if (c.i >= this->_active_ptr)
+                            {
+                                partialSum((c.i - this->_active_ptr)*3 + d) += _L(ic) * (-this->_dt*c.nij[d]);
+                            }
+                            if (c.j >= this->_active_ptr)
+                            {
+                            partialSum((c.j - this->_active_ptr)*3 + d) += _L(ic) * (this->_dt*c.nij[d]);
+                            }
+                        }
+
+                        auto r_i = c.pi - this->_particles.pos()(c.i);
+                        auto r_j = c.pj - this->_particles.pos()(c.j);
+
+                        xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
+
+                        if (dim == 2)
+                        {
+                            ri_cross = {{      0,      0, r_i(1)},
+                                {      0,      0, -r_i(0)},
+                                {-r_i(1), r_i(0),       0}};
+
+                            rj_cross = {{      0,      0,  r_j(1)},
+                                {      0,      0, -r_j(0)},
+                                {-r_j(1), r_j(0),       0}};
+                        }
+                        else
+                        {
+                            ri_cross = {{      0, -r_i(2),  r_i(1)},
+                                { r_i(2),       0, -r_i(0)},
+                                {-r_i(1),  r_i(0),       0}};
+
+                            rj_cross = {{      0, -r_j(2),  r_j(1)},
+                                { r_j(2),       0, -r_j(0)},
+                                {-r_j(1),  r_j(0),       0}};
+                        }
+
+                        auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
+                        auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
+
+                        if (c.i >= this->_active_ptr)
+                        {
+                            std::size_t ind_part = c.i - this->_active_ptr;
+                            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+                            for (std::size_t ip=0; ip<3; ++ip)
+                            {
+                                partialSum(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                            }
+                        }
+
+                        if (c.j >= this->_active_ptr)
+                        {
+                            std::size_t ind_part = c.j - this->_active_ptr;
+                            auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+                            for (std::size_t ip=0; ip<3; ++ip)
+                            {
+                                partialSum(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                            }
+                        }
                     }
-                    if (c.j >= this->_active_ptr)
-                    {
-#pragma omp atomic
-                        _U((c.j - this->_active_ptr)*3 + d) += _L(ic) * (this->_dt*c.nij[d]);
-                    }
-                }
-
-                auto r_i = c.pi - this->_particles.pos()(c.i);
-                auto r_j = c.pj - this->_particles.pos()(c.j);
-
-                xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
-
-                if (dim == 2)
-                {
-                    ri_cross = {{      0,      0, r_i(1)},
-                        {      0,      0, -r_i(0)},
-                        {-r_i(1), r_i(0),       0}};
-
-                    rj_cross = {{      0,      0,  r_j(1)},
-                        {      0,      0, -r_j(0)},
-                        {-r_j(1), r_j(0),       0}};
-                }
-                else
-                {
-                    ri_cross = {{      0, -r_i(2),  r_i(1)},
-                        { r_i(2),       0, -r_i(0)},
-                        {-r_i(1),  r_i(0),       0}};
-
-                    rj_cross = {{      0, -r_j(2),  r_j(1)},
-                        { r_j(2),       0, -r_j(0)},
-                        {-r_j(1),  r_j(0),       0}};
-                }
-
-                auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
-                auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
-
-                if (c.i >= this->_active_ptr)
-                {
-                    std::size_t ind_part = c.i - this->_active_ptr;
-                    auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                    for (std::size_t ip=0; ip<3; ++ip)
-                    {
-#pragma omp atomic
-                        _U(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                    }
-                }
-
-                if (c.j >= this->_active_ptr)
-                {
-                    std::size_t ind_part = c.j - this->_active_ptr;
-                    auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                    for (std::size_t ip=0; ip<3; ++ip)
-                    {
-#pragma omp atomic
-                        _U(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                    }
-                }
+                    return partialSum;
+                },
+            []( xt::xtensor<double, 1> x, xt::xtensor<double, 1> y )-> xt::xtensor<double, 1> {
+                return x+y;
             });
         }
 }
