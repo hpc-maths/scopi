@@ -1,21 +1,19 @@
 #pragma once
 
 #include "OptimBase.hpp"
-#include "mkl_service.h"
-#include "mkl_spblas.h"
-#include <stdio.h>
+#include <omp.h>
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
 
 namespace scopi{
     template<std::size_t dim>
-        class OptimUzawaMatrixFree : public OptimBase<OptimUzawaMatrixFree<dim>, dim>
+        class OptimUzawaMatrixFreeOmp : public OptimBase<OptimUzawaMatrixFreeOmp<dim>, dim>
     {
         public:
-            using base_type = OptimBase<OptimUzawaMatrixFree<dim>, dim>;
+            using base_type = OptimBase<OptimUzawaMatrixFreeOmp<dim>, dim>;
 
-            OptimUzawaMatrixFree(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+            OptimUzawaMatrixFreeOmp(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
             void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
             void createMatrixMass_impl();
             int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
@@ -41,26 +39,26 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        OptimUzawaMatrixFree<dim>::OptimUzawaMatrixFree(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
-            OptimBase<OptimUzawaMatrixFree<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
+        OptimUzawaMatrixFreeOmp<dim>::OptimUzawaMatrixFreeOmp(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+            OptimBase<OptimUzawaMatrixFreeOmp<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
             _tol(1.0e-6), _maxiter(40000), _rho(2000.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFree<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawaMatrixFreeOmp<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             std::ignore = contacts;
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFree<dim>::createMatrixMass_impl()
+        void OptimUzawaMatrixFreeOmp<dim>::createMatrixMass_impl()
         {
         }
 
     template<std::size_t dim>
-        int OptimUzawaMatrixFree<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimUzawaMatrixFreeOmp<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
         {
             _L = xt::zeros_like(this->_distances);
             _R = xt::zeros_like(this->_distances);
@@ -116,10 +114,10 @@ namespace scopi{
             }
 
             std::cout << "----> CPUTIME : solve (U = c) = " << timeAssignU << std::endl;
-            std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvA << std::endl;
+            std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvTransposeA << std::endl;
             std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << timeGemvInvP << std::endl;
             std::cout << "----> CPUTIME : solve (R = d) = " << timeAssignR << std::endl;
-            std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvTransposeA << std::endl;
+            std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvA << std::endl;
             std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << timeAssignL << std::endl;
             std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << timeComputeCmax << std::endl;
 
@@ -127,36 +125,36 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        auto OptimUzawaMatrixFree<dim>::getUadapt_impl()
+        auto OptimUzawaMatrixFreeOmp<dim>::getUadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_U.data()), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        auto OptimUzawaMatrixFree<dim>::getWadapt_impl()
+        auto OptimUzawaMatrixFreeOmp<dim>::getWadapt_impl()
         {
             return xt::adapt(reinterpret_cast<double*>(_U.data()+3*this->_Nactive), {this->_Nactive, 3UL});
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFree<dim>::allocateMemory_impl(const std::size_t nc)
+        void OptimUzawaMatrixFreeOmp<dim>::allocateMemory_impl(const std::size_t nc)
         {
             std::ignore = nc;
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFree<dim>::freeMemory_impl()
+        void OptimUzawaMatrixFreeOmp<dim>::freeMemory_impl()
         {
         }
 
     template<std::size_t dim>
-        int OptimUzawaMatrixFree<dim>::getNbActiveContacts_impl()
+        int OptimUzawaMatrixFreeOmp<dim>::getNbActiveContacts_impl()
         {
             return xt::sum(xt::where(_L > 0., xt::ones_like(_L), xt::zeros_like(_L)))();
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFree<dim>::gemv_invP()
+        void OptimUzawaMatrixFreeOmp<dim>::gemv_invP()
         {
             // for loops instead of xtensor functions to control exactly the parallelism
 #pragma omp parallel for
@@ -171,7 +169,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFree<dim>::gemv_A(const std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawaMatrixFreeOmp<dim>::gemv_A(const std::vector<scopi::neighbor<dim>>& contacts)
         {
 #pragma omp parallel for
             for(std::size_t ic = 0; ic < contacts.size(); ++ic)
@@ -242,7 +240,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFree<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawaMatrixFreeOmp<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
         {
 #pragma omp parallel for
             for(std::size_t ic = 0; ic < contacts.size(); ++ic)
