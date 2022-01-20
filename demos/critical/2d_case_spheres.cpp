@@ -8,12 +8,9 @@
 
 int main()
 {
-    int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
-    tbb::task_scheduler_init init(thread_qty);
-
     constexpr std::size_t dim = 2;
     double dt = .01;
-    std::size_t total_it = 100;
+    std::size_t total_it = 2000;
     scopi::scopi_container<dim> particles;
 
     int n = 10; // 2*n*n particles
