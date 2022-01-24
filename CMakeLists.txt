@@ -37,10 +37,7 @@ message(STATUS "CMAKE_MODULE_PATH:    " ${CMAKE_MODULE_PATH})
 find_package(xtensor REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
-find_package(MOSEK REQUIRED)
-find_package(OpenMP)
-find_package(scs REQUIRED)
-find_package(MKL REQUIRED)
+find_package(OpenMP REQUIRED)
 
 IF (APPLE)
   set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
@@ -62,10 +59,17 @@ endif()
 message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
 message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
+
+set(MKL_THREAD_LAYER "TBB")
+find_package(MKL REQUIRED)
+find_package(TBB REQUIRED)
+find_package(MOSEK REQUIRED)
+find_package(scs REQUIRED)
+
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 add_library(scopi_cpp INTERFACE)
-include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
+include_directories(SYSTEM ${MOSEK_INCLUDE_DIR} ${TBB_INCLUDE_DIRS})
 target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
                                                $<INSTALL_INTERFACE:include>
                                                )
@@ -74,7 +78,7 @@ target_include_directories(scopi_cpp INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE
 
 # target_link_libraries(scopi_cpp INTERFACE xtensor MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 # target_link_libraries(scopi_cpp INTERFACE xtensor ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARY} ${MOSEK_FUSION_LIBRARY})
-target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX MKL::MKL ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir)
+target_link_libraries(scopi_cpp INTERFACE xtensor nlohmann_json::nlohmann_json fmt::fmt OpenMP::OpenMP_CXX MKL::MKL ${TBB_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${MOSEK_LIBRARIES} scs::scsdir)
 
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 

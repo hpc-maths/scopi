@@ -19,7 +19,9 @@
 
 #include "OptimMosek.hpp"
 #include "OptimScs.hpp"
-#include "OptimUzawa.hpp"
+#include "OptimUzawaMkl.hpp"
+#include "OptimUzawaMatrixFreeOmp.hpp"
+#include "OptimUzawaMatrixFreeTbb.hpp"
 
 #include <scopi/contact/contact_kdtree.hpp>
 // #include <scopi/contact/contact_brute_force.hpp>
@@ -29,8 +31,6 @@
 
 #include <nanoflann.hpp>
 
-using namespace mosek::fusion;
-using namespace monty;
 namespace nl = nlohmann;
 
 using namespace xt::placeholders;
@@ -55,8 +55,8 @@ namespace scopi
                 double _dt;
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
-                OptimUzawa<dim> _solver;
-                vap_fpd _vap;
+                OptimUzawaMkl<dim> _solver;
+                vap_fixed _vap;
 
         };
 
