@@ -88,7 +88,7 @@ namespace scopi
         }
 
         template <class T>
-        auto get_value(T t, std::size_t s)
+        auto get_value(T& t, std::size_t s)
         {
             return get_value_impl(t, s);
         }
