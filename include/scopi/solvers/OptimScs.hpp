@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef SCOPI_USE_SCS
 #include "OptimBase.hpp"
 #include <scs.h>
 
@@ -36,7 +37,7 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        OptimScs<dim>::OptimScs(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+        OptimScs<dim>::OptimScs(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) :
             OptimBase<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
         _P.x = new scs_float[6*this->_Nactive];
@@ -154,8 +155,8 @@ namespace scopi{
 
             _k.z = 0; // 0 linear equality constraints
             _k.l = this->_distances.size(); // s >= 0
-            _k.bu = NULL; 
-            _k.bl = NULL; 
+            _k.bu = NULL;
+            _k.bl = NULL;
             _k.bsize = 0;
             _k.q = NULL;
             _k.qsize = 0;
@@ -270,3 +271,4 @@ namespace scopi{
 
 
 }
+#endif

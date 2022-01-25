@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef SCOPI_USE_MOSEK
 #include "OptimBase.hpp"
 #include <fusion.h>
 
@@ -32,7 +33,7 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        OptimMosek<dim>::OptimMosek(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+        OptimMosek<dim>::OptimMosek(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) :
             base_type(particles, dt, Nactive, active_ptr, 1 + 2*3*Nactive + 2*3*Nactive, 1)
     {
         this->_c(0) = 1;
@@ -168,7 +169,7 @@ namespace scopi{
         int OptimMosek<dim>::getNbActiveContacts_impl()
         {
             int nbActiveContacts = 0;
-            for(auto x : *_dual) 
+            for(auto x : *_dual)
             {
                 if(std::abs(x) > 1e-3)
                     nbActiveContacts++;
@@ -177,3 +178,4 @@ namespace scopi{
         }
 
 }
+#endif

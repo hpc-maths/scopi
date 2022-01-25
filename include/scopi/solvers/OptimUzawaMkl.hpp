@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef SCOPI_USE_MKL
 #include "OptimBase.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
@@ -48,7 +49,7 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+        OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) :
             OptimBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
             _tol(1.0e-6), _maxiter(40000), _rho(2000.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
@@ -327,3 +328,4 @@ namespace scopi{
             std::cout << "_____________________________________________________________________  \n" ;
         }
 }
+#endif

@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef SCOPI_USE_TBB
 #include "OptimBase.hpp"
 #include <omp.h>
 #include "tbb/tbb.h"
@@ -40,7 +41,7 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        OptimUzawaMatrixFreeTbb<dim>::OptimUzawaMatrixFreeTbb(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+        OptimUzawaMatrixFreeTbb<dim>::OptimUzawaMatrixFreeTbb(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) :
             OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
             _tol(1.0e-6), _maxiter(40000), _rho(2000.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
@@ -314,3 +315,4 @@ namespace scopi{
             });
         }
 }
+#endif
