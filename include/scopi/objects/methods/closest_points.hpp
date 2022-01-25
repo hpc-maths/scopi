@@ -16,11 +16,12 @@
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"
 
+#include <xtensor/xio.hpp>
 namespace scopi
 {
     // SPHERE - SPHERE
-    template<std::size_t dim>
-    auto closest_points(const sphere<dim, false>& si, const sphere<dim, false>& sj)
+    template<std::size_t dim, bool owner>
+    auto closest_points(const sphere<dim, owner>& si, const sphere<dim, owner>& sj)
     {
         // std::cout << "closest_points : SPHERE - SPHERE" << std::endl;
         auto si_pos = xt::view(si.pos(), 0);
@@ -1636,15 +1637,15 @@ namespace scopi
         }
     };
 
-    template <std::size_t dim>
+    template <std::size_t dim, bool owner=false>
     using closest_points_dispatcher = double_static_dispatcher
     <
         closest_points_functor<dim>,
-        const object<dim, false>,
-        mpl::vector<const sphere<dim, false>,
-                    const superellipsoid<dim, false>,
-                    const globule<dim, false>,
-                    const plan<dim, false>>,
+        const object<dim, owner>,
+        mpl::vector<const sphere<dim, owner>,
+                    const superellipsoid<dim, owner>,
+                    const globule<dim, owner>,
+                    const plan<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
         symmetric_dispatch
     >;
