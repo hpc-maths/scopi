@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "base.hpp"
 
@@ -51,7 +51,7 @@ namespace scopi
             // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
             tic();
             using my_kd_tree_t = typename nanoflann::KDTreeSingleIndexAdaptor<
-            nanoflann::L2_Simple_Adaptor<double, KdTree<dim>>, KdTree<dim>, dim >;
+            nanoflann::L2_Simple_Adaptor<double, KdTree<dim>>, KdTree<dim>, dim, std::size_t>;
             KdTree<dim> kd(particles,active_ptr);
             my_kd_tree_t index(
             dim, kd,
@@ -92,7 +92,7 @@ namespace scopi
                 nanoflann::RadiusResultSet<double, std::size_t> resultSet(
                     _kdtree_radius, indices_dists);
 
-                std::vector<std::pair<unsigned long, double>> ret_matches;
+                std::vector<std::pair<std::size_t, double>> ret_matches;
 
                 const std::size_t nMatches = index.radiusSearch(query_pt, _kdtree_radius, ret_matches,
                     nanoflann::SearchParams());
