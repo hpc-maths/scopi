@@ -6,6 +6,83 @@
 
 namespace scopi
 {
+    // pos
+    TEST(sphere, pos_2d)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.pos()(0), -0.2);
+        EXPECT_EQ(s.pos()(1), 0.);
+    }
+
+    TEST(sphere, pos_3d)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        EXPECT_EQ(s.pos()(0), -0.2);
+        EXPECT_EQ(s.pos()(1), 0.);
+        EXPECT_EQ(s.pos()(2), 0.1);
+    }
+
+    TEST(sphere, pos_2d_const)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.pos()(0), -0.2);
+        EXPECT_EQ(s.pos()(1), 0.);
+    }
+
+    TEST(sphere, pos_3d_const)
+    {
+        constexpr std::size_t dim = 3;
+        const sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        EXPECT_EQ(s.pos()(0), -0.2);
+        EXPECT_EQ(s.pos()(1), 0.);
+        EXPECT_EQ(s.pos()(2), 0.1);
+    }
+
+    TEST(sphere, pos_2d_index)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.pos(0)(), -0.2);
+        EXPECT_EQ(s.pos(1)(), 0.);
+    }
+
+    TEST(sphere, pos_3d_index)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        EXPECT_EQ(s.pos(0)(), -0.2);
+        EXPECT_EQ(s.pos(1)(), 0.);
+        EXPECT_EQ(s.pos(2)(), 0.1);
+    }
+
+    TEST(sphere, pos_2d_index_const)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.pos(0)(), -0.2);
+        EXPECT_EQ(s.pos(1)(), 0.);
+    }
+
+    TEST(sphere, pos_3d_index_const)
+    {
+        constexpr std::size_t dim = 3;
+        const sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        EXPECT_EQ(s.pos(0)(), -0.2);
+        EXPECT_EQ(s.pos(1)(), 0.);
+        EXPECT_EQ(s.pos(2)(), 0.1);
+    }
+
     // distance sphere - sphere
     TEST(sphere, closest_points_sphere_2d)
     {
