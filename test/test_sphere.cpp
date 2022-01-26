@@ -293,6 +293,38 @@ namespace scopi
         EXPECT_EQ(s.radius(), 0.1);
     }
 
+    // rotation
+    TEST(sphere, rotation_2d)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        auto rotation_matrix = s.rotation();
+
+        EXPECT_EQ(rotation_matrix(0, 0), 1.);
+        EXPECT_EQ(rotation_matrix(0, 1), 0.);
+        EXPECT_EQ(rotation_matrix(1, 0), 0.);
+        EXPECT_EQ(rotation_matrix(1, 1), 1.);
+    }
+
+    TEST(sphere, rotation_3d)
+    {
+        constexpr std::size_t dim = 3;
+        const sphere<dim> s({{-0.2, 0.0, 0.0}}, 0.1);
+
+        auto rotation_matrix = s.rotation();
+
+        EXPECT_EQ(rotation_matrix(0, 0), 1.);
+        EXPECT_EQ(rotation_matrix(0, 1), 0.);
+        EXPECT_EQ(rotation_matrix(0, 2), 0.);
+        EXPECT_EQ(rotation_matrix(1, 0), 0.);
+        EXPECT_EQ(rotation_matrix(1, 1), 1.);
+        EXPECT_EQ(rotation_matrix(1, 2), 0.);
+        EXPECT_EQ(rotation_matrix(2, 0), 0.);
+        EXPECT_EQ(rotation_matrix(2, 1), 0.);
+        EXPECT_EQ(rotation_matrix(2, 2), 1.);
+    }
+
     // distance sphere - sphere
     TEST(sphere, closest_points_sphere_2d)
     {
