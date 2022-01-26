@@ -634,7 +634,6 @@ namespace scopi
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
         double sinRot = 1./2.;
-        sphere<dim> s({{dist*cosRot, -dist*sinRot}}, 0.1);
         superellipsoid<dim> s1({{ dist*cosRot, -dist*sinRot}}, {scopi::quaternion(-PI/6.)}, {{0.1, 0.2}}, {{1}});
         superellipsoid<dim> s2({{-dist*cosRot,  dist*sinRot}}, {scopi::quaternion(PI-PI/6.)}, {{0.1, 0.2}}, {{1}});
 
@@ -679,7 +678,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_superellipsoid_3d)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s1({{ 0.2, 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         superellipsoid<dim> s2({{-0.2, 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
@@ -691,7 +689,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_superellipsoid_3d_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         double PI = xt::numeric_constants<double>::PI;
         double dist = 0.4;
@@ -739,6 +736,264 @@ namespace scopi
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         EXPECT_NEAR(out.dij, 0.6, 1e-7);
+    }
+
+    // distance superellipsoid - plan
+    TEST(closest_points, superellipsoid_plan_2d)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0}}, 0.);
+
+        auto out = closest_points(s, p);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, superellipsoid_plan_2d_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
+
+        auto out = closest_points(s, p);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, superellipsoid_plan_2d_dispatch)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(p, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, superellipsoid_plan_2d_dispatch_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(p, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, superellipsoid_plan_3d)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
+
+        auto out = closest_points(s, p);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, superellipsoid_plan_3d_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
+
+        auto out = closest_points(s, p);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, superellipsoid_plan_3d_dispatch)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(p, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, superellipsoid_plan_3d_dispatch_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(p, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    // distance plan - superellipsoid
+    TEST(closest_points, plan_superellipsoid_2d)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0}}, 0.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_superellipsoid_2d_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_superellipsoid_2d_dispatch)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(p, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_superellipsoid_2d_dispatch_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{ 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(p, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_superellipsoid_3d)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_superellipsoid_3d_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_superellipsoid_3d_dispatch)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(p, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_superellipsoid_3d_dispatch_rotation_30_deg)
+    {
+        GTEST_SKIP();
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{ 0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(p, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
     }
 
 }
