@@ -83,6 +83,51 @@ namespace scopi
         EXPECT_EQ(s.pos(2)(), 0.1);
     }
 
+    // q
+    TEST(sphere, q)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.q()(0), 1.);
+        EXPECT_EQ(s.q()(1), 0.);
+        EXPECT_EQ(s.q()(2), 0.);
+        EXPECT_EQ(s.q()(3), 0.);
+    }
+
+    TEST(sphere, q_const)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.q()(0), 1.);
+        EXPECT_EQ(s.q()(1), 0.);
+        EXPECT_EQ(s.q()(2), 0.);
+        EXPECT_EQ(s.q()(3), 0.);
+    }
+
+    TEST(sphere, q_index)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.q(0)(), 1.);
+        EXPECT_EQ(s.q(1)(), 0.);
+        EXPECT_EQ(s.q(2)(), 0.);
+        EXPECT_EQ(s.q(3)(), 0.);
+    }
+
+    TEST(sphere, q_index_const)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.q(0)(), 1.);
+        EXPECT_EQ(s.q(1)(), 0.);
+        EXPECT_EQ(s.q(2)(), 0.);
+        EXPECT_EQ(s.q(3)(), 0.);
+    }
+
     // distance sphere - sphere
     TEST(sphere, closest_points_sphere_2d)
     {
