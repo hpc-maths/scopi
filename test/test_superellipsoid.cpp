@@ -283,4 +283,50 @@ namespace scopi
         EXPECT_EQ(particles[0]->q(3)(), 0.);
     }
 
+    // radius
+    TEST(superellipsoid, radius_2d)
+    {
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+
+        auto radius = s.radius();
+
+        EXPECT_EQ(radius(0), 0.1);
+        EXPECT_EQ(radius(1), 0.2);
+    }
+
+    TEST(superellipsoid, radius_3d)
+    {
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto radius = s.radius();
+
+        EXPECT_EQ(radius(0), 0.1);
+        EXPECT_EQ(radius(1), 0.2);
+        EXPECT_EQ(radius(2), 0.3);
+    }
+
+    //squareness
+    TEST(superellipsoid, squareness_2d)
+    {
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1.5}});
+
+        auto squareness = s.squareness();
+
+        EXPECT_EQ(squareness(0), 1.5);
+    }
+
+    TEST(superellipsoid, squareness_3d)
+    {
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}});
+
+        auto squareness = s.squareness();
+
+        EXPECT_EQ(squareness(0), 0.5);
+        EXPECT_EQ(squareness(1), 1.5);
+    }
+
 }
