@@ -83,6 +83,106 @@ namespace scopi
         EXPECT_EQ(s.pos(2)(), 0.1);
     }
 
+    TEST(sphere, pos_2d_container)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->pos()(0), -0.2);
+        EXPECT_EQ(particles[0]->pos()(1), 0.);
+    }
+
+    TEST(sphere, pos_3d_container)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        EXPECT_EQ(particles[0]->pos()(0), -0.2);
+        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(2), 0.1);
+    }
+
+    TEST(sphere, pos_2d_const_container)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->pos()(0), -0.2);
+        EXPECT_EQ(particles[0]->pos()(1), 0.);
+    }
+
+    TEST(sphere, pos_3d_const_container)
+    {
+        constexpr std::size_t dim = 3;
+        const sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        EXPECT_EQ(particles[0]->pos()(0), -0.2);
+        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(2), 0.1);
+    }
+
+    TEST(sphere, pos_2d_index_container)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->pos(0)(), -0.2);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+    }
+
+    TEST(sphere, pos_3d_index_container)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        EXPECT_EQ(particles[0]->pos(0)(), -0.2);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(2)(), 0.1);
+    }
+
+    TEST(sphere, pos_2d_index_const_container)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->pos(0)(), -0.2);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+    }
+
+    TEST(sphere, pos_3d_index_const_container)
+    {
+        constexpr std::size_t dim = 3;
+        const sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        EXPECT_EQ(particles[0]->pos(0)(), -0.2);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(2)(), 0.1);
+    }
+
     // q
     TEST(sphere, q)
     {
@@ -126,6 +226,71 @@ namespace scopi
         EXPECT_EQ(s.q(1)(), 0.);
         EXPECT_EQ(s.q(2)(), 0.);
         EXPECT_EQ(s.q(3)(), 0.);
+    }
+
+    TEST(sphere, q_container)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->q()(0), 1.);
+        EXPECT_EQ(particles[0]->q()(1), 0.);
+        EXPECT_EQ(particles[0]->q()(2), 0.);
+        EXPECT_EQ(s.q()(3), 0.);
+    }
+
+    TEST(sphere, q_const_container)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->q()(0), 1.);
+        EXPECT_EQ(particles[0]->q()(1), 0.);
+        EXPECT_EQ(particles[0]->q()(2), 0.);
+        EXPECT_EQ(particles[0]->q()(3), 0.);
+    }
+
+    TEST(sphere, q_index_container)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->q(0)(), 1.);
+        EXPECT_EQ(particles[0]->q(1)(), 0.);
+        EXPECT_EQ(particles[0]->q(2)(), 0.);
+        EXPECT_EQ(particles[0]->q(3)(), 0.);
+    }
+
+    TEST(sphere, q_index_const_container)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->q(0)(), 1.);
+        EXPECT_EQ(particles[0]->q(1)(), 0.);
+        EXPECT_EQ(particles[0]->q(2)(), 0.);
+        EXPECT_EQ(particles[0]->q(3)(), 0.);
+    }
+
+    // radius
+    TEST(sphere, radius)
+    {
+        constexpr std::size_t dim = 2;
+        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+
+        EXPECT_EQ(s.radius(), 0.1);
     }
 
     // distance sphere - sphere
