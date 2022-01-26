@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <scopi/objects/types/sphere.hpp>
+#include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
 #include <scopi/objects/methods/closest_points.hpp>
 
