@@ -135,11 +135,45 @@ namespace scopi
         EXPECT_DOUBLE_EQ(out.dij, 0.2);
     }
 
+    TEST(closest_points, sphere_plan_2d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
+
+        auto out = closest_points(s, p);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
     TEST(closest_points, sphere_plan_2d_dispatch)
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(p, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, sphere_plan_2d_dispatch_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
 
         scopi::scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
@@ -161,11 +195,45 @@ namespace scopi
         EXPECT_DOUBLE_EQ(out.dij, 0.2);
     }
 
+    TEST(closest_points, sphere_plan_3d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
+
+        auto out = closest_points(s, p);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
     TEST(closest_points, sphere_plan_3d_dispatch)
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(p, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, sphere_plan_3d_dispatch_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
 
         scopi::scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
@@ -188,11 +256,46 @@ namespace scopi
         EXPECT_DOUBLE_EQ(out.dij, 0.2);
     }
 
+    TEST(closest_points, plan_sphere_2d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+
     TEST(closest_points, plan_sphere_2d_dispatch)
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(p, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_sphere_2d_dispatch_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
 
         scopi::scopi_container<dim> particles;
         particles.push_back(p, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
@@ -214,11 +317,45 @@ namespace scopi
         EXPECT_DOUBLE_EQ(out.dij, 0.2);
     }
 
+    TEST(closest_points, plan_sphere_3d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
     TEST(closest_points, plan_sphere_3d_dispatch)
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(p, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_sphere_3d_dispatch_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
 
         scopi::scopi_container<dim> particles;
         particles.push_back(p, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
