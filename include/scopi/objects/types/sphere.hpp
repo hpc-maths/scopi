@@ -101,6 +101,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     auto sphere<dim, owner>::point(const double b) const
     {
+        static_assert(dim == 2);
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = m_radius * std::cos(b);
         pt(1) = m_radius * std::sin(b);
@@ -110,6 +111,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     auto sphere<dim, owner>::point(const double a, const double b) const
     {
+        static_assert(dim == 3);
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = m_radius * std::cos(a) * std::cos(b);
         pt(1) = m_radius * std::cos(a) * std::sin(b);
@@ -120,6 +122,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     auto sphere<dim, owner>::normal(const double b) const
     {
+        static_assert(dim == 2);
         xt::xtensor_fixed<double, xt::xshape<dim>> n;
         n(0) = m_radius * std::cos(b);
         n(1) = m_radius * std::sin(b);
@@ -131,6 +134,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     auto sphere<dim, owner>::normal(const double a, const double b) const
     {
+        static_assert(dim == 3);
         xt::xtensor_fixed<double, xt::xshape<dim>> n;
         n(0) =  std::cos(a) * std::cos(b);
         n(1) =  std::cos(a) * std::sin(b);
