@@ -329,4 +329,37 @@ namespace scopi
         EXPECT_EQ(squareness(1), 1.5);
     }
 
+    // rotation
+    TEST(superellipsoid, rotation_2d)
+    {
+        constexpr std::size_t dim = 2;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(PI/3)}, {{0.1, 0.2}}, {{1}});
+
+        auto rotation_matrix = s.rotation();
+
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 0), 1./2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 1), -std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 0), std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 1), 1./2.);
+    }
+
+    TEST(superellipsoid, rotation_3d)
+    {
+        constexpr std::size_t dim = 3;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(PI/3    )}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto rotation_matrix = s.rotation();
+
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 0), 1./2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 1), -std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 2), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 0), std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 1), 1./2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 2), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(2, 0), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(2, 1), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(2, 2), 1.);
+    }
 }

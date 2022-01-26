@@ -287,7 +287,7 @@ namespace scopi
     TEST(sphere, radius)
     {
         constexpr std::size_t dim = 2;
-        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
         EXPECT_EQ(s.radius(), 0.1);
     }
@@ -296,39 +296,41 @@ namespace scopi
     TEST(sphere, rotation_2d)
     {
         constexpr std::size_t dim = 2;
-        const sphere<dim> s({{-0.2, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        sphere<dim> s({{-0.2, 0.0}}, {quaternion(PI/3)}, 0.1);
 
         auto rotation_matrix = s.rotation();
 
-        EXPECT_EQ(rotation_matrix(0, 0), 1.);
-        EXPECT_EQ(rotation_matrix(0, 1), 0.);
-        EXPECT_EQ(rotation_matrix(1, 0), 0.);
-        EXPECT_EQ(rotation_matrix(1, 1), 1.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 0), 1./2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 1), -std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 0), std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 1), 1./2.);
     }
 
     TEST(sphere, rotation_3d)
     {
         constexpr std::size_t dim = 3;
-        const sphere<dim> s({{-0.2, 0.0, 0.0}}, 0.1);
+        double PI = xt::numeric_constants<double>::PI;
+        sphere<dim> s({{-0.2, 0.0, 0.0}}, {quaternion(PI/3)}, 0.1);
 
         auto rotation_matrix = s.rotation();
 
-        EXPECT_EQ(rotation_matrix(0, 0), 1.);
-        EXPECT_EQ(rotation_matrix(0, 1), 0.);
-        EXPECT_EQ(rotation_matrix(0, 2), 0.);
-        EXPECT_EQ(rotation_matrix(1, 0), 0.);
-        EXPECT_EQ(rotation_matrix(1, 1), 1.);
-        EXPECT_EQ(rotation_matrix(1, 2), 0.);
-        EXPECT_EQ(rotation_matrix(2, 0), 0.);
-        EXPECT_EQ(rotation_matrix(2, 1), 0.);
-        EXPECT_EQ(rotation_matrix(2, 2), 1.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 0), 1./2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 1), -std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(0, 2), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 0), std::sqrt(3.)/2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 1), 1./2.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(1, 2), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(2, 0), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(2, 1), 0.);
+        EXPECT_DOUBLE_EQ(rotation_matrix(2, 2), 1.);
     }
 
     // point
     TEST(sphere, point_2d)
     {
         constexpr std::size_t dim = 2;
-        const sphere<dim> s({{0.0, 0.0}}, 0.1);
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
 
         auto point = s.point(0.);
 
@@ -339,7 +341,7 @@ namespace scopi
     TEST(sphere, point_3d)
     {
         constexpr std::size_t dim = 3;
-        const sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
 
         auto point = s.point(0., 0.);
 
@@ -352,7 +354,7 @@ namespace scopi
     TEST(sphere, normal_2d)
     {
         constexpr std::size_t dim = 2;
-        const sphere<dim> s({{0.0, 0.0}}, 0.1);
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
 
         auto normal = s.normal(0.);
 
@@ -363,7 +365,7 @@ namespace scopi
     TEST(sphere, normal_3d)
     {
         constexpr std::size_t dim = 3;
-        const sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
 
         auto normal = s.normal(0., 0.);
 
