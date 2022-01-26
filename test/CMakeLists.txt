@@ -6,6 +6,7 @@ set(COMMON_BASE
 
 set(SCOPI_TESTS
     test_sphere.cpp
+    test_closest_points.cpp
 )
 
 foreach(filename IN LISTS SCOPI_TESTS)
@@ -21,5 +22,5 @@ endforeach()
 # target_link_libraries(test_scopi_lib scopi gtest_main gtest)
 
 
-add_executable(test_adapt test_adapt.cpp)
-target_link_libraries(test_adapt scopi)
+# add_executable(test_adapt test_adapt.cpp)
+# target_link_libraries(test_adapt scopi)
