@@ -18,6 +18,20 @@ namespace scopi
         EXPECT_EQ(out.dij, 0.2);
     }
 
+    TEST(closest_points, sphere_sphere_2d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 2;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        sphere<dim> s1({{-dist*cosRot,  dist*sinRot}}, 0.1);
+        sphere<dim> s2({{ dist*cosRot, -dist*sinRot}}, 0.1);
+
+        auto out = closest_points(s1, s2);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.4);
+    }
+
     TEST(closest_points, sphere_sphere_2d_dispatch)
     {
         constexpr std::size_t dim = 2;
@@ -33,6 +47,24 @@ namespace scopi
         EXPECT_EQ(out.dij, 0.2);
     }
 
+    TEST(closest_points, sphere_sphere_2d_dispatch_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 2;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        sphere<dim> s1({{-dist*cosRot,  dist*sinRot}}, 0.1);
+        sphere<dim> s2({{ dist*cosRot, -dist*sinRot}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.4);
+    }
+
     TEST(closest_points, sphere_sphere_3d)
     {
         constexpr std::size_t dim = 3;
@@ -42,6 +74,20 @@ namespace scopi
         auto out = closest_points(s1, s2);
 
         EXPECT_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, sphere_sphere_3d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 3;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        sphere<dim> s1({{-dist*cosRot,  dist*sinRot, 0.}}, 0.1);
+        sphere<dim> s2({{ dist*cosRot, -dist*sinRot, 0.}}, 0.1);
+
+        auto out = closest_points(s1, s2);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.4);
     }
 
     TEST(closest_points, sphere_sphere_3d_dispatch)
@@ -57,6 +103,24 @@ namespace scopi
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         EXPECT_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, sphere_sphere_3d_dispatch_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 3;
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        sphere<dim> s1({{-dist*cosRot,  dist*sinRot, 0.}}, 0.1);
+        sphere<dim> s2({{ dist*cosRot, -dist*sinRot, 0.}}, 0.1);
+
+        scopi::scopi_container<dim> particles;
+        particles.push_back(s1, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(s2, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        EXPECT_DOUBLE_EQ(out.dij, 0.4);
     }
 
     // distance sphere - plan
