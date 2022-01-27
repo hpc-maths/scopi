@@ -374,22 +374,28 @@ namespace scopi
         EXPECT_EQ(normal(2), 0.);
     }
 
+    class TestTwoSpheresAsymetrical  : public ::testing::Test {
+        protected:
+            void SetUp() override {
+                sphere<2> s1({{-0.2, -0.05}}, 0.1);
+                sphere<2> s2({{ 0.2,  0.05}}, 0.1);
+                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+            }
+
+            double m_dt = .005;
+            std::size_t m_total_it = 1000;
+            scopi_container<2> m_particles;
+            std::size_t m_active_ptr = 0; // without obstacles
+    };
+
     // two_spheres
-    TEST(sphere, two_spheres_asymetrical)
+    TEST_F(TestTwoSpheresAsymetrical, two_spheres_asymetrical)
     {
+        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
         constexpr std::size_t dim = 2;
-        double dt = .005;
-        std::size_t total_it = 1000;
-        scopi_container<dim> particles;
-
-        sphere<dim> s1({{-0.2, -0.05}}, 0.1);
-        sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
-        particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-        particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
-
-        std::size_t active_ptr = 0; // without obstacles
-        ScopiSolver<dim> solver(particles, dt, active_ptr);
-        solver.solve(total_it);
+        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
+        solver.solve(m_total_it);
 
         std::string filenameRef;
         if(solver.getOptimSolverName() == "OptimMosek")
