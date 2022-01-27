@@ -362,4 +362,81 @@ namespace scopi
         EXPECT_DOUBLE_EQ(rotation_matrix(2, 1), 0.);
         EXPECT_DOUBLE_EQ(rotation_matrix(2, 2), 1.);
     }
+
+    // point
+    TEST(superellipsoid, point_2d)
+    {
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+
+        auto point = s.point(0.);
+
+        EXPECT_DOUBLE_EQ(point(0), 0.1);
+        EXPECT_DOUBLE_EQ(point(1), 0.);
+    }
+
+    TEST(superellipsoid, point_3d)
+    {
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto point = s.point(0., 0.);
+
+        EXPECT_DOUBLE_EQ(point(0), 0.1);
+        EXPECT_DOUBLE_EQ(point(1), 0.);
+        EXPECT_DOUBLE_EQ(point(2), 0.);
+    }
+
+    // normal
+    TEST(superellipsoid, normal_2d)
+    {
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+
+        auto normal = s.normal(0.);
+
+        EXPECT_DOUBLE_EQ(normal(0), 1.);
+        EXPECT_DOUBLE_EQ(normal(1), 0.);
+    }
+
+    TEST(superellipsoid, normal_3d)
+    {
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto normal = s.normal(0., 0.);
+
+        EXPECT_DOUBLE_EQ(normal(0), 1.);
+        EXPECT_DOUBLE_EQ(normal(1), 0.);
+        EXPECT_DOUBLE_EQ(normal(2), 0.);
+    }
+
+    // tangent
+    TEST(superellipsoid, tangent_2d)
+    {
+        constexpr std::size_t dim = 2;
+        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+
+        auto tangent = s.tangent(0.);
+
+        EXPECT_DOUBLE_EQ(tangent(0), 0.);
+        EXPECT_DOUBLE_EQ(tangent(1), 1.);
+    }
+
+    TEST(superellipsoid, tangent_3d)
+    {
+        constexpr std::size_t dim = 3;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto tangent = s.tangents(0., 0.);
+
+        EXPECT_DOUBLE_EQ(tangent.first(0), 0.);
+        EXPECT_DOUBLE_EQ(tangent.first(1), 1.);
+        EXPECT_DOUBLE_EQ(tangent.first(2), 0.);
+
+        EXPECT_DOUBLE_EQ(tangent.second(0), 0.);
+        EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
+        EXPECT_DOUBLE_EQ(tangent.second(2), 1.);
+    }
+
 }
