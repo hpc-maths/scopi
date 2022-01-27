@@ -3,6 +3,7 @@
 
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
+#include <scopi/solvers/mosek.hpp>
 
 namespace scopi
 {
@@ -550,5 +551,44 @@ namespace scopi
         EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
         EXPECT_NEAR(tangent.second(2), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
     }
+
+    // two ellipsoids
+    class TestTwoEllipsoidsSymmetrical  : public ::testing::Test {
+        protected:
+            void SetUp() override {
+                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{1}});
+                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1}});
+                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+            }
+
+            double m_dt = .005;
+            std::size_t m_total_it = 200;
+            scopi_container<2> m_particles;
+            std::size_t m_active_ptr = 0; // without obstacles
+    };
+
+    TEST_F(TestTwoEllipsoidsSymmetrical, two_ellipsoids_symmetrical)
+    {
+        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
+        constexpr std::size_t dim = 2;
+        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
+        solver.solve(m_total_it);
+
+        std::string filenameRef;
+        if(solver.getOptimSolverName() == "OptimMosek")
+            filenameRef = "../test/two_ellipsoids_symmetrical_mosek.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
+            filenameRef = "../test/two_ellipsoids_symmetrical_uzawaMkl.json"; 
+        else if(solver.getOptimSolverName() == "OptimScs")
+            filenameRef = "../test/two_ellipsoids_symmetrical_scs.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
+            filenameRef = "../test/two_ellipsoids_symmetrical_uzawaMatrixFreeTbb.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
+            filenameRef = "../test/two_ellipsoids_symmetrical_uzawaMatrixFreeOmp.json"; 
+
+        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0199.json", filenameRef);
+    }
+
 
 }

@@ -427,7 +427,7 @@ namespace scopi
         EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
     }
 
-    TEST_F(TestTwoSpheresSymmetrical, two_spheres_Symmetrical)
+    TEST_F(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
     {
         // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
         constexpr std::size_t dim = 2;
