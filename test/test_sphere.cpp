@@ -3,6 +3,7 @@
 
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/container.hpp>
+#include <scopi/solvers/mosek.hpp>
 
 namespace scopi
 {
@@ -374,9 +375,35 @@ namespace scopi
     }
 
     // two_spheres
-    TEST(sphere, two_spheres_symetrical)
+    TEST(sphere, two_spheres_asymetrical)
     {
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", "./Results/scopi_objects_0999.json"); 
+        constexpr std::size_t dim = 2;
+        double dt = .005;
+        std::size_t total_it = 1000;
+        scopi_container<dim> particles;
+
+        sphere<dim> s1({{-0.2, -0.05}}, 0.1);
+        sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
+        particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+
+        std::size_t active_ptr = 0; // without obstacles
+        ScopiSolver<dim> solver(particles, dt, active_ptr);
+        solver.solve(total_it);
+
+        std::string filenameRef;
+        if(solver.getOptimSolverName() == "OptimMosek")
+            filenameRef = "../test/two_spheres_asymetrical_mosek.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
+            filenameRef = "../test/two_spheres_asymetrical_uzawaMkl.json"; 
+        else if(solver.getOptimSolverName() == "OptimScs")
+            filenameRef = "../test/two_spheres_asymetrical_scs.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
+            filenameRef = "../test/two_spheres_asymetrical_uzawaMatrixFreeTbb.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
+            filenameRef = "../test/two_spheres_asymetrical_uzawaMatrixFreeOmp.json"; 
+
+        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
     }
 
 }
