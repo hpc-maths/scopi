@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "utils.hpp"
 
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
@@ -9,7 +10,7 @@ namespace scopi
     TEST(superellipsoid, pos_2d)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.pos()(0), -0.2);
         EXPECT_EQ(s.pos()(1), 0.);
@@ -18,7 +19,7 @@ namespace scopi
     TEST(superellipsoid, pos_3d)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         EXPECT_EQ(s.pos()(0), -0.2);
         EXPECT_EQ(s.pos()(1), 0.);
@@ -28,7 +29,7 @@ namespace scopi
     TEST(superellipsoid, pos_2d_const)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.pos()(0), -0.2);
         EXPECT_EQ(s.pos()(1), 0.);
@@ -37,7 +38,7 @@ namespace scopi
     TEST(superellipsoid, pos_3d_const)
     {
         constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         EXPECT_EQ(s.pos()(0), -0.2);
         EXPECT_EQ(s.pos()(1), 0.);
@@ -47,7 +48,7 @@ namespace scopi
     TEST(superellipsoid, pos_2d_index)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.pos(0)(), -0.2);
         EXPECT_EQ(s.pos(1)(), 0.);
@@ -56,7 +57,7 @@ namespace scopi
     TEST(superellipsoid, pos_3d_index)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         EXPECT_EQ(s.pos(0)(), -0.2);
         EXPECT_EQ(s.pos(1)(), 0.);
@@ -66,7 +67,7 @@ namespace scopi
     TEST(superellipsoid, pos_2d_index_const)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.pos(0)(), -0.2);
         EXPECT_EQ(s.pos(1)(), 0.);
@@ -75,7 +76,7 @@ namespace scopi
     TEST(superellipsoid, pos_3d_index_const)
     {
         constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         EXPECT_EQ(s.pos(0)(), -0.2);
         EXPECT_EQ(s.pos(1)(), 0.);
@@ -85,9 +86,9 @@ namespace scopi
     TEST(superellipsoid, pos_2d_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -97,9 +98,9 @@ namespace scopi
     TEST(superellipsoid, pos_3d_container)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -110,9 +111,9 @@ namespace scopi
     TEST(superellipsoid, pos_2d_const_container)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -122,9 +123,9 @@ namespace scopi
     TEST(superellipsoid, pos_3d_const_container)
     {
         constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -135,9 +136,9 @@ namespace scopi
     TEST(superellipsoid, pos_2d_index_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -147,9 +148,9 @@ namespace scopi
     TEST(superellipsoid, pos_3d_index_container)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -160,9 +161,9 @@ namespace scopi
     TEST(superellipsoid, pos_2d_index_const_container)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -172,9 +173,9 @@ namespace scopi
     TEST(superellipsoid, pos_3d_index_const_container)
     {
         constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -186,7 +187,7 @@ namespace scopi
     TEST(superellipsoid, q)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.q()(0), 1.);
         EXPECT_EQ(s.q()(1), 0.);
@@ -197,7 +198,7 @@ namespace scopi
     TEST(superellipsoid, q_const)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.q()(0), 1.);
         EXPECT_EQ(s.q()(1), 0.);
@@ -208,7 +209,7 @@ namespace scopi
     TEST(superellipsoid, q_index)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.q(0)(), 1.);
         EXPECT_EQ(s.q(1)(), 0.);
@@ -219,7 +220,7 @@ namespace scopi
     TEST(superellipsoid, q_index_const)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         EXPECT_EQ(s.q(0)(), 1.);
         EXPECT_EQ(s.q(1)(), 0.);
@@ -230,9 +231,9 @@ namespace scopi
     TEST(superellipsoid, q_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
@@ -244,9 +245,9 @@ namespace scopi
     TEST(superellipsoid, q_const_container)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
@@ -258,9 +259,9 @@ namespace scopi
     TEST(superellipsoid, q_index_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
@@ -272,9 +273,9 @@ namespace scopi
     TEST(superellipsoid, q_index_const_container)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
@@ -287,7 +288,7 @@ namespace scopi
     TEST(superellipsoid, radius_2d)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
 
         auto radius = s.radius();
 
@@ -298,7 +299,7 @@ namespace scopi
     TEST(superellipsoid, radius_3d)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto radius = s.radius();
 
@@ -311,7 +312,7 @@ namespace scopi
     TEST(superellipsoid, squareness_2d)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(0)}, {{0.1, 0.2}}, {{1.5}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1.5}});
 
         auto squareness = s.squareness();
 
@@ -321,7 +322,7 @@ namespace scopi
     TEST(superellipsoid, squareness_3d)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}});
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}});
 
         auto squareness = s.squareness();
 
@@ -333,8 +334,7 @@ namespace scopi
     TEST(superellipsoid, rotation_2d)
     {
         constexpr std::size_t dim = 2;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{-0.2, 0.}}, {scopi::quaternion(PI/3)}, {{0.1, 0.2}}, {{1}});
+        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(PI/3)}, {{0.1, 0.2}}, {{1}});
 
         auto rotation_matrix = s.rotation();
 
@@ -347,8 +347,7 @@ namespace scopi
     TEST(superellipsoid, rotation_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {scopi::quaternion(PI/3    )}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(PI/3    )}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto rotation_matrix = s.rotation();
 
@@ -378,7 +377,6 @@ namespace scopi
     TEST(superellipsoid, point_y_2d)
     {
         constexpr std::size_t dim = 2;
-        double PI = xt::numeric_constants<double>::PI;
         superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
 
         auto point = s.point(PI/2.);
@@ -390,7 +388,7 @@ namespace scopi
     TEST(superellipsoid, point_x_3d)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto point = s.point(0., 0.);
 
@@ -402,8 +400,7 @@ namespace scopi
     TEST(superellipsoid, point_y_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto point = s.point(0., PI/2.);
 
@@ -415,8 +412,7 @@ namespace scopi
     TEST(superellipsoid, point_z_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto point = s.point(PI/2., 0.);
 
@@ -440,7 +436,6 @@ namespace scopi
     TEST(superellipsoid, normal_y_2d)
     {
         constexpr std::size_t dim = 2;
-        double PI = xt::numeric_constants<double>::PI;
         superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
 
         auto normal = s.normal(PI/2.);
@@ -452,7 +447,7 @@ namespace scopi
     TEST(superellipsoid, normal_x_3d)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto normal = s.normal(0., 0.);
 
@@ -464,8 +459,7 @@ namespace scopi
     TEST(superellipsoid, normal_y_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto normal = s.normal(0., PI/2.);
 
@@ -477,8 +471,7 @@ namespace scopi
     TEST(superellipsoid, normal_z_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto normal = s.normal(PI/2., 0.);
 
@@ -502,7 +495,6 @@ namespace scopi
     TEST(superellipsoid, tangent_y_2d)
     {
         constexpr std::size_t dim = 2;
-        double PI = xt::numeric_constants<double>::PI;
         superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
 
         auto tangent = s.tangent(PI/2.);
@@ -514,7 +506,7 @@ namespace scopi
     TEST(superellipsoid, tangent_x_3d)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto tangent = s.tangents(0., 0.);
 
@@ -530,8 +522,7 @@ namespace scopi
     TEST(superellipsoid, tangent_y_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto tangent = s.tangents(0., PI/2.);
 
@@ -547,8 +538,7 @@ namespace scopi
     TEST(superellipsoid, tangent_z_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
-        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
 
         auto tangent = s.tangents(PI/2., 0.);
 

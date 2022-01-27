@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
+#include "utils.hpp"
 
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/container.hpp>
-#include <fstream>
-#include <nlohmann/json.hpp>
 
 namespace scopi
 {
@@ -89,7 +88,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -101,7 +100,7 @@ namespace scopi
         constexpr std::size_t dim = 3;
         sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -114,7 +113,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         const sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -126,7 +125,7 @@ namespace scopi
         constexpr std::size_t dim = 3;
         const sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
@@ -139,7 +138,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -151,7 +150,7 @@ namespace scopi
         constexpr std::size_t dim = 3;
         sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -164,7 +163,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         const sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -176,7 +175,7 @@ namespace scopi
         constexpr std::size_t dim = 3;
         const sphere<dim> s({{-0.2, 0.0, 0.1}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
@@ -234,7 +233,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
@@ -248,7 +247,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         const sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
@@ -262,7 +261,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
@@ -276,7 +275,7 @@ namespace scopi
         constexpr std::size_t dim = 2;
         const sphere<dim> s({{-0.2, 0.0}}, 0.1);
 
-        scopi::scopi_container<dim> particles;
+        scopi_container<dim> particles;
         particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
@@ -298,7 +297,6 @@ namespace scopi
     TEST(sphere, rotation_2d)
     {
         constexpr std::size_t dim = 2;
-        double PI = xt::numeric_constants<double>::PI;
         sphere<dim> s({{-0.2, 0.0}}, {quaternion(PI/3)}, 0.1);
 
         auto rotation_matrix = s.rotation();
@@ -312,7 +310,6 @@ namespace scopi
     TEST(sphere, rotation_3d)
     {
         constexpr std::size_t dim = 3;
-        double PI = xt::numeric_constants<double>::PI;
         sphere<dim> s({{-0.2, 0.0, 0.0}}, {quaternion(PI/3)}, 0.1);
 
         auto rotation_matrix = s.rotation();
@@ -377,22 +374,9 @@ namespace scopi
     }
 
     // two_spheres
-    TEST(sphere, two_spheres)
+    TEST(sphere, two_spheres_symetrical)
     {
-        std::ifstream file1("./Results/scopi_objects_0999.json");
-        std::ifstream file2("./Results/scopi_objects_0999.json");
-        if(file1 && file2)
-        {
-            nlohmann::json j1 = nlohmann::json::parse(file1);
-            nlohmann::json j2 = nlohmann::json::parse(file2);
-            nlohmann::json difference = nlohmann::json::diff(j1, j2);
-            EXPECT_EQ(difference.empty(), true);
-        }
-        else
-        {
-            FAIL();
-        }
-
+        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", "./Results/scopi_objects_0999.json"); 
     }
 
 }
