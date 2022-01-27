@@ -21,6 +21,7 @@ namespace scopi{
             void allocateMemory_impl(const std::size_t nc);
             void freeMemory_impl();
             int getNbActiveContacts_impl();
+            std::string getName_impl() const;
 
         private:
             void cooToCsr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
@@ -219,6 +220,12 @@ namespace scopi{
                 }
             }
             return nbActiveContacts;
+        }
+
+    template<std::size_t dim>
+        std::string OptimScs<dim>::getName_impl() const
+        {
+            return "OptimScs";
         }
 
     template<std::size_t dim>

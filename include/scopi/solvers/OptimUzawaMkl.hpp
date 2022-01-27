@@ -25,6 +25,7 @@ namespace scopi{
             void allocateMemory_impl(const std::size_t nc);
             void freeMemory_impl();
             int getNbActiveContacts_impl();
+            std::string getName_impl() const;
 
         private:
             void printCrsMatrix(const sparse_matrix_t);
@@ -327,5 +328,12 @@ namespace scopi{
             }
             std::cout << "_____________________________________________________________________  \n" ;
         }
+
+    template<std::size_t dim>
+        std::string OptimUzawaMkl<dim>::getName_impl() const
+        {
+            return "OptimUzawaMkl";
+        }
+
 }
 #endif
