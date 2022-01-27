@@ -364,7 +364,7 @@ namespace scopi
     }
 
     // point
-    TEST(superellipsoid, point_2d)
+    TEST(superellipsoid, point_x_2d)
     {
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
@@ -375,7 +375,19 @@ namespace scopi
         EXPECT_DOUBLE_EQ(point(1), 0.);
     }
 
-    TEST(superellipsoid, point_3d)
+    TEST(superellipsoid, point_y_2d)
+    {
+        constexpr std::size_t dim = 2;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+
+        auto point = s.point(PI/2.);
+
+        EXPECT_NEAR(point(0), 0., 1e-17); // TODO point(0) = 6e-18, EXPECT_DOUBLE_EQ fails
+        EXPECT_DOUBLE_EQ(point(1), 0.2);
+    }
+
+    TEST(superellipsoid, point_x_3d)
     {
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
@@ -387,8 +399,34 @@ namespace scopi
         EXPECT_DOUBLE_EQ(point(2), 0.);
     }
 
+    TEST(superellipsoid, point_y_3d)
+    {
+        constexpr std::size_t dim = 3;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto point = s.point(0., PI/2.);
+
+        EXPECT_NEAR(point(0), 0., 1e-17); // TODO point(0) = 6e-18, EXPECT_DOUBLE_EQ fails
+        EXPECT_DOUBLE_EQ(point(1), 0.2);
+        EXPECT_DOUBLE_EQ(point(2), 0.);
+    }
+
+    TEST(superellipsoid, point_z_3d)
+    {
+        constexpr std::size_t dim = 3;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto point = s.point(PI/2., 0.);
+
+        EXPECT_NEAR(point(0), 0., 1e-17); // TODO point(0) = 6e-18, EXPECT_DOUBLE_EQ fails
+        EXPECT_DOUBLE_EQ(point(1), 0.);
+        EXPECT_DOUBLE_EQ(point(2), 0.3);
+    }
+
     // normal
-    TEST(superellipsoid, normal_2d)
+    TEST(superellipsoid, normal_x_2d)
     {
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
@@ -399,7 +437,19 @@ namespace scopi
         EXPECT_DOUBLE_EQ(normal(1), 0.);
     }
 
-    TEST(superellipsoid, normal_3d)
+    TEST(superellipsoid, normal_y_2d)
+    {
+        constexpr std::size_t dim = 2;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+
+        auto normal = s.normal(PI/2.);
+
+        EXPECT_NEAR(normal(0), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        EXPECT_DOUBLE_EQ(normal(1), 1.);
+    }
+
+    TEST(superellipsoid, normal_x_3d)
     {
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
@@ -411,8 +461,34 @@ namespace scopi
         EXPECT_DOUBLE_EQ(normal(2), 0.);
     }
 
+    TEST(superellipsoid, normal_y_3d)
+    {
+        constexpr std::size_t dim = 3;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto normal = s.normal(0., PI/2.);
+
+        EXPECT_NEAR(normal(0), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        EXPECT_DOUBLE_EQ(normal(1), 1.);
+        EXPECT_DOUBLE_EQ(normal(2), 0.);
+    }
+
+    TEST(superellipsoid, normal_z_3d)
+    {
+        constexpr std::size_t dim = 3;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto normal = s.normal(PI/2., 0.);
+
+        EXPECT_NEAR(normal(0), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        EXPECT_DOUBLE_EQ(normal(1), 0.);
+        EXPECT_DOUBLE_EQ(normal(2), 1.);
+    }
+
     // tangent
-    TEST(superellipsoid, tangent_2d)
+    TEST(superellipsoid, tangent_x_2d)
     {
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
@@ -423,7 +499,19 @@ namespace scopi
         EXPECT_DOUBLE_EQ(tangent(1), 1.);
     }
 
-    TEST(superellipsoid, tangent_3d)
+    TEST(superellipsoid, tangent_y_2d)
+    {
+        constexpr std::size_t dim = 2;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
+
+        auto tangent = s.tangent(PI/2.);
+
+        EXPECT_DOUBLE_EQ(tangent(0), -1.);
+        EXPECT_NEAR(tangent(1), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+    }
+
+    TEST(superellipsoid, tangent_x_3d)
     {
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
@@ -437,6 +525,40 @@ namespace scopi
         EXPECT_DOUBLE_EQ(tangent.second(0), 0.);
         EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
         EXPECT_DOUBLE_EQ(tangent.second(2), 1.);
+    }
+
+    TEST(superellipsoid, tangent_y_3d)
+    {
+        constexpr std::size_t dim = 3;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto tangent = s.tangents(0., PI/2.);
+
+        EXPECT_DOUBLE_EQ(tangent.first(0), -1.);
+        EXPECT_NEAR(tangent.first(1), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        EXPECT_DOUBLE_EQ(tangent.first(2), 0.);
+
+        EXPECT_DOUBLE_EQ(tangent.second(0), 0.);
+        EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
+        EXPECT_DOUBLE_EQ(tangent.second(2), 1.);
+    }
+
+    TEST(superellipsoid, tangent_z_3d)
+    {
+        constexpr std::size_t dim = 3;
+        double PI = xt::numeric_constants<double>::PI;
+        superellipsoid<dim> s({{0., 0., 0.}}, {scopi::quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
+
+        auto tangent = s.tangents(PI/2., 0.);
+
+        EXPECT_DOUBLE_EQ(tangent.first(0), 0.);
+        EXPECT_DOUBLE_EQ(tangent.first(1), 1.);
+        EXPECT_DOUBLE_EQ(tangent.first(2), 0.);
+
+        EXPECT_DOUBLE_EQ(tangent.second(0), -1.);
+        EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
+        EXPECT_NEAR(tangent.second(2), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
     }
 
 }
