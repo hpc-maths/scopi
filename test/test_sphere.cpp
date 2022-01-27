@@ -374,7 +374,8 @@ namespace scopi
         EXPECT_EQ(normal(2), 0.);
     }
 
-    class TestTwoSpheresAsymetrical  : public ::testing::Test {
+    // two_spheres
+    class TestTwoSpheresAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
                 sphere<2> s1({{-0.2, -0.05}}, 0.1);
@@ -389,8 +390,22 @@ namespace scopi
             std::size_t m_active_ptr = 0; // without obstacles
     };
 
-    // two_spheres
-    TEST_F(TestTwoSpheresAsymetrical, two_spheres_asymetrical)
+    class TestTwoSpheresSymmetrical  : public ::testing::Test {
+        protected:
+            void SetUp() override {
+                sphere<2> s1({{-0.2, 0.}}, 0.1);
+                sphere<2> s2({{ 0.2, 0.}}, 0.1);
+                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+            }
+
+            double m_dt = .005;
+            std::size_t m_total_it = 1000;
+            scopi_container<2> m_particles;
+            std::size_t m_active_ptr = 0; // without obstacles
+    };
+
+    TEST_F(TestTwoSpheresAsymmetrical, two_spheres_asymmetrical)
     {
         // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
         constexpr std::size_t dim = 2;
@@ -399,15 +414,37 @@ namespace scopi
 
         std::string filenameRef;
         if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/two_spheres_asymetrical_mosek.json"; 
+            filenameRef = "../test/two_spheres_asymmetrical_mosek.json"; 
         else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/two_spheres_asymetrical_uzawaMkl.json"; 
+            filenameRef = "../test/two_spheres_asymmetrical_uzawaMkl.json"; 
         else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/two_spheres_asymetrical_scs.json"; 
+            filenameRef = "../test/two_spheres_asymmetrical_scs.json"; 
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/two_spheres_asymetrical_uzawaMatrixFreeTbb.json"; 
+            filenameRef = "../test/two_spheres_asymmetrical_uzawaMatrixFreeTbb.json"; 
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/two_spheres_asymetrical_uzawaMatrixFreeOmp.json"; 
+            filenameRef = "../test/two_spheres_asymmetrical_uzawaMatrixFreeOmp.json"; 
+
+        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+    }
+
+    TEST_F(TestTwoSpheresSymmetrical, two_spheres_Symmetrical)
+    {
+        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
+        constexpr std::size_t dim = 2;
+        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
+        solver.solve(m_total_it);
+
+        std::string filenameRef;
+        if(solver.getOptimSolverName() == "OptimMosek")
+            filenameRef = "../test/two_spheres_symmetrical_mosek.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
+            filenameRef = "../test/two_spheres_symmetrical_uzawaMkl.json"; 
+        else if(solver.getOptimSolverName() == "OptimScs")
+            filenameRef = "../test/two_spheres_symmetrical_scs.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
+            filenameRef = "../test/two_spheres_symmetrical_uzawaMatrixFreeTbb.json"; 
+        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
+            filenameRef = "../test/two_spheres_symmetrical_uzawaMatrixFreeOmp.json"; 
 
         EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
     }
