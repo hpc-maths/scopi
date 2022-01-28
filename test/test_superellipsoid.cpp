@@ -7,171 +7,183 @@
 
 namespace scopi
 {
+    class Superellipsoid2dTest  : public ::testing::Test {
+        protected:
+            Superellipsoid2dTest()
+                : m_s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1.5}})
+                {}
+            superellipsoid<2> m_s;
+    };
+
+    class Superellipsoid2dConstTest  : public ::testing::Test {
+        protected:
+            Superellipsoid2dConstTest()
+                : m_s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}})
+                {}
+            const superellipsoid<2> m_s;
+    };
+
+    class Superellipsoid2dRotationTest  : public ::testing::Test {
+        protected:
+            Superellipsoid2dRotationTest()
+                : m_s({{-0.2, 0.}}, {quaternion(PI/3)}, {{0.1, 0.2}}, {{1.5}})
+                {}
+            superellipsoid<2> m_s;
+    };
+
+    class Superellipsoid3dTest  : public ::testing::Test {
+        protected:
+            Superellipsoid3dTest()
+                : m_s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
+                {}
+            superellipsoid<3> m_s;
+    };
+
+    class Superellipsoid3dConstTest  : public ::testing::Test {
+        protected:
+            Superellipsoid3dConstTest()
+                : m_s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}})
+                {}
+            const superellipsoid<3> m_s;
+    };
+
+    class Superellipsoid3dRotationTest  : public ::testing::Test {
+        protected:
+            Superellipsoid3dRotationTest()
+                : m_s({{-0.2, 0., 0.1}}, {quaternion(PI/3)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
+                {}
+            superellipsoid<3> m_s;
+    };
+
+
     // pos
-    TEST(superellipsoid, pos_2d)
+    TEST_F(Superellipsoid2dTest, pos_2d)
+    {
+        EXPECT_EQ(m_s.pos()(0), -0.2);
+        EXPECT_EQ(m_s.pos()(1), 0.);
+    }
+
+    TEST_F(Superellipsoid3dTest, pos_3d)
+    {
+        EXPECT_EQ(m_s.pos()(0), -0.2);
+        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(2), 0.1);
+    }
+
+    TEST_F(Superellipsoid2dConstTest, pos_2d_const)
+    {
+        EXPECT_EQ(m_s.pos()(0), -0.2);
+        EXPECT_EQ(m_s.pos()(1), 0.);
+    }
+
+    TEST_F(Superellipsoid3dConstTest, pos_3d_const)
+    {
+        EXPECT_EQ(m_s.pos()(0), -0.2);
+        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(2), 0.1);
+    }
+
+    TEST_F(Superellipsoid2dTest, pos_2d_index)
+    {
+        EXPECT_EQ(m_s.pos(0)(), -0.2);
+        EXPECT_EQ(m_s.pos(1)(), 0.);
+    }
+
+    TEST_F(Superellipsoid3dTest, pos_3d_index)
+    {
+        EXPECT_EQ(m_s.pos(0)(), -0.2);
+        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(2)(), 0.1);
+    }
+
+    TEST_F(Superellipsoid2dConstTest, pos_2d_index_const)
+    {
+
+        EXPECT_EQ(m_s.pos(0)(), -0.2);
+        EXPECT_EQ(m_s.pos(1)(), 0.);
+    }
+
+    TEST_F(Superellipsoid3dConstTest, pos_3d_index_const)
+    {
+        EXPECT_EQ(m_s.pos(0)(), -0.2);
+        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(2)(), 0.1);
+    }
+
+    TEST_F(Superellipsoid2dTest, pos_2d_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.pos()(0), -0.2);
-        EXPECT_EQ(s.pos()(1), 0.);
-    }
-
-    TEST(superellipsoid, pos_3d)
-    {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        EXPECT_EQ(s.pos()(0), -0.2);
-        EXPECT_EQ(s.pos()(1), 0.);
-        EXPECT_EQ(s.pos()(2), 0.1);
-    }
-
-    TEST(superellipsoid, pos_2d_const)
-    {
-        constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.pos()(0), -0.2);
-        EXPECT_EQ(s.pos()(1), 0.);
-    }
-
-    TEST(superellipsoid, pos_3d_const)
-    {
-        constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        EXPECT_EQ(s.pos()(0), -0.2);
-        EXPECT_EQ(s.pos()(1), 0.);
-        EXPECT_EQ(s.pos()(2), 0.1);
-    }
-
-    TEST(superellipsoid, pos_2d_index)
-    {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.pos(0)(), -0.2);
-        EXPECT_EQ(s.pos(1)(), 0.);
-    }
-
-    TEST(superellipsoid, pos_3d_index)
-    {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        EXPECT_EQ(s.pos(0)(), -0.2);
-        EXPECT_EQ(s.pos(1)(), 0.);
-        EXPECT_EQ(s.pos(2)(), 0.1);
-    }
-
-    TEST(superellipsoid, pos_2d_index_const)
-    {
-        constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.pos(0)(), -0.2);
-        EXPECT_EQ(s.pos(1)(), 0.);
-    }
-
-    TEST(superellipsoid, pos_3d_index_const)
-    {
-        constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        EXPECT_EQ(s.pos(0)(), -0.2);
-        EXPECT_EQ(s.pos(1)(), 0.);
-        EXPECT_EQ(s.pos(2)(), 0.1);
-    }
-
-    TEST(superellipsoid, pos_2d_container)
-    {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.);
     }
 
-    TEST(superellipsoid, pos_3d_container)
+    TEST_F(Superellipsoid3dTest, pos_3d_container)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.);
         EXPECT_EQ(particles[0]->pos()(2), 0.1);
     }
 
-    TEST(superellipsoid, pos_2d_const_container)
+    TEST_F(Superellipsoid2dConstTest, pos_2d_const_container)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.);
     }
 
-    TEST(superellipsoid, pos_3d_const_container)
+    TEST_F(Superellipsoid3dConstTest, pos_3d_const_container)
     {
         constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.);
         EXPECT_EQ(particles[0]->pos()(2), 0.1);
     }
 
-    TEST(superellipsoid, pos_2d_index_container)
+    TEST_F(Superellipsoid2dTest, pos_2d_index_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.);
     }
 
-    TEST(superellipsoid, pos_3d_index_container)
+    TEST_F(Superellipsoid3dTest, pos_3d_index_container)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.);
         EXPECT_EQ(particles[0]->pos(2)(), 0.1);
     }
 
-    TEST(superellipsoid, pos_2d_index_const_container)
+    TEST_F(Superellipsoid2dConstTest, pos_2d_index_const_container)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.);
     }
 
-    TEST(superellipsoid, pos_3d_index_const_container)
+    TEST_F(Superellipsoid3dConstTest, pos_3d_index_const_container)
     {
         constexpr std::size_t dim = 3;
         const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
@@ -185,71 +197,43 @@ namespace scopi
     }
 
     // q
-    TEST(superellipsoid, q)
+    TEST_F(Superellipsoid2dTest, q)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.q()(0), 1.);
-        EXPECT_EQ(s.q()(1), 0.);
-        EXPECT_EQ(s.q()(2), 0.);
-        EXPECT_EQ(s.q()(3), 0.);
+        EXPECT_EQ(m_s.q()(0), 1.);
+        EXPECT_EQ(m_s.q()(1), 0.);
+        EXPECT_EQ(m_s.q()(2), 0.);
+        EXPECT_EQ(m_s.q()(3), 0.);
     }
 
-    TEST(superellipsoid, q_const)
+    TEST_F(Superellipsoid2dConstTest, q_const)
     {
-        constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.q()(0), 1.);
-        EXPECT_EQ(s.q()(1), 0.);
-        EXPECT_EQ(s.q()(2), 0.);
-        EXPECT_EQ(s.q()(3), 0.);
+        EXPECT_EQ(m_s.q()(0), 1.);
+        EXPECT_EQ(m_s.q()(1), 0.);
+        EXPECT_EQ(m_s.q()(2), 0.);
+        EXPECT_EQ(m_s.q()(3), 0.);
     }
 
-    TEST(superellipsoid, q_index)
+    TEST_F(Superellipsoid2dTest, q_index)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.q(0)(), 1.);
-        EXPECT_EQ(s.q(1)(), 0.);
-        EXPECT_EQ(s.q(2)(), 0.);
-        EXPECT_EQ(s.q(3)(), 0.);
+        EXPECT_EQ(m_s.q(0)(), 1.);
+        EXPECT_EQ(m_s.q(1)(), 0.);
+        EXPECT_EQ(m_s.q(2)(), 0.);
+        EXPECT_EQ(m_s.q(3)(), 0.);
     }
 
-    TEST(superellipsoid, q_index_const)
+    TEST_F(Superellipsoid2dConstTest, q_index_const)
     {
-        constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        EXPECT_EQ(s.q(0)(), 1.);
-        EXPECT_EQ(s.q(1)(), 0.);
-        EXPECT_EQ(s.q(2)(), 0.);
-        EXPECT_EQ(s.q(3)(), 0.);
+        EXPECT_EQ(m_s.q(0)(), 1.);
+        EXPECT_EQ(m_s.q(1)(), 0.);
+        EXPECT_EQ(m_s.q(2)(), 0.);
+        EXPECT_EQ(m_s.q(3)(), 0.);
     }
 
-    TEST(superellipsoid, q_container)
+    TEST_F(Superellipsoid2dTest, q_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-
-        EXPECT_EQ(particles[0]->q()(0), 1.);
-        EXPECT_EQ(particles[0]->q()(1), 0.);
-        EXPECT_EQ(particles[0]->q()(2), 0.);
-        EXPECT_EQ(s.q()(3), 0.);
-    }
-
-    TEST(superellipsoid, q_const_container)
-    {
-        constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
         EXPECT_EQ(particles[0]->q()(1), 0.);
@@ -257,13 +241,23 @@ namespace scopi
         EXPECT_EQ(particles[0]->q()(3), 0.);
     }
 
-    TEST(superellipsoid, q_index_container)
+    TEST_F(Superellipsoid2dConstTest, q_const_container)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+
+        EXPECT_EQ(particles[0]->q()(0), 1.);
+        EXPECT_EQ(particles[0]->q()(1), 0.);
+        EXPECT_EQ(particles[0]->q()(2), 0.);
+        EXPECT_EQ(particles[0]->q()(3), 0.);
+    }
+
+    TEST_F(Superellipsoid2dTest, q_index_container)
+    {
+        constexpr std::size_t dim = 2;
+        scopi_container<dim> particles;
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
         EXPECT_EQ(particles[0]->q(1)(), 0.);
@@ -271,13 +265,11 @@ namespace scopi
         EXPECT_EQ(particles[0]->q(3)(), 0.);
     }
 
-    TEST(superellipsoid, q_index_const_container)
+    TEST_F(Superellipsoid2dConstTest, q_index_const_container)
     {
         constexpr std::size_t dim = 2;
-        const superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
         EXPECT_EQ(particles[0]->q(1)(), 0.);
@@ -286,72 +278,48 @@ namespace scopi
     }
 
     // radius
-    TEST(superellipsoid, radius_2d)
+    TEST_F(Superellipsoid2dTest, radius_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}});
-
-        auto radius = s.radius();
-
+        auto radius = m_s.radius();
         EXPECT_EQ(radius(0), 0.1);
         EXPECT_EQ(radius(1), 0.2);
     }
 
-    TEST(superellipsoid, radius_3d)
+    TEST_F(Superellipsoid3dTest, radius_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto radius = s.radius();
-
+        auto radius = m_s.radius();
         EXPECT_EQ(radius(0), 0.1);
         EXPECT_EQ(radius(1), 0.2);
         EXPECT_EQ(radius(2), 0.3);
     }
 
     //squareness
-    TEST(superellipsoid, squareness_2d)
+    TEST_F(Superellipsoid2dTest, squareness_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1.5}});
-
-        auto squareness = s.squareness();
-
+        auto squareness = m_s.squareness();
         EXPECT_EQ(squareness(0), 1.5);
     }
 
-    TEST(superellipsoid, squareness_3d)
+    TEST_F(Superellipsoid3dTest, squareness_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}});
-
-        auto squareness = s.squareness();
-
+        auto squareness = m_s.squareness();
         EXPECT_EQ(squareness(0), 0.5);
         EXPECT_EQ(squareness(1), 1.5);
     }
 
     // rotation
-    TEST(superellipsoid, rotation_2d)
+    TEST_F(Superellipsoid2dRotationTest, rotation_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{-0.2, 0.}}, {quaternion(PI/3)}, {{0.1, 0.2}}, {{1}});
-
-        auto rotation_matrix = s.rotation();
-
+        auto rotation_matrix = m_s.rotation();
         EXPECT_DOUBLE_EQ(rotation_matrix(0, 0), 1./2.);
         EXPECT_DOUBLE_EQ(rotation_matrix(0, 1), -std::sqrt(3.)/2.);
         EXPECT_DOUBLE_EQ(rotation_matrix(1, 0), std::sqrt(3.)/2.);
         EXPECT_DOUBLE_EQ(rotation_matrix(1, 1), 1./2.);
     }
 
-    TEST(superellipsoid, rotation_3d)
+    TEST_F(Superellipsoid3dRotationTest, rotation_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(PI/3    )}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto rotation_matrix = s.rotation();
-
+        auto rotation_matrix = m_s.rotation();
         EXPECT_DOUBLE_EQ(rotation_matrix(0, 0), 1./2.);
         EXPECT_DOUBLE_EQ(rotation_matrix(0, 1), -std::sqrt(3.)/2.);
         EXPECT_DOUBLE_EQ(rotation_matrix(0, 2), 0.);
@@ -364,153 +332,103 @@ namespace scopi
     }
 
     // point
-    TEST(superellipsoid, point_x_2d)
+    TEST_F(Superellipsoid2dTest, point_x_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
-
-        auto point = s.point(0.);
-
-        EXPECT_DOUBLE_EQ(point(0), 0.1);
+        auto point = m_s.point(0.);
+        EXPECT_DOUBLE_EQ(point(0), -0.1);
         EXPECT_DOUBLE_EQ(point(1), 0.);
     }
 
-    TEST(superellipsoid, point_y_2d)
+    TEST_F(Superellipsoid2dTest, point_y_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
-
-        auto point = s.point(PI/2.);
-
-        EXPECT_NEAR(point(0), 0., 1e-17); // TODO point(0) = 6e-18, EXPECT_DOUBLE_EQ fails
+        auto point = m_s.point(PI/2.);
+        EXPECT_DOUBLE_EQ(point(0), -0.2);
         EXPECT_DOUBLE_EQ(point(1), 0.2);
     }
 
-    TEST(superellipsoid, point_x_3d)
+    TEST_F(Superellipsoid3dTest, point_x_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto point = s.point(0., 0.);
-
-        EXPECT_DOUBLE_EQ(point(0), 0.1);
+        auto point = m_s.point(0., 0.);
+        EXPECT_DOUBLE_EQ(point(0), -0.1);
         EXPECT_DOUBLE_EQ(point(1), 0.);
-        EXPECT_DOUBLE_EQ(point(2), 0.);
+        EXPECT_DOUBLE_EQ(point(2), 0.1);
     }
 
-    TEST(superellipsoid, point_y_3d)
+    TEST_F(Superellipsoid3dTest, point_y_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto point = s.point(0., PI/2.);
-
-        EXPECT_NEAR(point(0), 0., 1e-17); // TODO point(0) = 6e-18, EXPECT_DOUBLE_EQ fails
+        auto point = m_s.point(0., PI/2.);
+        EXPECT_NEAR(point(0), -0.2, 1e-9); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
+        // EXPECT_DOUBLE_EQ(point(0), -0.2);
         EXPECT_DOUBLE_EQ(point(1), 0.2);
-        EXPECT_DOUBLE_EQ(point(2), 0.);
+        EXPECT_DOUBLE_EQ(point(2), 0.1);
     }
 
-    TEST(superellipsoid, point_z_3d)
+    TEST_F(Superellipsoid3dTest, point_z_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto point = s.point(PI/2., 0.);
-
-        EXPECT_NEAR(point(0), 0., 1e-17); // TODO point(0) = 6e-18, EXPECT_DOUBLE_EQ fails
+        auto point = m_s.point(PI/2., 0.);
+        EXPECT_DOUBLE_EQ(point(0), -0.2);
         EXPECT_DOUBLE_EQ(point(1), 0.);
-        EXPECT_DOUBLE_EQ(point(2), 0.3);
+        EXPECT_DOUBLE_EQ(point(2), 0.4);
     }
 
     // normal
-    TEST(superellipsoid, normal_x_2d)
+    TEST_F(Superellipsoid2dTest, normal_x_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
-
-        auto normal = s.normal(0.);
-
+        auto normal = m_s.normal(0.);
         EXPECT_DOUBLE_EQ(normal(0), 1.);
         EXPECT_DOUBLE_EQ(normal(1), 0.);
     }
 
-    TEST(superellipsoid, normal_y_2d)
+    TEST_F(Superellipsoid2dTest, normal_y_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
-
-        auto normal = s.normal(PI/2.);
-
-        EXPECT_NEAR(normal(0), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        auto normal = m_s.normal(PI/2.);
+        EXPECT_NEAR(normal(0), 0., 1e-7); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
         EXPECT_DOUBLE_EQ(normal(1), 1.);
     }
 
-    TEST(superellipsoid, normal_x_3d)
+    TEST_F(Superellipsoid3dTest, normal_x_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto normal = s.normal(0., 0.);
-
+        auto normal = m_s.normal(0., 0.);
         EXPECT_DOUBLE_EQ(normal(0), 1.);
         EXPECT_DOUBLE_EQ(normal(1), 0.);
         EXPECT_DOUBLE_EQ(normal(2), 0.);
     }
 
-    TEST(superellipsoid, normal_y_3d)
+    TEST_F(Superellipsoid3dTest, normal_y_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto normal = s.normal(0., PI/2.);
-
-        EXPECT_NEAR(normal(0), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        auto normal = m_s.normal(0., PI/2.);
+        EXPECT_NEAR(normal(0), 0., 1e-17); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
         EXPECT_DOUBLE_EQ(normal(1), 1.);
         EXPECT_DOUBLE_EQ(normal(2), 0.);
     }
 
-    TEST(superellipsoid, normal_z_3d)
+    TEST_F(Superellipsoid3dTest, normal_z_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto normal = s.normal(PI/2., 0.);
-
-        EXPECT_NEAR(normal(0), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        auto normal = m_s.normal(PI/2., 0.);
+        EXPECT_NEAR(normal(0), 0., 1e-7); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
         EXPECT_DOUBLE_EQ(normal(1), 0.);
         EXPECT_DOUBLE_EQ(normal(2), 1.);
     }
+    //
 
     // tangent
-    TEST(superellipsoid, tangent_x_2d)
+    TEST_F(Superellipsoid2dTest, tangent_x_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
-
-        auto tangent = s.tangent(0.);
-
+        auto tangent = m_s.tangent(0.);
         EXPECT_DOUBLE_EQ(tangent(0), 0.);
         EXPECT_DOUBLE_EQ(tangent(1), 1.);
     }
 
-    TEST(superellipsoid, tangent_y_2d)
+    TEST_F(Superellipsoid2dTest, tangent_y_2d)
     {
-        constexpr std::size_t dim = 2;
-        superellipsoid<dim> s({{0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
-
-        auto tangent = s.tangent(PI/2.);
-
+        auto tangent = m_s.tangent(PI/2.);
         EXPECT_DOUBLE_EQ(tangent(0), -1.);
-        EXPECT_NEAR(tangent(1), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        EXPECT_NEAR(tangent(1), 0., 1e-7); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
     }
 
-    TEST(superellipsoid, tangent_x_3d)
+    TEST_F(Superellipsoid3dTest, tangent_x_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto tangent = s.tangents(0., 0.);
-
+        auto tangent = m_s.tangents(0., 0.);
         EXPECT_DOUBLE_EQ(tangent.first(0), 0.);
         EXPECT_DOUBLE_EQ(tangent.first(1), 1.);
         EXPECT_DOUBLE_EQ(tangent.first(2), 0.);
@@ -520,15 +438,11 @@ namespace scopi
         EXPECT_DOUBLE_EQ(tangent.second(2), 1.);
     }
 
-    TEST(superellipsoid, tangent_y_3d)
+    TEST_F(Superellipsoid3dTest, tangent_y_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto tangent = s.tangents(0., PI/2.);
-
+        auto tangent = m_s.tangents(0., PI/2.);
         EXPECT_DOUBLE_EQ(tangent.first(0), -1.);
-        EXPECT_NEAR(tangent.first(1), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        EXPECT_NEAR(tangent.first(1), 0., 1e-17); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
         EXPECT_DOUBLE_EQ(tangent.first(2), 0.);
 
         EXPECT_DOUBLE_EQ(tangent.second(0), 0.);
@@ -536,21 +450,18 @@ namespace scopi
         EXPECT_DOUBLE_EQ(tangent.second(2), 1.);
     }
 
-    TEST(superellipsoid, tangent_z_3d)
+    TEST_F(Superellipsoid3dTest, tangent_z_3d)
     {
-        constexpr std::size_t dim = 3;
-        superellipsoid<dim> s({{0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
-        auto tangent = s.tangents(PI/2., 0.);
-
+        auto tangent = m_s.tangents(PI/2., 0.);
         EXPECT_DOUBLE_EQ(tangent.first(0), 0.);
         EXPECT_DOUBLE_EQ(tangent.first(1), 1.);
         EXPECT_DOUBLE_EQ(tangent.first(2), 0.);
 
         EXPECT_DOUBLE_EQ(tangent.second(0), -1.);
         EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
-        EXPECT_NEAR(tangent.second(2), 0., 5e-16); // TODO point(0) = 1e-16, EXPECT_DOUBLE_EQ fails
+        EXPECT_NEAR(tangent.second(2), 0., 1e-7); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
     }
+    //
 
     // two ellipsoids
     class TestTwoEllipsoidsSymmetrical  : public ::testing::Test {
@@ -578,7 +489,7 @@ namespace scopi
             }
 
             double m_dt = .005;
-            std::size_t m_total_it = 200;
+            std::size_t m_total_it = 1000;
             scopi_container<2> m_particles;
             std::size_t m_active_ptr = 0; // without obstacles
     };
