@@ -38,7 +38,12 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, double kdtree_radius): contact_base(dmax), _kdtree_radius(kdtree_radius){};
+        contact_kdtree(double dmax, double kdtree_radius): contact_base(dmax), _kdtree_radius(kdtree_radius), m_nMatches(0) {};
+
+        std::size_t get_nMatches() const
+        {
+            return m_nMatches;
+        }
 
         template <std::size_t dim>
         std::vector<scopi::neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
@@ -94,12 +99,12 @@ namespace scopi
 
                 std::vector<std::pair<std::size_t, double>> ret_matches;
 
-                const std::size_t nMatches = index.radiusSearch(query_pt, _kdtree_radius, ret_matches,
+                m_nMatches = index.radiusSearch(query_pt, _kdtree_radius, ret_matches,
                     nanoflann::SearchParams());
 
                 //std::cout << i << " nMatches = " << nMatches << std::endl;
 
-                for (std::size_t ic = 0; ic < nMatches; ++ic) {
+                for (std::size_t ic = 0; ic < m_nMatches; ++ic) {
 
                     std::size_t j = ret_matches[ic].first;
                     //double dist = ret_matches[ic].second;
@@ -169,6 +174,7 @@ namespace scopi
 
       private:
         double _kdtree_radius;
+        std::size_t m_nMatches;
 
     };
 
