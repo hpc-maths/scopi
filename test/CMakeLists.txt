@@ -9,6 +9,7 @@ set(SCOPI_TESTS
     test_superellipsoid.cpp
     test_closest_points.cpp
     test_container.cpp
+    test_contacts_kdtree.cpp
 )
 
 foreach(filename IN LISTS SCOPI_TESTS)
