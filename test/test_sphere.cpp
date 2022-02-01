@@ -10,7 +10,7 @@ namespace scopi
     class Sphere2dTest  : public ::testing::Test {
         protected:
             Sphere2dTest()
-                : m_s({{-0.2, 0.0}}, 0.1)
+                : m_s({{-0.2, 0.3}}, 0.1)
                 {}
             sphere<2> m_s;
     };
@@ -18,7 +18,7 @@ namespace scopi
     class Sphere2dConstTest  : public ::testing::Test {
         protected:
             Sphere2dConstTest()
-                : m_s({{-0.2, 0.0}}, 0.1)
+                : m_s({{-0.2, 0.3}}, 0.1)
                 {}
             const sphere<2> m_s;
     };
@@ -26,7 +26,7 @@ namespace scopi
     class Sphere2dRotationTest  : public ::testing::Test {
         protected:
             Sphere2dRotationTest()
-                : m_s({{-0.2, 0.0}}, {quaternion(PI/3)}, 0.1)
+                : m_s({{-0.2, 0.3}}, {quaternion(PI/3)}, 0.1)
                 {}
             sphere<2> m_s;
     };
@@ -34,7 +34,7 @@ namespace scopi
     class Sphere3dTest  : public ::testing::Test {
         protected:
             Sphere3dTest()
-                : m_s({{-0.2, 0.0, 0.1}}, 0.1)
+                : m_s({{-0.2, 0.3, 0.1}}, 0.1)
                 {}
             sphere<3> m_s;
     };
@@ -42,7 +42,7 @@ namespace scopi
     class Sphere3dConstTest  : public ::testing::Test {
         protected:
             Sphere3dConstTest()
-                : m_s({{-0.2, 0.0, 0.1}}, 0.1)
+                : m_s({{-0.2, 0.3, 0.1}}, 0.1)
                 {}
             const sphere<3> m_s;
     };
@@ -50,7 +50,7 @@ namespace scopi
     class Sphere3dRotationTest  : public ::testing::Test {
         protected:
             Sphere3dRotationTest()
-                : m_s({{-0.2, 0.0, 0.1}}, {quaternion(PI/3)}, 0.1)
+                : m_s({{-0.2, 0.3, 0.1}}, {quaternion(PI/3)}, 0.1)
                 {}
             sphere<3> m_s;
     };
@@ -59,52 +59,52 @@ namespace scopi
     TEST_F(Sphere2dTest, pos_2d)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
     }
 
     TEST_F(Sphere3dTest, pos_3d)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
         EXPECT_EQ(m_s.pos()(2), 0.1);
     }
 
     TEST_F(Sphere2dConstTest, pos_2d_const)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
     }
 
     TEST_F(Sphere3dConstTest, pos_3d_const)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
         EXPECT_EQ(m_s.pos()(2), 0.1);
     }
 
     TEST_F(Sphere2dTest, pos_2d_index)
     {
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
     }
 
     TEST_F(Sphere3dTest, pos_3d_index)
     {
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
         EXPECT_EQ(m_s.pos(2)(), 0.1);
     }
 
     TEST_F(Sphere2dConstTest, pos_2d_index_const)
     {
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
     }
 
     TEST_F(Sphere3dConstTest, pos_3d_index_const)
     {
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
         EXPECT_EQ(m_s.pos(2)(), 0.1);
     }
 
@@ -115,7 +115,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
     }
 
     TEST_F(Sphere3dTest, pos_3d_container)
@@ -125,7 +125,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
         EXPECT_EQ(particles[0]->pos()(2), 0.1);
     }
 
@@ -136,7 +136,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
     }
 
     TEST_F(Sphere3dConstTest, pos_3d_const_container)
@@ -146,7 +146,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
         EXPECT_EQ(particles[0]->pos()(2), 0.1);
     }
 
@@ -157,7 +157,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
     }
 
     TEST_F(Sphere3dTest, pos_3d_index_container)
@@ -167,7 +167,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
         EXPECT_EQ(particles[0]->pos(2)(), 0.1);
     }
 
@@ -178,7 +178,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
     }
 
     TEST_F(Sphere3dConstTest, pos_3d_index_const_container)
@@ -188,7 +188,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
         EXPECT_EQ(particles[0]->pos(2)(), 0.1);
     }
 
@@ -306,21 +306,45 @@ namespace scopi
     //
 
     // point
-    TEST_F(Sphere2dTest, point_2d)
+    // point
+    TEST_F(Sphere2dTest, point_x_2d)
     {
         auto point = m_s.point(0.);
-        EXPECT_EQ(point(0), -0.1);
-        EXPECT_EQ(point(1), 0.);
+        EXPECT_DOUBLE_EQ(point(0), -0.1);
+        EXPECT_DOUBLE_EQ(point(1), 0.3);
     }
 
-    TEST_F(Sphere3dTest, point_3d)
+    TEST_F(Sphere2dTest, point_y_2d)
+    {
+        auto point = m_s.point(PI/2.);
+        EXPECT_DOUBLE_EQ(point(0), -0.2);
+        EXPECT_DOUBLE_EQ(point(1), 0.4);
+    }
+
+    TEST_F(Sphere3dTest, point_x_3d)
     {
         auto point = m_s.point(0., 0.);
-        EXPECT_EQ(point(0), -0.1);
-        EXPECT_EQ(point(1), 0.);
-        EXPECT_EQ(point(2), 0.1);
+        EXPECT_DOUBLE_EQ(point(0), -0.1);
+        EXPECT_DOUBLE_EQ(point(1), 0.3);
+        EXPECT_DOUBLE_EQ(point(2), 0.1);
     }
-    //
+
+    TEST_F(Sphere3dTest, point_y_3d)
+    {
+        auto point = m_s.point(0., PI/2.);
+        // EXPECT_NEAR(point(0), -0.2, 1e-9); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
+        EXPECT_DOUBLE_EQ(point(0), -0.2);
+        EXPECT_DOUBLE_EQ(point(1), 0.4);
+        EXPECT_DOUBLE_EQ(point(2), 0.1);
+    }
+
+    TEST_F(Sphere3dTest, point_z_3d)
+    {
+        auto point = m_s.point(PI/2., 0.);
+        EXPECT_DOUBLE_EQ(point(0), -0.2);
+        EXPECT_DOUBLE_EQ(point(1), 0.3);
+        EXPECT_DOUBLE_EQ(point(2), 0.2);
+    }
 
     // normal
     TEST_F(Sphere2dTest, normal_2d)

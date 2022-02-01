@@ -10,7 +10,7 @@ namespace scopi
     class Superellipsoid2dTest  : public ::testing::Test {
         protected:
             Superellipsoid2dTest()
-                : m_s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1.5}})
+                : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, {{1.5}})
                 {}
             superellipsoid<2> m_s;
     };
@@ -18,7 +18,7 @@ namespace scopi
     class Superellipsoid2dConstTest  : public ::testing::Test {
         protected:
             Superellipsoid2dConstTest()
-                : m_s({{-0.2, 0.}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}})
+                : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}})
                 {}
             const superellipsoid<2> m_s;
     };
@@ -26,7 +26,7 @@ namespace scopi
     class Superellipsoid2dRotationTest  : public ::testing::Test {
         protected:
             Superellipsoid2dRotationTest()
-                : m_s({{-0.2, 0.}}, {quaternion(PI/3)}, {{0.1, 0.2}}, {{1.5}})
+                : m_s({{-0.2, 0.3}}, {quaternion(PI/3)}, {{0.1, 0.2}}, {{1.5}})
                 {}
             superellipsoid<2> m_s;
     };
@@ -34,7 +34,7 @@ namespace scopi
     class Superellipsoid3dTest  : public ::testing::Test {
         protected:
             Superellipsoid3dTest()
-                : m_s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
+                : m_s({{-0.2, 0.3, 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
                 {}
             superellipsoid<3> m_s;
     };
@@ -42,7 +42,7 @@ namespace scopi
     class Superellipsoid3dConstTest  : public ::testing::Test {
         protected:
             Superellipsoid3dConstTest()
-                : m_s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}})
+                : m_s({{-0.2, 0.3, 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}})
                 {}
             const superellipsoid<3> m_s;
     };
@@ -50,7 +50,7 @@ namespace scopi
     class Superellipsoid3dRotationTest  : public ::testing::Test {
         protected:
             Superellipsoid3dRotationTest()
-                : m_s({{-0.2, 0., 0.1}}, {quaternion(PI/3)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
+                : m_s({{-0.2, 0.3, 0.1}}, {quaternion(PI/3)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
                 {}
             superellipsoid<3> m_s;
     };
@@ -60,39 +60,39 @@ namespace scopi
     TEST_F(Superellipsoid2dTest, pos_2d)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
     }
 
     TEST_F(Superellipsoid3dTest, pos_3d)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
         EXPECT_EQ(m_s.pos()(2), 0.1);
     }
 
     TEST_F(Superellipsoid2dConstTest, pos_2d_const)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
     }
 
     TEST_F(Superellipsoid3dConstTest, pos_3d_const)
     {
         EXPECT_EQ(m_s.pos()(0), -0.2);
-        EXPECT_EQ(m_s.pos()(1), 0.);
+        EXPECT_EQ(m_s.pos()(1), 0.3);
         EXPECT_EQ(m_s.pos()(2), 0.1);
     }
 
     TEST_F(Superellipsoid2dTest, pos_2d_index)
     {
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
     }
 
     TEST_F(Superellipsoid3dTest, pos_3d_index)
     {
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
         EXPECT_EQ(m_s.pos(2)(), 0.1);
     }
 
@@ -100,13 +100,13 @@ namespace scopi
     {
 
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
     }
 
     TEST_F(Superellipsoid3dConstTest, pos_3d_index_const)
     {
         EXPECT_EQ(m_s.pos(0)(), -0.2);
-        EXPECT_EQ(m_s.pos(1)(), 0.);
+        EXPECT_EQ(m_s.pos(1)(), 0.3);
         EXPECT_EQ(m_s.pos(2)(), 0.1);
     }
 
@@ -117,7 +117,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
     }
 
     TEST_F(Superellipsoid3dTest, pos_3d_container)
@@ -127,7 +127,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
         EXPECT_EQ(particles[0]->pos()(2), 0.1);
     }
 
@@ -138,7 +138,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
     }
 
     TEST_F(Superellipsoid3dConstTest, pos_3d_const_container)
@@ -148,7 +148,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
-        EXPECT_EQ(particles[0]->pos()(1), 0.);
+        EXPECT_EQ(particles[0]->pos()(1), 0.3);
         EXPECT_EQ(particles[0]->pos()(2), 0.1);
     }
 
@@ -159,7 +159,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
     }
 
     TEST_F(Superellipsoid3dTest, pos_3d_index_container)
@@ -169,7 +169,7 @@ namespace scopi
         particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
         EXPECT_EQ(particles[0]->pos(2)(), 0.1);
     }
 
@@ -180,19 +180,17 @@ namespace scopi
         particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
     }
 
     TEST_F(Superellipsoid3dConstTest, pos_3d_index_const_container)
     {
         constexpr std::size_t dim = 3;
-        const superellipsoid<dim> s({{-0.2, 0., 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}});
-
         scopi_container<dim> particles;
-        particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
-        EXPECT_EQ(particles[0]->pos(1)(), 0.);
+        EXPECT_EQ(particles[0]->pos(1)(), 0.3);
         EXPECT_EQ(particles[0]->pos(2)(), 0.1);
     }
 
@@ -336,21 +334,21 @@ namespace scopi
     {
         auto point = m_s.point(0.);
         EXPECT_DOUBLE_EQ(point(0), -0.1);
-        EXPECT_DOUBLE_EQ(point(1), 0.);
+        EXPECT_DOUBLE_EQ(point(1), 0.3);
     }
 
     TEST_F(Superellipsoid2dTest, point_y_2d)
     {
         auto point = m_s.point(PI/2.);
         EXPECT_DOUBLE_EQ(point(0), -0.2);
-        EXPECT_DOUBLE_EQ(point(1), 0.2);
+        EXPECT_DOUBLE_EQ(point(1), 0.5);
     }
 
     TEST_F(Superellipsoid3dTest, point_x_3d)
     {
         auto point = m_s.point(0., 0.);
         EXPECT_DOUBLE_EQ(point(0), -0.1);
-        EXPECT_DOUBLE_EQ(point(1), 0.);
+        EXPECT_DOUBLE_EQ(point(1), 0.3);
         EXPECT_DOUBLE_EQ(point(2), 0.1);
     }
 
@@ -359,7 +357,7 @@ namespace scopi
         auto point = m_s.point(0., PI/2.);
         EXPECT_NEAR(point(0), -0.2, 1e-9); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
         // EXPECT_DOUBLE_EQ(point(0), -0.2);
-        EXPECT_DOUBLE_EQ(point(1), 0.2);
+        EXPECT_DOUBLE_EQ(point(1), 0.5);
         EXPECT_DOUBLE_EQ(point(2), 0.1);
     }
 
@@ -367,7 +365,7 @@ namespace scopi
     {
         auto point = m_s.point(PI/2., 0.);
         EXPECT_DOUBLE_EQ(point(0), -0.2);
-        EXPECT_DOUBLE_EQ(point(1), 0.);
+        EXPECT_DOUBLE_EQ(point(1), 0.3);
         EXPECT_DOUBLE_EQ(point(2), 0.4);
     }
 
