@@ -421,7 +421,6 @@ namespace scopi
 
     TEST(closest_points, sphere_superellipsoid_3d)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.2}}, {{1}});
@@ -433,7 +432,6 @@ namespace scopi
 
     TEST(closest_points, sphere_superellipsoid_3d_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -448,7 +446,6 @@ namespace scopi
 
     TEST(closest_points, sphere_superellipsoid_3d_dispatch)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
@@ -464,7 +461,6 @@ namespace scopi
 
     TEST(closest_points, sphere_superellipsoid_3d_dispatch_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -542,7 +538,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_sphere_3d)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.1, 0.1}}, {{1}});
@@ -553,7 +548,6 @@ namespace scopi
     }
     TEST(closest_points, superellipsoid_sphere_3d_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -568,7 +562,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_sphere_3d_dispatch)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
@@ -584,7 +577,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_sphere_3d_dispatch_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -687,7 +679,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_superellipsoid_3d_dispatch)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s1({{ 0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         superellipsoid<dim> s2({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
@@ -703,7 +694,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_superellipsoid_3d_dispatch_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -723,7 +713,6 @@ namespace scopi
     // distance superellipsoid - plan
     TEST(closest_points, superellipsoid_plan_2d)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         plan<dim> p({{ 0.3, 0.0}}, 0.);
@@ -735,7 +724,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_plan_2d_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         double dist = 0.3;
@@ -750,7 +738,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_plan_2d_dispatch)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         plan<dim> p({{ 0.3, 0.0}}, 0.);
@@ -766,7 +753,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_plan_2d_dispatch_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         double dist = 0.3;
@@ -785,7 +771,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_plan_3d)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
@@ -797,7 +782,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_plan_3d_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         double dist = 0.3;
@@ -812,7 +796,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_plan_3d_dispatch)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
@@ -828,7 +811,6 @@ namespace scopi
 
     TEST(closest_points, superellipsoid_plan_3d_dispatch_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         double dist = 0.3;
@@ -848,7 +830,6 @@ namespace scopi
     // distance plan - superellipsoid
     TEST(closest_points, plan_superellipsoid_2d)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         plan<dim> p({{ 0.3, 0.0}}, 0.);
@@ -860,7 +841,6 @@ namespace scopi
 
     TEST(closest_points, plan_superellipsoid_2d_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         double dist = 0.3;
@@ -875,7 +855,6 @@ namespace scopi
 
     TEST(closest_points, plan_superellipsoid_2d_dispatch)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         plan<dim> p({{ 0.3, 0.0}}, 0.);
@@ -891,7 +870,6 @@ namespace scopi
 
     TEST(closest_points, plan_superellipsoid_2d_dispatch_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{ 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2}}, {{1}});
         double dist = 0.3;
@@ -910,7 +888,6 @@ namespace scopi
 
     TEST(closest_points, plan_superellipsoid_3d)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
@@ -922,7 +899,6 @@ namespace scopi
 
     TEST(closest_points, plan_superellipsoid_3d_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         double dist = 0.3;
@@ -937,7 +913,6 @@ namespace scopi
 
     TEST(closest_points, plan_superellipsoid_3d_dispatch)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
@@ -953,7 +928,6 @@ namespace scopi
 
     TEST(closest_points, plan_superellipsoid_3d_dispatch_rotation_30_deg)
     {
-        GTEST_SKIP();
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{ 0., 0., 0.}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {{1}});
         double dist = 0.3;
