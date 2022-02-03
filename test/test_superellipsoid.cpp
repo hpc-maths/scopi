@@ -3,7 +3,7 @@
 
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
-#include <scopi/solvers/mosek.hpp>
+#include <scopi/solver.hpp>
 
 namespace scopi
 {
@@ -523,88 +523,88 @@ namespace scopi
 
     TEST_F(TestTwoEllipsoidsSymmetrical, two_ellipsoids_symmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
+        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver
         constexpr std::size_t dim = 2;
         ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
         solver.solve(m_total_it);
 
         std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMatrixFreeOmp.json"; 
+        if(solver.get_optim_solver_name() == "OptimMosek")
+            filenameRef = "../test/references/two_ellipsoids_symmetrical_mosek.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMkl")
+            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMkl.json";
+        else if(solver.get_optim_solver_name() == "OptimScs")
+            filenameRef = "../test/references/two_ellipsoids_symmetrical_scs.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeTbb")
+            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMatrixFreeTbb.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeOmp")
+            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMatrixFreeOmp.json";
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0199.json", filenameRef, tolerance);
     }
 
     TEST_F(TestTwoEllipsoidsSpheresSymmetrical, two_ellipsoids_spheres_symmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
+        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver
         constexpr std::size_t dim = 2;
         ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
         solver.solve(m_total_it);
 
         std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMatrixFreeOmp.json"; 
+        if(solver.get_optim_solver_name() == "OptimMosek")
+            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_mosek.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMkl")
+            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMkl.json";
+        else if(solver.get_optim_solver_name() == "OptimScs")
+            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_scs.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeTbb")
+            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMatrixFreeTbb.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeOmp")
+            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMatrixFreeOmp.json";
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
     TEST_F(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_symmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
+        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver
         constexpr std::size_t dim = 2;
         ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
         solver.solve(m_total_it);
 
         std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMatrixFreeOmp.json"; 
+        if(solver.get_optim_solver_name() == "OptimMosek")
+            filenameRef = "../test/references/two_ellipsoids_asymmetrical_mosek.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMkl")
+            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMkl.json";
+        else if(solver.get_optim_solver_name() == "OptimScs")
+            filenameRef = "../test/references/two_ellipsoids_asymmetrical_scs.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeTbb")
+            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMatrixFreeTbb.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeOmp")
+            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMatrixFreeOmp.json";
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
     TEST_F(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_symmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
+        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver
         constexpr std::size_t dim = 2;
         ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
         solver.solve(m_total_it);
 
         std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMatrixFreeOmp.json"; 
+        if(solver.get_optim_solver_name() == "OptimMosek")
+            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_mosek.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMkl")
+            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMkl.json";
+        else if(solver.get_optim_solver_name() == "OptimScs")
+            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_scs.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeTbb")
+            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMatrixFreeTbb.json";
+        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeOmp")
+            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMatrixFreeOmp.json";
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }

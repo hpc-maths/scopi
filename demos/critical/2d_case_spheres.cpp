@@ -1,6 +1,6 @@
 #include <xtensor/xmath.hpp>
 #include <scopi/objects/types/sphere.hpp>
-#include <scopi/solvers/mosek.hpp>
+#include <scopi/solver.hpp>
 #include <scopi/container.hpp>
 #include <random>
 
@@ -40,7 +40,7 @@ int main()
             particles.push_back(s2, {{0, 0}}, {{-velocity, 0.}}, 0, 0, {{0, 0}});
         }
     }
- 
+
     std::size_t active_ptr = 0; // pas d'obstacles
 
     scopi::ScopiSolver<dim> solver(particles, dt, active_ptr);

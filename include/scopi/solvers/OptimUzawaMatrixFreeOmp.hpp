@@ -6,6 +6,8 @@
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
 
+#include "../quaternion.hpp"
+
 namespace scopi{
     template<std::size_t dim>
         class OptimUzawaMatrixFreeOmp : public OptimBase<OptimUzawaMatrixFreeOmp<dim>, dim>
@@ -13,10 +15,10 @@ namespace scopi{
         public:
             using base_type = OptimBase<OptimUzawaMatrixFreeOmp<dim>, dim>;
 
-            OptimUzawaMatrixFreeOmp(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-            void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            OptimUzawaMatrixFreeOmp(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+            void createMatrixConstraint_impl(const std::vector<neighbor<dim>>& contacts);
             void createMatrixMass_impl();
-            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+            int solveOptimizationProblem_impl(const std::vector<neighbor<dim>>& contacts);
             auto getUadapt_impl();
             auto getWadapt_impl();
             void allocateMemory_impl(const std::size_t nc);
@@ -26,8 +28,8 @@ namespace scopi{
 
         private:
             void gemv_invP();
-            void gemv_A(const std::vector<scopi::neighbor<dim>>& contacts);
-            void gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts);
+            void gemv_A(const std::vector<neighbor<dim>>& contacts);
+            void gemv_transposeA(const std::vector<neighbor<dim>>& contacts);
 
             const double _tol;
             const std::size_t _maxiter;
@@ -40,7 +42,7 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-        OptimUzawaMatrixFreeOmp<dim>::OptimUzawaMatrixFreeOmp(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) : 
+        OptimUzawaMatrixFreeOmp<dim>::OptimUzawaMatrixFreeOmp(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) :
             OptimBase<OptimUzawaMatrixFreeOmp<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
             _tol(1.0e-6), _maxiter(40000), _rho(2000.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
@@ -48,7 +50,7 @@ namespace scopi{
             }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFreeOmp<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawaMatrixFreeOmp<dim>::createMatrixConstraint_impl(const std::vector<neighbor<dim>>& contacts)
         {
             std::ignore = contacts;
         }
@@ -59,7 +61,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        int OptimUzawaMatrixFreeOmp<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+        int OptimUzawaMatrixFreeOmp<dim>::solveOptimizationProblem_impl(const std::vector<neighbor<dim>>& contacts)
         {
             _L = xt::zeros_like(this->_distances);
             _R = xt::zeros_like(this->_distances);
@@ -170,7 +172,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFreeOmp<dim>::gemv_A(const std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawaMatrixFreeOmp<dim>::gemv_A(const std::vector<neighbor<dim>>& contacts)
         {
 #pragma omp parallel for
             for(std::size_t ic = 0; ic < contacts.size(); ++ic)
@@ -214,8 +216,8 @@ namespace scopi{
                         {-r_j(1),  r_j(0),       0}};
                 }
 
-                auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
-                auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
+                auto Ri = rotation_matrix<3>(this->_particles.q()(c.i));
+                auto Rj = rotation_matrix<3>(this->_particles.q()(c.j));
 
                 if (c.i >= this->_active_ptr)
                 {
@@ -241,7 +243,7 @@ namespace scopi{
         }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFreeOmp<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
+        void OptimUzawaMatrixFreeOmp<dim>::gemv_transposeA(const std::vector<neighbor<dim>>& contacts)
         {
 #pragma omp parallel for
             for(std::size_t ic = 0; ic < contacts.size(); ++ic)
@@ -288,8 +290,8 @@ namespace scopi{
                         {-r_j(1),  r_j(0),       0}};
                 }
 
-                auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
-                auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
+                auto Ri = rotation_matrix<3>(this->_particles.q()(c.i));
+                auto Rj = rotation_matrix<3>(this->_particles.q()(c.j));
 
                 if (c.i >= this->_active_ptr)
                 {

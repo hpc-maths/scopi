@@ -1,6 +1,6 @@
 #include <xtensor/xmath.hpp>
 #include <scopi/objects/types/superellipsoid.hpp>
-#include <scopi/solvers/mosek.hpp>
+#include <scopi/solver.hpp>
 
 int main()
 {
