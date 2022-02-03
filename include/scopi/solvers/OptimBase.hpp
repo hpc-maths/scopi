@@ -11,6 +11,7 @@ namespace scopi{
             void freeMemory();
             auto getUadapt();
             auto getWadapt();
+            std::string getName() const;
 
         protected:
             OptimBase(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec);
@@ -38,7 +39,7 @@ namespace scopi{
     };
 
     template<class D, std::size_t dim>
-        void OptimBase<D, dim>::run(const std::vector<scopi::neighbor<dim>>& contacts, const std::size_t nite)
+        void OptimBase<D, dim>::run(const std::vector<scopi::neighbor<dim>>& contacts, const std::size_t)
         {
             // create mass and inertia matrices
             tic();
@@ -232,6 +233,12 @@ namespace scopi{
         int OptimBase<D, dim>::getNbActiveContacts()
         {
             return this->derived_cast().getNbActiveContacts_impl();
+        }
+
+    template<class D, std::size_t dim>
+        std::string OptimBase<D, dim>::getName() const
+        {
+            return this->derived_cast().getName_impl();
         }
 }
 

@@ -67,28 +67,32 @@ namespace scopi
         }
 
         // quaternion type
-        auto get_value_impl(const std::vector<type::quaternion>& t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(const std::vector<object_t>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, 4UL});
         }
 
-        auto get_value_impl(const type::quaternion* t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(const object_t* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL});
         }
 
-        auto get_value_impl(std::vector<type::quaternion>& t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(std::vector<object_t>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, 4UL});
         }
 
-        auto get_value_impl(type::quaternion* t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(object_t* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL});
         }
 
         template <class T>
-        auto get_value(T t, std::size_t s)
+        auto get_value(T& t, std::size_t s)
         {
             return get_value_impl(t, s);
         }
@@ -122,16 +126,16 @@ namespace scopi
 
         object_container(position_type pos, quaternion_type q, std::size_t size);
 
-        const auto pos() const;
+        auto pos() const;
         auto pos();
 
-        const auto pos(std::size_t i) const;
+        auto pos(std::size_t i) const;
         auto pos(std::size_t i);
 
-        const auto q() const;
+        auto q() const;
         auto q();
 
-        const auto q(std::size_t i) const;
+        auto q(std::size_t i) const;
         auto q(std::size_t i);
 
         std::size_t size() const;
@@ -158,7 +162,7 @@ namespace scopi
     {}
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::pos() const
+    inline auto object_container<dim, owner>::pos() const
     {
         return detail::get_value(m_pos, m_size);
     }
@@ -170,7 +174,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::pos(std::size_t i) const
+    inline auto object_container<dim, owner>::pos(std::size_t i) const
     {
         return xt::view(detail::get_value(m_pos, m_size), i);
     }
@@ -182,7 +186,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::q() const
+    inline auto object_container<dim, owner>::q() const
     {
         return detail::get_value(m_q, m_size);
     }
@@ -194,7 +198,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::q(std::size_t i) const
+    inline auto object_container<dim, owner>::q(std::size_t i) const
     {
         return xt::view(detail::get_value(m_q, m_size), i);
     }

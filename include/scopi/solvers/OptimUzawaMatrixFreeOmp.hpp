@@ -22,6 +22,7 @@ namespace scopi{
             void allocateMemory_impl(const std::size_t nc);
             void freeMemory_impl();
             int getNbActiveContacts_impl();
+            std::string getName_impl() const;
 
         private:
             void gemv_invP();
@@ -313,4 +314,11 @@ namespace scopi{
                 }
             }
         }
+
+    template<std::size_t dim>
+        std::string OptimUzawaMatrixFreeOmp<dim>::getName_impl() const
+        {
+            return "OptimUzawaMatrixFreeOmp";
+        }
+
 }

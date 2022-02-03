@@ -44,6 +44,7 @@ namespace scopi
             public:
                 ScopiSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr);
                 void solve(std::size_t total_it);
+                std::string getOptimSolverName() const;
 
             private:
                 void displacementObstacles();
@@ -55,7 +56,7 @@ namespace scopi
                 double _dt;
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
-                OptimUzawaMkl<dim> _solver;
+                OptimUzawaMatrixFreeOmp<dim> _solver;
                 vap_fixed _vap;
 
         };
@@ -69,6 +70,12 @@ namespace scopi
             _solver(_particles, _dt, _Nactive, _active_ptr),
             _vap(_Nactive, _active_ptr, _dt)
     {
+    }
+
+    template<std::size_t dim>
+        std::string ScopiSolver<dim>::getOptimSolverName() const
+    {
+        return _solver.getName();
     }
 
     template<std::size_t dim>

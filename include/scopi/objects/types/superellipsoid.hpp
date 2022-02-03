@@ -24,8 +24,8 @@ namespace scopi
         // superellipsoid(const superellipsoid&) = default;
         // superellipsoid& operator=(const superellipsoid&) = default;
 
-        const auto radius() const;
-        const auto squareness() const; // e, n
+        auto radius() const;
+        auto squareness() const; // e, n
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
         virtual std::size_t hash() const override;
@@ -76,13 +76,13 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    const auto superellipsoid<dim, owner>::radius() const
+    auto superellipsoid<dim, owner>::radius() const
     {
         return m_radius;
     }
 
     template<std::size_t dim, bool owner>
-    const auto superellipsoid<dim, owner>::squareness() const
+    auto superellipsoid<dim, owner>::squareness() const
     {
         return m_squareness;
     }
@@ -302,7 +302,7 @@ namespace scopi
         // double d = std::pow( std::pow(m_radius(2)*x_ell,2/m_squareness(0))+std::pow(m_radius(0)*z_ell,2/m_squareness(0)), m_squareness(0)/2);
         double d = std::pow( std::pow(m_radius(2)*x_ell,2.0/m_squareness(1))+std::pow(m_radius(0)*z_ell,2.0/m_squareness(1)), m_squareness(1)/2.0);
         // std::cout << "d= " << d << std::endl;
-        double x_supell = x_ell*m_radius(0)*m_radius(2)/d;
+        // double x_supell = x_ell*m_radius(0)*m_radius(2)/d;
         double z_supell = z_ell*m_radius(0)*m_radius(2)/d;
         // std::cout << "y_supell= " << y_supell << " z_supell= " << z_supell<< std::endl;
         // double sina = std::max(-1.0, std::min( 1.0, std::sqrt( std::pow( std::pow(z_supell/m_radius(2),2), 1/m_squareness(0)) )) );

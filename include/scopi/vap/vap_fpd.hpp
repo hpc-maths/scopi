@@ -22,15 +22,9 @@ namespace scopi
             double t_ext();
 
             double _mass;
-            double _moment;
+            // double _moment;
 
     };
-
-    vap_fpd::vap_fpd(std::size_t Nactive, std::size_t active_ptr, double dt)
-        : base_type(Nactive, active_ptr, dt)
-          , _mass(1.)
-          , _moment(0.1)
-    {}
 
     template <std::size_t dim>
         void vap_fpd::aPrioriVelocity_impl(scopi_container<dim>& particles)
@@ -67,9 +61,4 @@ namespace scopi
             auto res = _mass/(dist*dist)*pos/dist;
             return res;
         }
-
-    double vap_fpd::t_ext()
-    {
-        return 0.;
-    }
 }

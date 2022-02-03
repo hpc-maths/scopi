@@ -1,6 +1,7 @@
 name: scopi-env
 channels:
   - conda-forge
+  - intel
 dependencies:
   - cxx-compiler
   - cmake
@@ -10,5 +11,7 @@ dependencies:
   - imageio-ffmpeg
   - xsimd
   - fmt
+  - mkl-include
+  - mkl-static
   - nanoflann
   - nlohmann_json
