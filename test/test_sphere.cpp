@@ -396,7 +396,7 @@ namespace scopi
     {
         // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
         constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
+        ScopiSolver<dim, OptimMosek> solver(m_particles, m_dt, m_active_ptr);
         solver.solve(m_total_it);
 
         std::string filenameRef;

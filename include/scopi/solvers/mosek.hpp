@@ -38,7 +38,7 @@ using namespace xt::placeholders;
 namespace scopi
 {
 
-    template<std::size_t dim>
+    template<std::size_t dim, template<std::size_t> class optim_solver = OptimUzawaMatrixFreeOmp>
         class ScopiSolver
         {
             public:
@@ -56,13 +56,13 @@ namespace scopi
                 double _dt;
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
-                OptimUzawaMatrixFreeOmp<dim> _solver;
+                optim_solver<dim> _solver;
                 vap_fixed _vap;
 
         };
 
-    template<std::size_t dim>
-        ScopiSolver<dim>::ScopiSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr) : 
+    template<std::size_t dim, template<std::size_t> class optim_solver>
+        ScopiSolver<dim, optim_solver>::ScopiSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr) : 
             _particles(particles),
             _dt(dt),
             _active_ptr(active_ptr),
@@ -72,14 +72,14 @@ namespace scopi
     {
     }
 
-    template<std::size_t dim>
-        std::string ScopiSolver<dim>::getOptimSolverName() const
+    template<std::size_t dim, template<std::size_t> class optim_solver>
+        std::string ScopiSolver<dim, optim_solver>::getOptimSolverName() const
     {
         return _solver.getName();
     }
 
-    template<std::size_t dim>
-        void ScopiSolver<dim>::solve(std::size_t total_it)
+    template<std::size_t dim, template<std::size_t> class optim_solver>
+        void ScopiSolver<dim, optim_solver>::solve(std::size_t total_it)
         {
             // Time Loop
             for (std::size_t nite=0; nite<total_it; ++nite)
@@ -120,8 +120,8 @@ namespace scopi
             }
         }
 
-    template<std::size_t dim>
-        void ScopiSolver<dim>::displacementObstacles()
+    template<std::size_t dim, template<std::size_t> class optim_solver>
+        void ScopiSolver<dim, optim_solver>::displacementObstacles()
         {
             for (std::size_t i=0; i<_active_ptr; ++i)
             {
@@ -145,8 +145,8 @@ namespace scopi
             }
         }
 
-    template<std::size_t dim>
-        std::vector<scopi::neighbor<dim>> ScopiSolver<dim>::computeContacts()
+    template<std::size_t dim, template<std::size_t> class optim_solver>
+        std::vector<scopi::neighbor<dim>> ScopiSolver<dim, optim_solver>::computeContacts()
         {
             // // scopi::contact_brute_force cont(2);
             scopi::contact_kdtree cont(2., 10.);
@@ -155,8 +155,8 @@ namespace scopi
             return contacts;
         }
 
-    template<std::size_t dim>
-        void ScopiSolver<dim>::writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite)
+    template<std::size_t dim, template<std::size_t> class optim_solver>
+        void ScopiSolver<dim, optim_solver>::writeOutputFiles(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite)
         {
             nl::json json_output;
 
@@ -187,8 +187,8 @@ namespace scopi
             file.close();
         }
 
-    template<std::size_t dim>
-        void ScopiSolver<dim>::moveActiveParticles()
+    template<std::size_t dim, template<std::size_t> class optim_solver>
+        void ScopiSolver<dim, optim_solver>::moveActiveParticles()
         {
 
             auto uadapt = _solver.getUadapt();
