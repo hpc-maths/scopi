@@ -48,7 +48,7 @@ namespace scopi
         template <std::size_t dim>
         std::vector<scopi::neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
         {
-            std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
+            // std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
 
             std::vector<scopi::neighbor<dim>> contacts;
             // double dmax = 2;
@@ -64,7 +64,7 @@ namespace scopi
             );
             index.buildIndex();
             auto duration = toc();
-            std::cout << "----> CPUTIME : build kdtree index = " << duration << std::endl;
+            // std::cout << "----> CPUTIME : build kdtree index = " << duration << std::endl;
 
             tic();
 
@@ -140,7 +140,7 @@ namespace scopi
             }
 
             duration = toc();
-            std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
+            // std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
 
 
 
@@ -158,7 +158,7 @@ namespace scopi
                 return false;
             });
             duration = toc();
-            std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
+            // std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 
             /*
             for(std::size_t ic=0; ic<contacts.size(); ++ic)

@@ -84,17 +84,17 @@ namespace scopi
             // Time Loop
             for (std::size_t nite=0; nite<total_it; ++nite)
             {
-                std::cout << "\n\n------------------- Time iteration ----------------> " << nite << std::endl;
+                // std::cout << "\n\n------------------- Time iteration ----------------> " << nite << std::endl;
 
                 //displacement of obstacles
                 displacementObstacles();
 
                 // create list of contacts
-                std::cout << "----> create list of contacts " << nite << std::endl;
+                // std::cout << "----> create list of contacts " << nite << std::endl;
                 auto contacts = computeContacts();
 
                 // output files
-                std::cout << "----> json output files " << nite << std::endl;
+                // std::cout << "----> json output files " << nite << std::endl;
                 writeOutputFiles(contacts, nite);
 
                 // for (std::size_t i=0; i<_Nactive; ++i)
@@ -141,7 +141,7 @@ namespace scopi
                 }
                 _particles.q()(i) = scopi::mult_quaternion(_particles.q()(i), expw);
 
-                std::cout << "obstacle " << i << ": " << _particles.pos()(0) << " " << _particles.q()(0) << std::endl;
+                // std::cout << "obstacle " << i << ": " << _particles.pos()(0) << " " << _particles.q()(0) << std::endl;
             }
         }
 
@@ -151,7 +151,7 @@ namespace scopi
             // // scopi::contact_brute_force cont(2);
             scopi::contact_kdtree cont(2., 10.);
             auto contacts = cont.run(_particles, _active_ptr);
-            std::cout << "----> MOSEK : contacts.size() = " << contacts.size() << std::endl;
+            // std::cout << "----> MOSEK : contacts.size() = " << contacts.size() << std::endl;
             return contacts;
         }
 

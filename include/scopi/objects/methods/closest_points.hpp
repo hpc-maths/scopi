@@ -668,7 +668,7 @@ namespace scopi
         neigh.dij = sign(0)*xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
         // std::cout << "pi = " << neigh.pi << " pj = " << neigh.pj << std::endl;
         // std::cout << "nij = " << neigh.nij << " dij = " << neigh.dij << std::endl;
-        std::cout << "dij = " << neigh.dij << std::endl;
+        // std::cout << "dij = " << neigh.dij << std::endl;
         return neigh;
     }
 

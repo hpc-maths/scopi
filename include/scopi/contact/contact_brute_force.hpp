@@ -16,7 +16,7 @@ namespace scopi
         template <std::size_t dim>
         std::vector<scopi::neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
         {
-            std::cout << "----> CONTACTS : run implementation contact_brute_force" << std::endl;
+            // std::cout << "----> CONTACTS : run implementation contact_brute_force" << std::endl;
 
             std::vector<scopi::neighbor<dim>> contacts;
 
@@ -60,7 +60,7 @@ namespace scopi
             }
 
             auto duration = toc();
-            std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
+            // std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
 
             tic();
             std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
@@ -76,13 +76,13 @@ namespace scopi
               return false;
             });
             duration = toc();
-            std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
+            // std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 
-            for(std::size_t ic=0; ic<contacts.size(); ++ic)
-            {
-                std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
-                // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
-            }
+            // for(std::size_t ic=0; ic<contacts.size(); ++ic)
+            // {
+            //     std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
+            //     // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
+            // }
 
             return contacts;
 

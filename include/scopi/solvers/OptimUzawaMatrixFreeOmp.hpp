@@ -107,20 +107,20 @@ namespace scopi{
                 // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
             }
 
-            if (cc>=_maxiter)
-            {
-                std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
-                std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
-                std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
-            }
+            // if (cc>=_maxiter)
+            // {
+            //     std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
+            //     std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
+            //     std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
+            // }
 
-            std::cout << "----> CPUTIME : solve (U = c) = " << timeAssignU << std::endl;
-            std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvTransposeA << std::endl;
-            std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << timeGemvInvP << std::endl;
-            std::cout << "----> CPUTIME : solve (R = d) = " << timeAssignR << std::endl;
-            std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvA << std::endl;
-            std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << timeAssignL << std::endl;
-            std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << timeComputeCmax << std::endl;
+            // std::cout << "----> CPUTIME : solve (U = c) = " << timeAssignU << std::endl;
+            // std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvTransposeA << std::endl;
+            // std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << timeGemvInvP << std::endl;
+            // std::cout << "----> CPUTIME : solve (R = d) = " << timeAssignR << std::endl;
+            // std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvA << std::endl;
+            // std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << timeAssignL << std::endl;
+            // std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << timeComputeCmax << std::endl;
 
             return cc;
         }

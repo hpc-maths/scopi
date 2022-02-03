@@ -423,7 +423,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.2}}, 1);
+        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.2}}, {1, 1});
 
         auto out = closest_points(s, e);
 
@@ -437,7 +437,7 @@ namespace scopi
         double cosRot = std::sqrt(3.)/2.;
         double sinRot = 1./2.;
         sphere<dim> s({{dist*cosRot, -dist*sinRot, 0.}}, 0.1);
-        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         auto out = closest_points(s, e);
 
@@ -448,7 +448,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
@@ -466,7 +466,7 @@ namespace scopi
         double cosRot = std::sqrt(3.)/2.;
         double sinRot = 1./2.;
         sphere<dim> s({{dist*cosRot, -dist*sinRot, 0.}}, 0.1);
-        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         scopi_container<dim> particles;
         particles.push_back(s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
@@ -540,7 +540,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.1, 0.1}}, 1);
+        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.1, 0.1}},  {1, 1});
 
         auto out = closest_points(e, s);
 
@@ -553,7 +553,7 @@ namespace scopi
         double cosRot = std::sqrt(3.)/2.;
         double sinRot = 1./2.;
         sphere<dim> s({{dist*cosRot, -dist*sinRot, 0.}}, 0.1);
-        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         auto out = closest_points(e, s);
 
@@ -564,7 +564,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         scopi_container<dim> particles;
         particles.push_back(e, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
@@ -582,7 +582,7 @@ namespace scopi
         double cosRot = std::sqrt(3.)/2.;
         double sinRot = 1./2.;
         sphere<dim> s({{dist*cosRot, -dist*sinRot, 0.}}, 0.1);
-        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         scopi_container<dim> particles;
         particles.push_back(e, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
@@ -655,8 +655,8 @@ namespace scopi
     TEST(closest_points, superellipsoid_superellipsoid_3d)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s1({{ 0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, 1);
-        superellipsoid<dim> s2({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> s1({{ 0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
+        superellipsoid<dim> s2({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         auto out = closest_points(s1, s2);
 
@@ -669,8 +669,8 @@ namespace scopi
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
         double sinRot = 1./2.;
-        superellipsoid<dim> s1({{ dist*cosRot, -dist*sinRot, 0.}}, {quaternion(-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
-        superellipsoid<dim> s2({{-dist*cosRot,  dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> s1({{ dist*cosRot, -dist*sinRot, 0.}}, {quaternion(-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
+        superellipsoid<dim> s2({{-dist*cosRot,  dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         auto out = closest_points(s1, s2);
 
@@ -680,8 +680,8 @@ namespace scopi
     TEST(closest_points, superellipsoid_superellipsoid_3d_dispatch)
     {
         constexpr std::size_t dim = 3;
-        superellipsoid<dim> s1({{ 0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, 1);
-        superellipsoid<dim> s2({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> s1({{ 0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
+        superellipsoid<dim> s2({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         scopi_container<dim> particles;
         particles.push_back(s1, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
@@ -698,8 +698,8 @@ namespace scopi
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
         double sinRot = 1./2.;
-        superellipsoid<dim> s1({{ dist*cosRot, -dist*sinRot, 0.}}, {quaternion(-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
-        superellipsoid<dim> s2({{-dist*cosRot,  dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}}, 1);
+        superellipsoid<dim> s1({{ dist*cosRot, -dist*sinRot, 0.}}, {quaternion(-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
+        superellipsoid<dim> s2({{-dist*cosRot,  dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         scopi_container<dim> particles;
         particles.push_back(s1, {{0, 0, 0}}, {{-0.25, 0, 0}}, 0, 0, {{0, 0, 0}});

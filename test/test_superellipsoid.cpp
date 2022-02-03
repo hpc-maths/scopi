@@ -540,7 +540,7 @@ namespace scopi
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
             filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMatrixFreeOmp.json"; 
 
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0199.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0199.json", filenameRef, tolerance);
     }
 
     TEST_F(TestTwoEllipsoidsSpheresSymmetrical, two_ellipsoids_spheres_symmetrical)
@@ -562,7 +562,7 @@ namespace scopi
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
             filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMatrixFreeOmp.json"; 
 
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
     TEST_F(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_symmetrical)
@@ -584,7 +584,7 @@ namespace scopi
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
             filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMatrixFreeOmp.json"; 
 
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
     TEST_F(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_symmetrical)
@@ -606,7 +606,7 @@ namespace scopi
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
             filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMatrixFreeOmp.json"; 
 
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
 }

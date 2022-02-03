@@ -411,7 +411,7 @@ namespace scopi
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
             filenameRef = "../test/references/two_spheres_asymmetrical_uzawaMatrixFreeOmp.json"; 
 
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
     TEST_F(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
@@ -433,7 +433,7 @@ namespace scopi
         else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
             filenameRef = "../test/references/two_spheres_symmetrical_uzawaMatrixFreeOmp.json"; 
 
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
 }

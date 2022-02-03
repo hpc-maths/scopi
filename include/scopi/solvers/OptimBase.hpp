@@ -49,7 +49,7 @@ namespace scopi{
             createMatrixConstraint(contacts);
             createMatrixMass();
             auto duration4 = toc();
-            std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
+            // std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
 
             // Solve optimization problem
             // std::cout << "----> Create optimization problem " << nite << std::endl;
@@ -57,8 +57,8 @@ namespace scopi{
             auto nbIter = solveOptimizationProblem(contacts);
             // auto duration5 = toc();
             // std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
-            std::cout << "iterations : " << nbIter << std::endl;
-            std::cout << "Contacts: " << contacts.size() << "  active contacts " << getNbActiveContacts() << std::endl;
+            // std::cout << "iterations : " << nbIter << std::endl;
+            // std::cout << "Contacts: " << contacts.size() << "  active contacts " << getNbActiveContacts() << std::endl;
         }
 
 
