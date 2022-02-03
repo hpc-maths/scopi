@@ -12,7 +12,7 @@ namespace scopi
             Container2dTest()
             {
                 constexpr std::size_t dim = 2;
-                superellipsoid<dim> s1({{-0.2, 0.1}}, {quaternion(PI/3)}, {{.2, .05}}, {{1}});
+                superellipsoid<dim> s1({{-0.2, 0.1}}, {quaternion(PI/3)}, {{.2, .05}}, 1);
                 sphere<dim> s2({{ 0.2,  0.05}}, {quaternion(PI/2)}, 0.1);
                 m_particles.push_back(s1, {{0.1, 0.2}}, {{0.01, 0.02}}, PI/3, PI/12, {{1., 2.}});
                 m_particles.push_back(s2, {{0.4, 0.5}}, {{0.04, 0.05}}, PI/3, PI/12, {{4., 5.}});

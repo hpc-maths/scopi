@@ -39,7 +39,7 @@ namespace scopi{
     };
 
     template<class D, std::size_t dim>
-        void OptimBase<D, dim>::run(const std::vector<scopi::neighbor<dim>>& contacts, const std::size_t nite)
+        void OptimBase<D, dim>::run(const std::vector<scopi::neighbor<dim>>& contacts, const std::size_t)
         {
             // create mass and inertia matrices
             tic();

@@ -10,7 +10,7 @@ namespace scopi
     class Superellipsoid2dTest  : public ::testing::Test {
         protected:
             Superellipsoid2dTest()
-                : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, {{1.5}})
+                : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, 1.5)
                 {}
             superellipsoid<2> m_s;
     };
@@ -18,7 +18,7 @@ namespace scopi
     class Superellipsoid2dConstTest  : public ::testing::Test {
         protected:
             Superellipsoid2dConstTest()
-                : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, {{1}})
+                : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, 1)
                 {}
             const superellipsoid<2> m_s;
     };
@@ -26,7 +26,7 @@ namespace scopi
     class Superellipsoid2dRotationTest  : public ::testing::Test {
         protected:
             Superellipsoid2dRotationTest()
-                : m_s({{-0.2, 0.3}}, {quaternion(PI/3)}, {{0.1, 0.2}}, {{1.5}})
+                : m_s({{-0.2, 0.3}}, {quaternion(PI/3)}, {{0.1, 0.2}}, 1.5)
                 {}
             superellipsoid<2> m_s;
     };
@@ -464,8 +464,8 @@ namespace scopi
     class TestTwoEllipsoidsSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{1}});
-                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1}});
+                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
+                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
                 m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
                 m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
             }
@@ -479,8 +479,8 @@ namespace scopi
     class TestTwoEllipsoidsSpheresSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, {{1}});
-                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, {{1}});
+                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
+                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
                 m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
                 m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
             }
@@ -494,8 +494,8 @@ namespace scopi
     class TestTwoEllipsoidsAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, {{1}});
-                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, {{1}});
+                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
+                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
                 m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
                 m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
             }
@@ -509,8 +509,8 @@ namespace scopi
     class TestTwoEllipsoidsSpheresAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, {{1}});
-                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, {{1}});
+                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
+                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
                 m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
                 m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
             }

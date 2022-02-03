@@ -122,16 +122,16 @@ namespace scopi
 
         object_container(position_type pos, quaternion_type q, std::size_t size);
 
-        const auto pos() const;
+        auto pos() const;
         auto pos();
 
-        const auto pos(std::size_t i) const;
+        auto pos(std::size_t i) const;
         auto pos(std::size_t i);
 
-        const auto q() const;
+        auto q() const;
         auto q();
 
-        const auto q(std::size_t i) const;
+        auto q(std::size_t i) const;
         auto q(std::size_t i);
 
         std::size_t size() const;
@@ -158,7 +158,7 @@ namespace scopi
     {}
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::pos() const
+    inline auto object_container<dim, owner>::pos() const
     {
         return detail::get_value(m_pos, m_size);
     }
@@ -170,7 +170,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::pos(std::size_t i) const
+    inline auto object_container<dim, owner>::pos(std::size_t i) const
     {
         return xt::view(detail::get_value(m_pos, m_size), i);
     }
@@ -182,7 +182,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::q() const
+    inline auto object_container<dim, owner>::q() const
     {
         return detail::get_value(m_q, m_size);
     }
@@ -194,7 +194,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    inline const auto object_container<dim, owner>::q(std::size_t i) const
+    inline auto object_container<dim, owner>::q(std::size_t i) const
     {
         return xt::view(detail::get_value(m_q, m_size), i);
     }

@@ -5,6 +5,12 @@ project(scopi)
 # Flags
 # ===========
 
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic ")
 set (CMAKE_CXX_STANDARD 17)
 message(STATUS "CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
@@ -102,20 +108,24 @@ target_link_libraries(scopi INTERFACE xtensor
 
 if(SCOPI_USE_MKL)
     target_link_libraries(scopi INTERFACE MKL::MKL)
+    target_compile_definitions(scopi INTERFACE SCOPI_USE_MKL)
 endif()
 
 if(SCOPI_USE_TBB)
     include_directories(SYSTEM ${TBB_INCLUDE_DIRS})
     target_link_libraries(scopi INTERFACE ${TBB_LIBRARIES})
+    target_compile_definitions(scopi INTERFACE SCOPI_USE_TBB)
 endif()
 
 if(SCOPI_USE_OPENMP)
     target_link_libraries(scopi INTERFACE OpenMP::OpenMP_CXX)
+    target_compile_definitions(scopi INTERFACE SCOPI_USE_OPENMP)
 endif()
 
 if(SCOPI_USE_MOSEK)
     include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
     target_link_libraries(scopi INTERFACE ${MOSEK_LIBRARIES})
+    target_compile_definitions(scopi INTERFACE SCOPI_USE_MOSEK)
 endif()
 
 add_subdirectory(demos EXCLUDE_FROM_ALL)

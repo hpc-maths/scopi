@@ -46,25 +46,25 @@ namespace scopi
 
         void reserve(std::size_t size);
 
-        const auto pos() const;
+        auto pos() const;
         auto pos();
 
-        const auto q() const;
+        auto q() const;
         auto q();
 
-        const auto f() const;
+        auto f() const;
         auto f();
 
-        const auto v() const;
+        auto v() const;
         auto v();
 
-        const auto omega() const;
+        auto omega() const;
         auto omega();
 
-        const auto desired_omega() const;
+        auto desired_omega() const;
         auto desired_omega();
 
-        const auto vd() const;
+        auto vd() const;
         auto vd();
 
         std::size_t size() const;
@@ -184,9 +184,9 @@ namespace scopi
     // position
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::pos() const
+    auto scopi_container<dim>::pos() const
     {
-        return xt::adapt(reinterpret_cast<position_type*>(m_positions.data()), {m_positions.size()});
+        return xt::adapt(reinterpret_cast<const position_type*>(m_positions.data()), {m_positions.size()});
     }
 
     template<std::size_t dim>
@@ -198,9 +198,9 @@ namespace scopi
     // rotation
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::q() const
+    auto scopi_container<dim>::q() const
     {
-        return xt::adapt(reinterpret_cast<quaternion_type*>(m_quaternions.data()), {m_quaternions.size()});
+        return xt::adapt(reinterpret_cast<const quaternion_type*>(m_quaternions.data()), {m_quaternions.size()});
     }
 
     template<std::size_t dim>
@@ -212,9 +212,9 @@ namespace scopi
     // velocity
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::v() const
+    auto scopi_container<dim>::v() const
     {
-        return xt::adapt(reinterpret_cast<velocity_type*>(m_velocities.data()), {m_velocities.size()});
+        return xt::adapt(reinterpret_cast<const velocity_type*>(m_velocities.data()), {m_velocities.size()});
     }
 
     template<std::size_t dim>
@@ -226,9 +226,9 @@ namespace scopi
     // desired velocity
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::vd() const
+    auto scopi_container<dim>::vd() const
     {
-        return xt::adapt(reinterpret_cast<velocity_type*>(m_desired_velocities.data()), {m_desired_velocities.size()});
+        return xt::adapt(reinterpret_cast<const velocity_type*>(m_desired_velocities.data()), {m_desired_velocities.size()});
     }
 
     template<std::size_t dim>
@@ -240,9 +240,9 @@ namespace scopi
     // omega
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::omega() const
+    auto scopi_container<dim>::omega() const
     {
-        return xt::adapt(reinterpret_cast<rotation_type*>(m_omega.data()), {m_omega.size()});
+        return xt::adapt(reinterpret_cast<const rotation_type*>(m_omega.data()), {m_omega.size()});
     }
 
     template<std::size_t dim>
@@ -254,9 +254,9 @@ namespace scopi
     // desired velocity
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::desired_omega() const
+    auto scopi_container<dim>::desired_omega() const
     {
-        return xt::adapt(reinterpret_cast<rotation_type*>(m_desired_omega.data()), {m_desired_omega.size()});
+        return xt::adapt(reinterpret_cast<const rotation_type*>(m_desired_omega.data()), {m_desired_omega.size()});
     }
 
     template<std::size_t dim>
@@ -268,9 +268,9 @@ namespace scopi
     // force
 
     template<std::size_t dim>
-    const auto scopi_container<dim>::f() const
+    auto scopi_container<dim>::f() const
     {
-        return xt::adapt(reinterpret_cast<force_type*>(m_forces.data()), {m_forces.size()});
+        return xt::adapt(reinterpret_cast<const force_type*>(m_forces.data()), {m_forces.size()});
     }
 
     template<std::size_t dim>
