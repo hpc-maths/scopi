@@ -5,11 +5,11 @@ project(scopi)
 # Flags
 # ===========
 
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+# set(CMAKE_SKIP_BUILD_RPATH FALSE)
+# set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic ")
 set (CMAKE_CXX_STANDARD 17)
@@ -95,37 +95,54 @@ endif()
 
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
-add_library(scopi INTERFACE)
+set(SCOPI_SRC
+    src/vap/vap_fixed.cpp
+    src/vap/vap_fpd.cpp
+    src/minpack.cpp
+    src/quaternion.cpp
+    src/utils.cpp
+)
 
-target_include_directories(scopi INTERFACE $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
-                                               $<INSTALL_INTERFACE:include>)
+add_library(scopi ${SCOPI_SRC})
 
-target_link_libraries(scopi INTERFACE xtensor
-                                          nlohmann_json::nlohmann_json
-                                          fmt::fmt
+target_include_directories(scopi PUBLIC 
+                                 $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
+                                 $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(scopi PUBLIC xtensor
+                                   nlohmann_json::nlohmann_json
+                                   fmt::fmt
                                         #   nanoflann::nanoflann
-                                          ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+                                   ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+
+# set_target_properties(scopi PROPERTIES
+#                       PUBLIC_HEADER "${SCOPI_HEADERS}"
+#                     #   COMPILE_DEFINITIONS "SCOPI_EXPORTS"
+#                       PREFIX ""
+#                       VERSION ${${PROJECT_NAME}_VERSION}
+#                       SOVERSION ${VERSION_MAJOR}
+#                       OUTPUT_NAME "libscopi")
 
 if(SCOPI_USE_MKL)
-    target_link_libraries(scopi INTERFACE MKL::MKL)
-    target_compile_definitions(scopi INTERFACE SCOPI_USE_MKL)
+    target_link_libraries(scopi PUBLIC MKL::MKL)
+    target_compile_definitions(scopi PUBLIC SCOPI_USE_MKL)
 endif()
 
 if(SCOPI_USE_TBB)
     include_directories(SYSTEM ${TBB_INCLUDE_DIRS})
-    target_link_libraries(scopi INTERFACE ${TBB_LIBRARIES})
-    target_compile_definitions(scopi INTERFACE SCOPI_USE_TBB)
+    target_link_libraries(scopi PUBLIC ${TBB_LIBRARIES})
+    target_compile_definitions(scopi PUBLIC SCOPI_USE_TBB)
 endif()
 
 if(SCOPI_USE_OPENMP)
-    target_link_libraries(scopi INTERFACE OpenMP::OpenMP_CXX)
-    target_compile_definitions(scopi INTERFACE SCOPI_USE_OPENMP)
+    target_link_libraries(scopi PUBLIC OpenMP::OpenMP_CXX)
+    target_compile_definitions(scopi PUBLIC SCOPI_USE_OPENMP)
 endif()
 
 if(SCOPI_USE_MOSEK)
     include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
-    target_link_libraries(scopi INTERFACE ${MOSEK_LIBRARIES})
-    target_compile_definitions(scopi INTERFACE SCOPI_USE_MOSEK)
+    target_link_libraries(scopi PUBLIC ${MOSEK_LIBRARIES})
+    target_compile_definitions(scopi PUBLIC SCOPI_USE_MOSEK)
 endif()
 
 add_subdirectory(demos EXCLUDE_FROM_ALL)

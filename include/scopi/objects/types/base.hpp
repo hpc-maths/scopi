@@ -67,22 +67,26 @@ namespace scopi
         }
 
         // quaternion type
-        auto get_value_impl(const std::vector<type::quaternion>& t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(const std::vector<object_t>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, 4UL});
         }
 
-        auto get_value_impl(const type::quaternion* t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(const object_t* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL});
         }
 
-        auto get_value_impl(std::vector<type::quaternion>& t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(std::vector<object_t>& t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, 4UL});
         }
 
-        auto get_value_impl(type::quaternion* t, std::size_t size)
+        template <class object_t = type::quaternion>
+        auto get_value_impl(object_t* t, std::size_t size)
         {
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL});
         }

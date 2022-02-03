@@ -16,7 +16,6 @@
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"
 
-#include <xtensor/xio.hpp>
 namespace scopi
 {
     // SPHERE - SPHERE
