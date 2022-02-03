@@ -56,7 +56,7 @@ namespace scopi
                 double _dt;
                 std::size_t _active_ptr;
                 std::size_t _Nactive;
-                OptimUzawaMkl<dim> _solver;
+                OptimUzawaMatrixFreeOmp<dim> _solver;
                 vap_fixed _vap;
 
         };
