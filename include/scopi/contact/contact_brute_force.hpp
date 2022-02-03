@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "base.hpp"
 
@@ -26,8 +26,7 @@ namespace scopi
 
             for(std::size_t i = active_ptr; i < particles.size() - 1; ++i)
             {
-              for(std::size_t j = active_ptr; j < particles.size() - 1; ++j)
-              // for(std::size_t j = i + 1; j < particles.size(); ++j)
+              for(std::size_t j = i + 1; j < particles.size(); ++j)
               {
                 if (i < j) {
                   auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);

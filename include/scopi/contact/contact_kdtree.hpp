@@ -38,7 +38,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, double kdtree_radius): contact_base(dmax), _kdtree_radius(kdtree_radius), m_nMatches(0) {};
+        contact_kdtree(double dmax, double kdtree_radius=10): contact_base(dmax), _kdtree_radius(kdtree_radius), m_nMatches(0) {};
 
         std::size_t get_nMatches() const
         {

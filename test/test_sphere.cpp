@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+
+#include "test_common.hpp"
 #include "utils.hpp"
 
 #include <scopi/objects/types/sphere.hpp>
@@ -362,6 +364,7 @@ namespace scopi
     }
 
     // two_spheres
+    template <class S>
     class TestTwoSpheresAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
@@ -377,27 +380,12 @@ namespace scopi
             std::size_t m_active_ptr = 0; // without obstacles
     };
 
-    class TestTwoSpheresSymmetrical  : public ::testing::Test {
-        protected:
-            void SetUp() override {
-                sphere<2> s1({{-0.2, 0.}}, 0.1);
-                sphere<2> s2({{ 0.2, 0.}}, 0.1);
-                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
-            }
+    TYPED_TEST_SUITE(TestTwoSpheresAsymmetrical, solver_with_contact_types<2>);
 
-            double m_dt = .005;
-            std::size_t m_total_it = 1000;
-            scopi_container<2> m_particles;
-            std::size_t m_active_ptr = 0; // without obstacles
-    };
-
-    TEST_F(TestTwoSpheresAsymmetrical, two_spheres_asymmetrical)
+    TYPED_TEST(TestTwoSpheresAsymmetrical, two_spheres_asymmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
+        TypeParam solver(this->m_particles, this->m_dt, this->m_active_ptr);
+        solver.solve(this->m_total_it);
 
         std::string filenameRef;
         if(solver.get_optim_solver_name() == "OptimMosek")
@@ -414,12 +402,28 @@ namespace scopi
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
     }
 
-    TEST_F(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
+    template <class S>
+    class TestTwoSpheresSymmetrical  : public ::testing::Test {
+        protected:
+            void SetUp() override {
+                sphere<2> s1({{-0.2, 0.}}, 0.1);
+                sphere<2> s2({{ 0.2, 0.}}, 0.1);
+                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+            }
+
+            double m_dt = .005;
+            std::size_t m_total_it = 1000;
+            scopi_container<2> m_particles;
+            std::size_t m_active_ptr = 0; // without obstacles
+    };
+
+    TYPED_TEST_SUITE(TestTwoSpheresSymmetrical, solver_with_contact_types<2>);
+
+    TYPED_TEST(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
+        TypeParam solver(this->m_particles, this->m_dt, this->m_active_ptr);
+        solver.solve(this->m_total_it);
 
         std::string filenameRef;
         if(solver.get_optim_solver_name() == "OptimMosek")

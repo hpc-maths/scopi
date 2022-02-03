@@ -141,7 +141,8 @@ namespace scopi
     std::vector<scopi::neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
         // // scopi::contact_brute_force cont(2);
-        contact_t cont(2., 10.);
+        // contact_t cont(2., 10.);
+        contact_t cont(2.);
         auto contacts = cont.run(_particles, m_active_ptr);
         // std::cout << "----> MOSEK : contacts.size() = " << contacts.size() << std::endl;
         return contacts;
