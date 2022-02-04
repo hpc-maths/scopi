@@ -11,6 +11,9 @@
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
+
 #include "container.hpp"
 #include "objects/methods/closest_points.hpp"
 #include "objects/methods/write_objects.hpp"
@@ -70,16 +73,14 @@ namespace scopi
         // Time Loop
         for (std::size_t nite = 0; nite < total_it; ++nite)
         {
-            // std::cout << "\n\n------------------- Time iteration ----------------> " << nite << std::endl;
+            PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
 
             displacement_obstacles();
 
-            // create list of contacts
-            // std::cout << "----> create list of contacts " << nite << std::endl;
+            PLOG_INFO << "----> create list of contacts " << nite;
             auto contacts = compute_contacts();
 
-            // output files
-            // std::cout << "----> json output files " << nite << std::endl;
+            PLOG_INFO << "----> json output files " << nite << std::endl;
             write_output_files(contacts, nite);
 
             // for (std::size_t i=0; i<m_Nactive; ++i)
@@ -137,7 +138,7 @@ namespace scopi
         // contact_t cont(2., 10.);
         contact_t cont(2.);
         auto contacts = cont.run(m_particles, m_active_ptr);
-        // std::cout << "----> MOSEK : contacts.size() = " << contacts.size() << std::endl;
+        PLOG_INFO << "contacts.size() = " << contacts.size() << std::endl;
         return contacts;
     }
 

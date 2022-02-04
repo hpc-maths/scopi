@@ -5,6 +5,9 @@
 
 #include <xtensor-blas/xlinalg.hpp>
 
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
+
 /////////////////////////////
 // Functions for the timer //
 /////////////////////////////
@@ -55,7 +58,7 @@ auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double
     // std::cout << "newton_method : iteration " << cc << " => u = " << u << std::endl;
     cc += 1;
   }
-  std::cout << "newton_method : !!!!!! FAILED !!!!!! after " << cc << " iterations => RETURN u = " << u << std::endl;
+  PLOG_ERROR << "newton_method : !!!!!! FAILED !!!!!! after " << cc << " iterations => RETURN u = " << u;
 
   return std::make_tuple(u,-1);
 }

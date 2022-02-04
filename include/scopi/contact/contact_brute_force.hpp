@@ -2,6 +2,9 @@
 
 #include "base.hpp"
 
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
+
 namespace scopi
 {
 
@@ -59,7 +62,7 @@ namespace scopi
             }
 
             auto duration = toc();
-            // std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration;
 
             tic();
             std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
@@ -75,7 +78,7 @@ namespace scopi
               return false;
             });
             duration = toc();
-            // std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
 
             // for (std::size_t ic=0; ic<contacts.size(); ++ic)
             // {

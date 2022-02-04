@@ -7,6 +7,8 @@
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi{
     template<std::size_t dim>
@@ -24,7 +26,6 @@ namespace scopi{
         void allocate_memory_impl(const std::size_t nc);
         void free_memory_impl();
         int get_nb_active_contacts_impl();
-        std::string getName_impl() const;
 
     private:
         void gemv_inv_P();
@@ -38,7 +39,6 @@ namespace scopi{
         xt::xtensor<double, 1> m_U;
         xt::xtensor<double, 1> m_L;
         xt::xtensor<double, 1> m_R;
-        int m_nb_active_contacts = 0;
     };
 
     template<std::size_t dim>
@@ -105,23 +105,19 @@ namespace scopi{
             cmax = double((xt::amin(m_R))(0));
             time_compute_cmax += toc();
             cc += 1;
-            // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
+
+            PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
         }
 
-        // if (cc>=m_max_iter)
-        // {
-        //     std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
-        //     std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
-        //     std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
-        // }
+        PLOG_ERROR_IF(cc >= m_max_iter) << "Uzawa does not converge";
 
-        // std::cout << "----> CPUTIME : solve (U = c) = " << time_assign_u << std::endl;
-        // std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A << std::endl;
-        // std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P << std::endl;
-        // std::cout << "----> CPUTIME : solve (R = d) = " << time_assign_r << std::endl;
-        // std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << time_gemv_A << std::endl;
-        // std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l << std::endl;
-        // std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax << std::endl;
+        PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
+        PLOG_INFO << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A;
+        PLOG_INFO << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P; 
+        PLOG_INFO << "----> CPUTIME : solve (R = d) = " << time_assign_r;
+        PLOG_INFO << "----> CPUTIME : solve (R = -A*U+R) = " << time_gemv_A;
+        PLOG_INFO << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l;
+        PLOG_INFO << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax;
 
         return cc;
     }

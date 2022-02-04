@@ -1,9 +1,13 @@
 #include <xtensor/xmath.hpp>
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/solver.hpp>
 
 int main()
 {
+    plog::init(plog::info, "two_ellipsoids.log");
+
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
     double dt = .005;

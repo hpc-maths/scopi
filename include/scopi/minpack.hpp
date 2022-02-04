@@ -13,6 +13,9 @@
 #include <xtensor/xsort.hpp>
 #include <xtensor/xio.hpp>
 
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
+
 using namespace std;
 
 
@@ -362,7 +365,7 @@ int hybrd (F f, DF grad_f, A args,
       r[l-1] = wa1[j-1];
       if ( wa1[j-1] == 0.0 )
       {
-        cout << "  Matrix is singular.\n";
+        PLOG_ERROR << "  Matrix is singular.\n";
       }
     }
     //

@@ -2,6 +2,9 @@
 
 #include "base.hpp"
 
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
+
 namespace scopi
 {
 
@@ -66,7 +69,7 @@ namespace scopi
             );
             index.buildIndex();
             auto duration = toc();
-            // std::cout << "----> CPUTIME : build kdtree index = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : build kdtree index = " << duration << std::endl;
 
             tic();
 
@@ -142,7 +145,7 @@ namespace scopi
             }
 
             duration = toc();
-            // std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
 
 
 
@@ -160,7 +163,7 @@ namespace scopi
                 return false;
             });
             duration = toc();
-            // std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 
             /*
             for (std::size_t ic=0; ic<contacts.size(); ++ic)

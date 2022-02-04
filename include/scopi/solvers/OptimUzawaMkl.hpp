@@ -8,6 +8,8 @@
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi{
     template<std::size_t dim>
@@ -36,7 +38,6 @@ namespace scopi{
             xt::xtensor<double, 1> m_U;
             xt::xtensor<double, 1> m_L;
             xt::xtensor<double, 1> m_R;
-            int m_nb_active_contacts = 0;
             sparse_matrix_t m_A;
             struct matrix_descr m_descrA;
             std::vector<MKL_INT> m_A_coo_row;
@@ -72,38 +73,23 @@ namespace scopi{
                                            m_A_coo_row.data(),
                                            m_A_coo_col.data(),
                                            m_A_coo_val.data());
-        if (m_status != SPARSE_STATUS_SUCCESS)
-        {
-            std::cout << " Error in mkl_sparse_d_create_coo for matrix A: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_create_coo for matrix A: " << m_status;
 
         m_status = mkl_sparse_convert_csr(A_coo,
                                           SPARSE_OPERATION_NON_TRANSPOSE,
                                           &m_A);
-        if (m_status != SPARSE_STATUS_SUCCESS)
-        {
-            std::cout << " Error in mkl_sparse_convert_csr for matrix A: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_convert_csr for matrix A: " << m_status;
 
         m_descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
 
         m_status = mkl_sparse_set_mv_hint(m_A, SPARSE_OPERATION_NON_TRANSPOSE, m_descrA, 1 );
-        if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
-        {
-            std::cout << " Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_NON_TRANSPOSE: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_NON_TRANSPOSE: " << m_status;
 
         m_status = mkl_sparse_set_mv_hint(m_A, SPARSE_OPERATION_TRANSPOSE, m_descrA, 1 );
-        if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
-        {
-            std::cout << " Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_TRANSPOSE: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_TRANSPOSE: " << m_status;
 
         m_status = mkl_sparse_optimize ( m_A );
-        if (m_status != SPARSE_STATUS_SUCCESS)
-        {
-            std::cout << " Error in mkl_sparse_optimize for matrix A: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix A: " << m_status;
     }
 
     template<std::size_t dim>
@@ -144,25 +130,16 @@ namespace scopi{
                                            invP_csr_row.data()+1,
                                            invP_csr_col.data(),
                                            invP_csr_val.data());
-        if (m_status != SPARSE_STATUS_SUCCESS)
-        {
-            std::cout << " Error in mkl_sparse_d_create_csr for matrix invP: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_create_csr for matrix invP: " << m_status;
 
         m_descr_inv_P.type = SPARSE_MATRIX_TYPE_DIAGONAL;
         m_descr_inv_P.diag = SPARSE_DIAG_NON_UNIT;
 
         m_status = mkl_sparse_set_mv_hint(m_inv_P, SPARSE_OPERATION_NON_TRANSPOSE, m_descr_inv_P, 1 );
-        if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
-        {
-            std::cout << " Error in mkl_sparse_set_mv_hint for matrix invP: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix invP: " << m_status;
 
         m_status = mkl_sparse_optimize ( m_inv_P );
-        if (m_status != SPARSE_STATUS_SUCCESS)
-        {
-            std::cout << " Error in mkl_sparse_optimize for matrix invP: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
     }
 
     template<std::size_t dim>
@@ -191,7 +168,7 @@ namespace scopi{
             m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, m_L.data(), 1., m_U.data()); // U = A^T * L + U
             if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
             {
-                std::cout << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status << std::endl;
+                PLOG_ERROR << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status;
                 return -1;
             }
             time_gemv_transpose_A += toc();
@@ -200,7 +177,7 @@ namespace scopi{
             m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, m_U.data(), 0., m_U.data()); // U = - P^-1 * U
             if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
             {
-                std::cout << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status << std::endl;
+                PLOG_ERROR << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status;
                 return -1;
             }
             time_gemv_inv_P += toc();
@@ -213,7 +190,7 @@ namespace scopi{
             m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_A, m_descrA, m_U.data(), 1., m_R.data()); // R = - A * U + R
             if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
             {
-                std::cout << " Error in mkl_sparse_d_mv for R = - A * U + R: " << m_status << std::endl;
+                PLOG_ERROR << " Error in mkl_sparse_d_mv for R = - A * U + R: " << m_status;
                 return -1;
             }
             time_gemv_A += toc();
@@ -226,23 +203,19 @@ namespace scopi{
             cmax = double((xt::amin(m_R))(0));
             time_compute_cmax += toc();
             cc += 1;
-            // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
+
+            PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
         }
 
-        // if (cc>=m_max_iter)
-        // {
-        //     std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
-        //     std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
-        //     std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
-        // }
+        PLOG_ERROR_IF(cc >= m_max_iter) << "Uzawa does not converge";
 
-        // std::cout << "----> CPUTIME : solve (U = c) = " << time_assign_u << std::endl;
-        // std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A << std::endl;
-        // std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P << std::endl;
-        // std::cout << "----> CPUTIME : solve (R = d) = " << time_assign_r << std::endl;
-        // std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << time_gemv_A << std::endl;
-        // std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l << std::endl;
-        // std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax << std::endl;
+        PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
+        PLOG_INFO << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A;
+        PLOG_INFO << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P; 
+        PLOG_INFO << "----> CPUTIME : solve (R = d) = " << time_assign_r;
+        PLOG_INFO << "----> CPUTIME : solve (R = -A*U+R) = " << time_gemv_A;
+        PLOG_INFO << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l;
+        PLOG_INFO << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax;
 
         return cc;
     }
@@ -274,12 +247,6 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    int OptimUzawaMkl<dim>::get_nb_active_contacts_impl()
-    {
-        return xt::sum(xt::where(m_L > 0., xt::ones_like(m_L), xt::zeros_like(m_L)))();
-    }
-
-    template<std::size_t dim>
     void OptimUzawaMkl<dim>::print_csr_matrix(const sparse_matrix_t A)
     {
         MKL_INT* csr_row_begin_ptr = NULL;
@@ -298,10 +265,7 @@ namespace scopi{
                                            &csr_col_ptr,
                                            &csr_val_ptr);
 
-        if (m_status != SPARSE_STATUS_SUCCESS)
-        {
-            std::cout << " Error in mkl_sparse_d_export_csr: " << m_status << std::endl;
-        }
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_export_csr: " << m_status;
 
         std::cout << "\nMatrix with " << nbRows << " rows and " << nbCols << " columns\n";
         std::cout << "RESULTANT MATRIX:\nrow# : (column, value) (column, value)\n";
@@ -318,5 +282,12 @@ namespace scopi{
         }
         std::cout << "_____________________________________________________________________  \n" ;
     }
+
+    template<std::size_t dim>
+    int OptimUzawaMkl<dim>::get_nb_active_contacts_impl()
+    {
+        return xt::sum(xt::where(m_L > 0., xt::ones_like(m_L), xt::zeros_like(m_L)))();
+    }
+
 }
 #endif

@@ -2,6 +2,8 @@
 #include "../crtp.hpp"
 #include "../container.hpp"
 #include "../objects/neighbor.hpp"
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi{
     template <class D, std::size_t dim>
@@ -39,7 +41,7 @@ namespace scopi{
     };
 
     template<class D, std::size_t dim>
-    void OptimBase<D, dim>::run(const std::vector<neighbor<dim>>& contacts, const std::size_t)
+    void OptimBase<D, dim>::run(const std::vector<neighbor<dim>>& contacts, const std::size_t nite)
     {
         tic();
         create_vector_c();
@@ -48,16 +50,15 @@ namespace scopi{
         create_matrix_constraint(contacts);
         create_matrix_mass();
         auto duration4 = toc();
-        // std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
+        PLOG_INFO << "----> CPUTIME : matrices = " << duration4;
 
-        // Solve optimization problem
-        // std::cout << "----> Create optimization problem " << nite << std::endl;
-        // tic();
+        PLOG_INFO << "----> Create optimization problem " << nite;
+        tic();
         auto nbIter = solve_optimization_problem(contacts);
-        // auto duration5 = toc();
-        // std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
-        // std::cout << "iterations : " << nbIter << std::endl;
-        // std::cout << "Contacts: " << contacts.size() << "  active contacts " << getNbActiveContacts() << std::endl;
+        auto duration5 = toc();
+        PLOG_INFO << "----> CPUTIME : solve = " << duration5;
+        PLOG_INFO << "iterations : " << nbIter;
+        PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
     }
 
 
