@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef SCOPI_USE_MKL
-#include "OptimBase.hpp"
+#include "OptimUzawaBase.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
 #include <stdio.h>
@@ -13,50 +13,35 @@
 
 namespace scopi{
     template<std::size_t dim>
-        class OptimUzawaMkl : public OptimBase<OptimUzawaMkl<dim>, dim>
+    class OptimUzawaMkl : public OptimUzawaBase<OptimUzawaMkl<dim>, dim>
     {
-        public:
-            using base_type = OptimBase<OptimUzawaMkl<dim>, dim>;
+    public:
+        OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+        void create_matrix_constraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
+        void create_matrix_mass_impl();
+        void free_memory_impl();
 
-            OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-            void create_matrix_constraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
-            void create_matrix_mass_impl();
-            int solve_optimization_problem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
-            auto get_uadapt_impl();
-            auto get_wadapt_impl();
-            void allocate_memory_impl(const std::size_t nc);
-            void free_memory_impl();
-            int get_nb_active_contacts_impl();
+        void gemv_inv_P_impl();
+        void gemv_A_impl(const std::vector<neighbor<dim>>& contacts);
+        void gemv_transpose_A_impl(const std::vector<neighbor<dim>>& contacts);
 
-        private:
-            void print_csr_matrix(const sparse_matrix_t);
+    private:
+        void print_csr_matrix(const sparse_matrix_t);
 
-            const double m_tol;
-            const std::size_t m_max_iter;
-            const double m_rho;
-            const double m_dmin;
-            xt::xtensor<double, 1> m_U;
-            xt::xtensor<double, 1> m_L;
-            xt::xtensor<double, 1> m_R;
-            sparse_matrix_t m_A;
-            struct matrix_descr m_descrA;
-            std::vector<MKL_INT> m_A_coo_row;
-            std::vector<MKL_INT> m_A_coo_col;
-            std::vector<double> m_A_coo_val;
-            sparse_matrix_t m_inv_P;
-            struct matrix_descr m_descr_inv_P;
-            sparse_status_t m_status;
+        sparse_matrix_t m_A;
+        struct matrix_descr m_descrA;
+        std::vector<MKL_INT> m_A_coo_row;
+        std::vector<MKL_INT> m_A_coo_col;
+        std::vector<double> m_A_coo_val;
+        sparse_matrix_t m_inv_P;
+        struct matrix_descr m_descr_inv_P;
+        sparse_status_t m_status;
 
     };
 
     template<std::size_t dim>
     OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
-    : OptimBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
-    , m_tol(1.0e-11)
-    , m_max_iter(40000)
-    , m_rho(2000.)
-    , m_dmin(0.)
-    , m_U(xt::zeros<double>({6*Nactive}))
+    : OptimUzawaBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr)
     {}
 
     template<std::size_t dim>
@@ -143,98 +128,25 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    int OptimUzawaMkl<dim>::solve_optimization_problem_impl(const std::vector<scopi::neighbor<dim>>&)
+    void OptimUzawaMkl<dim>::gemv_inv_P_impl()
     {
-        m_L = xt::zeros_like(this->m_distances);
-        m_R = xt::zeros_like(this->m_distances);
-
-        double time_assign_u = 0.;
-        double time_gemv_transpose_A = 0.;
-        double time_gemv_inv_P = 0.;
-        double time_assign_r = 0.;
-        double time_gemv_A = 0.;
-        double time_assign_l = 0.;
-        double time_compute_cmax = 0.;
-
-        std::size_t cc = 0;
-        double cmax = -1000.0;
-        while ( (cmax<=-m_tol) && (cc <= m_max_iter) )
-        {
-            tic();
-            m_U = this->m_c;
-            time_assign_u += toc();
-
-            tic();
-            m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, m_L.data(), 1., m_U.data()); // U = A^T * L + U
-            if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
-            {
-                PLOG_ERROR << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status;
-                return -1;
-            }
-            time_gemv_transpose_A += toc();
-
-            tic();
-            m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, m_U.data(), 0., m_U.data()); // U = - P^-1 * U
-            if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
-            {
-                PLOG_ERROR << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status;
-                return -1;
-            }
-            time_gemv_inv_P += toc();
-
-            tic();
-            m_R = this->m_distances - m_dmin;
-            time_assign_r += toc();
-
-            tic();
-            m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_A, m_descrA, m_U.data(), 1., m_R.data()); // R = - A * U + R
-            if (m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED)
-            {
-                PLOG_ERROR << " Error in mkl_sparse_d_mv for R = - A * U + R: " << m_status;
-                return -1;
-            }
-            time_gemv_A += toc();
-
-            tic();
-            m_L = xt::maximum( m_L - m_rho*m_R, 0);
-            time_assign_l += toc();
-
-            tic();
-            cmax = double((xt::amin(m_R))(0));
-            time_compute_cmax += toc();
-            cc += 1;
-
-            PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
-        }
-
-        PLOG_ERROR_IF(cc >= m_max_iter) << "Uzawa does not converge";
-
-        PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
-        PLOG_INFO << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A;
-        PLOG_INFO << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P; 
-        PLOG_INFO << "----> CPUTIME : solve (R = d) = " << time_assign_r;
-        PLOG_INFO << "----> CPUTIME : solve (R = -A*U+R) = " << time_gemv_A;
-        PLOG_INFO << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l;
-        PLOG_INFO << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax;
-
-        return cc;
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_U.data(), 0., this->m_U.data()); // U = - P^-1 * U
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status;
     }
 
     template<std::size_t dim>
-    auto OptimUzawaMkl<dim>::get_uadapt_impl()
+    void OptimUzawaMkl<dim>::gemv_A_impl(const std::vector<neighbor<dim>>&)
     {
-        return xt::adapt(reinterpret_cast<double*>(m_U.data()), {this->m_Nactive, 3UL});
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_A, m_descrA, this->m_U.data(), 1., this->m_R.data()); // R = - A * U + R
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for R = - A * U + R: " << m_status;
     }
 
     template<std::size_t dim>
-    auto OptimUzawaMkl<dim>::get_wadapt_impl()
+    void OptimUzawaMkl<dim>::gemv_transpose_A_impl(const std::vector<neighbor<dim>>&)
     {
-        return xt::adapt(reinterpret_cast<double*>(m_U.data()+3*this->m_Nactive), {this->m_Nactive, 3UL});
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, this->m_L.data(), 1., this->m_U.data()); // U = A^T * L + U
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status;
     }
-
-    template<std::size_t dim>
-    void OptimUzawaMkl<dim>::allocate_memory_impl(const std::size_t)
-    {}
 
     template<std::size_t dim>
     void OptimUzawaMkl<dim>::free_memory_impl()
@@ -282,12 +194,5 @@ namespace scopi{
         }
         std::cout << "_____________________________________________________________________  \n" ;
     }
-
-    template<std::size_t dim>
-    int OptimUzawaMkl<dim>::get_nb_active_contacts_impl()
-    {
-        return xt::sum(xt::where(m_L > 0., xt::ones_like(m_L), xt::zeros_like(m_L)))();
-    }
-
 }
 #endif
