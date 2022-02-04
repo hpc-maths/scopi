@@ -36,17 +36,16 @@ namespace scopi
     class ScopiSolver
     {
     public:
-        ScopiSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr);
+        ScopiSolver(scopi_container<dim>& particles, double dt, std::size_t active_ptr);
         void solve(std::size_t total_it);
-        std::string get_optim_solver_name() const;
 
     private:
         void displacement_obstacles();
 
-        std::vector<scopi::neighbor<dim>> compute_contacts();
-        void write_output_files(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite);
+        std::vector<neighbor<dim>> compute_contacts();
+        void write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite);
         void move_active_particles();
-        scopi::scopi_container<dim>& _particles;
+        scopi_container<dim>& m_particles;
         double m_dt;
         std::size_t m_active_ptr;
         std::size_t m_Nactive;
@@ -56,20 +55,14 @@ namespace scopi
     };
 
     template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi::scopi_container<dim>& particles, double dt, std::size_t active_ptr)
-    : _particles(particles)
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, std::size_t active_ptr)
+    : m_particles(particles)
     , m_dt(dt)
     , m_active_ptr(active_ptr)
-    , m_Nactive(_particles.size() - m_active_ptr)
-    , m_solver(_particles, m_dt, m_Nactive, m_active_ptr)
+    , m_Nactive(m_particles.size() - m_active_ptr)
+    , m_solver(m_particles, m_dt, m_Nactive, m_active_ptr)
     , m_vap(m_Nactive, m_active_ptr, m_dt)
     {}
-
-    template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
-    std::string ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::get_optim_solver_name() const
-    {
-        return m_solver.getName();
-    }
 
     template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it)
@@ -97,7 +90,7 @@ namespace scopi
             //     }
             // }
             //
-            m_vap.aPrioriVelocity(_particles);
+            m_vap.set_a_priori_velocity(m_particles);
 
             // solver optimization problem
             m_solver.run(contacts, nite);
@@ -105,10 +98,10 @@ namespace scopi
             // move the active particles
             move_active_particles();
 
-            m_vap.updateVelocity(_particles, m_solver.getUadapt(), m_solver.getWadapt());
+            m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
 
             // free the memory for the next solve
-            m_solver.freeMemory();
+            m_solver.free_memory();
         }
     }
 
@@ -117,39 +110,39 @@ namespace scopi
     {
         for (std::size_t i = 0; i < m_active_ptr; ++i)
         {
-            xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, _particles.desired_omega()(i)});
+            xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, m_particles.desired_omega()(i)});
             double normw = xt::linalg::norm(w);
             if (normw == 0)
             {
                 normw = 1;
             }
-            scopi::type::quaternion expw;
+            type::quaternion expw;
             expw(0) = std::cos(0.5*normw*m_dt);
             xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
 
             for (std::size_t d = 0; d < dim; ++d)
             {
-                _particles.pos()(i)(d) += m_dt*_particles.vd()(i)(d);
+                m_particles.pos()(i)(d) += m_dt*m_particles.vd()(i)(d);
             }
-            _particles.q()(i) = scopi::mult_quaternion(_particles.q()(i), expw);
+            m_particles.q()(i) = mult_quaternion(m_particles.q()(i), expw);
 
-            // std::cout << "obstacle " << i << ": " << _particles.pos()(0) << " " << _particles.q()(0) << std::endl;
+            // std::cout << "obstacle " << i << ": " << m_particles.pos()(0) << " " << m_particles.q()(0) << std::endl;
         }
     }
 
     template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
-    std::vector<scopi::neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
+    std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
-        // // scopi::contact_brute_force cont(2);
+        // // contact_brute_force cont(2);
         // contact_t cont(2., 10.);
         contact_t cont(2.);
-        auto contacts = cont.run(_particles, m_active_ptr);
+        auto contacts = cont.run(m_particles, m_active_ptr);
         // std::cout << "----> MOSEK : contacts.size() = " << contacts.size() << std::endl;
         return contacts;
     }
 
     template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<scopi::neighbor<dim>>& contacts, std::size_t nite)
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         nl::json json_output;
 
@@ -157,14 +150,14 @@ namespace scopi
 
         json_output["objects"] = {};
 
-        for(std::size_t i = 0; i < _particles.size(); ++i)
+        for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
-            json_output["objects"].push_back(scopi::write_objects_dispatcher<dim>::dispatch(*_particles[i]));
+            json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i]));
         }
 
         json_output["contacts"] = {};
 
-        for(std::size_t i = 0; i < contacts.size(); ++i)
+        for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             nl::json contact;
 
@@ -184,8 +177,8 @@ namespace scopi
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::move_active_particles()
     {
 
-        auto uadapt = m_solver.getUadapt();
-        auto wadapt = m_solver.getWadapt();
+        auto uadapt = m_solver.get_uadapt();
+        auto wadapt = m_solver.get_wadapt();
 
         for (std::size_t i = 0; i < m_Nactive; ++i)
         {
@@ -195,19 +188,19 @@ namespace scopi
             {
                 normw = 1;
             }
-            scopi::type::quaternion expw;
+            type::quaternion expw;
             expw(0) = std::cos(0.5*normw*m_dt);
             xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
             for (std::size_t d = 0; d < dim; ++d)
             {
-                _particles.pos()(i + m_active_ptr)(d) += m_dt*uadapt(i, d);
+                m_particles.pos()(i + m_active_ptr)(d) += m_dt*uadapt(i, d);
             }
             // xt::view(particles.pos(), i) += dt*xt::view(uadapt, i);
 
-            // particles.q()(i) = scopi::quaternion(theta(i));
+            // particles.q()(i) = quaternion(theta(i));
             // std::cout << expw << " " << particles.q()(i) << std::endl;
-            _particles.q()(i + m_active_ptr) = scopi::mult_quaternion(_particles.q()(i + m_active_ptr), expw);
-            normalize(_particles.q()(i + m_active_ptr));
+            m_particles.q()(i + m_active_ptr) = mult_quaternion(m_particles.q()(i + m_active_ptr), expw);
+            normalize(m_particles.q()(i + m_active_ptr));
             // std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
             // std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
 

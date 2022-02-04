@@ -10,317 +10,308 @@
 
 namespace scopi{
     template<std::size_t dim>
-        class OptimUzawaMatrixFreeTbb : public OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>
+    class OptimUzawaMatrixFreeTbb : public OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>
     {
-        public:
-            using base_type = OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>;
+    public:
+        using base_type = OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>;
 
-            OptimUzawaMatrixFreeTbb(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-            void createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
-            void createMatrixMass_impl();
-            int solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts);
-            auto getUadapt_impl();
-            auto getWadapt_impl();
-            void allocateMemory_impl(const std::size_t nc);
-            void freeMemory_impl();
-            int getNbActiveContacts_impl();
-            std::string getName_impl() const;
+        OptimUzawaMatrixFreeTbb(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+        void create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts);
+        void create_matrix_mass_impl();
+        int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
+        auto get_uadapt_impl();
+        auto get_wadapt_impl();
+        void allocate_memory_impl(const std::size_t nc);
+        void free_memory_impl();
+        int get_nb_active_contacts_impl();
+        std::string getName_impl() const;
 
-        private:
-            void gemv_invP();
-            void gemv_A(const std::vector<scopi::neighbor<dim>>& contacts);
-            void gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts);
+    private:
+        void gemv_inv_P();
+        void gemv_A(const std::vector<neighbor<dim>>& contacts);
+        void gemv_transpose_A(const std::vector<neighbor<dim>>& contacts);
 
-            const double _tol;
-            const std::size_t _maxiter;
-            const double _rho;
-            const double _dmin;
-            xt::xtensor<double, 1> _U;
-            xt::xtensor<double, 1> _L;
-            xt::xtensor<double, 1> _R;
-            int _nbActiveContacts = 0;
+        const double m_tol;
+        const std::size_t m_max_iter;
+        const double m_rho;
+        const double m_dmin;
+        xt::xtensor<double, 1> m_U;
+        xt::xtensor<double, 1> m_L;
+        xt::xtensor<double, 1> m_R;
+        int m_nb_active_contacts = 0;
     };
 
     template<std::size_t dim>
-        OptimUzawaMatrixFreeTbb<dim>::OptimUzawaMatrixFreeTbb(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) :
-            OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-11), _maxiter(40000), _rho(2000.), _dmin(0.),
-            _U(xt::zeros<double>({6*Nactive}))
+    OptimUzawaMatrixFreeTbb<dim>::OptimUzawaMatrixFreeTbb(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
+    : OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
+    , m_tol(1.0e-11)
+    , m_max_iter(40000)
+    , m_rho(2000.)
+    , m_dmin(0.)
+    , m_U(xt::zeros<double>({6*Nactive}))
+    {}
+
+    template<std::size_t dim>
+    void OptimUzawaMatrixFreeTbb<dim>::create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts)
+    {}
+
+    template<std::size_t dim>
+    void OptimUzawaMatrixFreeTbb<dim>::create_matrix_mass_impl()
+    {}
+
+    template<std::size_t dim>
+    int OptimUzawaMatrixFreeTbb<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts)
+    {
+        m_L = xt::zeros_like(this->m_distances);
+        m_R = xt::zeros_like(this->m_distances);
+
+        double time_assign_u = 0.;
+        double time_gemv_transpose_A = 0.;
+        double time_gemv_inv_P = 0.;
+        double time_assign_r = 0.;
+        double time_gemv_A = 0.;
+        double time_assign_l = 0.;
+        double time_compute_cmax = 0.;
+
+        std::size_t cc = 0;
+        double cmax = -1000.0;
+        while ( (cmax<=-m_tol) && (cc <= m_max_iter) )
+        {
+            tic();
+            m_U = this->m_c;
+            time_assign_u += toc();
+
+            tic();
+            gemv_transpose_A(contacts); // U = A^T * L + U
+            time_gemv_transpose_A += toc();
+
+            tic();
+            gemv_inv_P();  // U = - P^-1 * U
+            time_gemv_inv_P += toc();
+
+            tic();
+            m_R = this->m_distances - m_dmin;
+            time_assign_r += toc();
+
+            tic();
+            gemv_A(contacts); // R = - A * U + R
+            time_gemv_A += toc();
+
+            tic();
+            m_L = xt::maximum( m_L-m_rho*m_R, 0);
+            time_assign_l += toc();
+
+            tic();
+            cmax = double((xt::amin(m_R))(0));
+            time_compute_cmax += toc();
+            cc += 1;
+            // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
+        }
+
+        // if (cc>=m_max_iter)
+        // {
+        //     std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
+        //     std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
+        //     std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
+        // }
+
+        // std::cout << "----> CPUTIME : solve (U = c) = " << time_assign_u << std::endl;
+        // std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A << std::endl;
+        // std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P << std::endl;
+        // std::cout << "----> CPUTIME : solve (R = d) = " << time_assign_r << std::endl;
+        // std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << time_gemv_A << std::endl;
+        // std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l << std::endl;
+        // std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax << std::endl;
+
+        return cc;
+    }
+
+    template<std::size_t dim>
+    auto OptimUzawaMatrixFreeTbb<dim>::get_uadapt_impl()
+    {
+        return xt::adapt(reinterpret_cast<double*>(m_U.data()), {this->m_Nactive, 3UL});
+    }
+
+    template<std::size_t dim>
+    auto OptimUzawaMatrixFreeTbb<dim>::get_wadapt_impl()
+    {
+        return xt::adapt(reinterpret_cast<double*>(m_U.data()+3*this->m_Nactive), {this->m_Nactive, 3UL});
+    }
+
+    template<std::size_t dim>
+    void OptimUzawaMatrixFreeTbb<dim>::allocate_memory_impl(const std::size_t nc)
+    {}
+
+    template<std::size_t dim>
+    void OptimUzawaMatrixFreeTbb<dim>::free_memory_impl()
+    {}
+
+    template<std::size_t dim>
+    int OptimUzawaMatrixFreeTbb<dim>::get_nb_active_contacts_impl()
+    {
+        return xt::sum(xt::where(m_L > 0., xt::ones_like(m_L), xt::zeros_like(m_L)))();
+    }
+
+    template<std::size_t dim>
+    void OptimUzawaMatrixFreeTbb<dim>::gemv_inv_P()
+    {
+        // for loops instead of xtensor functions to control exactly the parallelism
+        tbb::parallel_for(std::size_t(0), this->m_Nactive, [=](std::size_t i) {
+            for (std::size_t d = 0; d < 3; ++d)
             {
+                m_U(3*i + d) /= (-1. * this->m_mass); // TODO: add mass into particles
+                m_U(3*this->m_Nactive + 3*i + d) /= (-1. * this->m_moment);
+            }
+        });
+    }
+
+    template<std::size_t dim>
+    void OptimUzawaMatrixFreeTbb<dim>::gemv_A(const std::vector<neighbor<dim>>& contacts)
+    {
+        tbb::parallel_for(std::size_t(0), contacts.size(), [=](std::size_t ic) {
+            auto &c = contacts[ic];
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                if (c.i >= this->m_active_ptr)
+                {
+                m_R(ic) -= (-this->m_dt*c.nij[d]) * m_U((c.i - this->m_active_ptr)*3 + d);
+                }
+                if (c.j >= this->m_active_ptr)
+                {
+                m_R(ic) -= (this->m_dt*c.nij[d]) * m_U((c.j - this->m_active_ptr)*3 + d);
+                }
             }
 
-    template<std::size_t dim>
-        void OptimUzawaMatrixFreeTbb<dim>::createMatrixConstraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            std::ignore = contacts;
-        }
+            auto r_i = c.pi - this->m_particles.pos()(c.i);
+            auto r_j = c.pj - this->m_particles.pos()(c.j);
 
-    template<std::size_t dim>
-        void OptimUzawaMatrixFreeTbb<dim>::createMatrixMass_impl()
-        {
-        }
+            xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
 
-    template<std::size_t dim>
-        int OptimUzawaMatrixFreeTbb<dim>::solveOptimizationProblem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            _L = xt::zeros_like(this->_distances);
-            _R = xt::zeros_like(this->_distances);
-
-            double timeAssignU = 0.;
-            double timeGemvTransposeA = 0.;
-            double timeGemvInvP = 0.;
-            double timeAssignR = 0.;
-            double timeGemvA = 0.;
-            double timeAssignL = 0.;
-            double timeComputeCmax = 0.;
-
-            std::size_t cc = 0;
-            double cmax = -1000.0;
-            while ( (cmax<=-_tol)&&(cc <= _maxiter) )
+            if (dim == 2)
             {
-                tic();
-                _U = this->_c;
-                timeAssignU += toc();
+                ri_cross = {{      0,      0, r_i(1)},
+                            {      0,      0, -r_i(0)},
+                            {-r_i(1), r_i(0),       0}};
 
-                tic();
-                gemv_transposeA(contacts); // U = A^T * L + U
-                timeGemvTransposeA += toc();
+                rj_cross = {{      0,      0,  r_j(1)},
+                            {      0,      0, -r_j(0)},
+                            {-r_j(1), r_j(0),       0}};
+            }
+            else
+            {
+                ri_cross = {{      0, -r_i(2),  r_i(1)},
+                            { r_i(2),       0, -r_i(0)},
+                            {-r_i(1),  r_i(0),       0}};
 
-                tic();
-                gemv_invP();  // U = - P^-1 * U
-                timeGemvInvP += toc();
-
-                tic();
-                _R = this->_distances - _dmin;
-                timeAssignR += toc();
-
-                tic();
-                gemv_A(contacts); // R = - A * U + R
-                timeGemvA += toc();
-
-                tic();
-                _L = xt::maximum( _L-_rho*_R, 0);
-                timeAssignL += toc();
-
-                tic();
-                cmax = double((xt::amin(_R))(0));
-                timeComputeCmax += toc();
-                cc += 1;
-                // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
+                rj_cross = {{      0, -r_j(2),  r_j(1)},
+                            { r_j(2),       0, -r_j(0)},
+                            {-r_j(1),  r_j(0),       0}};
             }
 
-            // if (cc>=_maxiter)
-            // {
-            //     std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
-            //     std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
-            //     std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
-            // }
+            auto Ri = rotation_matrix<3>(this->m_particles.q()(c.i));
+            auto Rj = rotation_matrix<3>(this->m_particles.q()(c.j));
 
-            // std::cout << "----> CPUTIME : solve (U = c) = " << timeAssignU << std::endl;
-            // std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvTransposeA << std::endl;
-            // std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << timeGemvInvP << std::endl;
-            // std::cout << "----> CPUTIME : solve (R = d) = " << timeAssignR << std::endl;
-            // std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvA << std::endl;
-            // std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << timeAssignL << std::endl;
-            // std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << timeComputeCmax << std::endl;
+            if (c.i >= this->m_active_ptr)
+            {
+                std::size_t ind_part = c.i - this->m_active_ptr;
+                auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+                for (std::size_t ip = 0; ip < 3; ++ip)
+                {
+                    m_R(ic) -= (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * m_U(3*this->m_Nactive + 3*ind_part + ip);
+                }
+            }
 
-            return cc;
-        }
-
-    template<std::size_t dim>
-        auto OptimUzawaMatrixFreeTbb<dim>::getUadapt_impl()
-        {
-            return xt::adapt(reinterpret_cast<double*>(_U.data()), {this->_Nactive, 3UL});
-        }
-
-    template<std::size_t dim>
-        auto OptimUzawaMatrixFreeTbb<dim>::getWadapt_impl()
-        {
-            return xt::adapt(reinterpret_cast<double*>(_U.data()+3*this->_Nactive), {this->_Nactive, 3UL});
-        }
+            if (c.j >= this->m_active_ptr)
+            {
+                std::size_t ind_part = c.j - this->m_active_ptr;
+                auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+                for (std::size_t ip = 0; ip < 3; ++ip)
+                {
+                    m_R(ic) -= (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * m_U(3*this->m_Nactive + 3*ind_part + ip);
+                }
+            }
+        });
+    }
 
     template<std::size_t dim>
-        void OptimUzawaMatrixFreeTbb<dim>::allocateMemory_impl(const std::size_t nc)
-        {
-            std::ignore = nc;
-        }
-
-    template<std::size_t dim>
-        void OptimUzawaMatrixFreeTbb<dim>::freeMemory_impl()
-        {
-        }
-
-    template<std::size_t dim>
-        int OptimUzawaMatrixFreeTbb<dim>::getNbActiveContacts_impl()
-        {
-            return xt::sum(xt::where(_L > 0., xt::ones_like(_L), xt::zeros_like(_L)))();
-        }
-
-    template<std::size_t dim>
-        void OptimUzawaMatrixFreeTbb<dim>::gemv_invP()
-        {
-            // for loops instead of xtensor functions to control exactly the parallelism
-            tbb::parallel_for(std::size_t(0), this->_Nactive, [=](std::size_t i) {
-                    for (std::size_t d=0; d<3; ++d)
-                    {
-                    _U(3*i + d) /= (-1. * this->_mass); // TODO: add mass into particles
-                    _U(3*this->_Nactive + 3*i + d) /= (-1. * this->_moment);
-                    }
-                    });
-        }
-
-    template<std::size_t dim>
-        void OptimUzawaMatrixFreeTbb<dim>::gemv_A(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            tbb::parallel_for(std::size_t(0), contacts.size(), [=](std::size_t ic) {
+    void OptimUzawaMatrixFreeTbb<dim>::gemv_transpose_A(const std::vector<neighbor<dim>>& contacts)
+    {
+        m_U = m_U + tbb::parallel_reduce(tbb::blocked_range<std::size_t>(0, contacts.size()),
+            xt::zeros_like(m_U),
+            [=](tbb::blocked_range<std::size_t>& r, xt::xtensor<double, 1> partialSum) -> xt::xtensor<double, 1>
+            {
+                for(std::size_t ic=r.begin(); ic!=r.end(); ++ic)
+                {
                     auto &c = contacts[ic];
-                    for (std::size_t d=0; d<3; ++d)
+
+                    for (std::size_t d = 0; d < 3; ++d)
                     {
-                    if (c.i >= this->_active_ptr)
-                    {
-                    _R(ic) -= (-this->_dt*c.nij[d]) * _U((c.i - this->_active_ptr)*3 + d);
-                    }
-                    if (c.j >= this->_active_ptr)
-                    {
-                    _R(ic) -= (this->_dt*c.nij[d]) * _U((c.j - this->_active_ptr)*3 + d);
-                    }
+                        if (c.i >= this->m_active_ptr)
+                        {
+                            partialSum((c.i - this->m_active_ptr)*3 + d) += m_L(ic) * (-this->m_dt*c.nij[d]);
+                        }
+                        if (c.j >= this->m_active_ptr)
+                        {
+                        partialSum((c.j - this->m_active_ptr)*3 + d) += m_L(ic) * (this->m_dt*c.nij[d]);
+                        }
                     }
 
-                    auto r_i = c.pi - this->_particles.pos()(c.i);
-                    auto r_j = c.pj - this->_particles.pos()(c.j);
+                    auto r_i = c.pi - this->m_particles.pos()(c.i);
+                    auto r_j = c.pj - this->m_particles.pos()(c.j);
 
                     xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
 
                     if (dim == 2)
                     {
                         ri_cross = {{      0,      0, r_i(1)},
-                            {      0,      0, -r_i(0)},
-                            {-r_i(1), r_i(0),       0}};
+                                    {      0,      0, -r_i(0)},
+                                    {-r_i(1), r_i(0),       0}};
 
                         rj_cross = {{      0,      0,  r_j(1)},
-                            {      0,      0, -r_j(0)},
-                            {-r_j(1), r_j(0),       0}};
+                                    {      0,      0, -r_j(0)},
+                                    {-r_j(1), r_j(0),       0}};
                     }
                     else
                     {
                         ri_cross = {{      0, -r_i(2),  r_i(1)},
-                            { r_i(2),       0, -r_i(0)},
-                            {-r_i(1),  r_i(0),       0}};
+                                    { r_i(2),       0, -r_i(0)},
+                                    {-r_i(1),  r_i(0),       0}};
 
                         rj_cross = {{      0, -r_j(2),  r_j(1)},
-                            { r_j(2),       0, -r_j(0)},
-                            {-r_j(1),  r_j(0),       0}};
+                                    { r_j(2),       0, -r_j(0)},
+                                    {-r_j(1),  r_j(0),       0}};
                     }
 
-                    auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
-                    auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
+                    auto Ri = rotation_matrix<3>(this->m_particles.q()(c.i));
+                    auto Rj = rotation_matrix<3>(this->m_particles.q()(c.j));
 
-                    if (c.i >= this->_active_ptr)
+                    if (c.i >= this->m_active_ptr)
                     {
-                        std::size_t ind_part = c.i - this->_active_ptr;
+                        std::size_t ind_part = c.i - this->m_active_ptr;
                         auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                        for (std::size_t ip=0; ip<3; ++ip)
+                        for (std::size_t ip = 0; ip < 3; ++ip)
                         {
-                            _R(ic) -= (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
+                            partialSum(3*this->m_Nactive + 3*ind_part + ip) += m_L(ic) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                         }
                     }
 
-                    if (c.j >= this->_active_ptr)
+                    if (c.j >= this->m_active_ptr)
                     {
-                        std::size_t ind_part = c.j - this->_active_ptr;
+                        std::size_t ind_part = c.j - this->m_active_ptr;
                         auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                        for (std::size_t ip=0; ip<3; ++ip)
+                        for (std::size_t ip = 0; ip < 3; ++ip)
                         {
-                            _R(ic) -= (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * _U(3*this->_Nactive + 3*ind_part + ip);
+                            partialSum(3*this->m_Nactive + 3*ind_part + ip) += m_L(ic) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                         }
                     }
-
-            });
-        }
-
-    template<std::size_t dim>
-        void OptimUzawaMatrixFreeTbb<dim>::gemv_transposeA(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            _U = _U + tbb::parallel_reduce(tbb::blocked_range<std::size_t>(0, contacts.size()),
-                    xt::zeros_like(_U),
-                    [=](tbb::blocked_range<std::size_t>& r, xt::xtensor<double, 1> partialSum) -> xt::xtensor<double, 1> {
-                    for(std::size_t ic=r.begin(); ic!=r.end(); ++ic)
-                    {
-                        auto &c = contacts[ic];
-
-                        for (std::size_t d=0; d<3; ++d)
-                        {
-                            if (c.i >= this->_active_ptr)
-                            {
-                                partialSum((c.i - this->_active_ptr)*3 + d) += _L(ic) * (-this->_dt*c.nij[d]);
-                            }
-                            if (c.j >= this->_active_ptr)
-                            {
-                            partialSum((c.j - this->_active_ptr)*3 + d) += _L(ic) * (this->_dt*c.nij[d]);
-                            }
-                        }
-
-                        auto r_i = c.pi - this->_particles.pos()(c.i);
-                        auto r_j = c.pj - this->_particles.pos()(c.j);
-
-                        xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
-
-                        if (dim == 2)
-                        {
-                            ri_cross = {{      0,      0, r_i(1)},
-                                {      0,      0, -r_i(0)},
-                                {-r_i(1), r_i(0),       0}};
-
-                            rj_cross = {{      0,      0,  r_j(1)},
-                                {      0,      0, -r_j(0)},
-                                {-r_j(1), r_j(0),       0}};
-                        }
-                        else
-                        {
-                            ri_cross = {{      0, -r_i(2),  r_i(1)},
-                                { r_i(2),       0, -r_i(0)},
-                                {-r_i(1),  r_i(0),       0}};
-
-                            rj_cross = {{      0, -r_j(2),  r_j(1)},
-                                { r_j(2),       0, -r_j(0)},
-                                {-r_j(1),  r_j(0),       0}};
-                        }
-
-                        auto Ri = scopi::rotation_matrix<3>(this->_particles.q()(c.i));
-                        auto Rj = scopi::rotation_matrix<3>(this->_particles.q()(c.j));
-
-                        if (c.i >= this->_active_ptr)
-                        {
-                            std::size_t ind_part = c.i - this->_active_ptr;
-                            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                            for (std::size_t ip=0; ip<3; ++ip)
-                            {
-                                partialSum(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                            }
-                        }
-
-                        if (c.j >= this->_active_ptr)
-                        {
-                            std::size_t ind_part = c.j - this->_active_ptr;
-                            auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                            for (std::size_t ip=0; ip<3; ++ip)
-                            {
-                                partialSum(3*this->_Nactive + 3*ind_part + ip) += _L(ic) * (-this->_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                            }
-                        }
-                    }
-                    return partialSum;
-                },
-            []( xt::xtensor<double, 1> x, xt::xtensor<double, 1> y )-> xt::xtensor<double, 1> {
+                }
+                return partialSum;
+            },
+            []( xt::xtensor<double, 1> x, xt::xtensor<double, 1> y )-> xt::xtensor<double, 1>
+            {
                 return x+y;
-            });
-        }
-
-    template<std::size_t dim>
-        std::string OptimUzawaMatrixFreeTbb<dim>::getName_impl() const
-        {
-            return "OptimUzawaMatrixFreeTbb";
-        }
-
+            }
+        );
+    }
 }
 #endif
