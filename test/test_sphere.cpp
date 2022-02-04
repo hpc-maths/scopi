@@ -387,19 +387,7 @@ namespace scopi
         TypeParam solver(this->m_particles, this->m_dt, this->m_active_ptr);
         solver.solve(this->m_total_it);
 
-        std::string filenameRef;
-        if(solver.get_optim_solver_name() == "OptimMosek")
-            filenameRef = "../test/references/two_spheres_asymmetrical_mosek.json";
-        else if(solver.get_optim_solver_name() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_spheres_asymmetrical_uzawaMkl.json";
-        else if(solver.get_optim_solver_name() == "OptimScs")
-            filenameRef = "../test/references/two_spheres_asymmetrical_scs.json";
-        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_spheres_asymmetrical_uzawaMatrixFreeTbb.json";
-        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_spheres_asymmetrical_uzawaMatrixFreeOmp.json";
-
-        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance);
     }
 
     template <class S>
@@ -425,19 +413,7 @@ namespace scopi
         TypeParam solver(this->m_particles, this->m_dt, this->m_active_ptr);
         solver.solve(this->m_total_it);
 
-        std::string filenameRef;
-        if(solver.get_optim_solver_name() == "OptimMosek")
-            filenameRef = "../test/references/two_spheres_symmetrical_mosek.json";
-        else if(solver.get_optim_solver_name() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_spheres_symmetrical_uzawaMkl.json";
-        else if(solver.get_optim_solver_name() == "OptimScs")
-            filenameRef = "../test/references/two_spheres_symmetrical_scs.json";
-        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_spheres_symmetrical_uzawaMatrixFreeTbb.json";
-        else if(solver.get_optim_solver_name() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_spheres_symmetrical_uzawaMatrixFreeOmp.json";
-
-        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", filenameRef, tolerance);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance);
     }
 
 }

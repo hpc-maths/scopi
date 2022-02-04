@@ -44,7 +44,7 @@ namespace scopi{
     template<std::size_t dim>
         OptimUzawaMatrixFreeTbb<dim>::OptimUzawaMatrixFreeTbb(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) :
             OptimBase<OptimUzawaMatrixFreeTbb<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0),
-            _tol(1.0e-6), _maxiter(40000), _rho(2000.), _dmin(0.),
+            _tol(1.0e-11), _maxiter(40000), _rho(2000.), _dmin(0.),
             _U(xt::zeros<double>({6*Nactive}))
             {
             }
@@ -109,20 +109,20 @@ namespace scopi{
                 // std::cout << "-- C++ -- Projection : minimal constraint : " << cmax << std::endl;
             }
 
-            if (cc>=_maxiter)
-            {
-                std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
-                std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
-                std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
-            }
+            // if (cc>=_maxiter)
+            // {
+            //     std::cout<<"\n-- C++ -- Projection : ********************** WARNING **********************"<<std::endl;
+            //     std::cout<<  "-- C++ -- Projection : *************** Uzawa does not converge ***************"<<std::endl;
+            //     std::cout<<  "-- C++ -- Projection : ********************** WARNING **********************\n"<<std::endl;
+            // }
 
-            std::cout << "----> CPUTIME : solve (U = c) = " << timeAssignU << std::endl;
-            std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvTransposeA << std::endl;
-            std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << timeGemvInvP << std::endl;
-            std::cout << "----> CPUTIME : solve (R = d) = " << timeAssignR << std::endl;
-            std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvA << std::endl;
-            std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << timeAssignL << std::endl;
-            std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << timeComputeCmax << std::endl;
+            // std::cout << "----> CPUTIME : solve (U = c) = " << timeAssignU << std::endl;
+            // std::cout << "----> CPUTIME : solve (U = A^T*L+U) = " << timeGemvTransposeA << std::endl;
+            // std::cout << "----> CPUTIME : solve (U = -P^-1*U) = " << timeGemvInvP << std::endl;
+            // std::cout << "----> CPUTIME : solve (R = d) = " << timeAssignR << std::endl;
+            // std::cout << "----> CPUTIME : solve (R = -A*U+R) = " << timeGemvA << std::endl;
+            // std::cout << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << timeAssignL << std::endl;
+            // std::cout << "----> CPUTIME : solve (cmax = min(R)) = " << timeComputeCmax << std::endl;
 
             return cc;
         }
