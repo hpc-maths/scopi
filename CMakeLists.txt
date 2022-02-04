@@ -145,6 +145,12 @@ if(SCOPI_USE_MOSEK)
     target_compile_definitions(scopi PUBLIC SCOPI_USE_MOSEK)
 endif()
 
+if(SCOPI_USE_SCS)
+    include_directories(SYSTEM ${scs_INCLUDE_DIR})
+    target_link_libraries(scopi PUBLIC ${scs_LIBRARIES})
+    target_compile_definitions(scopi PUBLIC SCOPI_USE_SCS)
+endif()
+
 add_subdirectory(demos EXCLUDE_FROM_ALL)
 if(BUILD_TESTS)
     add_subdirectory(test)
