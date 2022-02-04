@@ -95,7 +95,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    int OptimMosek<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts)
+    int OptimMosek<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>&)
     {
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
@@ -140,7 +140,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    void OptimMosek<dim>::allocate_memory_impl(const std::size_t nc)
+    void OptimMosek<dim>::allocate_memory_impl(const std::size_t)
     {}
 
     template<std::size_t dim>

@@ -144,7 +144,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    int OptimScs<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts)
+    int OptimScs<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>&)
     {
         m_d.m = this->m_distances.size();
         m_d.n = 6*this->m_Nactive;

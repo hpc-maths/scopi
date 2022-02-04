@@ -143,7 +143,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    int OptimUzawaMkl<dim>::solve_optimization_problem_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+    int OptimUzawaMkl<dim>::solve_optimization_problem_impl(const std::vector<scopi::neighbor<dim>>&)
     {
         m_L = xt::zeros_like(this->m_distances);
         m_R = xt::zeros_like(this->m_distances);
@@ -233,7 +233,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    void OptimUzawaMkl<dim>::allocate_memory_impl(const std::size_t nc)
+    void OptimUzawaMkl<dim>::allocate_memory_impl(const std::size_t)
     {}
 
     template<std::size_t dim>

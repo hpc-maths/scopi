@@ -52,7 +52,7 @@ namespace scopi{
     {}
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeOmp<dim>::create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts)
+    void OptimUzawaMatrixFreeOmp<dim>::create_matrix_constraint_impl(const std::vector<neighbor<dim>>&)
     {}
 
     template<std::size_t dim>
@@ -135,7 +135,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeOmp<dim>::allocate_memory_impl(const std::size_t nc)
+    void OptimUzawaMatrixFreeOmp<dim>::allocate_memory_impl(const std::size_t)
     {}
 
     template<std::size_t dim>
