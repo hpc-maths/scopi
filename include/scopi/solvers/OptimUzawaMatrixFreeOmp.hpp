@@ -16,13 +16,11 @@ namespace scopi{
     {
     public:
         OptimUzawaMatrixFreeOmp(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-        void create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts);
-        void create_matrix_mass_impl();
-        void free_memory_impl();
 
         void gemv_inv_P_impl();
         void gemv_A_impl(const std::vector<neighbor<dim>>& contacts);
         void gemv_transpose_A_impl(const std::vector<neighbor<dim>>& contacts);
+        void setup_impl(const std::vector<neighbor<dim>>& contacts);
     };
 
     template<std::size_t dim>
@@ -31,11 +29,7 @@ namespace scopi{
     {}
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeOmp<dim>::create_matrix_constraint_impl(const std::vector<neighbor<dim>>&)
-    {}
-
-    template<std::size_t dim>
-    void OptimUzawaMatrixFreeOmp<dim>::create_matrix_mass_impl()
+    void OptimUzawaMatrixFreeOmp<dim>::setup_impl(const std::vector<neighbor<dim>>&)
     {}
 
     template<std::size_t dim>
@@ -198,7 +192,4 @@ namespace scopi{
         }
     }
 
-    template<std::size_t dim>
-    void OptimUzawaMatrixFreeOmp<dim>::free_memory_impl()
-    {}
 }

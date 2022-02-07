@@ -2,6 +2,7 @@
 
 #ifdef SCOPI_USE_MKL
 #include "OptimUzawaBase.hpp"
+#include "MatrixOptimSolver.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
 #include <stdio.h>
@@ -13,19 +14,20 @@
 
 namespace scopi{
     template<std::size_t dim>
-    class OptimUzawaMkl : public OptimUzawaBase<OptimUzawaMkl<dim>, dim>
+    class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<dim>, dim>
+                       , public MatrixOptimSolver<OptimUzawaMkl<dim>, dim>
     {
     public:
         OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-        void create_matrix_constraint_impl(const std::vector<scopi::neighbor<dim>>& contacts);
-        void create_matrix_mass_impl();
-        void free_memory_impl();
+        void setup_impl(const std::vector<neighbor<dim>>& contacts);
+        void tear_down_impl();
 
         void gemv_inv_P_impl();
         void gemv_A_impl(const std::vector<neighbor<dim>>& contacts);
         void gemv_transpose_A_impl(const std::vector<neighbor<dim>>& contacts);
 
     private:
+        using base_type = OptimUzawaBase<OptimUzawaMkl<dim>, dim>;
         void print_csr_matrix(const sparse_matrix_t);
 
         sparse_matrix_t m_A;
@@ -42,18 +44,21 @@ namespace scopi{
     template<std::size_t dim>
     OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
     : OptimUzawaBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr)
+    , MatrixOptimSolver<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr)
     {}
 
     template<std::size_t dim>
-    void OptimUzawaMkl<dim>::create_matrix_constraint_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+    void OptimUzawaMkl<dim>::setup_impl(const std::vector<scopi::neighbor<dim>>& contacts)
     {
+        PLOG_NONE << "OptimUzawaMkl::setup_impl";
+        // constraint matrix
         this->create_matrix_constraint_coo(contacts, m_A_coo_row, m_A_coo_col, m_A_coo_val, 0);
 
         sparse_matrix_t A_coo;
         m_status =  mkl_sparse_d_create_coo(&A_coo,
                                            SPARSE_INDEX_BASE_ZERO,
                                            contacts.size(), // number of rows
-                                           6*this->m_Nactive, // number of cols
+                                           6*base_type::m_Nactive, // number of cols
                                            m_A_coo_val.size(), // number of non-zero elements
                                            m_A_coo_row.data(),
                                            m_A_coo_col.data(),
@@ -75,19 +80,16 @@ namespace scopi{
 
         m_status = mkl_sparse_optimize ( m_A );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix A: " << m_status;
-    }
 
-    template<std::size_t dim>
-    void OptimUzawaMkl<dim>::create_matrix_mass_impl()
-    {
+        // mass matrix
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;
         std::vector<double> invP_csr_val;
-        invP_csr_col.reserve(6*this->m_Nactive);
-        invP_csr_row.reserve(6*this->m_Nactive+1);
-        invP_csr_val.reserve(6*this->m_Nactive);
+        invP_csr_col.reserve(6*base_type::m_Nactive);
+        invP_csr_row.reserve(6*base_type::m_Nactive+1);
+        invP_csr_val.reserve(6*base_type::m_Nactive);
 
-        for (std::size_t i = 0; i < this->m_Nactive; ++i)
+        for (std::size_t i = 0; i < base_type::m_Nactive; ++i)
         {
             for (std::size_t d = 0; d < 3; ++d)
             {
@@ -96,21 +98,21 @@ namespace scopi{
                 invP_csr_val.push_back(1./this->m_mass); // TODO: add mass into particles
             }
         }
-        for (std::size_t i = 0; i < this->m_Nactive; ++i)
+        for (std::size_t i = 0; i < base_type::m_Nactive; ++i)
         {
             for (std::size_t d  =0; d < 3; ++d)
             {
-                invP_csr_row.push_back(3*this->m_Nactive + 3*i + d);
-                invP_csr_col.push_back(3*this->m_Nactive + 3*i + d);
+                invP_csr_row.push_back(3*base_type::m_Nactive + 3*i + d);
+                invP_csr_col.push_back(3*base_type::m_Nactive + 3*i + d);
                 invP_csr_val.push_back(1./this->m_moment);
             }
         }
-        invP_csr_row.push_back(6*this->m_Nactive);
+        invP_csr_row.push_back(6*base_type::m_Nactive);
 
         m_status = mkl_sparse_d_create_csr(&m_inv_P,
                                            SPARSE_INDEX_BASE_ZERO,
-                                           6*this->m_Nactive, // number of rows
-                                           6*this->m_Nactive, // number of cols
+                                           6*base_type::m_Nactive, // number of rows
+                                           6*base_type::m_Nactive, // number of cols
                                            invP_csr_row.data(),
                                            invP_csr_row.data()+1,
                                            invP_csr_col.data(),
@@ -149,7 +151,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    void OptimUzawaMkl<dim>::free_memory_impl()
+    void OptimUzawaMkl<dim>::tear_down_impl()
     {
         mkl_sparse_destroy ( m_inv_P );
         mkl_sparse_destroy ( m_A );

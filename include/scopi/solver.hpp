@@ -100,9 +100,6 @@ namespace scopi
             move_active_particles();
 
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
-
-            // free the memory for the next solve
-            m_solver.free_memory();
         }
     }
 

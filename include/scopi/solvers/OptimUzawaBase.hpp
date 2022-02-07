@@ -2,6 +2,7 @@
 
 #ifdef SCOPI_USE_TBB
 #include "OptimBase.hpp"
+#include "MatrixOptimSolver.hpp"
 #include <omp.h>
 #include "tbb/tbb.h"
 
@@ -12,17 +13,16 @@
 
 namespace scopi{
     template<class D, std::size_t dim>
-    class OptimUzawaBase : public crtp_base<D>, public OptimBase<OptimUzawaBase<D, dim>, dim>
+    class OptimUzawaBase: public crtp_base<D>
+                        , public OptimBase<OptimUzawaBase<D, dim>, dim>
     {
     public:
         OptimUzawaBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol = 1e-9);
-        void create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts);
-        void create_matrix_mass_impl();
         int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
         auto get_uadapt_impl();
         auto get_wadapt_impl();
-        void allocate_memory_impl(const std::size_t nc);
-        void free_memory_impl();
+        void setup_impl(const std::vector<neighbor<dim>>& contacts);
+        void tear_down_impl();
         int get_nb_active_contacts_impl();
 
     private:
@@ -51,18 +51,6 @@ namespace scopi{
     , m_dmin(0.)
     , m_U(xt::zeros<double>({6*Nactive}))
     {}
-
-    template<class D, std::size_t dim>
-    void OptimUzawaBase<D, dim>::create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts)
-    {
-        this->base_type::derived_cast().create_matrix_constraint_impl(contacts);
-    }
-
-    template<class D, std::size_t dim>
-    void OptimUzawaBase<D, dim>::create_matrix_mass_impl()
-    {
-        this->base_type::derived_cast().create_matrix_mass_impl();
-    }
 
     template<class D, std::size_t dim>
     int OptimUzawaBase<D, dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts)
@@ -140,16 +128,6 @@ namespace scopi{
     }
 
     template<class D, std::size_t dim>
-    void OptimUzawaBase<D, dim>::allocate_memory_impl(const std::size_t)
-    {}
-
-    template<class D, std::size_t dim>
-    void OptimUzawaBase<D, dim>::free_memory_impl()
-    {
-        this->base_type::derived_cast().free_memory_impl();
-    }
-
-    template<class D, std::size_t dim>
     int OptimUzawaBase<D, dim>::get_nb_active_contacts_impl()
     {
         return xt::sum(xt::where(m_L > 0., xt::ones_like(m_L), xt::zeros_like(m_L)))();
@@ -172,5 +150,17 @@ namespace scopi{
     {
         this->base_type::derived_cast().gemv_transpose_A_impl(contacts);
     }
+
+    template<class D, std::size_t dim>
+    void OptimUzawaBase<D, dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
+    {
+        this->base_type::derived_cast().setup_impl(contacts);
+    }
+
+    template<class D, std::size_t dim>
+    void OptimUzawaBase<D, dim>::tear_down_impl()
+    {}
+
+
 }
 #endif
