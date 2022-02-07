@@ -15,7 +15,7 @@ namespace scopi{
     class OptimUzawaBase : public crtp_base<D>, public OptimBase<OptimUzawaBase<D, dim>, dim>
     {
     public:
-        OptimUzawaBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+        OptimUzawaBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol = 1e-9);
         void create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts);
         void create_matrix_mass_impl();
         int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
@@ -43,9 +43,9 @@ namespace scopi{
     };
 
     template<class D, std::size_t dim>
-    OptimUzawaBase<D, dim>::OptimUzawaBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
+    OptimUzawaBase<D, dim>::OptimUzawaBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol)
     : OptimBase<OptimUzawaBase<D, dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
-    , m_tol(1.0e-9)
+    , m_tol(tol)
     , m_max_iter(40000)
     , m_rho(2000.)
     , m_dmin(0.)

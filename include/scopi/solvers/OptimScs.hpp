@@ -11,7 +11,7 @@ namespace scopi{
     public:
         using base_type = OptimBase<OptimScs<dim>, dim>;
 
-        OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+        OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol = 1e-7);
         ~OptimScs();
         void create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts);
         void create_matrix_mass_impl();
@@ -37,7 +37,7 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-    OptimScs<dim>::OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr) 
+    OptimScs<dim>::OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol) 
     : OptimBase<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     {
         m_P.x = new scs_float[6*this->m_Nactive];
@@ -53,9 +53,9 @@ namespace scopi{
         m_stgs.adaptive_scale = 1;
         m_stgs.rho_x = 1e-6;
         m_stgs.max_iters = 1e5;
-        m_stgs.eps_abs = 1e-7;
-        m_stgs.eps_rel = 1e-7;
-        m_stgs.eps_infeas = 1e-10;
+        m_stgs.eps_abs = tol;
+        m_stgs.eps_rel = tol;
+        m_stgs.eps_infeas = tol*1e-3;
         m_stgs.alpha = 1.5;
         m_stgs.time_limit_secs = 0.;
         m_stgs.verbose = 0;

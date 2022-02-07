@@ -16,7 +16,7 @@ namespace scopi{
     public:
         using base_type = OptimBase<OptimMosek<dim>, dim>;
 
-        OptimMosek(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+        OptimMosek(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol = 1e-8);
         void create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts);
         void create_matrix_mass_impl();
         int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
@@ -34,7 +34,7 @@ namespace scopi{
     };
 
     template<std::size_t dim>
-    OptimMosek<dim>::OptimMosek(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
+    OptimMosek<dim>::OptimMosek(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double)
     : base_type(particles, dt, Nactive, active_ptr, 1 + 2*3*Nactive + 2*3*Nactive, 1)
     {
         this->m_c(0) = 1;
