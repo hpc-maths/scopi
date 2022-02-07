@@ -7,6 +7,6 @@
 namespace scopi
 {
     static constexpr double PI = xt::numeric_constants<double>::PI;
-    static constexpr double tolerance = 1e-10;
+    static constexpr double tolerance = 1e-7;
     bool diffFile(std::string filenameRef, std::string filenameResult, double tol=1e-12);
 }

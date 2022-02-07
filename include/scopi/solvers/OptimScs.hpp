@@ -53,9 +53,9 @@ namespace scopi{
         m_stgs.adaptive_scale = 1;
         m_stgs.rho_x = 1e-6;
         m_stgs.max_iters = 1e5;
-        m_stgs.eps_abs = 1e-11;
-        m_stgs.eps_rel = 1e-11;
-        m_stgs.eps_infeas = 1e-11;
+        m_stgs.eps_abs = 1e-7;
+        m_stgs.eps_rel = 1e-7;
+        m_stgs.eps_infeas = 1e-10;
         m_stgs.alpha = 1.5;
         m_stgs.time_limit_secs = 0.;
         m_stgs.verbose = 0;

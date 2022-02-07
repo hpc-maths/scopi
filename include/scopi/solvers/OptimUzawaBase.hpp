@@ -45,7 +45,7 @@ namespace scopi{
     template<class D, std::size_t dim>
     OptimUzawaBase<D, dim>::OptimUzawaBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
     : OptimBase<OptimUzawaBase<D, dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
-    , m_tol(1.0e-11)
+    , m_tol(1.0e-9)
     , m_max_iter(40000)
     , m_rho(2000.)
     , m_dmin(0.)

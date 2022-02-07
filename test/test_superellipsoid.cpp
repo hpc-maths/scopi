@@ -500,7 +500,7 @@ namespace scopi
             }
 
             double m_dt = .005;
-            std::size_t m_total_it = 1000;
+            std::size_t m_total_it = 50;
             scopi_container<2> m_particles;
             std::size_t m_active_ptr = 0; // without obstacles
     };
@@ -512,7 +512,7 @@ namespace scopi
         TypeParam solver(this->m_particles, this->m_dt, this->m_active_ptr);
         solver.solve(this->m_total_it);
 
-        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0049.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance);
     }
 
     template <class S>
@@ -533,7 +533,7 @@ namespace scopi
 
     TYPED_TEST_SUITE(TestTwoEllipsoidsAsymmetrical, solver_with_contact_types<2>);
 
-    TYPED_TEST(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_symmetrical)
+    TYPED_TEST(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_asymmetrical)
     {
         TypeParam solver(this->m_particles, this->m_dt, this->m_active_ptr);
         solver.solve(this->m_total_it);
@@ -559,7 +559,7 @@ namespace scopi
 
     TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresAsymmetrical, solver_with_contact_types<2>);
 
-    TYPED_TEST(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_symmetrical)
+    TYPED_TEST(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_spheres_asymmetrical)
     {
         TypeParam solver(this->m_particles, this->m_dt, this->m_active_ptr);
         solver.solve(this->m_total_it);
