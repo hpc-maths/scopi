@@ -11,13 +11,16 @@ namespace scopi{
     {
     protected:
         MatrixOptimSolver(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
-        void create_matrix_constraint_coo(const std::vector<neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
-        void create_matrix_mass_coo(const std::vector<neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values);
+        void create_matrix_constraint_coo(const std::vector<neighbor<dim>>& contacts, std::size_t firstCol);
 
         scopi_container<dim>& m_particles;
         double m_dt;
         std::size_t m_Nactive;
         std::size_t m_active_ptr;
+
+        std::vector<int> m_A_rows;
+        std::vector<int> m_A_cols;
+        std::vector<double> m_A_values;
     };
 
 
@@ -30,30 +33,33 @@ namespace scopi{
     {}
 
     template<class D, std::size_t dim>
-    void MatrixOptimSolver<D, dim>::create_matrix_constraint_coo(const std::vector<neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol)
+    void MatrixOptimSolver<D, dim>::create_matrix_constraint_coo(const std::vector<neighbor<dim>>& contacts, std::size_t firstCol)
     {
         std::size_t u_size = 3*contacts.size()*2;
         std::size_t w_size = 3*contacts.size()*2;
-        A_rows.reserve(u_size + w_size);
-        A_cols.reserve(u_size + w_size);
-        A_values.reserve(u_size + w_size);
+        m_A_rows.resize(u_size + w_size);
+        m_A_cols.resize(u_size + w_size);
+        m_A_values.resize(u_size + w_size);
 
         std::size_t ic = 0;
+        std::size_t index = 0;
         for (auto &c: contacts)
         {
             for (std::size_t d = 0; d < 3; ++d)
             {
                 if (c.i >= m_active_ptr)
                 {
-                    A_rows.push_back(ic);
-                    A_cols.push_back(firstCol + (c.i - m_active_ptr)*3 + d);
-                    A_values.push_back(-m_dt*c.nij[d]);
+                    m_A_rows[index] = ic;
+                    m_A_cols[index] = firstCol + (c.i - m_active_ptr)*3 + d;
+                    m_A_values[index] = -m_dt*c.nij[d];
+                    index++;
                 }
                 if (c.j >= m_active_ptr)
                 {
-                    A_rows.push_back(ic);
-                    A_cols.push_back(firstCol + (c.j - m_active_ptr)*3 + d);
-                    A_values.push_back(m_dt*c.nij[d]);
+                    m_A_rows[index] = ic;
+                    m_A_cols[index] = firstCol + (c.j - m_active_ptr)*3 + d;
+                    m_A_values[index] = m_dt*c.nij[d];
+                    index++;
                 }
             }
 
@@ -92,9 +98,10 @@ namespace scopi{
                 auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    A_rows.push_back(ic);
-                    A_cols.push_back(firstCol + 3*m_Nactive + 3*ind_part + ip);
-                    A_values.push_back(m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                    m_A_rows[index] = ic;
+                    m_A_cols[index] = firstCol + 3*m_Nactive + 3*ind_part + ip;
+                    m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                    index++;
                 }
             }
 
@@ -104,14 +111,18 @@ namespace scopi{
                 auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    A_rows.push_back(ic);
-                    A_cols.push_back(firstCol + 3*m_Nactive + 3*ind_part + ip);
-                    A_values.push_back(-m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                    m_A_rows[index] = ic;
+                    m_A_cols[index] = firstCol + 3*m_Nactive + 3*ind_part + ip;
+                    m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                    index++;
                 }
             }
 
             ++ic;
         }
+        m_A_rows.resize(index);
+        m_A_cols.resize(index);
+        m_A_values.resize(index);
     }
 
 }

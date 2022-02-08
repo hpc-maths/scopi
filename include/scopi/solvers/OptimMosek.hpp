@@ -40,22 +40,6 @@ namespace scopi{
     , MatrixOptimSolver<OptimMosek<dim>, dim>(particles, dt, Nactive, active_ptr)
     {
         this->m_c(0) = 1;
-    }
-
-    template<std::size_t dim>
-    void OptimMosek<dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
-    {
-        // constraint matrix
-        std::vector<int> A_rows;
-        std::vector<int> A_cols;
-        std::vector<double> A_values;
-
-        this->create_matrix_constraint_coo(contacts, A_rows, A_cols, A_values, 1);
-
-        m_A = Matrix::sparse(contacts.size(), 1 + 6*base_type::m_Nactive + 6*base_type::m_Nactive,
-                             std::make_shared<ndarray<int, 1>>(A_rows.data(), shape_t<1>({A_rows.size()})),
-                             std::make_shared<ndarray<int, 1>>(A_cols.data(), shape_t<1>({A_cols.size()})),
-                             std::make_shared<ndarray<double, 1>>(A_values.data(), shape_t<1>({A_values.size()})));
 
         // mass matrix
         std::vector<int> Az_rows;
@@ -91,6 +75,17 @@ namespace scopi{
                               std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>({Az_rows.size()})),
                               std::make_shared<ndarray<int, 1>>(Az_cols.data(), shape_t<1>({Az_cols.size()})),
                               std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>({Az_values.size()})));
+    }
+
+    template<std::size_t dim>
+    void OptimMosek<dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
+    {
+        this->create_matrix_constraint_coo(contacts, 1);
+
+        m_A = Matrix::sparse(contacts.size(), 1 + 6*base_type::m_Nactive + 6*base_type::m_Nactive,
+                             std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
+                             std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
+                             std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
     }
 
     template<std::size_t dim>

@@ -19,6 +19,7 @@ namespace scopi{
     {
     public:
         OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+        ~OptimUzawaMkl();
         void setup_impl(const std::vector<neighbor<dim>>& contacts);
         void tear_down_impl();
 
@@ -38,6 +39,7 @@ namespace scopi{
         sparse_matrix_t m_inv_P;
         struct matrix_descr m_descr_inv_P;
         sparse_status_t m_status;
+        bool should_destroy;
 
     };
 
@@ -45,43 +47,8 @@ namespace scopi{
     OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
     : OptimUzawaBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr)
     , MatrixOptimSolver<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr)
-    {}
-
-    template<std::size_t dim>
-    void OptimUzawaMkl<dim>::setup_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+    , should_destroy(false)
     {
-        PLOG_NONE << "OptimUzawaMkl::setup_impl";
-        // constraint matrix
-        this->create_matrix_constraint_coo(contacts, m_A_coo_row, m_A_coo_col, m_A_coo_val, 0);
-
-        sparse_matrix_t A_coo;
-        m_status =  mkl_sparse_d_create_coo(&A_coo,
-                                           SPARSE_INDEX_BASE_ZERO,
-                                           contacts.size(), // number of rows
-                                           6*base_type::m_Nactive, // number of cols
-                                           m_A_coo_val.size(), // number of non-zero elements
-                                           m_A_coo_row.data(),
-                                           m_A_coo_col.data(),
-                                           m_A_coo_val.data());
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_create_coo for matrix A: " << m_status;
-
-        m_status = mkl_sparse_convert_csr(A_coo,
-                                          SPARSE_OPERATION_NON_TRANSPOSE,
-                                          &m_A);
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_convert_csr for matrix A: " << m_status;
-
-        m_descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
-
-        m_status = mkl_sparse_set_mv_hint(m_A, SPARSE_OPERATION_NON_TRANSPOSE, m_descrA, 1 );
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_NON_TRANSPOSE: " << m_status;
-
-        m_status = mkl_sparse_set_mv_hint(m_A, SPARSE_OPERATION_TRANSPOSE, m_descrA, 1 );
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_TRANSPOSE: " << m_status;
-
-        m_status = mkl_sparse_optimize ( m_A );
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix A: " << m_status;
-
-        // mass matrix
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;
         std::vector<double> invP_csr_val;
@@ -130,6 +97,57 @@ namespace scopi{
     }
 
     template<std::size_t dim>
+    OptimUzawaMkl<dim>::~OptimUzawaMkl()
+    {
+        m_status = mkl_sparse_destroy ( m_A );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix A: " << m_status;
+        m_status = mkl_sparse_destroy ( m_inv_P );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix P^-1: " << m_status;
+    }
+
+
+    template<std::size_t dim>
+    void OptimUzawaMkl<dim>::setup_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+    {
+        if(should_destroy)
+        {
+            m_status = mkl_sparse_destroy ( m_A );
+            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix A: " << m_status;
+        }
+
+        this->create_matrix_constraint_coo(contacts, 0);
+
+        sparse_matrix_t A_coo;
+        m_status =  mkl_sparse_d_create_coo(&A_coo,
+                                           SPARSE_INDEX_BASE_ZERO,
+                                           contacts.size(), // number of rows
+                                           6*base_type::m_Nactive, // number of cols
+                                           this->m_A_values.size(), // number of non-zero elements
+                                           this->m_A_rows.data(),
+                                           this->m_A_cols.data(),
+                                           this->m_A_values.data());
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_create_coo for matrix A: " << m_status;
+
+        m_status = mkl_sparse_convert_csr(A_coo,
+                                          SPARSE_OPERATION_NON_TRANSPOSE,
+                                          &m_A);
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_convert_csr for matrix A: " << m_status;
+
+        m_descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
+
+        m_status = mkl_sparse_set_mv_hint(m_A, SPARSE_OPERATION_NON_TRANSPOSE, m_descrA, 1 );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_NON_TRANSPOSE: " << m_status;
+
+        m_status = mkl_sparse_set_mv_hint(m_A, SPARSE_OPERATION_TRANSPOSE, m_descrA, 1 );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_set_mv_hint for matrix A SPARSE_OPERATION_TRANSPOSE: " << m_status;
+
+        m_status = mkl_sparse_optimize ( m_A );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix A: " << m_status;
+
+        should_destroy = true;
+    }
+
+    template<std::size_t dim>
     void OptimUzawaMkl<dim>::gemv_inv_P_impl()
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_U.data(), 0., this->m_U.data()); // U = - P^-1 * U
@@ -153,11 +171,6 @@ namespace scopi{
     template<std::size_t dim>
     void OptimUzawaMkl<dim>::tear_down_impl()
     {
-        mkl_sparse_destroy ( m_inv_P );
-        mkl_sparse_destroy ( m_A );
-        m_A_coo_row.clear();
-        m_A_coo_col.clear();
-        m_A_coo_val.clear();
     }
 
     template<std::size_t dim>

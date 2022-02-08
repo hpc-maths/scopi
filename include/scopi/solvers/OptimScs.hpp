@@ -25,10 +25,23 @@ namespace scopi{
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
         ScsMatrix m_P;
+        std::vector<scs_float> m_P_x;
+        std::vector<scs_int> m_P_i;
+        std::vector<scs_int> m_P_p;
+
         ScsMatrix m_A;
+        std::vector<scs_float> m_A_x;
+        std::vector<scs_int> m_A_i;
+        std::vector<scs_int> m_A_p;
+
         ScsData m_d;
         ScsCone m_k;
+
         ScsSolution m_sol;
+        std::vector<scs_float> m_sol_x;
+        std::vector<scs_float> m_sol_y;
+        std::vector<scs_float> m_sol_s;
+
         ScsInfo m_info;
         ScsSettings m_stgs;
         OptimScs(const OptimScs &);
@@ -39,111 +52,68 @@ namespace scopi{
     OptimScs<dim>::OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol) 
     : OptimBase<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
     , MatrixOptimSolver<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr)
+    , m_P_x(6*Nactive)
+    , m_P_i(6*Nactive)
+    , m_P_p(6*Nactive+1)
+    , m_A_p(6*Nactive+1)
+    , m_sol_x(6*Nactive)
     {
-        m_P.x = new scs_float[6*base_type::m_Nactive];
-        m_P.i = new scs_int[6*base_type::m_Nactive];
-        m_P.p = new scs_int[6*base_type::m_Nactive+1];
-        m_sol.x = new double[6*base_type::m_Nactive];
-        m_A.p = new scs_int[6*base_type::m_Nactive+1];
-        // default values not set
-        // use values given by
-        // https://www.cvxgrp.org/scs/api/settings.html#settings
-        m_stgs.normalize = 1;
-        m_stgs.scale = 0.1;
-        m_stgs.adaptive_scale = 1;
-        m_stgs.rho_x = 1e-6;
-        m_stgs.max_iters = 1e5;
+        std::size_t index = 0;
+        for (std::size_t i = 0; i < base_type::m_Nactive; ++i)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                m_P_i[index] = 3*i + d;
+                m_P_p[index] = 3*i + d;
+                m_P_x[index] = this->m_mass; // TODO: add mass into particles
+                index++;
+            }
+        }
+        for (std::size_t i = 0; i < base_type::m_Nactive; ++i)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                m_P_i[index] = 3*base_type::m_Nactive + 3*i + d;
+                m_P_p[index] = 3*base_type::m_Nactive + 3*i + d;
+                m_P_x[index] = this->m_moment;
+                index++;
+            }
+        }
+        m_P_p[index] = 6*base_type::m_Nactive;
+
+        m_P.x = m_P_x.data();
+        m_P.i = m_P_i.data();
+        m_P.p = m_P_p.data();
+        m_P.m = 6*base_type::m_Nactive;
+        m_P.n = 6*base_type::m_Nactive;
+
+        scs_set_default_settings(&m_stgs);
         m_stgs.eps_abs = tol;
         m_stgs.eps_rel = tol;
         m_stgs.eps_infeas = tol*1e-3;
-        m_stgs.alpha = 1.5;
-        m_stgs.time_limit_secs = 0.;
         m_stgs.verbose = 0;
-        m_stgs.warm_start = 0;
-        m_stgs.acceleration_lookback = 0;
-        m_stgs.acceleration_interval = 1;
-        m_stgs.write_data_filename = NULL;
-        m_stgs.log_csv_filename = NULL;
-
     }
 
     template<std::size_t dim>
     OptimScs<dim>::~OptimScs()
     {
-        delete[] m_P.x;
-        delete[] m_P.i;
-        delete[] m_P.p;
     }
 
     template<std::size_t dim>
     void OptimScs<dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
     {
-        // constraint matrix
-        std::size_t nc = contacts.size();
-        m_A.x = new scs_float[2*6*nc];
-        m_A.i = new scs_int[2*6*nc];
-        m_sol.y = new scs_float[nc];
-        m_sol.s = new scs_float[nc];
-        // COO storage to CSR storage is easy to write, e.g.
+        this->create_matrix_constraint_coo(contacts, 0);
+
+        // COO storage to CSR storage is easy to write
         // The CSC storage of A is the CSR storage of A^T
         // reverse the role of row and column pointers to have the transpose
-        std::vector<int> coo_rows;
-        std::vector<int> coo_cols;
-        std::vector<double> coo_vals;
-        this->create_matrix_constraint_coo(contacts, coo_rows, coo_cols, coo_vals, 0);
+        this->coo_to_csr(this->m_A_cols, this->m_A_rows, this->m_A_values, m_A_p, m_A_i, m_A_x);
 
-        std::vector<int> csc_row;
-        std::vector<int> csc_col;
-        std::vector<double> csc_val;
-        this->coo_to_csr(coo_cols, coo_rows, coo_vals, csc_col, csc_row, csc_val);
-
-        for (std::size_t i = 0; i < csc_val.size(); ++i)
-            m_A.x[i] = csc_val[i];
-        for (std::size_t i = 0; i < csc_row.size(); ++i)
-            m_A.i[i] = csc_row[i];
-        for (std::size_t i = 0; i < csc_col.size(); ++i)
-            m_A.p[i] = csc_col[i];
+        m_A.x = m_A_x.data();
+        m_A.i = m_A_i.data();
+        m_A.p = m_A_p.data();
         m_A.m = contacts.size();
         m_A.n = 6*base_type::m_Nactive;
-
-        // mass matrix
-        std::vector<scs_int> col;
-        std::vector<scs_int> row;
-        std::vector<scs_float> val;
-        row.reserve(6*base_type::m_Nactive);
-        col.reserve(6*base_type::m_Nactive+1);
-        val.reserve(6*base_type::m_Nactive);
-
-        for (std::size_t i = 0; i < base_type::m_Nactive; ++i)
-        {
-            for (std::size_t d = 0; d < 3; ++d)
-            {
-                row.push_back(3*i + d);
-                col.push_back(3*i + d);
-                val.push_back(this->m_mass); // TODO: add mass into particles
-            }
-        }
-        for (std::size_t i = 0; i < base_type::m_Nactive; ++i)
-        {
-            for (std::size_t d = 0; d < 3; ++d)
-            {
-                row.push_back(3*base_type::m_Nactive + 3*i + d);
-                col.push_back(3*base_type::m_Nactive + 3*i + d);
-                val.push_back(this->m_moment);
-            }
-        }
-        col.push_back(6*base_type::m_Nactive);
-
-        // TODO allocation in constructor
-        // There is a segfault if the memory is allocated in the constructor
-        for (std::size_t i = 0; i < val.size(); ++i)
-            m_P.x[i] = val[i];
-        for (std::size_t i = 0; i < row.size(); ++i)
-            m_P.i[i] = row[i];
-        for (std::size_t i = 0; i < col.size(); ++i)
-            m_P.p[i] = col[i];
-        m_P.m = 6*base_type::m_Nactive;
-        m_P.n = 6*base_type::m_Nactive;
     }
 
     template<std::size_t dim>
@@ -170,6 +140,12 @@ namespace scopi{
         m_k.p = NULL;
         m_k.psize = 0;
 
+        m_sol.x = m_sol_x.data();
+        m_sol_y.resize(this->m_distances.size());
+        m_sol.y = m_sol_y.data();
+        m_sol_s.resize(this->m_distances.size());
+        m_sol.s = m_sol_s.data();
+
         scs(&m_d, &m_k, &m_stgs, &m_sol, &m_info);
 
         return m_info.iter;
@@ -190,11 +166,6 @@ namespace scopi{
     template<std::size_t dim>
     void OptimScs<dim>::tear_down_impl()
     {
-        // TODO check that the memory was indeed allocated before freeing it
-        delete[] m_A.x;
-        delete[] m_A.i;
-        delete[] m_sol.y;
-        delete[] m_sol.s;
     }
 
     template<std::size_t dim>
