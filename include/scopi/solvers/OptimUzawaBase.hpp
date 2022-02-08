@@ -159,8 +159,9 @@ namespace scopi{
 
     template<class D, std::size_t dim>
     void OptimUzawaBase<D, dim>::tear_down_impl()
-    {}
-
+    {
+        this->base_type::derived_cast().tear_down_impl();
+    }
 
 }
 #endif
