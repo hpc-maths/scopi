@@ -16,7 +16,6 @@ namespace scopi{
 
     protected:
         OptimBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t c_dec);
-        void setup(const std::vector<neighbor<dim>>& contacts);
 
         scopi_container<dim>& m_particles;
         double m_dt;
@@ -41,7 +40,6 @@ namespace scopi{
         tic();
         create_vector_c();
         create_vector_distances(contacts);
-        setup(contacts);
         auto duration4 = toc();
         PLOG_INFO << "----> CPUTIME : matrices = " << duration4;
 
@@ -109,12 +107,6 @@ namespace scopi{
     auto OptimBase<D, dim>::get_wadapt()
     {
         return this->derived_cast().get_wadapt_impl();
-    }
-
-    template<class D, std::size_t dim>
-    void OptimBase<D, dim>::setup(const std::vector<neighbor<dim>>& contacts)
-    {
-        this->derived_cast().setup_impl(contacts);
     }
 
     template<class D, std::size_t dim>

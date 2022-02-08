@@ -15,7 +15,6 @@ namespace scopi{
         int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
         auto get_uadapt_impl();
         auto get_wadapt_impl();
-        void setup_impl(const std::vector<neighbor<dim>>& contacts);
         int get_nb_active_contacts_impl();
 
     private:
@@ -93,25 +92,19 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    void OptimScs<dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
+    int OptimScs<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts)
     {
         this->create_matrix_constraint_coo(contacts, 0);
-
         // COO storage to CSR storage is easy to write
         // The CSC storage of A is the CSR storage of A^T
         // reverse the role of row and column pointers to have the transpose
         this->coo_to_csr(this->m_A_cols, this->m_A_rows, this->m_A_values, m_A_p, m_A_i, m_A_x);
-
         m_A.x = m_A_x.data();
         m_A.i = m_A_i.data();
         m_A.p = m_A_p.data();
         m_A.m = contacts.size();
         m_A.n = 6*base_type::m_Nactive;
-    }
 
-    template<std::size_t dim>
-    int OptimScs<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>&)
-    {
         m_d.m = this->m_distances.size();
         m_d.n = 6*base_type::m_Nactive;
         m_d.A = &m_A;

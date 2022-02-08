@@ -20,7 +20,7 @@ namespace scopi{
     public:
         OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
         ~OptimUzawaMkl();
-        void setup_impl(const std::vector<neighbor<dim>>& contacts);
+        void init_uzawa_impl(const std::vector<neighbor<dim>>& contacts);
 
         void gemv_inv_P_impl();
         void gemv_A_impl(const std::vector<neighbor<dim>>& contacts);
@@ -106,7 +106,7 @@ namespace scopi{
 
 
     template<std::size_t dim>
-    void OptimUzawaMkl<dim>::setup_impl(const std::vector<scopi::neighbor<dim>>& contacts)
+    void OptimUzawaMkl<dim>::init_uzawa_impl(const std::vector<scopi::neighbor<dim>>& contacts)
     {
         if(should_destroy)
         {

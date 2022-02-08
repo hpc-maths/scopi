@@ -21,7 +21,6 @@ namespace scopi{
         int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
         auto get_uadapt_impl();
         auto get_wadapt_impl();
-        void setup_impl(const std::vector<neighbor<dim>>& contacts);
         int get_nb_active_contacts_impl();
 
     private:
@@ -31,6 +30,7 @@ namespace scopi{
         void gemv_inv_P();
         void gemv_A(const std::vector<neighbor<dim>>& contacts);
         void gemv_transpose_A(const std::vector<neighbor<dim>>& contacts);
+        void init_uzawa(const std::vector<neighbor<dim>>& contacts);
 
         const double m_tol;
         const std::size_t m_max_iter;
@@ -54,6 +54,7 @@ namespace scopi{
     template<class D, std::size_t dim>
     int OptimUzawaBase<D, dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts)
     {
+        init_uzawa(contacts);
         m_L = xt::zeros_like(this->m_distances);
         m_R = xt::zeros_like(this->m_distances);
 
@@ -151,9 +152,9 @@ namespace scopi{
     }
 
     template<class D, std::size_t dim>
-    void OptimUzawaBase<D, dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
+    void OptimUzawaBase<D, dim>::init_uzawa(const std::vector<neighbor<dim>>& contacts)
     {
-        this->base_type::derived_cast().setup_impl(contacts);
+        this->base_type::derived_cast().init_uzawa_impl(contacts);
     }
 }
 #endif

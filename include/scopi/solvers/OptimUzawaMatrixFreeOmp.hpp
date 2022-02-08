@@ -20,7 +20,7 @@ namespace scopi{
         void gemv_inv_P_impl();
         void gemv_A_impl(const std::vector<neighbor<dim>>& contacts);
         void gemv_transpose_A_impl(const std::vector<neighbor<dim>>& contacts);
-        void setup_impl(const std::vector<neighbor<dim>>& contacts);
+        void init_uzawa_impl(const std::vector<neighbor<dim>>& contacts);
     };
 
     template<std::size_t dim>
@@ -29,7 +29,7 @@ namespace scopi{
     {}
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeOmp<dim>::setup_impl(const std::vector<neighbor<dim>>&)
+    void OptimUzawaMatrixFreeOmp<dim>::init_uzawa_impl(const std::vector<neighbor<dim>>&)
     {}
 
     template<std::size_t dim>

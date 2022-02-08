@@ -22,7 +22,6 @@ namespace scopi{
         int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
         auto get_uadapt_impl();
         auto get_wadapt_impl();
-        void setup_impl(const std::vector<neighbor<dim>>& contacts);
         int get_nb_active_contacts_impl();
 
     private:
@@ -77,18 +76,7 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    void OptimMosek<dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
-    {
-        this->create_matrix_constraint_coo(contacts, 1);
-
-        m_A = Matrix::sparse(contacts.size(), 1 + 6*base_type::m_Nactive + 6*base_type::m_Nactive,
-                             std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
-                             std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
-                             std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
-    }
-
-    template<std::size_t dim>
-    int OptimMosek<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>&)
+    int OptimMosek<dim>::solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts)
     {
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
@@ -100,6 +88,13 @@ namespace scopi{
 
         // constraints
         auto D_mosek = std::make_shared<ndarray<double, 1>>(this->m_distances.data(), shape_t<1>({this->m_distances.shape(0)}));
+         
+        // matrix
+        this->create_matrix_constraint_coo(contacts, 1);
+        m_A = Matrix::sparse(contacts.size(), 1 + 6*base_type::m_Nactive + 6*base_type::m_Nactive,
+                             std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
+                             std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
+                             std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
         Constraint::t qc1 = model->constraint("qc1", Expr::mul(m_A, X), Domain::lessThan(D_mosek));
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
