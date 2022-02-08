@@ -12,12 +12,10 @@ namespace scopi{
     {
     public:
         OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol = 1e-7);
-        ~OptimScs();
         int solve_optimization_problem_impl(const std::vector<neighbor<dim>>& contacts);
         auto get_uadapt_impl();
         auto get_wadapt_impl();
         void setup_impl(const std::vector<neighbor<dim>>& contacts);
-        void tear_down_impl();
         int get_nb_active_contacts_impl();
 
     private:
@@ -95,11 +93,6 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    OptimScs<dim>::~OptimScs()
-    {
-    }
-
-    template<std::size_t dim>
     void OptimScs<dim>::setup_impl(const std::vector<neighbor<dim>>& contacts)
     {
         this->create_matrix_constraint_coo(contacts, 0);
@@ -164,11 +157,6 @@ namespace scopi{
     }
 
     template<std::size_t dim>
-    void OptimScs<dim>::tear_down_impl()
-    {
-    }
-
-    template<std::size_t dim>
     int OptimScs<dim>::get_nb_active_contacts_impl()
     {
         int nb_active_contacts = 0;
@@ -229,6 +217,5 @@ namespace scopi{
         }
         csr_rows[0] = 0;
     }
-
 }
 #endif

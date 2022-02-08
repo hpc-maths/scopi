@@ -21,7 +21,6 @@ namespace scopi{
         OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
         ~OptimUzawaMkl();
         void setup_impl(const std::vector<neighbor<dim>>& contacts);
-        void tear_down_impl();
 
         void gemv_inv_P_impl();
         void gemv_A_impl(const std::vector<neighbor<dim>>& contacts);
@@ -166,11 +165,6 @@ namespace scopi{
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, this->m_L.data(), 1., this->m_U.data()); // U = A^T * L + U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status;
-    }
-
-    template<std::size_t dim>
-    void OptimUzawaMkl<dim>::tear_down_impl()
-    {
     }
 
     template<std::size_t dim>

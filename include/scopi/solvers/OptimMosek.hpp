@@ -23,7 +23,6 @@ namespace scopi{
         auto get_uadapt_impl();
         auto get_wadapt_impl();
         void setup_impl(const std::vector<neighbor<dim>>& contacts);
-        void tear_down_impl();
         int get_nb_active_contacts_impl();
 
     private:
@@ -144,10 +143,5 @@ namespace scopi{
         }
         return nb_active_contacts;
     }
-
-    template<std::size_t dim>
-    void OptimMosek<dim>::tear_down_impl()
-    {}
-
 }
 #endif

@@ -22,7 +22,6 @@ namespace scopi{
         auto get_uadapt_impl();
         auto get_wadapt_impl();
         void setup_impl(const std::vector<neighbor<dim>>& contacts);
-        void tear_down_impl();
         int get_nb_active_contacts_impl();
 
     private:
@@ -156,12 +155,5 @@ namespace scopi{
     {
         this->base_type::derived_cast().setup_impl(contacts);
     }
-
-    template<class D, std::size_t dim>
-    void OptimUzawaBase<D, dim>::tear_down_impl()
-    {
-        this->base_type::derived_cast().tear_down_impl();
-    }
-
 }
 #endif

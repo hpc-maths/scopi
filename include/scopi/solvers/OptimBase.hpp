@@ -17,7 +17,6 @@ namespace scopi{
     protected:
         OptimBase(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t c_dec);
         void setup(const std::vector<neighbor<dim>>& contacts);
-        void tear_down();
 
         scopi_container<dim>& m_particles;
         double m_dt;
@@ -53,7 +52,6 @@ namespace scopi{
         PLOG_INFO << "----> CPUTIME : solve = " << duration5;
         PLOG_INFO << "iterations : " << nbIter;
         PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
-        tear_down();
     }
 
 
@@ -117,12 +115,6 @@ namespace scopi{
     void OptimBase<D, dim>::setup(const std::vector<neighbor<dim>>& contacts)
     {
         this->derived_cast().setup_impl(contacts);
-    }
-
-    template<class D, std::size_t dim>
-    void OptimBase<D, dim>::tear_down()
-    {
-        this->derived_cast().tear_down_impl();
     }
 
     template<class D, std::size_t dim>
