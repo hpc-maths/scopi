@@ -8,7 +8,7 @@
 namespace scopi{
     template<std::size_t dim>
     class OptimScs: public OptimBase<OptimScs<dim>, dim>
-                  , public MatrixOptimSolver<OptimScs<dim>, dim>
+                  , public MatrixOptimSolver<dim>
     {
     public:
         OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol = 1e-7);
@@ -49,7 +49,7 @@ namespace scopi{
     template<std::size_t dim>
     OptimScs<dim>::OptimScs(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol) 
     : OptimBase<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr, 2*3*Nactive, 0)
-    , MatrixOptimSolver<OptimScs<dim>, dim>(particles, dt, Nactive, active_ptr)
+    , MatrixOptimSolver<dim>(particles, dt, Nactive, active_ptr)
     , m_P_x(6*Nactive)
     , m_P_i(6*Nactive)
     , m_P_p(6*Nactive+1)

@@ -13,7 +13,7 @@ namespace scopi{
 
     template <std::size_t dim>
     class OptimMosek: public OptimBase<OptimMosek<dim>, dim>
-                    , public MatrixOptimSolver<OptimMosek<dim>, dim>
+                    , public MatrixOptimSolver<dim>
     {
     public:
         OptimMosek(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double tol = 1e-8);
@@ -36,7 +36,7 @@ namespace scopi{
     template<std::size_t dim>
     OptimMosek<dim>::OptimMosek(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, double)
     : OptimBase<OptimMosek<dim>, dim>(particles, dt, Nactive, active_ptr, 1 + 2*3*Nactive + 2*3*Nactive, 1)
-    , MatrixOptimSolver<OptimMosek<dim>, dim>(particles, dt, Nactive, active_ptr)
+    , MatrixOptimSolver<dim>(particles, dt, Nactive, active_ptr)
     {
         this->m_c(0) = 1;
 

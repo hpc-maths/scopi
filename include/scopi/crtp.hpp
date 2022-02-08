@@ -2,9 +2,7 @@
 
 namespace scopi
 {
-    class Foo{};
-
-    template <class D, class crtpType = Foo>
+    template <class D>
     class crtp_base
     {
     public:
@@ -25,20 +23,20 @@ namespace scopi
         crtp_base& operator=(crtp_base&&) = default;
     };
 
-    template <class D, class crtpType>
-    inline auto crtp_base<D, crtpType>::derived_cast() const & noexcept -> const derived_type&
+    template <class D>
+    inline auto crtp_base<D>::derived_cast() const & noexcept -> const derived_type&
     {
         return *static_cast<const derived_type*>(this);
     }
 
-    template <class D, class crtpType>
-    inline auto crtp_base<D, crtpType>::derived_cast() & noexcept -> derived_type&
+    template <class D>
+    inline auto crtp_base<D>::derived_cast() & noexcept -> derived_type&
     {
         return *static_cast<derived_type*>(this);
     }
 
-    template <class D, class crtpType>
-    inline auto crtp_base<D, crtpType>::derived_cast() && noexcept -> derived_type
+    template <class D>
+    inline auto crtp_base<D>::derived_cast() && noexcept -> derived_type
     {
         return *static_cast<derived_type*>(this);
     }

@@ -15,7 +15,7 @@
 namespace scopi{
     template<std::size_t dim>
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<dim>, dim>
-                       , public MatrixOptimSolver<OptimUzawaMkl<dim>, dim>
+                       , public MatrixOptimSolver<dim>
     {
     public:
         OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
@@ -45,7 +45,7 @@ namespace scopi{
     template<std::size_t dim>
     OptimUzawaMkl<dim>::OptimUzawaMkl(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
     : OptimUzawaBase<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr)
-    , MatrixOptimSolver<OptimUzawaMkl<dim>, dim>(particles, dt, Nactive, active_ptr)
+    , MatrixOptimSolver<dim>(particles, dt, Nactive, active_ptr)
     , should_destroy(false)
     {
         std::vector<MKL_INT> invP_csr_row;

@@ -6,8 +6,8 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi{
-    template <class D, std::size_t dim>
-    class MatrixOptimSolver: public crtp_base<D, MatrixOptimSolver<D, dim>>
+    template <std::size_t dim>
+    class MatrixOptimSolver
     {
     protected:
         MatrixOptimSolver(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
@@ -24,16 +24,16 @@ namespace scopi{
     };
 
 
-    template<class D, std::size_t dim>
-    MatrixOptimSolver<D, dim>::MatrixOptimSolver(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
+    template<std::size_t dim>
+    MatrixOptimSolver<dim>::MatrixOptimSolver(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr)
     : m_particles(particles)
     , m_dt(dt)
     , m_Nactive(Nactive)
     , m_active_ptr(active_ptr)
     {}
 
-    template<class D, std::size_t dim>
-    void MatrixOptimSolver<D, dim>::create_matrix_constraint_coo(const std::vector<neighbor<dim>>& contacts, std::size_t firstCol)
+    template<std::size_t dim>
+    void MatrixOptimSolver<dim>::create_matrix_constraint_coo(const std::vector<neighbor<dim>>& contacts, std::size_t firstCol)
     {
         std::size_t u_size = 3*contacts.size()*2;
         std::size_t w_size = 3*contacts.size()*2;

@@ -7,7 +7,7 @@
 
 namespace scopi{
     template <class D, std::size_t dim>
-    class OptimBase: public crtp_base<D, OptimBase<D, dim>>
+    class OptimBase: public crtp_base<D>
     {
     public:
         void run(const std::vector<neighbor<dim>>& contacts, const std::size_t nite);
