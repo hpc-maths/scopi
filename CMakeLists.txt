@@ -96,6 +96,7 @@ endif()
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
+    src/solvers/OptimUzawaMatrixFreeOmp.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/minpack.cpp
@@ -105,7 +106,7 @@ set(SCOPI_SRC
 
 add_library(scopi ${SCOPI_SRC})
 
-target_include_directories(scopi PUBLIC 
+target_include_directories(scopi PUBLIC
                                  $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
                                  $<INSTALL_INTERFACE:include>)
 

@@ -6,11 +6,13 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi{
-    template <std::size_t dim>
     class MatrixOptimSolver
     {
     protected:
+        template <std::size_t dim>
         MatrixOptimSolver(scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr);
+
+        template <std::size_t dim>
         void create_matrix_constraint_coo(const std::vector<neighbor<dim>>& contacts, std::size_t firstCol);
 
         scopi_container<dim>& m_particles;

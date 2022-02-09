@@ -38,14 +38,14 @@ target_link_libraries(critical_2d_spheres scopi)
 
 add_executable(two_spheres two_spheres.cpp)
 target_link_libraries(two_spheres scopi)
-if (APPLE)
-   add_custom_command(TARGET two_spheres
-   POST_BUILD COMMAND
-   ${CMAKE_INSTALL_NAME_TOOL} -change
-   `otool -L two_spheres | sed -n -e \" "s/.*\\(libmosek.*dylib\\).*/\\1/p" \"`
-   ${MOSEK_LIBRARY} two_spheres
-   )
-endif(APPLE)
+# if (APPLE)
+#    add_custom_command(TARGET two_spheres
+#    POST_BUILD COMMAND
+#    ${CMAKE_INSTALL_NAME_TOOL} -change
+#    `otool -L two_spheres | sed -n -e \" "s/.*\\(libmosek.*dylib\\).*/\\1/p" \"`
+#    ${MOSEK_LIBRARY} two_spheres
+#    )
+# endif(APPLE)
 
 add_executable(two_spheres_periodic two_spheres_periodic.cpp)
 target_link_libraries(two_spheres_periodic scopi)

@@ -21,7 +21,7 @@ namespace scopi
                 auto f_ext(scopi_container<dim>& particles, std::size_t i);
             double t_ext();
 
-            double _mass;
+            double m_mass;
             // double _moment;
 
     };
@@ -33,8 +33,8 @@ namespace scopi
             {
                 auto pos = particles.pos()(i + m_active_ptr);
                 double dist = xt::linalg::norm(pos);
-                auto fExt = - _mass*_mass/(dist*dist)*pos/dist;
-                particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*fExt/_mass; // TODO: add mass into particles
+                auto fExt = - m_mass*m_mass/(dist*dist)*pos/dist;
+                particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*fExt/m_mass; // TODO: add mass into particles
             }
             // TODO should be dt * (R_i * t_i^{ext , n} - omega'_i * (J_i omega'_i)
             particles.desired_omega() = particles.omega();
@@ -58,7 +58,7 @@ namespace scopi
         {
             auto pos = particles.pos()(i + m_active_ptr);
             double dist = xt::linalg::norm(pos);
-            auto res = _mass/(dist*dist)*pos/dist;
+            auto res = m_mass/(dist*dist)*pos/dist;
             return res;
         }
 }

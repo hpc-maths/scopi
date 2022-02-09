@@ -32,14 +32,14 @@ namespace scopi
 {
 
     template<std::size_t dim,
-             template<std::size_t> class optim_solver_t = OptimUzawaMatrixFreeOmp,
+             class optim_solver_t = OptimUzawaMatrixFreeOmp,
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed
              >
     class ScopiSolver
     {
     public:
-        ScopiSolver(scopi_container<dim>& particles, double dt, std::size_t active_ptr);
+        ScopiSolver(scopi_container<dim>& particles, double dt);
         void solve(std::size_t total_it);
 
     private:
@@ -50,24 +50,19 @@ namespace scopi
         void move_active_particles();
         scopi_container<dim>& m_particles;
         double m_dt;
-        std::size_t m_active_ptr;
-        std::size_t m_Nactive;
-        optim_solver_t<dim> m_solver;
+        optim_solver_t m_solver;
         vap_t m_vap;
-
     };
 
-    template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, std::size_t active_ptr)
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
     : m_particles(particles)
     , m_dt(dt)
-    , m_active_ptr(active_ptr)
-    , m_Nactive(m_particles.size() - m_active_ptr)
-    , m_solver(m_particles, m_dt, m_Nactive, m_active_ptr)
-    , m_vap(m_Nactive, m_active_ptr, m_dt)
+    , m_solver(m_particles.nb_active(), m_dt)
+    , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
-    template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it)
     {
         // Time Loop
@@ -94,7 +89,7 @@ namespace scopi
             m_vap.set_a_priori_velocity(m_particles);
 
             // solver optimization problem
-            m_solver.run(contacts, nite);
+            m_solver.run(m_particles, contacts, nite);
 
             // move the active particles
             move_active_particles();
@@ -103,10 +98,10 @@ namespace scopi
         }
     }
 
-    template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
     {
-        for (std::size_t i = 0; i < m_active_ptr; ++i)
+        for (std::size_t i = 0; i < m_particles.nb_inactive(); ++i)
         {
             xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, m_particles.desired_omega()(i)});
             double normw = xt::linalg::norm(w);
@@ -114,7 +109,7 @@ namespace scopi
             {
                 normw = 1;
             }
-            type::quaternion expw;
+            type::quaternion_t expw;
             expw(0) = std::cos(0.5*normw*m_dt);
             xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
 
@@ -128,18 +123,18 @@ namespace scopi
         }
     }
 
-    template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
         // // contact_brute_force cont(2);
         // contact_t cont(2., 10.);
         contact_t cont(2.);
-        auto contacts = cont.run(m_particles, m_active_ptr);
+        auto contacts = cont.run(m_particles, m_particles.nb_inactive());
         PLOG_INFO << "contacts.size() = " << contacts.size() << std::endl;
         return contacts;
     }
 
-    template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         nl::json json_output;
@@ -171,14 +166,14 @@ namespace scopi
         file.close();
     }
 
-    template<std::size_t dim, template<std::size_t> class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::move_active_particles()
     {
-
+        std::size_t active_offset = m_particles.nb_inactive();
         auto uadapt = m_solver.get_uadapt();
         auto wadapt = m_solver.get_wadapt();
 
-        for (std::size_t i = 0; i < m_Nactive; ++i)
+        for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
             xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, wadapt(i, 2)});
             double normw = xt::linalg::norm(w);
@@ -186,19 +181,19 @@ namespace scopi
             {
                 normw = 1;
             }
-            type::quaternion expw;
+            type::quaternion_t expw;
             expw(0) = std::cos(0.5*normw*m_dt);
             xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
             for (std::size_t d = 0; d < dim; ++d)
             {
-                m_particles.pos()(i + m_active_ptr)(d) += m_dt*uadapt(i, d);
+                m_particles.pos()(i + active_offset)(d) += m_dt*uadapt(i, d);
             }
             // xt::view(particles.pos(), i) += dt*xt::view(uadapt, i);
 
             // particles.q()(i) = quaternion(theta(i));
             // std::cout << expw << " " << particles.q()(i) << std::endl;
-            m_particles.q()(i + m_active_ptr) = mult_quaternion(m_particles.q()(i + m_active_ptr), expw);
-            normalize(m_particles.q()(i + m_active_ptr));
+            m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
+            normalize(m_particles.q()(i + active_offset));
             // std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
             // std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
 

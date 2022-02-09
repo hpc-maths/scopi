@@ -20,11 +20,11 @@ namespace scopi
                 sphere<dim> s2({{1., 1.}}, 0.2);
                 sphere<dim> s3({{5., 10.}}, 0.1);
 
-                particles.push_back(s1, {{0, 0}}, {{0., 0}}, 0, 0, {{0, 0}});
-                particles.push_back(s2, {{0, 0}}, {{-0., 0}}, 0, 0, {{0, 0}});
-                particles.push_back(s3, {{0, 0}}, {{-0., 0}}, 0, 0, {{0, 0}});
+                particles.push_back(s1);
+                particles.push_back(s2);
+                particles.push_back(s3);
 
-                contact_kdtree cont(2., 5.76); 
+                contact_kdtree cont(2., 5.76);
                 m_contacts = cont.run(particles, 0);
                 m_nMatches = cont.get_nMatches();
             }
@@ -56,7 +56,7 @@ namespace scopi
     TEST_F(ContactsKdtreeTest, normal)
     {
         EXPECT_DOUBLE_EQ(m_contacts[0].nij(0), -1./std::sqrt(2.));
-        EXPECT_DOUBLE_EQ(m_contacts[0].nij(1), -1./std::sqrt(2.)); 
+        EXPECT_DOUBLE_EQ(m_contacts[0].nij(1), -1./std::sqrt(2.));
     }
 
     TEST_F(ContactsKdtreeTest, position)
