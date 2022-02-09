@@ -78,7 +78,7 @@ namespace scopi
                 {
                     normw = 1;
                 }
-                scopi::type::quaternion expw;
+                scopi::type::quaternion_t expw;
                 expw(0) = std::cos(0.5*normw*dt);
                 xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*dt)/normw*w;
 
@@ -399,7 +399,7 @@ namespace scopi
                 {
                     normw = 1;
                 }
-                scopi::type::quaternion expw;
+                scopi::type::quaternion_t expw;
                 expw(0) = std::cos(0.5*normw*dt);
                 xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*dt)/normw*w;
                 for (std::size_t d=0; d<dim; ++d)

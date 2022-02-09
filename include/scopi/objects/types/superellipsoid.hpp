@@ -18,8 +18,8 @@ namespace scopi
         using position_type = typename base_type::position_type;
         using quaternion_type = typename base_type::quaternion_type;
 
-        superellipsoid(position_type pos, type::position<dim> radius, type::position<dim-1>  squareness);
-        superellipsoid(position_type pos, quaternion_type q, type::position<dim> radius, type::position<dim-1>  squareness);
+        superellipsoid(position_type pos, type::position_t<dim> radius, type::position_t<dim-1>  squareness);
+        superellipsoid(position_type pos, quaternion_type q, type::position_t<dim> radius, type::position_t<dim-1>  squareness);
 
         // superellipsoid(const superellipsoid&) = default;
         // superellipsoid& operator=(const superellipsoid&) = default;
@@ -43,8 +43,8 @@ namespace scopi
 
         void create_hash();
 
-        type::position<dim>  m_radius;
-        type::position<dim-1>  m_squareness; // e, n
+        type::position_t<dim>  m_radius;
+        type::position_t<dim-1>  m_squareness; // e, n
         std::size_t m_hash;
     };
 
@@ -52,7 +52,7 @@ namespace scopi
     // superellipsoid implementation //
     ///////////////////////////////////
     template<std::size_t dim, bool owner>
-    superellipsoid<dim, owner>::superellipsoid(position_type pos, type::position<dim> radius, type::position<dim-1>  squareness)
+    superellipsoid<dim, owner>::superellipsoid(position_type pos, type::position_t<dim> radius, type::position_t<dim-1>  squareness)
     : base_type(pos, {quaternion()}, 1)
     , m_radius(radius)
     , m_squareness(squareness)
@@ -61,7 +61,7 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
-    superellipsoid<dim, owner>::superellipsoid(position_type pos, quaternion_type q, type::position<dim> radius, type::position<dim-1>  squareness)
+    superellipsoid<dim, owner>::superellipsoid(position_type pos, quaternion_type q, type::position_t<dim> radius, type::position_t<dim-1>  squareness)
     : base_type(pos, q, 1)
     , m_radius(radius)
     , m_squareness(squareness)
