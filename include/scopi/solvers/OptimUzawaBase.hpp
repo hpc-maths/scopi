@@ -22,8 +22,8 @@ namespace scopi{
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts);
 
-        auto get_uadapt_impl();
-        auto get_wadapt_impl();
+        auto uadapt_data();
+        auto wadapt_data();
 
         int get_nb_active_contacts_impl() const;
 
@@ -128,15 +128,15 @@ namespace scopi{
     }
 
     template<class Derived>
-    auto OptimUzawaBase<Derived>::get_uadapt_impl()
+    auto OptimUzawaBase<Derived>::uadapt_data()
     {
-        return xt::adapt(reinterpret_cast<double*>(m_U.data()), {this->m_nparts, 3UL});
+        return m_U.data();
     }
 
     template<class Derived>
-    auto OptimUzawaBase<Derived>::get_wadapt_impl()
+    auto OptimUzawaBase<Derived>::wadapt_data()
     {
-        return xt::adapt(reinterpret_cast<double*>(m_U.data()+3*this->m_nparts), {this->m_nparts, 3UL});
+        return m_U.data() + 3*this->m_nparts;
     }
 
     template<class Derived>

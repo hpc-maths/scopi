@@ -114,13 +114,15 @@ namespace scopi{
     template<class Derived>
     auto OptimBase<Derived>::get_uadapt()
     {
-        return static_cast<Derived&>(*this).get_uadapt_impl();
+        auto data = static_cast<Derived&>(*this).uadapt_data();
+        return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
     }
 
     template<class Derived>
     auto OptimBase<Derived>::get_wadapt()
     {
-        return static_cast<Derived&>(*this).get_wadapt_impl();
+        auto data = static_cast<Derived&>(*this).wadapt_data();
+        return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
     }
 
     template<class Derived>

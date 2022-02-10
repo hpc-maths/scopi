@@ -96,6 +96,8 @@ endif()
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
+    src/solvers/MatrixOptimSolver.cpp
+    src/solvers/OptimMosek.cpp
     src/solvers/OptimUzawaMatrixFreeOmp.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
