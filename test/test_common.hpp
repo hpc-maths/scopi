@@ -15,16 +15,10 @@
 
 namespace scopi
 {
-    // #define SOLVER_WITH_CONTACT(dim, contact) \
-    //     ScopiSolver<dim, OptimMosek, contact>, \
-    //     ScopiSolver<dim, OptimScs, contact>, \
-    //     ScopiSolver<dim, OptimUzawaMkl, contact>, \
-    //     ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact>, \
-    //     ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact>
-
     #define SOLVER_WITH_CONTACT(dim, contact) \
-        ScopiSolver<dim, OptimScs, contact>, \
         ScopiSolver<dim, OptimMosek, contact>, \
+        ScopiSolver<dim, OptimScs, contact>, \
+        ScopiSolver<dim, OptimUzawaMkl, contact>, \
         ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact>, \
         ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact>
 

@@ -40,7 +40,8 @@ namespace scopi{
                               const std::vector<neighbor<dim>>& contacts);
 
         template <std::size_t dim>
-        void init_uzawa(const std::vector<neighbor<dim>>& contacts);
+        void init_uzawa(const scopi_container<dim>& particles,
+                        const std::vector<neighbor<dim>>& contacts);
 
         const double m_tol;
         const std::size_t m_max_iter;
@@ -66,7 +67,7 @@ namespace scopi{
     int OptimUzawaBase<Derived>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                            const std::vector<neighbor<dim>>& contacts)
     {
-        init_uzawa(contacts);
+        init_uzawa(particles, contacts);
         m_L = xt::zeros_like(this->m_distances);
         m_R = xt::zeros_like(this->m_distances);
 
@@ -170,8 +171,9 @@ namespace scopi{
 
     template<class Derived>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived>::init_uzawa(const std::vector<neighbor<dim>>& contacts)
+    void OptimUzawaBase<Derived>::init_uzawa(const scopi_container<dim>& particles,
+                                             const std::vector<neighbor<dim>>& contacts)
     {
-        static_cast<Derived&>(*this).init_uzawa_impl(contacts);
+        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts);
     }
 }

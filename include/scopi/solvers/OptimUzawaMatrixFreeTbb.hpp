@@ -32,11 +32,13 @@ namespace scopi
                                    const std::vector<neighbor<dim>>& contacts);
 
         template <std::size_t dim>
-        void init_uzawa_impl(const std::vector<neighbor<dim>>& contacts);
+        void init_uzawa_impl(const scopi_container<dim>& particles,
+                             const std::vector<neighbor<dim>>& contacts);
     };
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::init_uzawa_impl(const std::vector<neighbor<dim>>&)
+    void OptimUzawaMatrixFreeTbb::init_uzawa_impl(const scopi_container<dim>& particles,
+                                                  const std::vector<neighbor<dim>>&)
     {}
 
     template<std::size_t dim>
