@@ -6,6 +6,7 @@
 #include "../container.hpp"
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
+#include "../utils.hpp"
 
 namespace scopi
 {
@@ -64,32 +65,8 @@ namespace scopi
                 }
             }
 
-            auto r_i = c.pi - particles.pos()(c.i);
-            auto r_j = c.pj - particles.pos()(c.j);
-
-            xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
-
-            if (dim == 2)
-            {
-                ri_cross = {{      0,      0, r_i(1)},
-                            {      0,      0, -r_i(0)},
-                            {-r_i(1), r_i(0),       0}};
-
-                rj_cross = {{      0,      0,  r_j(1)},
-                            {      0,      0, -r_j(0)},
-                            {-r_j(1), r_j(0),       0}};
-            }
-            else
-            {
-                ri_cross = {{      0, -r_i(2),  r_i(1)},
-                            { r_i(2),       0, -r_i(0)},
-                            {-r_i(1),  r_i(0),       0}};
-
-                rj_cross = {{      0, -r_j(2),  r_j(1)},
-                            { r_j(2),       0, -r_j(0)},
-                            {-r_j(1),  r_j(0),       0}};
-            }
-
+            auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
+            auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
             auto Ri = rotation_matrix<3>(particles.q()(c.i));
             auto Rj = rotation_matrix<3>(particles.q()(c.j));
 
