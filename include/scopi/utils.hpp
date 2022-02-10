@@ -67,29 +67,56 @@ auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double
 
 namespace scopi
 {
+    // namespace detail
+    // {
+    //     using cross_t = xt::xtensor_fixed<double, xt::xshape<3, 3>>;
+
+    //     template <class E>
+    //     cross_t cross_product_impl(std::integral_constant<std::size_t, 2>, const xt::xexpression<E>& e)
+    //     {
+    //         return {{     0,    0,  e.derived_cast()(1)},
+    //                 {     0,    0, -e.derived_cast()(0)},
+    //                 { -e.derived_cast()(1), e.derived_cast()(0),     0}};
+    //     }
+
+    //     template <class E>
+    //     cross_t cross_product_impl(std::integral_constant<std::size_t, 3>, const xt::xexpression<E>& e)
+    //     {
+    //         return {{     0, -e.derived_cast()(2),  e.derived_cast()(1)},
+    //                 {  e.derived_cast()(2),     0, -e.derived_cast()(0)},
+    //                 { -e.derived_cast()(1),  e.derived_cast()(0),     0}};
+    //     }
+    // }
+    // template <std::size_t dim, class E>
+    // auto cross_product(const xt::xexpression<E>& e)
+    // {
+    //     return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
+    // }
+
     namespace detail
     {
         using cross_t = xt::xtensor_fixed<double, xt::xshape<3, 3>>;
 
         template <class E>
-        cross_t cross_product_impl(std::integral_constant<std::size_t, 2>, const xt::xexpression<E>& e)
+        cross_t cross_product_impl(std::integral_constant<std::size_t, 2>, const E& e)
         {
-            return {{     0,    0,  e.derived_cast()(1)},
-                    {     0,    0, -e.derived_cast()(0)},
-                    { -e.derived_cast()(1), e.derived_cast()(0),     0}};
+            return {{     0,    0,  e(1)},
+                    {     0,    0, -e(0)},
+                    { -e(1), e(0),     0}};
         }
 
         template <class E>
-        cross_t cross_product_impl(std::integral_constant<std::size_t, 3>, const xt::xexpression<E>& e)
+        cross_t cross_product_impl(std::integral_constant<std::size_t, 3>, const E& e)
         {
-            return {{     0, -e.derived_cast()(2),  e.derived_cast()(1)},
-                    {  e.derived_cast()(2),     0, -e.derived_cast()(0)},
-                    { -e.derived_cast()(1),  e.derived_cast()(0),     0}};
+            return {{     0, -e(2),  e(1)},
+                    {  e(2),     0, -e(0)},
+                    { -e(1),  e(0),     0}};
         }
     }
     template <std::size_t dim, class E>
-    auto cross_product(const xt::xexpression<E>& e)
+    auto cross_product(const E& e)
     {
         return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
     }
+
 }

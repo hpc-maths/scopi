@@ -100,6 +100,7 @@ set(SCOPI_SRC
     src/solvers/OptimMosek.cpp
     src/solvers/OptimScs.cpp
     src/solvers/OptimUzawaMatrixFreeOmp.cpp
+    src/solvers/OptimUzawaMatrixFreeTbb.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/minpack.cpp
@@ -133,8 +134,7 @@ if(SCOPI_USE_MKL)
 endif()
 
 if(SCOPI_USE_TBB)
-    include_directories(SYSTEM ${TBB_INCLUDE_DIRS})
-    target_link_libraries(scopi PUBLIC ${TBB_LIBRARIES})
+    target_link_libraries(scopi PUBLIC TBB)
     target_compile_definitions(scopi PUBLIC SCOPI_USE_TBB)
 endif()
 
