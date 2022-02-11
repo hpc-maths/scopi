@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <random>
 
 #include "test_common.hpp"
 #include "utils.hpp"
@@ -434,6 +435,54 @@ namespace scopi
         solver.solve(this->m_total_it);
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance);
+    }
+
+    template <class S>
+    class Test2dCaseSpheres  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
+        protected:
+            void SetUp() override {
+                int n = 3; // 2*n*n particles
+                std::default_random_engine generator(0);
+                std::uniform_real_distribution<double> distrib_r(0.2, 0.4);
+                std::uniform_real_distribution<double> distrib_move_x(-0.1, 0.1);
+                std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
+                std::uniform_real_distribution<double> distrib_velocity(2., 5.);
+
+                for(int i = 0; i < n; ++i)
+                {
+                    for(int j = 0; j < n; ++j)
+                    {
+                        double r = distrib_r(generator);
+                        double x = (i + 0.5) + distrib_move_x(generator);
+                        double y = (j + 0.5) + distrib_move_y(generator);
+                        double velocity = distrib_velocity(generator);
+                        sphere<dim> s1({{x, y}}, r);
+                        m_particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}));
+
+                        r = distrib_r(generator);
+                        x = (n + i + 0.5) + distrib_move_x(generator);
+                        y = (j + 0.5) + distrib_move_y(generator);
+                        velocity = distrib_velocity(generator);
+                        sphere<dim> s2({{x, y}}, r);
+                        m_particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}));
+                    }
+                }
+            }
+
+            double m_dt = .01;
+            std::size_t m_total_it = 30;
+            scopi_container<dim> m_particles;
+    };
+
+    TYPED_TEST_SUITE(Test2dCaseSpheres, solver_with_contact_types<2>);
+
+    TYPED_TEST(Test2dCaseSpheres, 2d_case_spheres)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
+
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0029.json", "../test/references/2d_case_spheres.json", tolerance);
     }
 
 }
