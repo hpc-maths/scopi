@@ -1,5 +1,4 @@
 function (generate_executable)
-    message(${ARGN})
     foreach(filename IN LISTS ARGN)
         string(REPLACE ".cpp" "" targetname ${filename})
         add_executable(${targetname} ${filename})
