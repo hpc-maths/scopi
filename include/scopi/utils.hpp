@@ -3,7 +3,12 @@
 #include <chrono>
 #include <vector>
 
+#include <xtensor/xfixed.hpp>
 #include <xtensor-blas/xlinalg.hpp>
+
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
+
 
 /////////////////////////////
 // Functions for the timer //
@@ -55,7 +60,65 @@ auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double
     // std::cout << "newton_method : iteration " << cc << " => u = " << u << std::endl;
     cc += 1;
   }
-  std::cout << "newton_method : !!!!!! FAILED !!!!!! after " << cc << " iterations => RETURN u = " << u << std::endl;
+  PLOG_ERROR << "newton_method : !!!!!! FAILED !!!!!! after " << cc << " iterations => RETURN u = " << u;
 
   return std::make_tuple(u,-1);
+}
+
+namespace scopi
+{
+    // namespace detail
+    // {
+    //     using cross_t = xt::xtensor_fixed<double, xt::xshape<3, 3>>;
+
+    //     template <class E>
+    //     cross_t cross_product_impl(std::integral_constant<std::size_t, 2>, const xt::xexpression<E>& e)
+    //     {
+    //         return {{     0,    0,  e.derived_cast()(1)},
+    //                 {     0,    0, -e.derived_cast()(0)},
+    //                 { -e.derived_cast()(1), e.derived_cast()(0),     0}};
+    //     }
+
+    //     template <class E>
+    //     cross_t cross_product_impl(std::integral_constant<std::size_t, 3>, const xt::xexpression<E>& e)
+    //     {
+    //         return {{     0, -e.derived_cast()(2),  e.derived_cast()(1)},
+    //                 {  e.derived_cast()(2),     0, -e.derived_cast()(0)},
+    //                 { -e.derived_cast()(1),  e.derived_cast()(0),     0}};
+    //     }
+    // }
+    // template <std::size_t dim, class E>
+    // auto cross_product(const xt::xexpression<E>& e)
+    // {
+    //     return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
+    // }
+
+    namespace detail
+    {
+        using cross_t = xt::xtensor_fixed<double, xt::xshape<3, 3>>;
+
+        template <class E>
+        cross_t cross_product_impl(std::integral_constant<std::size_t, 2>, const E& e)
+        {
+            return {{     0,    0,  e(1)},
+                    {     0,    0, -e(0)},
+                    { -e(1), e(0),     0}};
+        }
+
+        template <class E>
+        cross_t cross_product_impl(std::integral_constant<std::size_t, 3>, const E& e)
+        {
+            return {{     0, -e(2),  e(1)},
+                    {  e(2),     0, -e(0)},
+                    { -e(1),  e(0),     0}};
+        }
+    }
+    template <std::size_t dim, class E>
+    auto cross_product(const E& e)
+    {
+        return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
+    }
+
+    xt::xtensor_fixed<double, xt::xshape<3>> get_omega(double w);
+    const xt::xtensor_fixed<double, xt::xshape<3>>& get_omega(const xt::xtensor_fixed<double, xt::xshape<3>>& w);
 }

@@ -8,29 +8,42 @@
 namespace scopi
 {
     class Container2dTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             Container2dTest()
             {
-                constexpr std::size_t dim = 2;
                 superellipsoid<dim> s1({{-0.2, 0.1}}, {quaternion(PI/3)}, {{.2, .05}}, 1);
                 sphere<dim> s2({{ 0.2,  0.05}}, {quaternion(PI/2)}, 0.1);
-                m_particles.push_back(s1, {{0.1, 0.2}}, {{0.01, 0.02}}, PI/3, PI/12, {{1., 2.}});
-                m_particles.push_back(s2, {{0.4, 0.5}}, {{0.04, 0.05}}, PI/3, PI/12, {{4., 5.}});
+                auto p = property<dim>().omega(PI/3)
+                                        .desired_omega(PI/12);
+                m_particles.push_back(s1, p.velocity({{0.1, 0.2}})
+                                           .desired_velocity({{0.01, 0.02}})
+                                           .force({{1., 2.}}));
+                m_particles.push_back(s2, p.velocity({{0.4, 0.5}})
+                                           .desired_velocity({{0.04, 0.05}})
+                                           .force({{4., 5.}}));
             }
-            scopi_container<2> m_particles;
+            scopi_container<dim> m_particles;
     };
 
     class Container3dTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 3;
         protected:
             Container3dTest()
             {
-                constexpr std::size_t dim = 3;
                 superellipsoid<dim> s1({{-0.2, 0.1, 0.}}, {quaternion(PI/3)}, {{.2, .05, 0.01}}, {{1, 1}});
                 sphere<dim> s2({{ 0.2,  0.05, 0.}}, {quaternion(PI/2)}, 0.1);
-                m_particles.push_back(s1, {{0.1, 0.2, 0.3}}, {{0.01, 0.02, 0.03}}, PI/3, PI/12, {{1., 2., 3.}});
-                m_particles.push_back(s2, {{0.4, 0.5, 0.6}}, {{0.04, 0.05, 0.06}}, PI/3, PI/12, {{4., 5., 6.}});
+                auto p = property<dim>().omega({{PI/3, PI/3}})
+                                        .desired_omega({{PI/12, PI/12}});
+                m_particles.push_back(s1, p.velocity({{0.1, 0.2, 0.3}})
+                                           .desired_velocity({{0.01, 0.02, 0.03}})
+                                           .force({{1., 2., 3,}}));
+
+                m_particles.push_back(s2, p.velocity({{0.4, 0.5, 0.6}})
+                                           .desired_velocity({{0.04, 0.05, 0.06}})
+                                           .force({{4., 5., 6,}}));
             }
-            scopi_container<3> m_particles;
+            scopi_container<dim> m_particles;
     };
 
     //size
@@ -144,7 +157,8 @@ namespace scopi
     TEST_F(Container3dTest, omega_3d)
     {
         auto omega = m_particles.omega();
-        EXPECT_DOUBLE_EQ(omega(0), PI/3.);
+        EXPECT_DOUBLE_EQ(omega(0)[0], PI/3.);
+        EXPECT_DOUBLE_EQ(omega(0)[1], PI/3.);
     }
 
     // desired_omega
@@ -157,7 +171,8 @@ namespace scopi
     TEST_F(Container3dTest, desired_omega_3d)
     {
         auto desired_omega = m_particles.desired_omega();
-        EXPECT_DOUBLE_EQ(desired_omega(0), PI/12.);
+        EXPECT_DOUBLE_EQ(desired_omega(0)[0], PI/12.);
+        EXPECT_DOUBLE_EQ(desired_omega(0)[1], PI/12.);
     }
 
     // vd

@@ -1,58 +1,80 @@
 #include <gtest/gtest.h>
+
+#include "test_common.hpp"
 #include "utils.hpp"
 
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
-#include <scopi/solvers/mosek.hpp>
+#include <scopi/solver.hpp>
+#include <scopi/property.hpp>
 
 namespace scopi
 {
     class Superellipsoid2dTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             Superellipsoid2dTest()
                 : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, 1.5)
+                , m_p(property<dim>().desired_velocity({{0.25, 0}}))
                 {}
-            superellipsoid<2> m_s;
+            superellipsoid<dim> m_s;
+            property<dim> m_p;
     };
 
     class Superellipsoid2dConstTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             Superellipsoid2dConstTest()
                 : m_s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, 1)
+                , m_p(property<dim>().desired_velocity({{0.25, 0}}))
                 {}
-            const superellipsoid<2> m_s;
+            const superellipsoid<dim> m_s;
+            const property<dim> m_p;
+
     };
 
     class Superellipsoid2dRotationTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             Superellipsoid2dRotationTest()
                 : m_s({{-0.2, 0.3}}, {quaternion(PI/3)}, {{0.1, 0.2}}, 1.5)
+                , m_p(property<dim>().desired_velocity({{0.25, 0}}))
                 {}
-            superellipsoid<2> m_s;
+            superellipsoid<dim> m_s;
+            property<dim> m_p;
     };
 
     class Superellipsoid3dTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 3;
         protected:
             Superellipsoid3dTest()
                 : m_s({{-0.2, 0.3, 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
+                , m_p(property<dim>().desired_velocity({{0.25, 0, 0}}))
                 {}
-            superellipsoid<3> m_s;
+            superellipsoid<dim> m_s;
+            property<dim> m_p;
     };
 
     class Superellipsoid3dConstTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 3;
         protected:
             Superellipsoid3dConstTest()
                 : m_s({{-0.2, 0.3, 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{1, 1}})
+                , m_p(property<dim>().desired_velocity({{0.25, 0, 0}}))
                 {}
-            const superellipsoid<3> m_s;
+            const superellipsoid<dim> m_s;
+            const property<dim> m_p;
     };
 
     class Superellipsoid3dRotationTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 3;
         protected:
             Superellipsoid3dRotationTest()
                 : m_s({{-0.2, 0.3, 0.1}}, {quaternion(PI/3)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}})
+                , m_p(property<dim>().desired_velocity({{0.25, 0, 0}}))
                 {}
-            superellipsoid<3> m_s;
+            superellipsoid<dim> m_s;
+            property<dim> m_p;
     };
 
 
@@ -114,7 +136,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -124,7 +146,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -135,7 +157,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -145,7 +167,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -156,7 +178,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -166,7 +188,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -177,7 +199,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -187,7 +209,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -231,7 +253,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
         EXPECT_EQ(particles[0]->q()(1), 0.);
@@ -243,7 +265,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
         EXPECT_EQ(particles[0]->q()(1), 0.);
@@ -255,7 +277,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
         EXPECT_EQ(particles[0]->q(1)(), 0.);
@@ -267,7 +289,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
         EXPECT_EQ(particles[0]->q(1)(), 0.);
@@ -461,152 +483,108 @@ namespace scopi
     //
 
     // two ellipsoids
+    template <class S>
     class TestTwoEllipsoidsSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
                 superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+                auto p = property<2>().desired_velocity({{0.25, 0}});
+                m_particles.push_back(s1, p);
+                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
             double m_dt = .005;
             std::size_t m_total_it = 200;
             scopi_container<2> m_particles;
-            std::size_t m_active_ptr = 0; // without obstacles
     };
 
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSymmetrical, solver_with_contact_types<2>);
+
+    TYPED_TEST(TestTwoEllipsoidsSymmetrical, two_ellipsoids_symmetrical)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
+
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0199.json", "../test/references/two_ellipsoids_symmetrical.json", tolerance);
+    }
+
+    template <class S>
     class TestTwoEllipsoidsSpheresSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
                 superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+                auto p = property<2>().desired_velocity({{0.25, 0}});
+                m_particles.push_back(s1, p);
+                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
             double m_dt = .005;
-            std::size_t m_total_it = 1000;
+            std::size_t m_total_it = 50;
             scopi_container<2> m_particles;
-            std::size_t m_active_ptr = 0; // without obstacles
     };
 
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresSymmetrical, solver_with_contact_types<2>);
+
+    TYPED_TEST(TestTwoEllipsoidsSpheresSymmetrical, two_ellipsoids_spheres_symmetrical)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
+
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0049.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance);
+    }
+
+    template <class S>
     class TestTwoEllipsoidsAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
                 superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+                auto p = property<2>().desired_velocity({{0.25, 0}});
+                m_particles.push_back(s1, p);
+                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
             double m_dt = .005;
             std::size_t m_total_it = 1000;
             scopi_container<2> m_particles;
-            std::size_t m_active_ptr = 0; // without obstacles
     };
 
+    TYPED_TEST_SUITE(TestTwoEllipsoidsAsymmetrical, solver_with_contact_types<2>);
+
+    TYPED_TEST(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_asymmetrical)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
+
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_asymmetrical.json", tolerance);
+    }
+
+    template <class S>
     class TestTwoEllipsoidsSpheresAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
                 superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+                auto p = property<2>().desired_velocity({{0.25, 0}});
+                m_particles.push_back(s1, p);
+                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
             double m_dt = .005;
             std::size_t m_total_it = 1000;
             scopi_container<2> m_particles;
-            std::size_t m_active_ptr = 0; // without obstacles
     };
 
-    TEST_F(TestTwoEllipsoidsSymmetrical, two_ellipsoids_symmetrical)
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresAsymmetrical, solver_with_contact_types<2>);
+
+    TYPED_TEST(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_spheres_asymmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
 
-        std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_symmetrical_uzawaMatrixFreeOmp.json"; 
-
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0199.json", filenameRef);
-    }
-
-    TEST_F(TestTwoEllipsoidsSpheresSymmetrical, two_ellipsoids_spheres_symmetrical)
-    {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
-
-        std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_spheres_symmetrical_uzawaMatrixFreeOmp.json"; 
-
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
-    }
-
-    TEST_F(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_symmetrical)
-    {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
-
-        std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_asymmetrical_uzawaMatrixFreeOmp.json"; 
-
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
-    }
-
-    TEST_F(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_symmetrical)
-    {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
-
-        std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_ellipsoids_spheres_asymmetrical_uzawaMatrixFreeOmp.json"; 
-
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance);
     }
 
 }

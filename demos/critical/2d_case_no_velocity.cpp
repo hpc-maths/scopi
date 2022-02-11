@@ -1,8 +1,11 @@
-#include <xtensor/xmath.hpp>
-#include <scopi/objects/types/sphere.hpp>
-#include <scopi/solvers/mosek.hpp>
-#include <scopi/container.hpp>
 #include <random>
+
+#include <xtensor/xmath.hpp>
+
+#include <scopi/container.hpp>
+#include <scopi/objects/types/sphere.hpp>
+#include <scopi/property.hpp>
+#include <scopi/solver.hpp>
 
 // cmake --build . --target critical_2d_no_overlap
 
@@ -22,7 +25,7 @@ int main()
     std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
 
     scopi::sphere<dim> s({ {0., 0.}}, 0.01);
-    particles.push_back(s, {{0, 0}}, {{0., 0.}}, 0, 0, {{0, 0}});
+    particles.push_back(s, scopi::property<dim>().deactivate());
 
     for(int i = 0; i < n; ++i)
     {
@@ -32,18 +35,16 @@ int main()
             double x = -n + (i + 0.5) + distrib_move_x(generator);
             double y = -n/2. + (j + 0.5) + distrib_move_y(generator);
             scopi::sphere<dim> s1({ {x, y}}, r);
-            particles.push_back(s1, {{0, 0}}, {{0., 0.}}, 0, 0, {{0, 0}});
+            particles.push_back(s1);
 
             r = distrib_r(generator);
             x = (i + 0.5) + distrib_move_x(generator);
             y = -n/2. + (j + 0.5) + distrib_move_y(generator);
             scopi::sphere<dim> s2({ {x, y}}, r);
-            particles.push_back(s2, {{0, 0}}, {{0., 0.}}, 0, 0, {{0, 0}});
+            particles.push_back(s2);
         }
     }
- 
-    std::size_t active_ptr = 1;
 
-    scopi::ScopiSolver<dim> solver(particles, dt, active_ptr);
+    scopi::ScopiSolver<dim> solver(particles, dt);
     solver.solve(total_it);
 }

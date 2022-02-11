@@ -1,6 +1,9 @@
-#pragma once 
+#pragma once
 
 #include "base.hpp"
+
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi
 {
@@ -14,24 +17,23 @@ namespace scopi
         contact_brute_force(double dmax): contact_base(dmax){};
 
         template <std::size_t dim>
-        std::vector<scopi::neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
+        std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
         {
-            std::cout << "----> CONTACTS : run implementation contact_brute_force" << std::endl;
+            // std::cout << "----> CONTACTS : run implementation contact_brute_force" << std::endl;
 
-            std::vector<scopi::neighbor<dim>> contacts;
+            std::vector<neighbor<dim>> contacts;
 
             tic();
 
             #pragma omp parallel for num_threads(8)
 
-            for(std::size_t i = active_ptr; i < particles.size() - 1; ++i)
+            for (std::size_t i = active_ptr; i < particles.size() - 1; ++i)
             {
-              for(std::size_t j = active_ptr; j < particles.size() - 1; ++j)
-              // for(std::size_t j = i + 1; j < particles.size(); ++j)
+              for (std::size_t j = i + 1; j < particles.size(); ++j)
               {
                 if (i < j) {
-                  auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                  if (neigh.dij < _dmax) {
+                  auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+                  if (neigh.dij < m_dmax) {
                       neigh.i = i;
                       neigh.j = j;
                       #pragma omp critical
@@ -45,12 +47,12 @@ namespace scopi
             }
 
             // obstacles
-            for(std::size_t i = 0; i < active_ptr; ++i)
+            for (std::size_t i = 0; i < active_ptr; ++i)
             {
-                for(std::size_t j = active_ptr; j < particles.size(); ++j)
+                for (std::size_t j = active_ptr; j < particles.size(); ++j)
                 {
-                    auto neigh = scopi::closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                    if (neigh.dij < _dmax)
+                    auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+                    if (neigh.dij < m_dmax)
                     {
                         neigh.i = i;
                         neigh.j = j;
@@ -60,7 +62,7 @@ namespace scopi
             }
 
             auto duration = toc();
-            std::cout << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration;
 
             tic();
             std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
@@ -76,13 +78,13 @@ namespace scopi
               return false;
             });
             duration = toc();
-            std::cout << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
 
-            for(std::size_t ic=0; ic<contacts.size(); ++ic)
-            {
-                std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
-                // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
-            }
+            // for (std::size_t ic=0; ic<contacts.size(); ++ic)
+            // {
+            //     std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
+            //     // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
+            // }
 
             return contacts;
 

@@ -5,40 +5,39 @@
 namespace scopi
 {
     template <class D>
-        class vap_base: public crtp_base<D>
+    class vap_base: public crtp_base<D>
     {
-        public:
-            template <std::size_t dim>
-                void aPrioriVelocity(scopi_container<dim>& particles);
-            template <std::size_t dim>
-                void updateVelocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
-            vap_base(std::size_t Nactive, std::size_t active_ptr, double dt);
+    public:
+        template <std::size_t dim>
+        void set_a_priori_velocity(scopi_container<dim>& particles);
+        template <std::size_t dim>
+        void update_velocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
+        vap_base(std::size_t Nactive, std::size_t active_ptr, double dt);
 
-        protected:
-                std::size_t _Nactive;
-                std::size_t _active_ptr;
-                double _dt;
+    protected:
+        std::size_t m_Nactive;
+        std::size_t m_active_ptr;
+        double m_dt;
     };
 
     template <class D>
-        vap_base<D>::vap_base(std::size_t Nactive, std::size_t active_ptr, double dt)
-        : _Nactive(Nactive)
-          , _active_ptr(active_ptr),
-          _dt(dt)
+    vap_base<D>::vap_base(std::size_t Nactive, std::size_t active_ptr, double dt)
+    : m_Nactive(Nactive)
+    , m_active_ptr(active_ptr)
+    , m_dt(dt)
+    {}
+
+    template <class D>
+    template <std::size_t dim>
+    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles)
     {
+        this->derived_cast().set_a_priori_velocity_impl(particles);
     }
 
     template <class D>
-        template <std::size_t dim>
-        void vap_base<D>::aPrioriVelocity(scopi_container<dim>& particles)
-        {
-            this->derived_cast().aPrioriVelocity_impl(particles);
-        }
-
-    template <class D>
-        template <std::size_t dim>
-        void vap_base<D>::updateVelocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt)
-        {
-            this->derived_cast().updateVelocity_impl(particles, uadapt, wadapt);
-        }
+    template <std::size_t dim>
+    void vap_base<D>::update_velocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt)
+    {
+        this->derived_cast().update_velocity_impl(particles, uadapt, wadapt);
+    }
 }

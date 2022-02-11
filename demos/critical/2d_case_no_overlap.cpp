@@ -1,8 +1,11 @@
-#include <xtensor/xmath.hpp>
-#include <scopi/objects/types/superellipsoid.hpp>
-#include <scopi/solvers/mosek.hpp>
-#include <scopi/container.hpp>
 #include <random>
+
+#include <xtensor/xmath.hpp>
+
+#include <scopi/container.hpp>
+#include <scopi/objects/types/superellipsoid.hpp>
+#include <scopi/property.hpp>
+#include <scopi/solver.hpp>
 
 // cmake --build . --target critical_2d_no_overlap
 
@@ -35,8 +38,9 @@ int main()
             double x = (i + 0.5) + distrib_move_x(generator);
             double y = (j + 0.5) + distrib_move_y(generator);
             double velocity = distrib_velocity(generator);
-            scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
-            particles.push_back(s1, {{0, 0}}, {{velocity, 0.}}, 0, 0, {{0, 0}});
+
+            scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
+            particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}));
 
             rot = distrib_rot(generator);
             r = distrib_r(generator);
@@ -44,13 +48,12 @@ int main()
             x = (n + i + 0.5) + distrib_move_x(generator);
             y = (j + 0.5) + distrib_move_y(generator);
             velocity = distrib_velocity(generator);
-            scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
-            particles.push_back(s2, {{0, 0}}, {{-velocity, 0.}}, 0, 0, {{0, 0}});
+
+            scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
+            particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}));
         }
     }
- 
-    std::size_t active_ptr = 0; // pas d'obstacles
 
-    scopi::ScopiSolver<dim> solver(particles, dt, active_ptr);
+    scopi::ScopiSolver<dim> solver(particles, dt);
     solver.solve(total_it);
 }

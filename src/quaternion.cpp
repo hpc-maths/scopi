@@ -2,18 +2,18 @@
 
 namespace scopi
 {
-    void normalize(type::quaternion& q)
+    void normalize(type::quaternion_t& q)
     {
         q /= xt::linalg::norm(q, 2);
     }
 
-    type::quaternion quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<3>>& axes)
+    type::quaternion_t quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<3>>& axes)
     {
-        type::quaternion out = { std::cos(angle/2)
+        type::quaternion_t out = { std::cos(angle/2)
                                , std::sin(angle/2)*axes[0]
                                , std::sin(angle/2)*axes[1]
                                , std::sin(angle/2)*axes[2] };
-        // type::quaternion out = { std::sin(angle/2)*axes[0]
+        // type::quaternion_t out = { std::sin(angle/2)*axes[0]
         //                        , std::sin(angle/2)*axes[1]
         //                        , std::sin(angle/2)*axes[2]
         //                        , std::cos(angle/2)};
@@ -21,28 +21,28 @@ namespace scopi
         return out;
     }
 
-    type::quaternion quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<2>>& axes)
+    type::quaternion_t quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<2>>& axes)
     {
         xt::xtensor_fixed<double, xt::xshape<3>> new_axes{axes[0], axes[1], 1};
         return quaternion(angle, new_axes);
     }
 
-    type::quaternion quaternion(double angle)
+    type::quaternion_t quaternion(double angle)
     {
         xt::xtensor_fixed<double, xt::xshape<3>> axes{0, 0, 1};
         return quaternion(angle, axes);
     }
 
-    auto conj(const type::quaternion& q)
+    auto conj(const type::quaternion_t& q)
     {
-        type::quaternion out(q);
+        type::quaternion_t out(q);
         out *= -1;
         return out;
     }
 
     namespace detail
     {
-        type::rotation<2> rotation_matrix_impl(const type::quaternion& q, std::integral_constant<std::size_t, 2>)
+        type::matrix_rotation_t<2> rotation_matrix_impl(const type::quaternion_t& q, std::integral_constant<std::size_t, 2>)
         {
             auto x = q[0];
             // auto y = q[1];    // en 2D on a y = z = 0 et x*x+w*w = 1
@@ -52,7 +52,7 @@ namespace scopi
                      {   2*x*w, 1-2*w*w } };
         }
 
-        type::rotation<3> rotation_matrix_impl(const type::quaternion& q, std::integral_constant<std::size_t, 3>)
+        type::matrix_rotation_t<3> rotation_matrix_impl(const type::quaternion_t& q, std::integral_constant<std::size_t, 3>)
         {
             auto x = q[0];
             auto y = q[1];  // x*x + y*y + z*z + w*w = 1
@@ -67,9 +67,9 @@ namespace scopi
         }
     }
 
-    type::quaternion mult_quaternion(const type::quaternion& q1, const type::quaternion& q2)
+    type::quaternion_t mult_quaternion(const type::quaternion_t& q1, const type::quaternion_t& q2)
     {
-        type::quaternion result;
+        type::quaternion_t result;
 
         auto q1_axe = xt::view(q1, xt::range(1, _));
         auto q2_axe = xt::view(q2, xt::range(1, _));

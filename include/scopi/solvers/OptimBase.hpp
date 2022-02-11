@@ -1,244 +1,141 @@
 #pragma once
-#include "../crtp.hpp"
+
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
+
 #include "../container.hpp"
+#include "../crtp.hpp"
+#include "../objects/neighbor.hpp"
+#include "../utils.hpp"
 
 namespace scopi{
-    template <class D, std::size_t dim>
-        class OptimBase: public crtp_base<D>
+    template <class Derived>
+    class OptimBase
     {
-        public:
-            void run(const std::vector<scopi::neighbor<dim>>& contacts, const std::size_t nite);
-            void freeMemory();
-            auto getUadapt();
-            auto getWadapt();
-            std::string getName() const;
+    public:
+        template<std::size_t dim>
+        void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t nite);
+        auto get_uadapt();
+        auto get_wadapt();
 
-        protected:
-            OptimBase(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec);
-            void createMatrixConstraintCoo(const std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol);
+    protected:
+        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
 
-            scopi::scopi_container<dim>& _particles;
-            double _dt;
-            std::size_t _Nactive;
-            std::size_t _active_ptr;
-            double _mass;
-            double _moment;
-            xt::xtensor<double, 1> _c;
-            std::size_t _cDec;
-            xt::xtensor<double, 1> _distances;
+        std::size_t m_nparts;
+        double m_dt;
+        double m_mass;
+        double m_moment;
+        xt::xtensor<double, 1> m_c;
+        std::size_t m_c_dec;
+        xt::xtensor<double, 1> m_distances;
 
-        private:
-            void createVectorDistances(const std::vector<scopi::neighbor<dim>>& contacts);
-            void createVectorC();
+    private:
+        template<std::size_t dim>
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
-            void createMatrixConstraint(const std::vector<scopi::neighbor<dim>>& contacts);
-            void createMatrixMass();
-            int solveOptimizationProblem(const std::vector<scopi::neighbor<dim>>& contacts);
-            void allocateMemory(const std::size_t nc);
-            int getNbActiveContacts();
+        template<std::size_t dim>
+        void create_vector_c(const scopi_container<dim>& particles);
+
+        template<std::size_t dim>
+        int solve_optimization_problem(const scopi_container<dim>& particles,
+                                       const std::vector<neighbor<dim>>& contacts);
+
+        int get_nb_active_contacts() const;
     };
 
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::run(const std::vector<scopi::neighbor<dim>>& contacts, const std::size_t)
-        {
-            // create mass and inertia matrices
-            tic();
-            createVectorC();
-            createVectorDistances(contacts);
-            allocateMemory(contacts.size());
-            createMatrixConstraint(contacts);
-            createMatrixMass();
-            auto duration4 = toc();
-            std::cout << "----> CPUTIME : matrices = " << duration4 << std::endl;
+    template<class Derived>
+    template<std::size_t dim>
+    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t nite)
+    {
+        tic();
+        create_vector_c(particles);
+        create_vector_distances(contacts);
+        auto duration4 = toc();
+        PLOG_INFO << "----> CPUTIME : matrices = " << duration4;
 
-            // Solve optimization problem
-            // std::cout << "----> Create optimization problem " << nite << std::endl;
-            // tic();
-            auto nbIter = solveOptimizationProblem(contacts);
-            // auto duration5 = toc();
-            // std::cout << "----> CPUTIME : solve = " << duration5 << std::endl;
-            std::cout << "iterations : " << nbIter << std::endl;
-            std::cout << "Contacts: " << contacts.size() << "  active contacts " << getNbActiveContacts() << std::endl;
+        PLOG_INFO << "----> Create optimization problem " << nite;
+        tic();
+        auto nbIter = solve_optimization_problem(particles, contacts);
+        auto duration5 = toc();
+        PLOG_INFO << "----> CPUTIME : solve = " << duration5;
+        PLOG_INFO << "iterations : " << nbIter;
+        PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
+    }
+
+
+    template<class Derived>
+    OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
+    : m_nparts(nparts)
+    , m_dt(dt)
+    , m_mass(1.)
+    , m_moment(0.1)
+    , m_c(xt::zeros<double>({cSize}))
+    , m_c_dec(c_dec)
+    {}
+
+    template<class Derived>
+    template<std::size_t dim>
+    void OptimBase<Derived>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    {
+        m_distances = xt::zeros<double>({contacts.size()});
+        for (std::size_t i = 0; i < contacts.size(); ++i)
+        {
+            m_distances[i] = contacts[i].dij;
         }
+    }
 
+    template<class Derived>
+    template<std::size_t dim>
+    void OptimBase<Derived>::create_vector_c(const scopi_container<dim>& particles)
+    {
+        std::size_t mass_dec = m_c_dec;
+        std::size_t moment_dec = mass_dec + 3*particles.nb_active();
 
-    template<class D, std::size_t dim>
-        OptimBase<D, dim>::OptimBase(scopi::scopi_container<dim>& particles, double dt, std::size_t Nactive, std::size_t active_ptr, std::size_t cSize, std::size_t cDec) : 
-            _particles(particles),
-            _dt(dt),
-            _Nactive(Nactive),
-            _active_ptr(active_ptr),
-            _mass(1.),
-            _moment(0.1),
-            _c(xt::zeros<double>({cSize})),
-            _cDec(cDec)
-            {
-            }
+        auto active_offset = particles.nb_inactive();
 
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::createVectorDistances(const std::vector<scopi::neighbor<dim>>& contacts)
+        auto desired_velocity = particles.vd();
+        auto desired_omega = particles.desired_omega();
+
+        for (std::size_t i = 0; i < particles.nb_active(); ++i)
         {
-            // fill vector with distances
-            _distances = xt::zeros<double>({contacts.size()});
-            for(std::size_t i=0; i<contacts.size(); ++i)
+            for (std::size_t d = 0; d < dim; ++d)
             {
-                _distances[i] = contacts[i].dij;
+                m_c(mass_dec + 3*i + d) = -m_mass*desired_velocity(i + active_offset)[d]; // TODO: add mass into particles
             }
-            // std::cout << "distances " << distances << std::endl;
-        }
-
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::createVectorC()
-        {
-            std::size_t Mdec = _cDec;
-            std::size_t Jdec = Mdec + 3*_Nactive;
-            for (std::size_t i=0; i<_Nactive; ++i)
+            auto omega = get_omega(desired_omega(i + active_offset));
+            for (std::size_t d = 0; d < 3; ++d)
             {
-                for (std::size_t d=0; d<dim; ++d)
-                {
-                    _c(Mdec + 3*i + d) = -_mass*_particles.vd()(_active_ptr + i)[d]; // TODO: add mass into particles
-                }
-                _c(Jdec + 3*i + 2) = -_moment*_particles.desired_omega()(_active_ptr + i);
-            }
-        }
-
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::createMatrixConstraintCoo(const std::vector<scopi::neighbor<dim>>& contacts, std::vector<int>& A_rows, std::vector<int>& A_cols, std::vector<double>& A_values, std::size_t firstCol)
-        {
-            std::size_t u_size = 3*contacts.size()*2;
-            std::size_t w_size = 3*contacts.size()*2;
-            A_rows.reserve(u_size + w_size);
-            A_cols.reserve(u_size + w_size);
-            A_values.reserve(u_size + w_size);
-
-            std::size_t ic = 0;
-            for (auto &c: contacts)
-            {
-
-                for (std::size_t d=0; d<3; ++d)
-                {
-                    if (c.i >= _active_ptr)
-                    {
-                        A_rows.push_back(ic);
-                        A_cols.push_back(firstCol + (c.i - _active_ptr)*3 + d);
-                        A_values.push_back(-_dt*c.nij[d]);
-                    }
-                    if (c.j >= _active_ptr)
-                    {
-                        A_rows.push_back(ic);
-                        A_cols.push_back(firstCol + (c.j - _active_ptr)*3 + d);
-                        A_values.push_back(_dt*c.nij[d]);
-                    }
-                }
-
-                auto r_i = c.pi - _particles.pos()(c.i);
-                auto r_j = c.pj - _particles.pos()(c.j);
-
-                xt::xtensor_fixed<double, xt::xshape<3, 3>> ri_cross, rj_cross;
-
-                if (dim == 2)
-                {
-                    ri_cross = {{      0,      0, r_i(1)},
-                        {      0,      0, -r_i(0)},
-                        {-r_i(1), r_i(0),       0}};
-
-                    rj_cross = {{      0,      0,  r_j(1)},
-                        {      0,      0, -r_j(0)},
-                        {-r_j(1), r_j(0),       0}};
-                }
-                else
-                {
-                    ri_cross = {{      0, -r_i(2),  r_i(1)},
-                        { r_i(2),       0, -r_i(0)},
-                        {-r_i(1),  r_i(0),       0}};
-
-                    rj_cross = {{      0, -r_j(2),  r_j(1)},
-                        { r_j(2),       0, -r_j(0)},
-                        {-r_j(1),  r_j(0),       0}};
-                }
-
-                auto Ri = scopi::rotation_matrix<3>(_particles.q()(c.i));
-                auto Rj = scopi::rotation_matrix<3>(_particles.q()(c.j));
-
-                if (c.i >= _active_ptr)
-                {
-                    std::size_t ind_part = c.i - _active_ptr;
-                    auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                    for (std::size_t ip=0; ip<3; ++ip)
-                    {
-                        A_rows.push_back(ic);
-                        A_cols.push_back(firstCol + 3*_Nactive + 3*ind_part + ip);
-                        A_values.push_back(_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                    }
-                }
-
-                if (c.j >= _active_ptr)
-                {
-                    std::size_t ind_part = c.j - _active_ptr;
-                    auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                    for (std::size_t ip=0; ip<3; ++ip)
-                    {
-                        A_rows.push_back(ic);
-                        A_cols.push_back(firstCol + 3*_Nactive + 3*ind_part + ip);
-                        A_values.push_back(-_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                    }
-                }
-
-                ++ic;
+                m_c(moment_dec + 3*i + d) = -m_moment*omega(d);
             }
         }
+    }
 
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::createMatrixConstraint(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            this->derived_cast().createMatrixConstraint_impl(contacts);
-        }
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::createMatrixMass()
-        {
-            this->derived_cast().createMatrixMass_impl();
-        }
+    template<class Derived>
+    template<std::size_t dim>
+    int OptimBase<Derived>::solve_optimization_problem(const scopi_container<dim>& particles,
+                                                 const std::vector<neighbor<dim>>& contacts)
+    {
+        return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts);
+    }
 
-    template<class D, std::size_t dim>
-        int OptimBase<D, dim>::solveOptimizationProblem(const std::vector<scopi::neighbor<dim>>& contacts)
-        {
-            return this->derived_cast().solveOptimizationProblem_impl(contacts);
-        }
+    template<class Derived>
+    auto OptimBase<Derived>::get_uadapt()
+    {
+        auto data = static_cast<Derived&>(*this).uadapt_data();
+        return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
+    }
 
-    template<class D, std::size_t dim>
-        auto OptimBase<D, dim>::getUadapt()
-        {
-            return this->derived_cast().getUadapt_impl();
-        }
+    template<class Derived>
+    auto OptimBase<Derived>::get_wadapt()
+    {
+        auto data = static_cast<Derived&>(*this).wadapt_data();
+        return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
+    }
 
-    template<class D, std::size_t dim>
-        auto OptimBase<D, dim>::getWadapt()
-        {
-            return this->derived_cast().getWadapt_impl();
-        }
-
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::allocateMemory(const std::size_t nc)
-        {
-            this->derived_cast().allocateMemory_impl(nc);
-        }
-
-    template<class D, std::size_t dim>
-        void OptimBase<D, dim>::freeMemory()
-        {
-            this->derived_cast().freeMemory_impl();
-        }
-
-    template<class D, std::size_t dim>
-        int OptimBase<D, dim>::getNbActiveContacts()
-        {
-            return this->derived_cast().getNbActiveContacts_impl();
-        }
-
-    template<class D, std::size_t dim>
-        std::string OptimBase<D, dim>::getName() const
-        {
-            return this->derived_cast().getName_impl();
-        }
+    template<class Derived>
+    int OptimBase<Derived>::get_nb_active_contacts() const
+    {
+        return static_cast<const Derived&>(*this).get_nb_active_contacts_impl();
+    }
 }
 

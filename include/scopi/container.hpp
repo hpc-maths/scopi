@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <functional>
 #include <map>
@@ -10,6 +11,7 @@
 
 #include "objects/types/base.hpp"
 #include "types.hpp"
+#include "property.hpp"
 #include "crtp.hpp"
 
 namespace scopi
@@ -23,26 +25,18 @@ namespace scopi
     {
     public:
 
-        using default_container_type = type::position<dim>;
-        using position_type = default_container_type;
-        using velocity_type = default_container_type;
-        using rotation_type = double; // Fix std::array<double, 3> in 3d
-        using force_type = default_container_type;
-        using quaternion_type = type::quaternion;
+        using position_type = type::position_t<dim>;
+        using velocity_type = type::velocity_t<dim>;
+        using rotation_type = type::rotation_t<dim>;
+        using force_type = type::force_t<dim>;
+        using quaternion_type = type::quaternion_t;
 
         scopi_container();
 
         std::unique_ptr<object<dim, false>> operator[](std::size_t i);
 
-        void push_back(const object<dim>& s,
-                       const velocity_type& v,
-                       const velocity_type& dv,
-                       const rotation_type& omega,
-                       const rotation_type& domega,
-                       const force_type& f);
-
-        void push_back(std::size_t i,
-                        const position_type& pos);
+        void push_back(const object<dim>& s, const property<dim>& p = property<dim>());
+        void push_back(std::size_t i, const position_type& pos);
 
         void reserve(std::size_t size);
 
@@ -68,6 +62,8 @@ namespace scopi
         auto vd();
 
         std::size_t size() const;
+        std::size_t nb_active() const;
+        std::size_t nb_inactive() const;
 
         void reset_periodic();
 
@@ -84,13 +80,18 @@ namespace scopi
         std::vector<std::size_t> m_shapes_id;
         std::vector<std::size_t> m_offset;
         std::vector<std::size_t> m_periodic_indices;
+
         std::size_t m_periodic_ptr;
+
+        std::size_t m_nb_inactive_core_objects;
+
         bool m_periodic_added;
     };
 
     template<std::size_t dim>
-    scopi_container<dim>::scopi_container() 
+    scopi_container<dim>::scopi_container()
     : m_periodic_ptr(0)
+    , m_nb_inactive_core_objects(0)
     , m_periodic_added(false)
     {}
 
@@ -101,12 +102,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void scopi_container<dim>::push_back(const object<dim>& s,
-                                         const velocity_type& v,
-                                         const velocity_type& dv,
-                                         const rotation_type& omega,
-                                         const rotation_type& domega,
-                                         const force_type& f)
+    void scopi_container<dim>::push_back(const object<dim>& s, const property<dim>& p)
     {
         assert(!m_periodic_added);
 
@@ -123,11 +119,20 @@ namespace scopi
         {
             m_positions.push_back(s.pos(i));
             m_quaternions.push_back(s.q(i));
-            m_velocities.push_back(v);
-            m_omega.push_back(omega);
-            m_desired_omega.push_back(domega);
-            m_desired_velocities.push_back(dv);
-            m_forces.push_back(f);
+            m_velocities.push_back(p.velocity());
+            m_omega.push_back(p.omega());
+            m_desired_omega.push_back(p.desired_omega());
+            m_desired_velocities.push_back(p.desired_velocity());
+            m_forces.push_back(p.force());
+        }
+
+        if (!p.is_active())
+        {
+            m_nb_inactive_core_objects += s.size();
+            if (m_nb_inactive_core_objects != m_positions.size())
+            {
+                throw std::runtime_error("All the obstacles must be pushed before the active particles.");
+            }
         }
 
         auto it = m_shape_map.find(s.hash());
@@ -179,6 +184,18 @@ namespace scopi
     std::size_t scopi_container<dim>::size() const
     {
         return m_shapes_id.size();
+    }
+
+    template<std::size_t dim>
+    std::size_t scopi_container<dim>::nb_active() const
+    {
+        return m_positions.size() - m_nb_inactive_core_objects;
+    }
+
+    template<std::size_t dim>
+    std::size_t scopi_container<dim>::nb_inactive() const
+    {
+        return m_nb_inactive_core_objects;
     }
 
     // position

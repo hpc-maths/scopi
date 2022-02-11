@@ -1,58 +1,78 @@
 #include <gtest/gtest.h>
+
+#include "test_common.hpp"
 #include "utils.hpp"
 
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/container.hpp>
-#include <scopi/solvers/mosek.hpp>
+#include <scopi/solver.hpp>
 
 namespace scopi
 {
     class Sphere2dTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             Sphere2dTest()
                 : m_s({{-0.2, 0.3}}, 0.1)
+                , m_p(property<dim>().desired_velocity({{0.25, 0}}))
                 {}
-            sphere<2> m_s;
+            sphere<dim> m_s;
+            property<dim> m_p;
     };
 
     class Sphere2dConstTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             Sphere2dConstTest()
                 : m_s({{-0.2, 0.3}}, 0.1)
+                , m_p(property<dim>().desired_velocity({{0.25, 0}}))
                 {}
-            const sphere<2> m_s;
+            const sphere<dim> m_s;
+            const property<dim> m_p;
     };
 
     class Sphere2dRotationTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             Sphere2dRotationTest()
                 : m_s({{-0.2, 0.3}}, {quaternion(PI/3)}, 0.1)
+                , m_p(property<dim>().desired_velocity({{0.25, 0}}))
                 {}
-            sphere<2> m_s;
+            sphere<dim> m_s;
+            property<dim> m_p;
     };
 
     class Sphere3dTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 3;
         protected:
             Sphere3dTest()
                 : m_s({{-0.2, 0.3, 0.1}}, 0.1)
+                , m_p(property<dim>().desired_velocity({{0.25, 0, 0}}))
                 {}
-            sphere<3> m_s;
+            sphere<dim> m_s;
+            property<dim> m_p;
     };
 
     class Sphere3dConstTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 3;
         protected:
             Sphere3dConstTest()
                 : m_s({{-0.2, 0.3, 0.1}}, 0.1)
+                , m_p(property<dim>().desired_velocity({{0.25, 0, 0}}))
                 {}
-            const sphere<3> m_s;
+            const sphere<dim> m_s;
+            const property<dim> m_p;
     };
 
     class Sphere3dRotationTest  : public ::testing::Test {
+        static constexpr std::size_t dim = 3;
         protected:
             Sphere3dRotationTest()
                 : m_s({{-0.2, 0.3, 0.1}}, {quaternion(PI/3)}, 0.1)
+                , m_p(property<dim>().desired_velocity({{0.25, 0, 0}}))
                 {}
-            sphere<3> m_s;
+            sphere<dim> m_s;
+            property<dim> m_p;
     };
 
     // pos
@@ -112,7 +132,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -122,7 +142,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -133,7 +153,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -143,7 +163,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos()(0), -0.2);
         EXPECT_EQ(particles[0]->pos()(1), 0.3);
@@ -154,7 +174,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -164,7 +184,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -175,7 +195,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -185,7 +205,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0, 0}}, {{0.25, 0, 0}}, 0, 0, {{0, 0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->pos(0)(), -0.2);
         EXPECT_EQ(particles[0]->pos(1)(), 0.3);
@@ -229,7 +249,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
         EXPECT_EQ(particles[0]->q()(1), 0.);
@@ -241,7 +261,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q()(0), 1.);
         EXPECT_EQ(particles[0]->q()(1), 0.);
@@ -253,7 +273,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
         EXPECT_EQ(particles[0]->q(1)(), 0.);
@@ -265,7 +285,7 @@ namespace scopi
     {
         constexpr std::size_t dim = 2;
         scopi_container<dim> particles;
-        particles.push_back(m_s, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+        particles.push_back(m_s, m_p);
 
         EXPECT_EQ(particles[0]->q(0)(), 1.);
         EXPECT_EQ(particles[0]->q(1)(), 0.);
@@ -288,7 +308,7 @@ namespace scopi
         EXPECT_DOUBLE_EQ(rotation_matrix(1, 0), std::sqrt(3.)/2.);
         EXPECT_DOUBLE_EQ(rotation_matrix(1, 1), 1./2.);
     }
-    
+
 
     TEST_F(Sphere3dRotationTest, rotation_3d)
     {
@@ -362,78 +382,58 @@ namespace scopi
     }
 
     // two_spheres
+    template <class S>
     class TestTwoSpheresAsymmetrical  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
         protected:
             void SetUp() override {
-                sphere<2> s1({{-0.2, -0.05}}, 0.1);
-                sphere<2> s2({{ 0.2,  0.05}}, 0.1);
-                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+                sphere<dim> s1({{-0.2, -0.05}}, 0.1);
+                sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
+                auto p = property<dim>().desired_velocity({{0.25, 0}});
+                m_particles.push_back(s1, p);
+                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
             double m_dt = .005;
             std::size_t m_total_it = 1000;
-            scopi_container<2> m_particles;
-            std::size_t m_active_ptr = 0; // without obstacles
+            scopi_container<dim> m_particles;
     };
 
-    class TestTwoSpheresSymmetrical  : public ::testing::Test {
-        protected:
-            void SetUp() override {
-                sphere<2> s1({{-0.2, 0.}}, 0.1);
-                sphere<2> s2({{ 0.2, 0.}}, 0.1);
-                m_particles.push_back(s1, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
-                m_particles.push_back(s2, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
-            }
+    TYPED_TEST_SUITE(TestTwoSpheresAsymmetrical, solver_with_contact_types<2>);
 
-            double m_dt = .005;
-            std::size_t m_total_it = 1000;
-            scopi_container<2> m_particles;
-            std::size_t m_active_ptr = 0; // without obstacles
-    };
-
-    TEST_F(TestTwoSpheresAsymmetrical, two_spheres_asymmetrical)
+    TYPED_TEST(TestTwoSpheresAsymmetrical, two_spheres_asymmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
 
-        std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_spheres_asymmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_spheres_asymmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_spheres_asymmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_spheres_asymmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_spheres_asymmetrical_uzawaMatrixFreeOmp.json"; 
-
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance);
     }
 
-    TEST_F(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
+    template <class S>
+    class TestTwoSpheresSymmetrical  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
+        protected:
+            void SetUp() override {
+                sphere<dim> s1({{-0.2, 0.}}, 0.1);
+                sphere<dim> s2({{ 0.2, 0.}}, 0.1);
+                auto p = property<dim>().desired_velocity({{0.25, 0}});
+                m_particles.push_back(s1, p);
+                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
+            }
+
+            double m_dt = .005;
+            std::size_t m_total_it = 1000;
+            scopi_container<dim> m_particles;
+    };
+
+    TYPED_TEST_SUITE(TestTwoSpheresSymmetrical, solver_with_contact_types<2>);
+
+    TYPED_TEST(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
     {
-        // TODO set the optimization solver (Mosek, Uzawa, ...) here and duplicate this test for all solver 
-        constexpr std::size_t dim = 2;
-        ScopiSolver<dim> solver(m_particles, m_dt, m_active_ptr);
-        solver.solve(m_total_it);
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
 
-        std::string filenameRef;
-        if(solver.getOptimSolverName() == "OptimMosek")
-            filenameRef = "../test/references/two_spheres_symmetrical_mosek.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMkl")
-            filenameRef = "../test/references/two_spheres_symmetrical_uzawaMkl.json"; 
-        else if(solver.getOptimSolverName() == "OptimScs")
-            filenameRef = "../test/references/two_spheres_symmetrical_scs.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeTbb")
-            filenameRef = "../test/references/two_spheres_symmetrical_uzawaMatrixFreeTbb.json"; 
-        else if(solver.getOptimSolverName() == "OptimUzawaMatrixFreeOmp")
-            filenameRef = "../test/references/two_spheres_symmetrical_uzawaMatrixFreeOmp.json"; 
-
-        EXPECT_PRED2(diffFile, "./Results/scopi_objects_0999.json", filenameRef);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance);
     }
 
 }
