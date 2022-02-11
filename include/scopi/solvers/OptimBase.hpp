@@ -50,14 +50,10 @@ namespace scopi{
         tic();
         create_vector_c(particles);
         create_vector_distances(contacts);
-        auto duration4 = toc();
-        PLOG_INFO << "----> CPUTIME : matrices = " << duration4;
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
-        PLOG_INFO << "----> Create optimization problem " << nite;
-        tic();
         auto nbIter = solve_optimization_problem(particles, contacts);
-        auto duration5 = toc();
-        PLOG_INFO << "----> CPUTIME : solve = " << duration5;
         PLOG_INFO << "iterations : " << nbIter;
         PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
     }

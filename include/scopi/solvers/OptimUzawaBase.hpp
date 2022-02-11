@@ -67,9 +67,12 @@ namespace scopi{
     int OptimUzawaBase<Derived>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                            const std::vector<neighbor<dim>>& contacts)
     {
+        tic();
         init_uzawa(particles, contacts);
+        auto duration = toc();
         m_L = xt::zeros_like(this->m_distances);
         m_R = xt::zeros_like(this->m_distances);
+        PLOG_INFO << "----> CPUTIME : Uzawa matrix = " << duration;
 
         double time_assign_u = 0.;
         double time_gemv_transpose_A = 0.;
@@ -78,6 +81,7 @@ namespace scopi{
         double time_gemv_A = 0.;
         double time_assign_l = 0.;
         double time_compute_cmax = 0.;
+        double time_solve = 0.;
 
         std::size_t cc = 0;
         double cmax = -1000.0;
@@ -85,31 +89,45 @@ namespace scopi{
         {
             tic();
             m_U = this->m_c;
-            time_assign_u += toc();
+            auto duration = toc();
+            time_assign_u += duration;
+            time_solve += duration;
 
             tic();
             gemv_transpose_A(particles, contacts); // U = A^T * L + U
-            time_gemv_transpose_A += toc();
+            duration = toc();
+            time_gemv_transpose_A += duration;
+            time_solve += duration;
 
             tic();
             gemv_inv_P(particles);  // U = - P^-1 * U
-            time_gemv_inv_P += toc();
+            duration = toc();
+            time_gemv_inv_P += duration;
+            time_solve += duration;
 
             tic();
             m_R = this->m_distances - m_dmin;
-            time_assign_r += toc();
+            duration = toc();
+            time_assign_r += duration;
+            time_solve += duration;
 
             tic();
             gemv_A(particles, contacts); // R = - A * U + R
-            time_gemv_A += toc();
+            duration = toc();
+            time_gemv_A += duration;
+            time_solve += duration;
 
             tic();
             m_L = xt::maximum( m_L-m_rho*m_R, 0);
-            time_assign_l += toc();
+            duration = toc();
+            time_assign_l += duration;
+            time_solve += duration;
 
             tic();
             cmax = double((xt::amin(m_R))(0));
-            time_compute_cmax += toc();
+            duration = toc();
+            time_compute_cmax += duration;
+            time_solve += duration;
             cc += 1;
 
             PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
