@@ -24,7 +24,7 @@ namespace scopi
                 particles.push_back(s2);
                 particles.push_back(s3);
 
-                contact_kdtree cont(2., 5.76);
+                contact_kdtree cont(2., 100);
                 m_contacts = cont.run(particles, 0);
                 m_nMatches = cont.get_nMatches();
             }
