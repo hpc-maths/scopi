@@ -119,4 +119,6 @@ namespace scopi
         return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
     }
 
+    xt::xtensor_fixed<double, xt::xshape<3>> get_omega(double w);
+    const xt::xtensor_fixed<double, xt::xshape<3>>& get_omega(const xt::xtensor_fixed<double, xt::xshape<3>>& w);
 }

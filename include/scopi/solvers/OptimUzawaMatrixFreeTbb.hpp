@@ -37,7 +37,7 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::init_uzawa_impl(const scopi_container<dim>& particles,
+    void OptimUzawaMatrixFreeTbb::init_uzawa_impl(const scopi_container<dim>&,
                                                   const std::vector<neighbor<dim>>&)
     {}
 

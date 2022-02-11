@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(scopi)
 
@@ -32,6 +32,7 @@ OPTION(SCOPI_USE_OPENMP "enable OpenMP" OFF)
 OPTION(SCOPI_USE_MOSEK "enable Mosek" OFF)
 OPTION(SCOPI_USE_SCS "enable SCS" OFF)
 OPTION(SCOPI_USE_MKL "enable MKL" OFF)
+OPTION(BUILD_EXAMPLES "scopi examples" OFF)
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 
 if(SCOPI_USE_TBB AND SCOPI_USE_OPENMP)
@@ -156,7 +157,12 @@ if(SCOPI_USE_SCS)
     target_compile_definitions(scopi PUBLIC SCOPI_USE_SCS)
 endif()
 
-add_subdirectory(demos EXCLUDE_FROM_ALL)
+if(BUILD_EXAMPLES)
+    add_subdirectory(demos)
+else()
+    add_subdirectory(demos EXCLUDE_FROM_ALL)
+endif()
+
 if(BUILD_TESTS)
     add_subdirectory(test)
 endif()

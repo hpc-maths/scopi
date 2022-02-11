@@ -1,9 +1,12 @@
 #pragma once
-#include "../crtp.hpp"
-#include "../container.hpp"
-#include "../objects/neighbor.hpp"
+
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
+
+#include "../container.hpp"
+#include "../crtp.hpp"
+#include "../objects/neighbor.hpp"
+#include "../utils.hpp"
 
 namespace scopi{
     template <class Derived>
@@ -99,7 +102,11 @@ namespace scopi{
             {
                 m_c(mass_dec + 3*i + d) = -m_mass*desired_velocity(i + active_offset)[d]; // TODO: add mass into particles
             }
-            m_c(moment_dec + 3*i + 2) = -m_moment*desired_omega(i + active_offset);
+            auto omega = get_omega(desired_omega(i + active_offset));
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                m_c(moment_dec + 3*i + d) = -m_moment*omega(d);
+            }
         }
     }
 

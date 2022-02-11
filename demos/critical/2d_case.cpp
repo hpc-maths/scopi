@@ -1,8 +1,11 @@
-#include <xtensor/xmath.hpp>
-#include <scopi/objects/types/superellipsoid.hpp>
-#include <scopi/solver.hpp>
-#include <scopi/container.hpp>
 #include <random>
+
+#include <xtensor/xmath.hpp>
+
+#include <scopi/container.hpp>
+#include <scopi/objects/types/superellipsoid.hpp>
+#include <scopi/property.hpp>
+#include <scopi/solver.hpp>
 #include <scopi/vap/base.hpp>
 
 // cmake --build . --target critical_2d
@@ -47,7 +50,7 @@ int main()
 
       scopi::sphere<dim> s1( {{x, y}}, {scopi::quaternion(rot)}, r);
       // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
-      particles.push_back(s1, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+      particles.push_back(s1, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}));
 
       // e = distrib_e(generator);
       r = distrib_r(generator);
@@ -57,9 +60,8 @@ int main()
       rot = distrib_rot(generator);
       dist_orig = std::sqrt(x*x+y*y);
       scopi::sphere<dim> s2( {{x, y}}, {scopi::quaternion(rot)}, r);
-      // particles.push_back(s2, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
       // scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r}}, {{1}});
-      particles.push_back(s2, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+      particles.push_back(s2, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}));
 
       // e = distrib_e(generator);
       // r = distrib_r(generator);
@@ -69,7 +71,7 @@ int main()
       // rot = distrib_rot(generator);
       // dist_orig = std::sqrt(x*x+y*y);
       // scopi::superellipsoid<dim> s3({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{e}});
-      // particles.push_back(s3, {{0, 0}}, {{-x/dist_orig, -y/dist_orig}}, 0, 0, {{0, 0}});
+      // particles.push_back(s3, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}));
 
     }
 
@@ -87,7 +89,7 @@ int main()
     //     {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
     //     {{e}});
     //   // s1.print();
-    //   particles.push_back(s1, {{0, 0}}, {{-0.25, 0}}, 0, 0, {{0, 0}});
+    //   particles.push_back(s1, scopi::property<dim>().desired_velocity({{-0.25, 0}}));
     //
     //   // scopi::sphere<dim> s2(
     //   //   {{distrib_gp2(generator), distrib_y(generator)}},
@@ -97,15 +99,11 @@ int main()
     //     {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
     //     {{e}});
     //   // s2.print();
-    //   particles.push_back(s2, {{0, 0}}, {{0.25, 0}}, 0, 0, {{0, 0}});
+    //   particles.push_back(s2, scopi::property<dim>().desired_velocity({{0.25, 0}}));
     //
     // }
 
-    // std::size_t active_ptr = 1;
-    std::size_t active_ptr = 0; // pas d'obstacles
-
-    // scopi::mosek_solver(particles, dt, total_it, active_ptr);
-    scopi::ScopiSolver<dim> solver(particles, dt, active_ptr);
+    scopi::ScopiSolver<dim> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;

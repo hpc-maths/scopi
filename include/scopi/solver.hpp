@@ -103,7 +103,8 @@ namespace scopi
     {
         for (std::size_t i = 0; i < m_particles.nb_inactive(); ++i)
         {
-            xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, m_particles.desired_omega()(i)});
+
+            auto  w = get_omega(m_particles.desired_omega()(i));
             double normw = xt::linalg::norm(w);
             if (normw == 0)
             {
