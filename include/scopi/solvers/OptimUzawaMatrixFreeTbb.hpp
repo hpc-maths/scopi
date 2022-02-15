@@ -10,6 +10,7 @@
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
+#include "../quaternion.hpp"
 #include "../utils.hpp"
 
 namespace scopi

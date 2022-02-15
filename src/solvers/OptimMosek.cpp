@@ -5,7 +5,7 @@ namespace scopi
 {
     OptimMosek::OptimMosek(std::size_t nparts, double dt,  double)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
-    , MatrixOptimSolver(nparts, dt)
+    , MatrixOptimSolverFriction(nparts, dt)
     {
         this->m_c(0) = 1;
 

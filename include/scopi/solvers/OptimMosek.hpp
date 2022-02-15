@@ -2,7 +2,7 @@
 
 #ifdef SCOPI_USE_MOSEK
 #include "OptimBase.hpp"
-#include "MatrixOptimSolver.hpp"
+#include "MatrixOptimSolverFriction.hpp"
 
 #include <memory>
 #include <fusion.h>
@@ -12,7 +12,7 @@ namespace scopi{
     using namespace monty;
 
     class OptimMosek: public OptimBase<OptimMosek>
-                    , public MatrixOptimSolver
+                    , public MatrixOptimSolverFriction
     {
     public:
         using base_type = OptimBase<OptimMosek>;
@@ -52,16 +52,22 @@ namespace scopi{
         model->objective("minvar", ObjectiveSense::Minimize, Expr::dot(c_mosek, X));
 
         // constraints
-        auto D_mosek = std::make_shared<ndarray<double, 1>>(this->m_distances.data(), shape_t<1>({this->m_distances.shape(0)}));
+        auto D_mosek = std::make_shared<ndarray<double, 1>>(this->m_distances.data(), shape_t<1>({4*this->m_distances.shape(0)}));
+        // TODO cleaner and faster way to set D to 0
+        for (std::size_t i = 0; i < 3*contacts.size(); ++i)
+        {
+            (*D_mosek)[contacts.size() + i] = 0.;
+        }
 
         // matrix
-        this->create_matrix_constraint_coo(particles, contacts, 1);
-        m_A = Matrix::sparse(contacts.size(), 1 + 6*this->m_nparts + 6*this->m_nparts,
+        this->create_matrix_constraint_coo(particles, contacts, 0);
+        m_A = Matrix::sparse(4*contacts.size(), 6*this->m_nparts,
                              std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
-        Constraint::t qc1 = model->constraint("qc1", Expr::mul(m_A, X), Domain::lessThan(D_mosek));
+        Constraint::t qc1 = model->constraint("qc1", Expr::reshape(Expr::add(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts))), 4, contacts.size()), Domain::inQCone());
+        // Constraint::t qc1 = model->constraint("qc1", (Expr::add(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)))), Domain::inQCone(4, contacts.size()));
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
         // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
