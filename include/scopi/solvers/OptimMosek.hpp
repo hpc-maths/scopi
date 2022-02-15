@@ -20,11 +20,6 @@ namespace scopi{
         OptimMosek(std::size_t nparts, double dt, double tol = 1e-8);
 
         template <std::size_t dim>
-        void create_matrix_constraint_impl(const std::vector<neighbor<dim>>& contacts);
-
-        void create_matrix_mass_impl();
-
-        template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts);
 
@@ -44,6 +39,7 @@ namespace scopi{
     int OptimMosek::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                     const std::vector<neighbor<dim>>& contacts)
     {
+        tic();
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
         Variable::t X = model->variable("X", 1 + 6*this->m_nparts + 6*this->m_nparts);
@@ -54,6 +50,7 @@ namespace scopi{
 
         // constraints
         auto D_mosek = std::make_shared<ndarray<double, 1>>(this->m_distances.data(), shape_t<1>({this->m_distances.shape(0)}));
+        auto duration1 = toc();
 
         // matrix
         this->create_matrix_constraint_coo(particles, contacts, 0);
@@ -84,6 +81,8 @@ namespace scopi{
 
         m_Xlvl = X->level();
         m_dual = qc1->dual();
+        auto duration3 = toc();
+        PLOG_INFO << "----> CPUTIME : Mosek solve = " << duration1 + duration3;
 
         return model->getSolverIntInfo("intpntIter");
     }

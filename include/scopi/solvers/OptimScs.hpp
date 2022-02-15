@@ -53,6 +53,7 @@ namespace scopi
     int OptimScs::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                  const std::vector<neighbor<dim>>& contacts)
     {
+        tic();
         this->create_matrix_constraint_coo(particles, contacts, 0);
         // COO storage to CSR storage is easy to write
         // The CSC storage of A is the CSR storage of A^T
@@ -90,8 +91,13 @@ namespace scopi
         m_sol.y = m_sol_y.data();
         m_sol_s.resize(this->m_distances.size());
         m_sol.s = m_sol_s.data();
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : SCS matrix = " << duration;
 
+        tic();
         scs(&m_d, &m_k, &m_stgs, &m_sol, &m_info);
+        duration = toc();
+        PLOG_INFO << "----> CPUTIME : SCS solve = " << duration;
 
         return m_info.iter;
     }
