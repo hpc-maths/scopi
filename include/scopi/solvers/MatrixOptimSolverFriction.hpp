@@ -26,6 +26,9 @@ namespace scopi
         std::vector<int> m_A_rows;
         std::vector<int> m_A_cols;
         std::vector<double> m_A_values;
+        std::vector<int> m_T_rows;
+        std::vector<int> m_T_cols;
+        std::vector<double> m_T_values;
     };
 
     template<std::size_t dim>
@@ -36,9 +39,12 @@ namespace scopi
         std::size_t active_offset = particles.nb_inactive();
         std::size_t u_size = 3*contacts.size()*2;
         std::size_t w_size = 3*contacts.size()*2;
-        m_A_rows.resize(4*(u_size + w_size));
-        m_A_cols.resize(4*(u_size + w_size));
-        m_A_values.resize(4*(u_size + w_size));
+        m_A_rows.resize(u_size + w_size);
+        m_A_cols.resize(u_size + w_size);
+        m_A_values.resize(u_size + w_size);
+        m_T_rows.resize(3*(u_size + w_size));
+        m_T_cols.resize(3*(u_size + w_size));
+        m_T_values.resize(3*(u_size + w_size));
 
         std::size_t ic = 0;
         std::size_t index = 0;
@@ -99,7 +105,12 @@ namespace scopi
 
             ++ic;
         }
+        m_A_rows.resize(index);
+        m_A_cols.resize(index);
+        m_A_values.resize(index);
 
+        ic = 0;
+        index = 0;
         for (auto &c: contacts)
         {
             if (c.i >= active_offset)
@@ -108,12 +119,12 @@ namespace scopi
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        m_A_rows[index] = ic + ind_row;
-                        m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
-                        m_A_values[index] = -m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        m_T_rows[index] = ic + ind_row;
+                        m_T_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
+                        m_T_values[index] = -m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
                         if(ind_row == ind_col)
                         {
-                            m_A_values[index] += m_dt*m_mu;
+                            m_T_values[index] += m_dt*m_mu;
                         }
                         index++;
                     }
@@ -126,12 +137,12 @@ namespace scopi
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        m_A_rows[index] = ic + ind_row;
-                        m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
-                        m_A_values[index] = m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        m_T_rows[index] = ic + ind_row;
+                        m_T_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
+                        m_T_values[index] = m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
                         if(ind_row == ind_col)
                         {
-                            m_A_values[index] -= m_dt*m_mu;
+                            m_T_values[index] -= m_dt*m_mu;
                         }
                         index++;
                     }
@@ -151,9 +162,9 @@ namespace scopi
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        m_A_rows[index] = ic + ind_row;
-                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        m_A_values[index] = -m_mu*m_dt*dot(ind_row, ind_col) + m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        m_T_rows[index] = ic + ind_row;
+                        m_T_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                        m_T_values[index] = -m_mu*m_dt*dot(ind_row, ind_col) + m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                         index++;
                     }
                 }
@@ -167,9 +178,9 @@ namespace scopi
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        m_A_rows[index] = ic + ind_row;
-                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        m_A_values[index] = m_mu*m_dt*dot(ind_row, ind_col) - m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        m_T_rows[index] = ic + ind_row;
+                        m_T_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                        m_T_values[index] = m_mu*m_dt*dot(ind_row, ind_col) - m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                         index++;
                     }
                 }
@@ -177,9 +188,9 @@ namespace scopi
 
             ++ic;
         }
-        m_A_rows.resize(index);
-        m_A_cols.resize(index);
-        m_A_values.resize(index);
+        m_T_rows.resize(index);
+        m_T_cols.resize(index);
+        m_T_values.resize(index);
     }
 
 }
