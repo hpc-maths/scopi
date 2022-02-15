@@ -66,8 +66,9 @@ namespace scopi{
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
-        Constraint::t qc1 = model->constraint("qc1", Expr::reshape(Expr::add(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts))), 4, contacts.size()), Domain::inQCone());
-        // Constraint::t qc1 = model->constraint("qc1", (Expr::add(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)))), Domain::inQCone(4, contacts.size()));
+        // Constraint::t qc1 = model->constraint("qc1", Expr::reshape(Expr::add(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts))), 4, contacts.size()), Domain::inQCone());
+        Constraint::t qc1 = model->constraint("qc1", (Expr::sub(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)))), Domain::inQCone());
+        // Constraint::t qc1 = model->constraint("qc1", Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::lessThan(D_mosek));
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
         // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
