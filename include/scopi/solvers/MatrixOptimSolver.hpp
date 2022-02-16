@@ -15,9 +15,6 @@
 
 namespace scopi
 {
-    using namespace mosek::fusion;
-    using namespace monty;
-
     class MatrixOptimSolver
     {
     protected:
@@ -28,17 +25,19 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
 
-        std::shared_ptr<ndarray<double, 1>> distances_to_mosek_vector(xt::xtensor<double, 1> distances) const;
+#ifdef SCOPI_USE_MOSEK
+        std::shared_ptr<monty::ndarray<double, 1>> distances_to_mosek_vector(xt::xtensor<double, 1> distances) const;
         template <std::size_t dim>
         std::size_t number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const;
         std::size_t number_col_matrix_mosek() const;
         std::size_t matrix_first_col_index_mosek() const;
         template <std::size_t dim>
-        Constraint::t constraint_mosek(std::shared_ptr<ndarray<double, 1>> D,
-                                       Matrix::t A,
-                                       Variable::t X,
-                                       Model::t model,
+        mosek::fusion::Constraint::t constraint_mosek(std::shared_ptr<monty::ndarray<double, 1>> D,
+                                       mosek::fusion::Matrix::t A,
+                                       mosek::fusion::Variable::t X,
+                                       mosek::fusion::Model::t model,
                                        const std::vector<neighbor<dim>>& contacts) const;
+#endif
 
         std::size_t m_nparticles;
         double m_dt;
@@ -124,6 +123,7 @@ namespace scopi
         m_A_values.resize(index);
     }
 
+#ifdef SCOPI_USE_MOSEK
     template <std::size_t dim>
     std::size_t MatrixOptimSolver::number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const
     {
@@ -131,14 +131,16 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    Constraint::t MatrixOptimSolver::constraint_mosek(std::shared_ptr<ndarray<double, 1>> D,
-                                   Matrix::t A,
-                                   Variable::t X,
-                                   Model::t model,
+    mosek::fusion::Constraint::t MatrixOptimSolver::constraint_mosek(std::shared_ptr<monty::ndarray<double, 1>> D,
+                                   mosek::fusion::Matrix::t A,
+                                   mosek::fusion::Variable::t X,
+                                   mosek::fusion::Model::t model,
                                    const std::vector<neighbor<dim>>&) const
     {
-         return model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
+        using namespace mosek::fusion;
+        return model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
     }
+#endif
 
 }
 

@@ -8,9 +8,6 @@
 #include <fusion.h>
 
 namespace scopi{
-    using namespace mosek::fusion;
-    using namespace monty;
-
     template<class model_t = MatrixOptimSolver>
     class OptimMosek: public OptimBase<OptimMosek<model_t>>
                     , public model_t
@@ -29,10 +26,11 @@ namespace scopi{
         int get_nb_active_contacts_impl() const;
 
     private:
-        Matrix::t m_Az;
-        Matrix::t m_A;
-        std::shared_ptr<ndarray<double,1>> m_Xlvl;
-        std::shared_ptr<ndarray<double,1>> m_dual;
+
+        mosek::fusion::Matrix::t m_Az;
+        mosek::fusion::Matrix::t m_A;
+        std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
+        std::shared_ptr<monty::ndarray<double,1>> m_dual;
     };
 
     template<class model_t>
@@ -40,6 +38,9 @@ namespace scopi{
     int OptimMosek<model_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                     const std::vector<neighbor<dim>>& contacts)
     {
+        using namespace mosek::fusion;
+        using namespace monty;
+
         tic();
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
@@ -87,6 +88,9 @@ namespace scopi{
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
     , model_t(nparts, dt, mu)
     {
+        using namespace mosek::fusion;
+        using namespace monty;
+
         this->m_c(0) = 1;
 
         // mass matrix

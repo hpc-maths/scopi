@@ -2,12 +2,15 @@
 
 namespace scopi
 {
+    using namespace monty;
+
     MatrixOptimSolverFriction::MatrixOptimSolverFriction(std::size_t nparticles, double dt, double mu)
     : m_nparticles(nparticles)
     , m_dt(dt)
     , m_mu(mu)
     {}
 
+#ifdef SCOPI_USE_MOSEK
     std::shared_ptr<ndarray<double, 1>> MatrixOptimSolverFriction::distances_to_mosek_vector(xt::xtensor<double, 1> distances) const
     {
         // TODO clean
@@ -31,4 +34,5 @@ namespace scopi
     {
         return 6*m_nparticles;
     }
+#endif
 }
