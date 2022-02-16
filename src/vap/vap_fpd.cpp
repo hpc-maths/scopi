@@ -7,9 +7,4 @@ namespace scopi
           , m_mass(1.)
         //   , _moment(0.1)
     {}
-
-    double vap_fpd::t_ext()
-    {
-        return 0.;
-    }
 }

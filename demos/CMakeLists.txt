@@ -6,6 +6,7 @@ set(SCOPI_EXAMPLES
    two_ellipsoids_spheres_3d.cpp
    two_spheres.cpp
    two_spheres_periodic.cpp
+   sphere_plan.cpp
 )
 
 include(generator)

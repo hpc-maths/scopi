@@ -78,22 +78,9 @@ namespace scopi
             PLOG_INFO << "----> json output files " << nite << std::endl;
             write_output_files(contacts, nite);
 
-            // for (std::size_t i=0; i<m_Nactive; ++i)
-            // {
-            //     for (std::size_t d=0; d<dim; ++d)
-            //     {
-            //         particles.pos()(i + active_ptr)(d) += dt*particles.vd()(i + active_ptr)(d);
-            //     }
-            // }
-            //
             m_vap.set_a_priori_velocity(m_particles);
-
-            // solver optimization problem
             m_solver.run(m_particles, contacts, nite);
-
-            // move the active particles
             move_active_particles();
-
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
         }
     }
@@ -189,15 +176,9 @@ namespace scopi
             {
                 m_particles.pos()(i + active_offset)(d) += m_dt*uadapt(i, d);
             }
-            // xt::view(particles.pos(), i) += dt*xt::view(uadapt, i);
 
-            // particles.q()(i) = quaternion(theta(i));
-            // std::cout << expw << " " << particles.q()(i) << std::endl;
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
-            // std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
-            // std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
-
         }
     }
 }
