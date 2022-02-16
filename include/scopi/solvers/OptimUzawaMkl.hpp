@@ -96,7 +96,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void OptimUzawaMkl::gemv_inv_P_impl(const scopi_container<dim>& particles)
+    void OptimUzawaMkl::gemv_inv_P_impl(const scopi_container<dim>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_U.data(), 0., this->m_U.data()); // U = - P^-1 * U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status;
@@ -111,7 +111,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void OptimUzawaMkl::gemv_transpose_A_impl(const scopi_container<dim>& particles,
+    void OptimUzawaMkl::gemv_transpose_A_impl(const scopi_container<dim>&,
                                                    const std::vector<neighbor<dim>>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, this->m_L.data(), 1., this->m_U.data()); // U = A^T * L + U

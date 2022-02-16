@@ -45,7 +45,7 @@ namespace scopi{
 
     template<class Derived>
     template<std::size_t dim>
-    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t nite)
+    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t)
     {
         tic();
         create_vector_c(particles);

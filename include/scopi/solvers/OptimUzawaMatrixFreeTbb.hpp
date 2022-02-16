@@ -43,7 +43,7 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::gemv_inv_P_impl(const scopi_container<dim>& particles)
+    void OptimUzawaMatrixFreeTbb::gemv_inv_P_impl(const scopi_container<dim>&)
     {
         // for loops instead of xtensor functions to control exactly the parallelism
         tbb::parallel_for(std::size_t(0), this->m_nparts, [=](std::size_t i) {
