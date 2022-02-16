@@ -2,6 +2,11 @@
 
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
+#include <xtensor/xtensor.hpp>
+
+#ifdef SCOPI_USE_MOSEK
+#include <fusion.h>
+#endif
 
 #include "../container.hpp"
 #include "../quaternion.hpp"
@@ -10,6 +15,9 @@
 
 namespace scopi
 {
+    using namespace mosek::fusion;
+    using namespace monty;
+
     class MatrixOptimSolver
     {
     protected:
@@ -20,6 +28,19 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
 
+        std::shared_ptr<ndarray<double, 1>> distances_to_mosek_vector(xt::xtensor<double, 1> distances) const;
+        template <std::size_t dim>
+        std::size_t number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const;
+        std::size_t number_col_matrix_mosek() const;
+        std::size_t matrix_first_col_index_mosek() const;
+        template <std::size_t dim>
+        Constraint::t constraint_mosek(std::shared_ptr<ndarray<double, 1>> D,
+                                       Matrix::t A,
+                                       Variable::t X,
+                                       Model::t model,
+                                       const std::vector<neighbor<dim>>& contacts) const;
+
+        std::size_t m_nparticles;
         double m_dt;
 
         std::vector<int> m_A_rows;
@@ -101,6 +122,22 @@ namespace scopi
         m_A_rows.resize(index);
         m_A_cols.resize(index);
         m_A_values.resize(index);
+    }
+
+    template <std::size_t dim>
+    std::size_t MatrixOptimSolver::number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const
+    {
+        return contacts.size();
+    }
+
+    template <std::size_t dim>
+    Constraint::t MatrixOptimSolver::constraint_mosek(std::shared_ptr<ndarray<double, 1>> D,
+                                   Matrix::t A,
+                                   Variable::t X,
+                                   Model::t model,
+                                   const std::vector<neighbor<dim>>&) const
+    {
+         return model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
     }
 
 }

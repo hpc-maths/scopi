@@ -2,7 +2,7 @@
 
 #ifdef SCOPI_USE_MOSEK
 #include "OptimBase.hpp"
-#include "MatrixOptimSolverFriction.hpp"
+#include "MatrixOptimSolver.hpp"
 
 #include <memory>
 #include <fusion.h>
@@ -11,8 +11,9 @@ namespace scopi{
     using namespace mosek::fusion;
     using namespace monty;
 
-    class OptimMosek: public OptimBase<OptimMosek>
-                    , public MatrixOptimSolverFriction
+    template<class model_t = MatrixOptimSolver>
+    class OptimMosek: public OptimBase<OptimMosek<model_t>>
+                    , public model_t
     {
     public:
         using base_type = OptimBase<OptimMosek>;
@@ -30,13 +31,13 @@ namespace scopi{
     private:
         Matrix::t m_Az;
         Matrix::t m_A;
-        Matrix::t m_T;
         std::shared_ptr<ndarray<double,1>> m_Xlvl;
         std::shared_ptr<ndarray<double,1>> m_dual;
     };
 
+    template<class model_t>
     template<std::size_t dim>
-    int OptimMosek::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+    int OptimMosek<model_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                     const std::vector<neighbor<dim>>& contacts)
     {
         tic();
@@ -49,37 +50,20 @@ namespace scopi{
         model->objective("minvar", ObjectiveSense::Minimize, Expr::dot(c_mosek, X));
 
         // constraints
-        auto D_mosek = std::make_shared<ndarray<double, 1>>(this->m_distances.data(), shape_t<1>({4*this->m_distances.shape(0)}));
-        for (std::size_t i = 0; i < contacts.size(); ++i)
-        {
-            (*D_mosek)[4*i] = m_distances[i];
-            (*D_mosek)[4*i + 1] = 0.;
-            (*D_mosek)[4*i + 2] = 0.;
-            (*D_mosek)[4*i + 3] = 0.;
-        }
+        auto D_mosek = this->distances_to_mosek_vector(this->m_distances);
         auto duration1 = toc();
 
         // matrix
-        this->create_matrix_constraint_coo(particles, contacts, 0);
-        m_A = Matrix::sparse(4*contacts.size(), 6*this->m_nparts,
+        this->create_matrix_constraint_coo(particles, contacts, this->matrix_first_col_index_mosek());
+        m_A = Matrix::sparse(this->number_row_matrix_mosek(contacts), this->number_col_matrix_mosek(),
                              std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
-        /*
-        PLOG_DEBUG << "D_mosek";
-        for (std::size_t i = 0; i < 4*contacts.size(); ++i)
-            PLOG_DEBUG << (*D_mosek)[i];
-        PLOG_DEBUG << "m_A";
-        for (std::size_t i = 0; i < m_A_rows.size(); ++i)
-            PLOG_DEBUG << m_A_rows[i] << "    " << m_A_cols[i] << "    " << m_A_values[i];
-        */
-
-        Constraint::t qc1 = model->constraint("qc1"
-                , Expr::reshape(Expr::sub(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts))), contacts.size(), 4)
-                , Domain::inQCone());
+        Constraint::t qc1 = this->constraint_mosek(D_mosek, m_A, X, model, contacts);
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
+
         // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
         // model->setSolverParam("numThreads", thread_qty);
         // model->setSolverParam("intpntCoTolPfeas", 1e-11);
@@ -96,6 +80,73 @@ namespace scopi{
         PLOG_INFO << "----> CPUTIME : Mosek solve = " << duration1 + duration3;
 
         return model->getSolverIntInfo("intpntIter");
+    }
+
+    template<class model_t>
+    OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt,  double mu, double)
+    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
+    , model_t(nparts, dt, mu)
+    {
+        this->m_c(0) = 1;
+
+        // mass matrix
+        std::vector<int> Az_rows;
+        std::vector<int> Az_cols;
+        std::vector<double> Az_values;
+
+        Az_rows.reserve(6*nparts*2);
+        Az_cols.reserve(6*nparts*2);
+        Az_values.reserve(6*nparts*2);
+
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < 2; ++d)
+            {
+                Az_rows.push_back(3*i + d);
+                Az_cols.push_back(1 + 3*i + d);
+                Az_values.push_back(std::sqrt(this->m_mass)); // TODO: add mass into particles
+                Az_rows.push_back(3*i + d);
+                Az_cols.push_back(1 + 6*nparts + 3*i + d);
+                Az_values.push_back(-1.);
+            }
+
+            Az_rows.push_back(3*nparts + 3*i + 2);
+            Az_cols.push_back(1 + 3*nparts + 3*i + 2);
+            Az_values.push_back(std::sqrt(this->m_moment));
+
+            Az_rows.push_back(3*nparts + 3*i + 2);
+            Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + 2);
+            Az_values.push_back(-1);
+        }
+
+        m_Az = Matrix::sparse(6*nparts, 1 + 6*nparts + 6*nparts,
+                              std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>({Az_rows.size()})),
+                              std::make_shared<ndarray<int, 1>>(Az_cols.data(), shape_t<1>({Az_cols.size()})),
+                              std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>({Az_values.size()})));
+    }
+
+    template<class model_t>
+    double* OptimMosek<model_t>::uadapt_data()
+    {
+        return m_Xlvl->raw() + 1;
+    }
+
+    template<class model_t>
+    double* OptimMosek<model_t>::wadapt_data()
+    {
+        return m_Xlvl->raw() + 1 + 3*this->m_nparts;
+    }
+
+    template<class model_t>
+    int OptimMosek<model_t>::get_nb_active_contacts_impl() const
+    {
+        int nb_active_contacts = 0;
+        for (auto x : *m_dual)
+        {
+            if(std::abs(x) > 1e-3)
+                nb_active_contacts++;
+        }
+        return nb_active_contacts;
     }
 }
 #endif

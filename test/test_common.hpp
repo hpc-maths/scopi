@@ -13,18 +13,20 @@
 #include <scopi/contact/contact_kdtree.hpp>
 #include <scopi/contact/contact_brute_force.hpp>
 
+#include <scopi/solvers/MatrixOptimSolverFriction.hpp>
+
 namespace scopi
 {
     #define SOLVER_WITH_CONTACT(dim, contact) \
-        ScopiSolver<dim, OptimMosek, contact>, \
+        ScopiSolver<dim, OptimMosek<>, contact>, \
         ScopiSolver<dim, OptimScs, contact>, \
         ScopiSolver<dim, OptimUzawaMkl, contact>, \
         ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact>, \
         ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact>, \
-        ScopiSolver<dim, OptimMosek, contact> // friction
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact> // friction
 
     #define SOLVER_WITH_CONTACT_FRICTION(dim, contact) \
-        ScopiSolver<dim, OptimMosek, contact> // friction
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact> // friction
 
     template<std::size_t dim>
     using solver_types = ::testing::Types<
