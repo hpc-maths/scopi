@@ -508,7 +508,7 @@ namespace scopi
 
     TYPED_TEST(TestTwoSpheresAsymmetricalFriction, two_spheres_asymmetrical_friction)
     {
-        TypeParam solver(this->m_particles, this->m_dt/*, this->m_mu*/);
+        TypeParam solver(this->m_particles, this->m_dt, this->m_mu);
         solver.solve(this->m_total_it);
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance);
@@ -557,7 +557,7 @@ namespace scopi
 
     TYPED_TEST(Test2dCaseSpheresFriction, 2d_case_spheres_friction)
     {
-        TypeParam solver(this->m_particles, this->m_dt/*, this->m_mu*/);
+        TypeParam solver(this->m_particles, this->m_dt, this->m_mu);
         solver.solve(this->m_total_it);
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance);

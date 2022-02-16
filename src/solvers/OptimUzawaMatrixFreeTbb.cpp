@@ -4,7 +4,7 @@
 
 namespace scopi
 {
-    OptimUzawaMatrixFreeTbb::OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt)
+    OptimUzawaMatrixFreeTbb::OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, double)
     : base_type(nparts, dt)
     {}
 }

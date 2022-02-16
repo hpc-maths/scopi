@@ -4,7 +4,7 @@
 
 namespace scopi
 {
-    OptimUzawaMkl::OptimUzawaMkl(std::size_t nparts, double dt)
+    OptimUzawaMkl::OptimUzawaMkl(std::size_t nparts, double dt, double)
     : base_type(nparts, dt)
     , MatrixOptimSolver(nparts, dt)
     , should_destroy(false)

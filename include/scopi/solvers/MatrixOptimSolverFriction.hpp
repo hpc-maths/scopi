@@ -13,7 +13,7 @@ namespace scopi
     class MatrixOptimSolverFriction
     {
     protected:
-        MatrixOptimSolverFriction(std::size_t nparts, double dt);
+        MatrixOptimSolverFriction(std::size_t nparts, double dt, double mu);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,

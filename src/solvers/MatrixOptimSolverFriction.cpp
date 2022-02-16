@@ -2,8 +2,8 @@
 
 namespace scopi
 {
-    MatrixOptimSolverFriction::MatrixOptimSolverFriction(std::size_t, double dt)
+    MatrixOptimSolverFriction::MatrixOptimSolverFriction(std::size_t, double dt, double mu)
     : m_dt(dt)
-    , m_mu(1./2.)
+    , m_mu(mu)
     {}
 }

@@ -20,7 +20,7 @@ namespace scopi
     public:
         using base_type = OptimUzawaBase<OptimUzawaMkl>;
 
-        OptimUzawaMkl(std::size_t nparts, double dt);
+        OptimUzawaMkl(std::size_t nparts, double dt, double mu = 0.);
         ~OptimUzawaMkl();
 
         template <std::size_t dim>

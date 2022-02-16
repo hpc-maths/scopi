@@ -39,7 +39,7 @@ namespace scopi
     class ScopiSolver
     {
     public:
-        ScopiSolver(scopi_container<dim>& particles, double dt);
+        ScopiSolver(scopi_container<dim>& particles, double dt, double mu = 0.);
         void solve(std::size_t total_it);
 
     private:
@@ -55,10 +55,10 @@ namespace scopi
     };
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, double mu)
     : m_particles(particles)
     , m_dt(dt)
-    , m_solver(m_particles.nb_active(), m_dt)
+    , m_solver(m_particles.nb_active(), m_dt, mu)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 

@@ -17,7 +17,7 @@ namespace scopi{
     public:
         using base_type = OptimBase<OptimMosek>;
 
-        OptimMosek(std::size_t nparts, double dt, double tol = 1e-8);
+        OptimMosek(std::size_t nparts, double dt, double mu = 0., double tol = 1e-8);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,

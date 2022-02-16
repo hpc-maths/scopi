@@ -3,9 +3,9 @@
 #ifdef SCOPI_USE_MOSEK
 namespace scopi
 {
-    OptimMosek::OptimMosek(std::size_t nparts, double dt,  double)
+    OptimMosek::OptimMosek(std::size_t nparts, double dt,  double mu, double)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
-    , MatrixOptimSolverFriction(nparts, dt)
+    , MatrixOptimSolverFriction(nparts, dt, mu)
     {
         this->m_c(0) = 1;
 

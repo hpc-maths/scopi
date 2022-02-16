@@ -2,7 +2,7 @@
 
 namespace scopi
 {
-    OptimUzawaMatrixFreeOmp::OptimUzawaMatrixFreeOmp(std::size_t nparts, double dt)
+    OptimUzawaMatrixFreeOmp::OptimUzawaMatrixFreeOmp(std::size_t nparts, double dt, double)
     : base_type(nparts, dt)
     {}
 }
