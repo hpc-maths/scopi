@@ -4,6 +4,6 @@ namespace scopi
 {
     MatrixOptimSolverFriction::MatrixOptimSolverFriction(std::size_t, double dt)
     : m_dt(dt)
-    , m_mu(0.)
+    , m_mu(1./2.)
     {}
 }

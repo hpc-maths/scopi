@@ -103,7 +103,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void OptimUzawaMkl::gemv_A_impl(const scopi_container<dim>& particles,
+    void OptimUzawaMkl::gemv_A_impl(const scopi_container<dim>&,
                                          const std::vector<neighbor<dim>>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_A, m_descrA, this->m_U.data(), 1., this->m_R.data()); // R = - A * U + R
