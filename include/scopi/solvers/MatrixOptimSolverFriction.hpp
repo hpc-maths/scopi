@@ -26,9 +26,6 @@ namespace scopi
         std::vector<int> m_A_rows;
         std::vector<int> m_A_cols;
         std::vector<double> m_A_values;
-        std::vector<int> m_T_rows;
-        std::vector<int> m_T_cols;
-        std::vector<double> m_T_values;
     };
 
     template<std::size_t dim>
@@ -39,12 +36,9 @@ namespace scopi
         std::size_t active_offset = particles.nb_inactive();
         std::size_t u_size = 3*contacts.size()*2;
         std::size_t w_size = 3*contacts.size()*2;
-        m_A_rows.resize(u_size + w_size);
-        m_A_cols.resize(u_size + w_size);
-        m_A_values.resize(u_size + w_size);
-        m_T_rows.resize(3*(u_size + w_size));
-        m_T_cols.resize(3*(u_size + w_size));
-        m_T_values.resize(3*(u_size + w_size));
+        m_A_rows.resize(4*(u_size + w_size));
+        m_A_cols.resize(4*(u_size + w_size));
+        m_A_values.resize(4*(u_size + w_size));
 
         std::size_t ic = 0;
         std::size_t index = 0;
@@ -54,10 +48,24 @@ namespace scopi
             {
                 for (std::size_t d = 0; d < 3; ++d)
                 {
-                    m_A_rows[index] = ic;
+                    m_A_rows[index] = 4*ic;
                     m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                     m_A_values[index] = -m_dt*c.nij[d];
                     index++;
+                }
+                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                {
+                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                    {
+                        m_A_rows[index] = 4*ic + 1 + ind_row;
+                        m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
+                        m_A_values[index] = -m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        if(ind_row == ind_col)
+                        {
+                            m_A_values[index] += m_dt*m_mu;
+                        }
+                        index++;
+                    }
                 }
             }
 
@@ -65,10 +73,24 @@ namespace scopi
             {
                 for (std::size_t d = 0; d < 3; ++d)
                 {
-                    m_A_rows[index] = ic;
+                    m_A_rows[index] = 4*ic;
                     m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                     m_A_values[index] = m_dt*c.nij[d];
                     index++;
+                }
+                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                {
+                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                    {
+                        m_A_rows[index] = 4*ic + 1 + ind_row;
+                        m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
+                        m_A_values[index] = m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        if(ind_row == ind_col)
+                        {
+                            m_A_values[index] -= m_dt*m_mu;
+                        }
+                        index++;
+                    }
                 }
             }
 
@@ -83,10 +105,20 @@ namespace scopi
                 auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    m_A_rows[index] = ic;
+                    m_A_rows[index] = 4*ic;
                     m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                     m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
+                }
+                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                {
+                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                    {
+                        m_A_rows[index] = 4*ic + 1 + ind_row;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                        m_A_values[index] = -m_mu*m_dt*dot(ind_row, ind_col) + m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        index++;
+                    }
                 }
             }
 
@@ -96,10 +128,20 @@ namespace scopi
                 auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    m_A_rows[index] = ic;
+                    m_A_rows[index] = 4*ic;
                     m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                     m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
+                }
+                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                {
+                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                    {
+                        m_A_rows[index] = 4*ic + 1 + ind_row;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                        m_A_values[index] = m_mu*m_dt*dot(ind_row, ind_col) - m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        index++;
+                    }
                 }
             }
 
@@ -108,89 +150,6 @@ namespace scopi
         m_A_rows.resize(index);
         m_A_cols.resize(index);
         m_A_values.resize(index);
-
-        ic = 0;
-        index = 0;
-        for (auto &c: contacts)
-        {
-            if (c.i >= active_offset)
-            {
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        m_T_rows[index] = ic + ind_row;
-                        m_T_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
-                        m_T_values[index] = -m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
-                        if(ind_row == ind_col)
-                        {
-                            m_T_values[index] += m_dt*m_mu;
-                        }
-                        index++;
-                    }
-                }
-            }
-
-            if (c.j >= active_offset)
-            {
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        m_T_rows[index] = ic + ind_row;
-                        m_T_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
-                        m_T_values[index] = m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
-                        if(ind_row == ind_col)
-                        {
-                            m_T_values[index] -= m_dt*m_mu;
-                        }
-                        index++;
-                    }
-                }
-            }
-
-            auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
-            auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
-            auto Ri = rotation_matrix<3>(particles.q()(c.i));
-            auto Rj = rotation_matrix<3>(particles.q()(c.j));
-
-            if (c.i >= active_offset)
-            {
-                std::size_t ind_part = c.i - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        m_T_rows[index] = ic + ind_row;
-                        m_T_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        m_T_values[index] = -m_mu*m_dt*dot(ind_row, ind_col) + m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
-                        index++;
-                    }
-                }
-            }
-
-            if (c.j >= active_offset)
-            {
-                std::size_t ind_part = c.j - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        m_T_rows[index] = ic + ind_row;
-                        m_T_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        m_T_values[index] = m_mu*m_dt*dot(ind_row, ind_col) - m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
-                        index++;
-                    }
-                }
-            }
-
-            ++ic;
-        }
-        m_T_rows.resize(index);
-        m_T_cols.resize(index);
-        m_T_values.resize(index);
     }
 
 }

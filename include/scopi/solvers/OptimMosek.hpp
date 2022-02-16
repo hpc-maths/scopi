@@ -49,23 +49,34 @@ namespace scopi{
         model->objective("minvar", ObjectiveSense::Minimize, Expr::dot(c_mosek, X));
 
         // constraints
-        auto D_mosek = std::make_shared<ndarray<double, 1>>(this->m_distances.data(), shape_t<1>({this->m_distances.shape(0)}));
+        auto D_mosek = std::make_shared<ndarray<double, 1>>(this->m_distances.data(), shape_t<1>({4*this->m_distances.shape(0)}));
+        for (std::size_t i = 0; i < contacts.size(); ++i)
+        {
+            (*D_mosek)[4*i] = m_distances[i];
+            (*D_mosek)[4*i + 1] = 0.;
+            (*D_mosek)[4*i + 2] = 0.;
+            (*D_mosek)[4*i + 3] = 0.;
+        }
         auto duration1 = toc();
 
         // matrix
         this->create_matrix_constraint_coo(particles, contacts, 0);
-        m_A = Matrix::sparse(contacts.size(), 6*this->m_nparts,
+        m_A = Matrix::sparse(4*contacts.size(), 6*this->m_nparts,
                              std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
-        m_T = Matrix::sparse(3*contacts.size(), 6*this->m_nparts,
-                             std::make_shared<ndarray<int, 1>>(this->m_T_rows.data(), shape_t<1>({this->m_T_rows.size()})),
-                             std::make_shared<ndarray<int, 1>>(this->m_T_cols.data(), shape_t<1>({this->m_T_cols.size()})),
-                             std::make_shared<ndarray<double, 1>>(this->m_T_values.data(), shape_t<1>({this->m_T_values.size()})));
+
+        /*
+        PLOG_DEBUG << "D_mosek";
+        for (std::size_t i = 0; i < 4*contacts.size(); ++i)
+            PLOG_DEBUG << (*D_mosek)[i];
+        PLOG_DEBUG << "m_A";
+        for (std::size_t i = 0; i < m_A_rows.size(); ++i)
+            PLOG_DEBUG << m_A_rows[i] << "    " << m_A_cols[i] << "    " << m_A_values[i];
+        */
 
         Constraint::t qc1 = model->constraint("qc1"
-                , Expr::hstack(Expr::sub(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)))
-                    , Expr::reshape(Expr::mul(m_T, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), contacts.size(), 3))
+                , Expr::reshape(Expr::sub(D_mosek, Expr::mul(m_A, X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts))), contacts.size(), 4)
                 , Domain::inQCone());
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
