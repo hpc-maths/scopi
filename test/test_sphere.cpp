@@ -445,7 +445,7 @@ namespace scopi
         protected:
             void SetUp() override {
                 int n = 3; // 2*n*n particles
-                std::default_random_engine generator(0);
+                std::minstd_rand0 generator(123);
                 std::uniform_real_distribution<double> distrib_r(0.2, 0.4);
                 std::uniform_real_distribution<double> distrib_move_x(-0.1, 0.1);
                 std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
@@ -473,7 +473,7 @@ namespace scopi
             }
 
             double m_dt = .01;
-            std::size_t m_total_it = 30;
+            std::size_t m_total_it = 20;
             scopi_container<dim> m_particles;
     };
 
@@ -484,7 +484,7 @@ namespace scopi
         TypeParam solver(this->m_particles, this->m_dt);
         solver.solve(this->m_total_it);
 
-        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0029.json", "../test/references/2d_case_spheres.json", tolerance);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0019.json", "../test/references/2d_case_spheres.json", tolerance);
     }
 
     template <class S>
