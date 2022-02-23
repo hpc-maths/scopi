@@ -115,7 +115,7 @@ namespace scopi
     template <std::size_t dim>
     auto property<dim>::deactivate() -> property&
     {
-        m_active = true;
+        m_active = false;
         return *this;
     }
 
