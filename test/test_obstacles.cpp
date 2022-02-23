@@ -52,8 +52,6 @@ namespace scopi
         scopi_container<2> m_particles;
     };
 
-    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
-
     template <class S>
     class TestSpherePlan  : public ::testing::Test 
                           , public TestSpherePlanBase
@@ -64,7 +62,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSpherePlan, solver_types_vap);
+    TYPED_TEST_SUITE(TestSpherePlan, solver_with_contact_types<2>);
 
     TYPED_TEST(TestSpherePlan, sphere_plan)
     {
@@ -83,7 +81,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSpherePlanVelocity, solver_types_vap);
+    TYPED_TEST_SUITE(TestSpherePlanVelocity, solver_with_contact_types<2>);
 
     TYPED_TEST(TestSpherePlanVelocity, sphere_plan_velocity)
     {
@@ -102,6 +100,7 @@ namespace scopi
         }
     };
 
+    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
     TYPED_TEST_SUITE(TestSpherePlanForce, solver_types_vap);
 
     TYPED_TEST(TestSpherePlanForce, sphere_plan_force)
