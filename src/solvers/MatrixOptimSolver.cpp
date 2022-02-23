@@ -2,7 +2,9 @@
 
 namespace scopi
 {
+#ifdef SCOPI_USE_MOSEK
     using namespace monty;
+#endif
 
     MatrixOptimSolver::MatrixOptimSolver(std::size_t nparticles, double dt, double)
     : m_nparticles(nparticles)
