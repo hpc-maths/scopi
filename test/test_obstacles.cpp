@@ -31,7 +31,7 @@ namespace scopi
             EXPECT_DOUBLE_EQ(pos(0)(0), 0.);
             EXPECT_DOUBLE_EQ(pos(0)(1), -m_radius);
             EXPECT_DOUBLE_EQ(pos(1)(0), 0.);
-            EXPECT_DOUBLE_EQ(pos(1)(1), 0.);
+            EXPECT_NEAR(pos(1)(1), 0., tolerance);
 
             auto q = m_particles.q();
             EXPECT_DOUBLE_EQ(q(0)(0), std::sqrt(2.)/2.);
