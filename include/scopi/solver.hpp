@@ -119,7 +119,7 @@ namespace scopi
                 m_particles.pos()(i)(d) += m_dt*m_particles.vd()(i)(d);
             }
             m_particles.q()(i) = mult_quaternion(m_particles.q()(i), expw);
-
+            normalize(m_particles.q()(i));
             // std::cout << "obstacle " << i << ": " << m_particles.pos()(0) << " " << m_particles.q()(0) << std::endl;
         }
     }
