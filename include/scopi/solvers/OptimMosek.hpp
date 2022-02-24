@@ -67,8 +67,8 @@ namespace scopi{
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
         // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
         // model->setSolverParam("numThreads", thread_qty);
-        // model->setSolverParam("intpntCoTolPfeas", 1e-11);
-        // model->setSolverParam("intpntTolPfeas", 1.e-11);
+        model->setSolverParam("intpntCoTolPfeas", 1e-11);
+        model->setSolverParam("intpntTolPfeas", 1.e-11);
 
         // model->setSolverParam("intpntCoTolDfeas", 1e-6);
         // model->setLogHandler([](const std::string & msg) { std::cout << msg << std::flush; } );
