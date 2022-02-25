@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 #include <random>
 
@@ -30,7 +29,7 @@ namespace scopi
             auto pos = m_particles.pos();
             EXPECT_DOUBLE_EQ(pos(0)(0), 0.);
             EXPECT_DOUBLE_EQ(pos(0)(1), 0.);
-            EXPECT_DOUBLE_EQ(pos(1)(0), 0.);
+            EXPECT_NEAR(pos(1)(0), 0., tolerance);
             EXPECT_NEAR(pos(1)(1), m_radius, tolerance);
 
             auto q = m_particles.q();
@@ -41,11 +40,11 @@ namespace scopi
             EXPECT_DOUBLE_EQ(q(1)(0), 1.);
             EXPECT_DOUBLE_EQ(q(1)(1), 0.);
             EXPECT_DOUBLE_EQ(q(1)(2), 0.);
-            EXPECT_DOUBLE_EQ(q(1)(3), 0.);
+            EXPECT_NEAR(q(1)(3), 0., tolerance);
         }
 
         double m_dt = .005;
-        std::size_t m_total_it = 100;
+        std::size_t m_total_it = 5;
 
         double m_radius;
         sphere<dim> m_s;
