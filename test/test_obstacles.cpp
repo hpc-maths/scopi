@@ -19,8 +19,8 @@ namespace scopi
         static constexpr std::size_t dim = 2;
         TestSpherePlanBase() 
         : m_radius(1.)
-        , m_s({{0., 0.}}, m_radius)
-        , m_p({{ 0.,  -m_radius}}, PI/2.)
+        , m_s({{0., m_radius}}, m_radius)
+        , m_p({{ 0.,  0.}}, PI/2.)
         {
             m_particles.push_back(m_p, scopi::property<dim>().deactivate());
         }
@@ -29,9 +29,9 @@ namespace scopi
         {
             auto pos = m_particles.pos();
             EXPECT_DOUBLE_EQ(pos(0)(0), 0.);
-            EXPECT_DOUBLE_EQ(pos(0)(1), -m_radius);
+            EXPECT_DOUBLE_EQ(pos(0)(1), 0.);
             EXPECT_DOUBLE_EQ(pos(1)(0), 0.);
-            EXPECT_NEAR(pos(1)(1), 0., tolerance);
+            EXPECT_NEAR(pos(1)(1), m_radius, tolerance);
 
             auto q = m_particles.q();
             EXPECT_DOUBLE_EQ(q(0)(0), std::sqrt(2.)/2.);
