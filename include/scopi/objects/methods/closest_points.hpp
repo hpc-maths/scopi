@@ -717,7 +717,7 @@ namespace scopi
         neighbor<dim> neigh;
         neigh.pi = s_pos - sign*s.radius()*normal;
         neigh.pj = s_pos - plan_to_sphere*normal;
-        neigh.nij = sign*normal;
+        neigh.nij = -sign*normal;
         neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
