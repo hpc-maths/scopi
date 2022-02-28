@@ -231,11 +231,11 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), 1.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
     }
@@ -297,11 +297,11 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), 1.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
     }
@@ -357,13 +357,13 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
         EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
         EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), 1.);
         EXPECT_DOUBLE_EQ(out.nij(2), 0.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
@@ -432,13 +432,13 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
         EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
         EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), 1.);
         EXPECT_DOUBLE_EQ(out.nij(2), 0.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
@@ -490,11 +490,11 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), -1.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
     }
@@ -556,11 +556,11 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), -1.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
     }
@@ -616,13 +616,13 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
         EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
         EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), -1.);
         EXPECT_DOUBLE_EQ(out.nij(2), 0.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
@@ -691,13 +691,13 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_NEAR(out.pi(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
         EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_NEAR(out.pj(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
         EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_NEAR(out.nij(0), 0., 1e-7);
         EXPECT_DOUBLE_EQ(out.nij(1), -1.);
         EXPECT_DOUBLE_EQ(out.nij(2), 0.);
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
@@ -712,13 +712,13 @@ namespace scopi
 
         auto out = closest_points(s, e);
 
-        EXPECT_NEAR(out.pi(0), -0.1, tolerance);
+        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
         EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(0), 0.1, tolerance);
+        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
         EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.nij(0), -1., tolerance);
+        EXPECT_NEAR(out.nij(0), -1., 1e-7);
         EXPECT_NEAR(out.nij(1), 0., 1e-5);
-        EXPECT_NEAR(out.dij, 0.2, tolerance);
+        EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
     TEST(closest_points, sphere_superellipsoid_2d_rotation_30_deg)
@@ -738,7 +738,7 @@ namespace scopi
         EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
         EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
         EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_NEAR(out.dij, 0.6, tolerance);
+        EXPECT_NEAR(out.dij, 0.6, 1e-7);
     }
 
     TEST(closest_points, sphere_superellipsoid_2d_dispatch)
@@ -753,13 +753,13 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), -0.1, tolerance);
+        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
         EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(0), 0.1, tolerance);
+        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
         EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.nij(0), -1., tolerance);
+        EXPECT_NEAR(out.nij(0), -1., 1e-7);
         EXPECT_NEAR(out.nij(1), 0., 1e-5);
-        EXPECT_NEAR(out.dij, 0.2, tolerance);
+        EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
     TEST(closest_points, sphere_superellipsoid_2d_dispatch_rotation_30_deg)
@@ -783,7 +783,7 @@ namespace scopi
         EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
         EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
         EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_NEAR(out.dij, 0.6, tolerance);
+        EXPECT_NEAR(out.dij, 0.6, 1e-7);
     }
 
     TEST(closest_points, sphere_superellipsoid_3d)
@@ -794,16 +794,16 @@ namespace scopi
 
         auto out = closest_points(s, e);
 
-        EXPECT_NEAR(out.pi(0), -0.1, tolerance);
+        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
         EXPECT_NEAR(out.pi(1), 0., 1e-5);
         EXPECT_NEAR(out.pi(2), 0., 1e-4);
-        EXPECT_NEAR(out.pj(0), 0.1, tolerance);
+        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
         EXPECT_NEAR(out.pj(1), 0., 1e-4);
         EXPECT_NEAR(out.pj(2), 0., 1e-4);
-        EXPECT_NEAR(out.nij(0), -1., tolerance);
+        EXPECT_NEAR(out.nij(0), -1., 1e-6);
         EXPECT_NEAR(out.nij(1), 0., 1e-3);
         EXPECT_NEAR(out.nij(2), 0., 1e-3);
-        EXPECT_NEAR(out.dij, 0.2, tolerance);
+        EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
     TEST(closest_points, sphere_superellipsoid_3d_rotation_30_deg)
@@ -842,13 +842,13 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), -0.1, tolerance);
+        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
         EXPECT_NEAR(out.pi(1), 0., 1e-5);
         EXPECT_NEAR(out.pi(2), 0., 1e-4);
-        EXPECT_NEAR(out.pj(0), 0.1, tolerance);
+        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
         EXPECT_NEAR(out.pj(1), 0., 1e-4);
         EXPECT_NEAR(out.pj(2), 0., 1e-4);
-        EXPECT_NEAR(out.nij(0), -1., tolerance);
+        EXPECT_NEAR(out.nij(0), -1., 1e-6);
         EXPECT_NEAR(out.nij(1), 0., 1e-3);
         EXPECT_NEAR(out.nij(2), 0., 1e-3);
         EXPECT_NEAR(out.dij, 0.2, 1e-7);
