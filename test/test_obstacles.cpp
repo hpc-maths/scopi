@@ -235,4 +235,42 @@ namespace scopi
         solver.solve(this->m_total_it);
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance);
     }
+
+    template <class S>
+    class TestInclinedPlan  : public ::testing::Test 
+    {
+        protected:
+        static constexpr std::size_t dim = 2;
+        TestInclinedPlan()
+        : m_r(1.)
+        , m_alpha(PI/4.)
+        {
+            plan<dim> p({{0., -m_r}}, PI/2. - m_alpha);
+            sphere<dim> s({{0., 0.}}, m_r);
+
+            m_particles.push_back(p, scopi::property<dim>().deactivate());
+            m_particles.push_back(s, scopi::property<dim>().force({{0., -m_g}}));
+        }
+
+        double m_r;
+        double m_alpha;
+        double m_g = 1.;
+        scopi_container<dim> m_particles;
+        double m_dt = .005;
+        std::size_t m_total_it = 100;
+    };
+
+    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
+    TYPED_TEST_SUITE(TestInclinedPlan, solver_types_vap);
+
+    TYPED_TEST(TestInclinedPlan, inclined_plan)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
+
+        auto pos = this->m_particles.pos();
+        double tf = this->m_dt*this->m_total_it;
+        EXPECT_NEAR(pos(1)(0), this->m_g/2.*std::sin(this->m_alpha)*tf*tf, tolerance);
+        EXPECT_NEAR(pos(1)(1), 0., tolerance);
+    }
 }
