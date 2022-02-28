@@ -1634,8 +1634,7 @@ namespace scopi
       xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), ainit(indmin(1,0))};
       // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
       auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
-      std::cout << "info = " << info << std::endl;
-      exit(0);
+      // std::cout << "info = " << info << std::endl;
       if (info==-1){
         std::cout << "\ns1 : " << std::endl;
         s1.print();
@@ -1643,7 +1642,6 @@ namespace scopi
         d2.print();
         std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
         std::cout << "d2.pos = " << d2.pos() << " d2.rotation = " << xt::flatten(d2.rotation()) << std::endl;
-        exit(0);
       }
       neigh.pi = s1.point(u(0));
       neigh.pj = d2.point(u(1));
