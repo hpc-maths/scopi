@@ -114,10 +114,10 @@ namespace scopi
     class TestSphereSphereBase {
         protected:
         static constexpr std::size_t dim = 2;
-        TestSphereSphereBase(double radius, double pos) 
+        TestSphereSphereBase(double radius, double pos_x, double pos_y) 
         : m_radius(radius)
-        , m_sphere({{ pos,  m_radius}}, m_radius)
-        , m_obstacle({{ 0.,  -m_radius}}, m_radius)
+        , m_sphere({{ pos_x,  pos_y}}, m_radius)
+        , m_obstacle({{ 0.,  0.}}, m_radius)
         {
             m_particles.push_back(m_obstacle, scopi::property<dim>().deactivate());
         }
@@ -126,9 +126,9 @@ namespace scopi
         {
             auto pos = m_particles.pos();
             EXPECT_DOUBLE_EQ(pos(0)(0), 0.);
-            EXPECT_DOUBLE_EQ(pos(0)(1), -m_radius);
+            EXPECT_DOUBLE_EQ(pos(0)(1), 0.);
             EXPECT_DOUBLE_EQ(pos(1)(0), 0.);
-            EXPECT_NEAR(pos(1)(1), m_radius, tolerance);
+            EXPECT_NEAR(pos(1)(1), 2., tolerance);
 
             auto q = m_particles.q();
             EXPECT_DOUBLE_EQ(q(0)(0), 1.);
@@ -156,7 +156,7 @@ namespace scopi
     {
         protected:
         TestSphereSphereFixed()
-        : TestSphereSphereBase(1., 0.)
+        : TestSphereSphereBase(1., 0., 2.)
         {
             m_particles.push_back(m_sphere);
         }
@@ -177,7 +177,7 @@ namespace scopi
     {
         protected:
         TestSphereSphereFixedVelocity()
-        : TestSphereSphereBase(1., 0.)
+        : TestSphereSphereBase(1., 0., 2.)
         {
             m_particles.push_back(m_sphere, scopi::property<dim>().desired_velocity({{0., -1.}}));
         }
@@ -198,7 +198,7 @@ namespace scopi
     {
         protected:
         TestSphereSphereFixedForce()
-        : TestSphereSphereBase(1., 0.)
+        : TestSphereSphereBase(1., 0., 2.)
         {
             m_particles.push_back(m_sphere, scopi::property<dim>().force({{0., -1.}}));
         }
@@ -212,5 +212,26 @@ namespace scopi
         TypeParam solver(this->m_particles, this->m_dt);
         solver.solve(this->m_total_it);
         this->check_result_fixed();
+    }
+
+    template <class S>
+    class TestSphereSphereMoving  : public ::testing::Test 
+                                  , public TestSphereSphereBase
+    {
+        protected:
+        TestSphereSphereMoving()
+        : TestSphereSphereBase(1., std::sqrt(3.), std::sqrt(3.)-3./2.)
+        {
+            m_particles.push_back(m_sphere, scopi::property<dim>().force({{0., -1.}}));
+        }
+    };
+
+    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
+    TYPED_TEST_SUITE(TestSphereSphereMoving, solver_types_vap);
+
+    TYPED_TEST(TestSphereSphereMoving, sphere_sphere_moving)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
     }
 }
