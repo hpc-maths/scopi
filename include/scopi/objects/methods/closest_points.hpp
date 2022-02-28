@@ -693,13 +693,6 @@ namespace scopi
         return neighbor<dim>();
     }
 
-    // GLOBULE - SPHERE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner> g, const sphere<dim, owner> s)
-    {
-        return closest_points(s, g);
-    }
-
     // SPHERE - PLAN
     template<std::size_t dim, bool owner>
     auto closest_points(const sphere<dim, owner>& s, const plan<dim, owner>& p)
@@ -709,6 +702,7 @@ namespace scopi
         auto p_pos = p.pos(0);
 
         auto normal = p.normal();
+        PLOG_DEBUG << "normal  " << normal;
 
         // plan2sphs.n
         auto plan_to_sphere = xt::eval(xt::linalg::dot(s_pos - p_pos, normal));
@@ -717,16 +711,9 @@ namespace scopi
         neighbor<dim> neigh;
         neigh.pi = s_pos - sign*s.radius()*normal;
         neigh.pj = s_pos - plan_to_sphere*normal;
-        neigh.nij = -sign*normal;
+        neigh.nij = sign*normal;
         neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
-    }
-
-    // PLAN - SPHERE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner>& p, const sphere<dim, owner>& s)
-    {
-        return closest_points(s, p);
     }
 
     // SUPERELLIPSOID 3D - SPHERE 3D
@@ -1055,13 +1042,6 @@ namespace scopi
         return neigh;
     }
 
-    // SPHERES 3D - SUPERELLIPSOID 3D
-    template<bool owner>
-    auto closest_points(const superellipsoid<3, owner>& s1, const sphere<3, owner>& s2)
-    {
-        return closest_points(s2, s1);
-    }
-
     // SUPERELLIPSOID 2D - SPHERE 2D
     template<bool owner>
     auto closest_points(const sphere<2, owner> s2, const superellipsoid<2, owner> s1)
@@ -1197,13 +1177,6 @@ namespace scopi
       neigh.nij = s2.normal(u(1));
       neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
       return neigh;
-    }
-
-    // SPHERE 2D - SUPERELLIPSOID 2D
-    template<bool owner>
-    auto closest_points(const superellipsoid<2, owner> s1, const sphere<2, owner> s2)
-    {
-        return closest_points(s2, s1);
     }
 
     // SUPERELLIPSOID 3D - PLAN 3D
@@ -1484,13 +1457,6 @@ namespace scopi
       return neigh;
     }
 
-    // PLAN 3D - SUPERELLIPSOID 3D
-    template<bool owner>
-    auto closest_points(const plan<3, owner> p2, const superellipsoid<3, owner> s1)
-    {
-        return closest_points(s1, p2);
-    }
-
     // SUPERELLIPSOID 2D - DROITE 2D
     template<bool owner>
     auto closest_points(const superellipsoid<2, owner> s1, const plan<2, owner> d2)
@@ -1647,13 +1613,6 @@ namespace scopi
       return neigh;
     }
 
-    // SUPERELLIPSOID 2D - DROITE 2D
-    template<bool owner>
-    auto closest_points(const plan<2, owner> d2, const superellipsoid<2, owner> s1)
-    {
-        return closest_points(s1, d2);
-    }
-
     // SUPERELLIPSOID - GLOBULE
     template<std::size_t dim, bool owner>
     auto closest_points(const superellipsoid<dim, owner>, const globule<dim, owner>)
@@ -1662,25 +1621,11 @@ namespace scopi
         return neighbor<dim>();
     }
 
-    // GLOBULE - SUPERELLIPSOID
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner> g, const superellipsoid<dim, owner> s)
-    {
-        return closest_points(s, g);
-    }
-
     // GLOBULE - PLAN
     template<std::size_t dim, bool owner>
     auto closest_points(const globule<dim, owner>, const plan<dim, owner>)
     {
         return neighbor<dim>();
-    }
-
-    // PLAN - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner> p, const globule<dim, owner> g)
-    {
-        return closest_points(g, p);
     }
 
     template <std::size_t dim>
