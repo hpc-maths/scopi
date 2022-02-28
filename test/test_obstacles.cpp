@@ -114,9 +114,9 @@ namespace scopi
     class TestSphereSphereBase {
         protected:
         static constexpr std::size_t dim = 2;
-        TestSphereSphereBase() 
-        : m_radius(1.)
-        , m_sphere({{ 0.,  m_radius}}, m_radius)
+        TestSphereSphereBase(double radius, double pos) 
+        : m_radius(radius)
+        , m_sphere({{ pos,  m_radius}}, m_radius)
         , m_obstacle({{ 0.,  -m_radius}}, m_radius)
         {
             m_particles.push_back(m_obstacle, scopi::property<dim>().deactivate());
@@ -155,7 +155,9 @@ namespace scopi
                                  , public TestSphereSphereBase
     {
         protected:
-        void SetUp() override {
+        TestSphereSphereFixed()
+        : TestSphereSphereBase(1., 0.)
+        {
             m_particles.push_back(m_sphere);
         }
     };
@@ -174,7 +176,9 @@ namespace scopi
                                          , public TestSphereSphereBase
     {
         protected:
-        void SetUp() override {
+        TestSphereSphereFixedVelocity()
+        : TestSphereSphereBase(1., 0.)
+        {
             m_particles.push_back(m_sphere, scopi::property<dim>().desired_velocity({{0., -1.}}));
         }
     };
@@ -193,7 +197,9 @@ namespace scopi
                                       , public TestSphereSphereBase
     {
         protected:
-        void SetUp() override {
+        TestSphereSphereFixedForce()
+        : TestSphereSphereBase(1., 0.)
+        {
             m_particles.push_back(m_sphere, scopi::property<dim>().force({{0., -1.}}));
         }
     };
