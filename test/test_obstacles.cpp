@@ -220,9 +220,9 @@ namespace scopi
     {
         protected:
         TestSphereSphereMoving()
-        : TestSphereSphereBase(1., std::sqrt(3.), std::sqrt(3.)-3./2.)
+        : TestSphereSphereBase(1., 2.*1./2., 2.*std::sqrt(3.)/2.)
         {
-            m_particles.push_back(m_sphere, scopi::property<dim>().force({{0., -1.}}));
+            m_particles.push_back(m_sphere, scopi::property<dim>().force({{0., -10.}}));
         }
     };
 
@@ -233,5 +233,6 @@ namespace scopi
     {
         TypeParam solver(this->m_particles, this->m_dt);
         solver.solve(this->m_total_it);
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance);
     }
 }
