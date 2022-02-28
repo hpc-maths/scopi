@@ -702,7 +702,6 @@ namespace scopi
         auto p_pos = p.pos(0);
 
         auto normal = p.normal();
-        PLOG_DEBUG << "normal  " << normal;
 
         // plan2sphs.n
         auto plan_to_sphere = xt::eval(xt::linalg::dot(s_pos - p_pos, normal));
@@ -1201,9 +1200,9 @@ namespace scopi
 
     // SUPERELLIPSOID 2D - SPHERE 2D
     template<bool owner>
-    auto closest_points(const superellipsoid<2, owner> s2, const sphere<2, owner> s1)
+    auto closest_points(const superellipsoid<2, owner> superellipsoid, const sphere<2, owner> sphere)
     {
-        auto neigh = closest_points(s1, s2);
+        auto neigh = closest_points(sphere, superellipsoid);
         neigh.nij *= -1.;
         std::swap(neigh.pi, neigh.pj);
         return neigh;

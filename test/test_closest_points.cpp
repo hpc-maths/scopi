@@ -882,16 +882,21 @@ namespace scopi
         EXPECT_NEAR(out.dij, 0.6, 1e-7);
     }
 
-#if 0
     // distance superellipsoid - sphere
     TEST(closest_points, superellipsoid_sphere_2d)
     {
         constexpr std::size_t dim = 2;
-        sphere<dim> s({{0.2, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+        superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
 
         auto out = closest_points(e, s);
 
+        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
+        EXPECT_NEAR(out.pi(1), 0., 1e-5);
+        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
+        EXPECT_NEAR(out.pj(1), 0., 1e-5);
+        EXPECT_NEAR(out.nij(0), 1., 1e-7);
+        EXPECT_NEAR(out.nij(1), 0., 1e-5);
         EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
@@ -906,22 +911,33 @@ namespace scopi
 
         auto out = closest_points(e, s);
 
+        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-5);
+        EXPECT_NEAR(out.pj(0), 0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pj(1), -0.3*sinRot, 1e-5);
+        EXPECT_NEAR(out.nij(0), -cosRot, 1e-5);
+        EXPECT_NEAR(out.nij(1), sinRot, 1e-5);
         EXPECT_NEAR(out.dij, 0.6, 1e-7);
     }
 
     TEST(closest_points, superellipsoid_sphere_2d_dispatch)
     {
         constexpr std::size_t dim = 2;
-        sphere<dim> s({{0.2, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
+        sphere<dim> s({{-0.2, 0.0}}, 0.1);
+        superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
 
         scopi_container<dim> particles;
-        auto prop = property<dim>().desired_velocity({{0.25, 0}});
-        particles.push_back(e, prop);
-        particles.push_back(s, prop.desired_velocity({{-0.25, 0}}));
+        particles.push_back(e);
+        particles.push_back(s);
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
+        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
+        EXPECT_NEAR(out.pi(1), 0., 1e-5);
+        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
+        EXPECT_NEAR(out.pj(1), 0., 1e-5);
+        EXPECT_NEAR(out.nij(0), 1., 1e-7);
+        EXPECT_NEAR(out.nij(1), 0., 1e-5);
         EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
@@ -941,6 +957,12 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
+        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-5);
+        EXPECT_NEAR(out.pj(0), 0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pj(1), -0.3*sinRot, 1e-5);
+        EXPECT_NEAR(out.nij(0), -cosRot, 1e-5);
+        EXPECT_NEAR(out.nij(1), sinRot, 1e-5);
         EXPECT_NEAR(out.dij, 0.6, 1e-7);
     }
 
@@ -948,14 +970,25 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.1, 0.1}},  {1, 1});
+        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
 
         auto out = closest_points(e, s);
 
+        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
+        EXPECT_NEAR(out.pi(1), 0., 1e-4);
+        EXPECT_NEAR(out.pi(2), 0., 1e-4);
+        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
+        EXPECT_NEAR(out.pj(1), 0., 1e-5);
+        EXPECT_NEAR(out.pj(2), 0., 1e-4);
+        EXPECT_NEAR(out.nij(0), 1., 1e-6);
+        EXPECT_NEAR(out.nij(1), 0., 1e-3);
+        EXPECT_NEAR(out.nij(2), 0., 1e-3);
         EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
+
     TEST(closest_points, superellipsoid_sphere_3d_rotation_30_deg)
     {
+        // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -965,6 +998,15 @@ namespace scopi
 
         auto out = closest_points(e, s);
 
+        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
+        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
+        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
+        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
+        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
+        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
+        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
         EXPECT_NEAR(out.dij, 0.6, 1e-7);
     }
 
@@ -972,20 +1014,29 @@ namespace scopi
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
-        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
+        superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
 
         scopi_container<dim> particles;
-        auto prop = property<dim>().desired_velocity({{0.25, 0, 0}});
-        particles.push_back(e, prop);
-        particles.push_back(s, prop.desired_velocity({{-0.25, 0, 0}}));
+        particles.push_back(e);
+        particles.push_back(s);
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
+        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
+        EXPECT_NEAR(out.pi(1), 0., 1e-4);
+        EXPECT_NEAR(out.pi(2), 0., 1e-4);
+        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
+        EXPECT_NEAR(out.pj(1), 0., 1e-5);
+        EXPECT_NEAR(out.pj(2), 0., 1e-4);
+        EXPECT_NEAR(out.nij(0), 1., 1e-6);
+        EXPECT_NEAR(out.nij(1), 0., 1e-3);
+        EXPECT_NEAR(out.nij(2), 0., 1e-3);
         EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
     TEST(closest_points, superellipsoid_sphere_3d_dispatch_rotation_30_deg)
     {
+        // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -994,24 +1045,39 @@ namespace scopi
         superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
         scopi_container<dim> particles;
-        auto prop = property<dim>().desired_velocity({{0.25, 0, 0}});
-        particles.push_back(e, prop);
-        particles.push_back(s, prop.desired_velocity({{-0.25, 0, 0}}));
+        particles.push_back(e);
+        particles.push_back(s);
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
+        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
+        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
+        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
+        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
+        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
+        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
+        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
+        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
         EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
+#if 0
     // distance superellipsoid - superellipsoid
     TEST(closest_points, superellipsoid_superellipsoid_2d)
     {
         constexpr std::size_t dim = 2;
-        superellipsoid<dim> s1({{ 0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
-        superellipsoid<dim> s2({{-0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
+        superellipsoid<dim> s1({{-0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
+        superellipsoid<dim> s2({{ 0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.3}}, 1);
 
         auto out = closest_points(s1, s2);
 
+        EXPECT_EQ(out.pi(0), -0.1);
+        EXPECT_EQ(out.pi(1), 0.);
+        EXPECT_EQ(out.pj(0), 0.1);
+        EXPECT_EQ(out.pj(1), 0.);
+        EXPECT_EQ(out.nij(0), -1.);
+        EXPECT_EQ(out.nij(1), 0.);
         EXPECT_NEAR(out.dij, 0.2, 1e-7);
     }
 
