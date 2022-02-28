@@ -44,7 +44,7 @@ namespace scopi
         }
 
         double m_dt = .005;
-        std::size_t m_total_it = 5;
+        std::size_t m_total_it = 100;
 
         double m_radius;
         sphere<dim> m_s;

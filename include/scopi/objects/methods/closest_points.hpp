@@ -716,6 +716,16 @@ namespace scopi
         return neigh;
     }
 
+    // PLAN - SPHERE
+    template<std::size_t dim, bool owner>
+    auto closest_points(const plan<dim, owner>& p, const sphere<dim, owner>& s)
+    {
+        auto neigh = closest_points(s, p);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
+    }
+
     // SUPERELLIPSOID 3D - SPHERE 3D
     template<bool owner>
     auto closest_points(const sphere<3, owner>& s2, const superellipsoid<3, owner>& s1)
@@ -1172,6 +1182,12 @@ namespace scopi
       xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), binit(indmin(1,0))};
       // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
       auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
+      /*
+      neigh.pi = s2.point(u(1));
+      neigh.pj = s1.point(u(0));
+      neigh.nij = s1.normal(u(0));
+      neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+      */
       neigh.pi = s1.point(u(0));
       neigh.pj = s2.point(u(1));
       neigh.nij = s2.normal(u(1));
@@ -1649,10 +1665,10 @@ namespace scopi
         closest_points_functor<dim>,
         const object<dim, owner>,
         mpl::vector<const sphere<dim, owner>,
-                    const superellipsoid<dim, owner>,
-                    const globule<dim, owner>,
+                    // const superellipsoid<dim, owner>,
+                    // const globule<dim, owner>,
                     const plan<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
-        symmetric_dispatch
+        antisymmetric_dispatch
     >;
 }
