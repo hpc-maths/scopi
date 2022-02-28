@@ -445,9 +445,62 @@ namespace scopi
     }
 
     // distance plan - sphere
+    TEST(closest_points, plan_sphere_2d)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
+        plan<dim> p({{ 0.3, 0.0}}, 0.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.pi(0), 0.3);
+        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
+        EXPECT_DOUBLE_EQ(out.pj(0), 0.1);
+        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
+        EXPECT_DOUBLE_EQ(out.nij(0), 1.);
+        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_sphere_2d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.pi(0), 0.3*cosRot);
+        EXPECT_DOUBLE_EQ(out.pi(1), 0.3*sinRot);
+        EXPECT_DOUBLE_EQ(out.pj(0), 0.1*cosRot);
+        EXPECT_DOUBLE_EQ(out.pj(1), 0.1*sinRot);
+        EXPECT_DOUBLE_EQ(out.nij(0), cosRot);
+        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_sphere_2d_rotation_90_deg)
+    {
+        constexpr std::size_t dim = 2;
+        sphere<dim> s({{0.0, 0.0}}, 0.1);
+        plan<dim> p({{0., -0.2}}, PI/2.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
+        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
+        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_DOUBLE_EQ(out.nij(1), -1.);
+        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+    }
+
     TEST(closest_points, plan_sphere_2d_dispatch)
     {
-        // FIXME revert particles i and j
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0}}, 0.);
@@ -469,7 +522,6 @@ namespace scopi
 
     TEST(closest_points, plan_sphere_2d_dispatch_rotation_30_deg)
     {
-        // FIXME revert particles i and j
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         double dist = 0.3;
@@ -494,7 +546,6 @@ namespace scopi
 
     TEST(closest_points, plan_sphere_2d_dispatch_rotation_90_deg)
     {
-        // FIXME revert particles i and j
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{0., -0.2}}, PI/2.);
@@ -514,10 +565,71 @@ namespace scopi
         EXPECT_DOUBLE_EQ(out.dij, 0.1);
     }
 
+    TEST(closest_points, plan_sphere_3d)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_EQ(out.pi(0), 0.3);
+        EXPECT_EQ(out.pi(1), 0.);
+        EXPECT_EQ(out.pi(2), 0.);
+        EXPECT_EQ(out.pj(0), 0.1);
+        EXPECT_EQ(out.pj(1), 0.);
+        EXPECT_EQ(out.pj(2), 0.);
+        EXPECT_EQ(out.nij(0), 1.);
+        EXPECT_EQ(out.nij(1), 0.);
+        EXPECT_EQ(out.nij(2), 0.);
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_sphere_3d_rotation_30_deg)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
+        double dist = 0.3;
+        double cosRot = std::sqrt(3.)/2.;
+        double sinRot = 1./2.;
+        plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_DOUBLE_EQ(out.pi(0), 0.3*cosRot);
+        EXPECT_DOUBLE_EQ(out.pi(1), 0.3*sinRot);
+        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
+        EXPECT_DOUBLE_EQ(out.pj(0), 0.1*cosRot);
+        EXPECT_DOUBLE_EQ(out.pj(1), 0.1*sinRot);
+        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
+        EXPECT_DOUBLE_EQ(out.nij(0), cosRot);
+        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
+        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
+        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+    }
+
+    TEST(closest_points, plan_sphere_3d_rotation_90_deg)
+    {
+        constexpr std::size_t dim = 3;
+        sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
+        plan<dim> p({{0., -0.2, 0.}}, PI/2.);
+
+        auto out = closest_points(p, s);
+
+        EXPECT_NEAR(out.pi(0), 0., tolerance);
+        EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
+        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
+        EXPECT_NEAR(out.pj(0), 0., tolerance);
+        EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
+        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
+        EXPECT_NEAR(out.nij(0), 0., tolerance);
+        EXPECT_DOUBLE_EQ(out.nij(1), -1.);
+        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
+        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+    }
 
     TEST(closest_points, plan_sphere_3d_dispatch)
     {
-        // FIXME revert particles i and j
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
@@ -542,7 +654,6 @@ namespace scopi
 
     TEST(closest_points, plan_sphere_3d_dispatch_rotation_30_deg)
     {
-        // FIXME revert particles i and j
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
         double dist = 0.3;
@@ -570,7 +681,6 @@ namespace scopi
 
     TEST(closest_points, plan_sphere_3d_dispatch_rotation_90_deg)
     {
-        // FIXME revert particles i and j
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
         plan<dim> p({{0., -0.2, 0.}}, PI/2.);
@@ -594,6 +704,7 @@ namespace scopi
     }
 
     // distance sphere - superellipsoid
+    /*
     TEST(closest_points, sphere_superellipsoid_2d)
     {
         constexpr std::size_t dim = 2;
@@ -641,6 +752,8 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(e);
 
+        particles[0]->print();
+        particles[1]->print();
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         EXPECT_NEAR(out.pi(0), -0.1, tolerance);
@@ -652,6 +765,7 @@ namespace scopi
         EXPECT_NEAR(out.dij, 0.2, tolerance);
     }
 
+    */
 #if 0
     TEST(closest_points, sphere_superellipsoid_2d_dispatch_rotation_30_deg)
     {
