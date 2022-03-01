@@ -138,6 +138,7 @@ function drawObjects() {
             const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
             const line_material_rot = new THREE.LineBasicMaterial({
                 color: 'blue',
+                depthTest: false
             });
             var line_mesh_rot = new THREE.LineSegments(line_geometry_rot, line_material_rot);
             scene.add(line_mesh_rot);
