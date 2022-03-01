@@ -81,14 +81,38 @@ function drawObjects() {
             const material = new THREE.MeshBasicMaterial({ color: 'red' });
             var mesh = new THREE.InstancedMesh(geometry, material, objects.length);
             scene.add(mesh);
+            const plan = [];
 
 
             const matrix = new THREE.Matrix4();
 
             objects.forEach((obj, index) => {
-                sphereObject(obj, matrix);
-                mesh.setMatrixAt(index, matrix);
+                if (obj.type === "plan") {
+                    const c = obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1];
+                    let xB = 0.;
+                    let yB = 0.;
+                    plan.push(new THREE.Vector3(obj.position[0], obj.position[0], 0.));
+                    if (obj.normal[1] === 0.) { // vertical straight line
+                        xB = c/obj.normal[0];
+                        yB = obj.position[0] + 30;
+                    }
+                    else {
+                        xB = 30.;
+                        yB = (c - obj.normal[0] * xB) / obj.normal[1];
+                    }
+                    plan.push(new THREE.Vector3(xB, yB, 0.));
+                }
+                else {
+                    sphereObject(obj, matrix);
+                    mesh.setMatrixAt(index, matrix);
+                }
             });
+            const line_geometry_plan = new THREE.BufferGeometry().setFromPoints(plan);
+            const line_material_plan = new THREE.LineBasicMaterial({
+                color: 'red',
+            });
+            var line_mesh_plan = new THREE.LineSegments(line_geometry_plan, line_material_plan);
+            scene.add(line_mesh_plan);
 
             const points = [];
             contacts.forEach((obj, index) => {
