@@ -15,28 +15,30 @@
 
 #include <scopi/solvers/MatrixOptimSolverFriction.hpp>
 
+#include <scopi/vap/vap_fixed.hpp>
+
 namespace scopi
 {
-    #define SOLVER_WITH_CONTACT(dim, contact) \
-        ScopiSolver<dim, OptimMosek<>, contact>, \
-        ScopiSolver<dim, OptimScs, contact>, \
-        ScopiSolver<dim, OptimUzawaMkl, contact>, \
-        ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact>, \
-        ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact>, \
-        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact> // friction
+    #define SOLVER_WITH_CONTACT(dim, contact, vap) \
+        ScopiSolver<dim, OptimMosek<>, contact, vap>, \
+        ScopiSolver<dim, OptimScs, contact, vap>, \
+        ScopiSolver<dim, OptimUzawaMkl, contact, vap>, \
+        ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact, vap>, \
+        ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact, vap>, \
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction
 
-    #define SOLVER_WITH_CONTACT_FRICTION(dim, contact) \
-        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact> // friction
+    #define SOLVER_WITH_CONTACT_FRICTION(dim, contact, vap) \
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction
 
-    template<std::size_t dim>
+    template<std::size_t dim, class vap_t = vap_fixed>
     using solver_types = ::testing::Types<
-                            SOLVER_WITH_CONTACT(dim, contact_kdtree)
+                            SOLVER_WITH_CONTACT(dim, contact_kdtree, vap_t)
                              >;
 
-    template<std::size_t dim>
+    template<std::size_t dim, class vap_t = vap_fixed>
     using solver_with_contact_types = ::testing::Types<
-                            SOLVER_WITH_CONTACT(dim, contact_kdtree),
-                            SOLVER_WITH_CONTACT(dim, contact_brute_force)
+                            SOLVER_WITH_CONTACT(dim, contact_kdtree, vap_t),
+                            SOLVER_WITH_CONTACT(dim, contact_brute_force, vap_t)
                              >;
 
     template<std::size_t dim>

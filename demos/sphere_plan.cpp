@@ -9,28 +9,37 @@
 
 int main()
 {
-    plog::init(plog::debug, "sphere_plan.log");
+    plog::init(plog::warning, "sphere_plan.log");
 
     constexpr std::size_t dim = 2;
-    scopi::scopi_container<dim> particles;
-
-    double h = 10.;
-    double r = 1.;
     double PI = xt::numeric_constants<double>::PI;
-    double alpha = PI/4.;
-    double L = h/std::tan(alpha);
-    double dt = std::sqrt(2.*std::sqrt(2.)*L)/100.;
-    PLOG_INFO << "dt = " << dt << "  L = " << L;
-    std::size_t total_it = 100;
 
-    scopi::sphere<dim> s({{0., h+r}}, r);
-    scopi::plan<dim> p({{ L*std::cos(alpha),  0.}}, alpha);
+    double radius = 1.;
+    double alpha = PI/3.;
+    double g = 1.;
 
-    particles.push_back(p, scopi::property<dim>().deactivate());
-    particles.push_back(s, scopi::property<dim>().force({{0., -1.}}));
+    std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001, 0.0005});
+    std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000, 20000});
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
-    solver.solve(total_it);
+    for (std::size_t i = 0; i < dt.size(); ++i)
+    {
+        scopi::scopi_container<dim> particles;
+        scopi::plan<dim> p({{-radius*std::cos(PI/2.-alpha), -radius*std::sin(PI/2.-alpha)}}, PI/2.-alpha);
+        scopi::sphere<dim> s({{0., 0.}}, radius);
+        particles.push_back(p, scopi::property<dim>().deactivate());
+        particles.push_back(s, scopi::property<dim>().force({{0., -g}}));
+
+        scopi::ScopiSolver<dim, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
+        solver.solve(total_it[i]);
+
+        auto pos = particles.pos();
+        double tf = dt[i]*(total_it[i]+1);
+        auto analytical_sol = g/2.*std::sin(alpha)*tf*tf * xt::xtensor<double, 1>({std::cos(alpha), -std::sin(alpha)});
+        PLOG_DEBUG << "pos = " << pos(1);
+        PLOG_DEBUG << "sol = " << analytical_sol;
+        double error = xt::linalg::norm(pos(1) - analytical_sol, 2) / xt::linalg::norm(analytical_sol);
+        PLOG_WARNING << dt[i] << '\t' << error;
+    }
 
     return 0;
 }

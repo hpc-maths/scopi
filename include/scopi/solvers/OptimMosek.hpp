@@ -69,6 +69,8 @@ namespace scopi{
         // model->setSolverParam("numThreads", thread_qty);
         // model->setSolverParam("intpntCoTolPfeas", 1e-11);
         // model->setSolverParam("intpntTolPfeas", 1.e-11);
+        model->setSolverParam("intpntCoTolPfeas", 1e-11);
+        model->setSolverParam("intpntCoTolRelGap", 1e-11);
 
         // model->setSolverParam("intpntCoTolDfeas", 1e-6);
         // model->setLogHandler([](const std::string & msg) { std::cout << msg << std::flush; } );
