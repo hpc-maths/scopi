@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <random>
+#include<xtensor/xmath.hpp>
 
 #include "test_common.hpp"
 #include "utils.hpp"
@@ -204,7 +205,6 @@ namespace scopi
         }
     };
 
-    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
     TYPED_TEST_SUITE(TestSphereSphereFixedForce, solver_types_vap);
 
     TYPED_TEST(TestSphereSphereFixedForce, sphere_sphere_fixed_force)
@@ -226,7 +226,6 @@ namespace scopi
         }
     };
 
-    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
     TYPED_TEST_SUITE(TestSphereSphereMoving, solver_types_vap);
 
     TYPED_TEST(TestSphereSphereMoving, sphere_sphere_moving)
@@ -245,7 +244,7 @@ namespace scopi
         : m_r(1.)
         , m_alpha(PI/4.)
         {
-            plan<dim> p({{0., -m_r}}, PI/2. - m_alpha);
+            plan<dim> p({{-m_r*std::cos(m_alpha), -m_r*std::sin(m_alpha)}}, m_alpha);
             sphere<dim> s({{0., 0.}}, m_r);
 
             m_particles.push_back(p, scopi::property<dim>().deactivate());
@@ -256,11 +255,10 @@ namespace scopi
         double m_alpha;
         double m_g = 1.;
         scopi_container<dim> m_particles;
-        double m_dt = .005;
-        std::size_t m_total_it = 100;
+        double m_dt = .001;
+        std::size_t m_total_it = 1000;
     };
 
-    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
     TYPED_TEST_SUITE(TestInclinedPlan, solver_types_vap);
 
     TYPED_TEST(TestInclinedPlan, inclined_plan)
@@ -269,8 +267,14 @@ namespace scopi
         solver.solve(this->m_total_it);
 
         auto pos = this->m_particles.pos();
-        double tf = this->m_dt*this->m_total_it;
-        EXPECT_NEAR(pos(1)(0), this->m_g/2.*std::sin(this->m_alpha)*tf*tf, tolerance);
-        EXPECT_NEAR(pos(1)(1), 0., tolerance);
+        double tf = this->m_dt*(this->m_total_it+1);
+        auto analytical_sol = this->m_g/2.*std::sin(this->m_alpha)*tf*tf * xt::xtensor<double, 1>({std::cos(this->m_alpha), -std::sin(this->m_alpha)});
+        PLOG_DEBUG << "pos = " << pos(1);
+        PLOG_DEBUG << "sol = " << analytical_sol;
+        double error = xt::linalg::norm(pos(1) - analytical_sol, 2) / xt::linalg::norm(analytical_sol);
+        PLOG_INFO << "error = " << error;
+        EXPECT_NEAR(error, 0., 1e-2);
+        // EXPECT_NEAR(pos(1)(0), x*std::cos(this->m_alpha), tolerance);
+        // EXPECT_NEAR(pos(1)(1), -x*std::sin(this->m_alpha), tolerance);
     }
 }
