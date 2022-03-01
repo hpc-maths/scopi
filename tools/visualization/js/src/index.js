@@ -116,7 +116,12 @@ function drawObjects() {
 
                     center = new THREE.Vector3(obj.position[0], obj.position[1], 0.);
                     rot.push(center);
-                    vec = new THREE.Vector3(obj.radius, 0., 0.);
+                    if (typeof obj.radius === "number") {
+                        vec = new THREE.Vector3(obj.radius, 0., 0.);
+                    }
+                    else {
+                        vec = new THREE.Vector3(obj.radius[0], 0., 0.);
+                    }
                     vec.applyQuaternion(quaternion);
                     vec.add(center);
                     rot.push(vec);
