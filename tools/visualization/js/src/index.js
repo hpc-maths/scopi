@@ -66,6 +66,24 @@ const sphereObject = function () {
     };
 }();
 
+const planObject = function() {
+    let xB = 0.;
+    let yB = 0.;
+    return function(obj, plan) {
+        const c = obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1];
+        plan.push(new THREE.Vector3(obj.position[0], obj.position[0], 0.));
+        if (obj.normal[1] === 0.) { // vertical straight line
+            xB = c/obj.normal[0];
+            yB = obj.position[0] + 30;
+        }
+        else {
+            xB = 30.;
+            yB = (c - obj.normal[0] * xB) / obj.normal[1];
+        }
+        plan.push(new THREE.Vector3(xB, yB, 0.));
+    };
+}();
+
 function drawObjects() {
 
     if (options.current_frame < oFiles.length) {
@@ -88,19 +106,7 @@ function drawObjects() {
 
             objects.forEach((obj, index) => {
                 if (obj.type === "plan") {
-                    const c = obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1];
-                    let xB = 0.;
-                    let yB = 0.;
-                    plan.push(new THREE.Vector3(obj.position[0], obj.position[0], 0.));
-                    if (obj.normal[1] === 0.) { // vertical straight line
-                        xB = c/obj.normal[0];
-                        yB = obj.position[0] + 30;
-                    }
-                    else {
-                        xB = 30.;
-                        yB = (c - obj.normal[0] * xB) / obj.normal[1];
-                    }
-                    plan.push(new THREE.Vector3(xB, yB, 0.));
+                    planObject(obj, plan);
                 }
                 else {
                     sphereObject(obj, matrix);
