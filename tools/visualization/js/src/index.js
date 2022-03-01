@@ -33,9 +33,8 @@ animate();
 const sphereObject = function () {
     const position = new THREE.Vector3();
     const rotation = new THREE.Euler();
-    const quaternion = new THREE.Quaternion();
     const scale = new THREE.Vector3();
-    return function (obj, matrix, rotMat) {
+    return function (obj, matrix, quaternion) {
         position.x = obj.position[0];
         position.y = obj.position[1];
 
@@ -63,13 +62,6 @@ const sphereObject = function () {
         quaternion.normalize();
 
         matrix.compose(position, quaternion, scale);
-
-        // TODO the same information is probably somewhere in matrix, should use it
-        let x = obj.quaternion[0];
-        let w = obj.quaternion[3];
-        rotMat.set(1.-2*w*w, -2.*x*w, 0.,
-            2.*x*w, 1.-2.*w*w, 0.,
-            0., 0., 0.);
     };
 }();
 
@@ -105,12 +97,12 @@ function drawObjects() {
             var geometry = new THREE.SphereGeometry(1, 16, 16);
             const material = new THREE.MeshBasicMaterial({ color: 'red' });
             var mesh = new THREE.InstancedMesh(geometry, material, objects.length);
+            scene.add(mesh);
             const plan = [];
             const rot = []
 
-
             const matrix = new THREE.Matrix4();
-            const rotMat = new THREE.Matrix3();
+            const quaternion = new THREE.Quaternion();
             let center = new THREE.Vector3();
             let vec = new THREE.Vector3();
 
@@ -119,13 +111,13 @@ function drawObjects() {
                     planObject(obj, plan);
                 }
                 else {
-                    sphereObject(obj, matrix, rotMat);
+                    sphereObject(obj, matrix, quaternion);
                     mesh.setMatrixAt(index, matrix);
 
                     center = new THREE.Vector3(obj.position[0], obj.position[1], 0.);
                     rot.push(center);
                     vec = new THREE.Vector3(obj.radius, 0., 0.);
-                    vec.applyMatrix3(rotMat);
+                    vec.applyQuaternion(quaternion);
                     vec.add(center);
                     rot.push(vec);
                 }
@@ -144,8 +136,6 @@ function drawObjects() {
             });
             var line_mesh_rot = new THREE.LineSegments(line_geometry_rot, line_material_rot);
             scene.add(line_mesh_rot);
-
-            scene.add(mesh);
 
             const points = [];
             contacts.forEach((obj, index) => {
