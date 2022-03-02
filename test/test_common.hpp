@@ -41,9 +41,9 @@ namespace scopi
                             SOLVER_WITH_CONTACT(dim, contact_brute_force, vap_t)
                              >;
 
-    template<std::size_t dim>
+    template<std::size_t dim, class vap_t = vap_fixed>
     using solver_with_contact_types_friction = ::testing::Types<
-                            SOLVER_WITH_CONTACT_FRICTION(dim, contact_kdtree),
-                            SOLVER_WITH_CONTACT_FRICTION(dim, contact_brute_force)
+                            SOLVER_WITH_CONTACT_FRICTION(dim, contact_kdtree, vap_t),
+                            SOLVER_WITH_CONTACT_FRICTION(dim, contact_brute_force, vap_t)
                              >;
 }
