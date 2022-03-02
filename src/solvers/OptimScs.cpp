@@ -4,7 +4,7 @@
 
 namespace scopi
 {
-    OptimScs::OptimScs(std::size_t nparts, double dt, double, double tol)
+    OptimScs::OptimScs(std::size_t nparts, double dt, double tol)
     : base_type(nparts, dt, 2*3*nparts, 0)
     , MatrixOptimSolver(nparts, dt)
     , m_P_x(6*nparts)

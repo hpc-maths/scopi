@@ -17,8 +17,8 @@ namespace scopi
 {
     class MatrixOptimSolver
     {
-    protected:
-        MatrixOptimSolver(std::size_t nparts, double dt, double mu = 0.);
+        protected:
+        MatrixOptimSolver(std::size_t nparts, double dt);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,

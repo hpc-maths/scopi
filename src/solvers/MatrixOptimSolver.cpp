@@ -6,7 +6,7 @@ namespace scopi
     using namespace monty;
 #endif
 
-    MatrixOptimSolver::MatrixOptimSolver(std::size_t nparticles, double dt, double)
+    MatrixOptimSolver::MatrixOptimSolver(std::size_t nparticles, double dt)
     : m_nparticles(nparticles)
     , m_dt(dt)
     {}

@@ -6,10 +6,10 @@ namespace scopi
     using namespace monty;
 #endif
 
-    MatrixOptimSolverFriction::MatrixOptimSolverFriction(std::size_t nparticles, double dt, double mu)
+    MatrixOptimSolverFriction::MatrixOptimSolverFriction(std::size_t nparticles, double dt)
     : m_nparticles(nparticles)
     , m_dt(dt)
-    , m_mu(mu)
+    , m_mu(0.)
     {}
 
 #ifdef SCOPI_USE_MOSEK

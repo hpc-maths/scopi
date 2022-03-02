@@ -13,7 +13,7 @@ namespace scopi
     public:
         using base_type = OptimBase<OptimScs>;
 
-        OptimScs(std::size_t nparts, double dt, double mu = 0., double tol = 1e-7);
+        OptimScs(std::size_t nparts, double dt, double tol = 1e-7);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
