@@ -6,10 +6,11 @@
 
 #include <scopi/solvers/OptimMosek.hpp>
 #include <scopi/vap/vap_fpd.hpp>
+#include <scopi/solvers/MatrixOptimSolverFriction.hpp>
 
 int main()
 {
-    plog::init(plog::warning, "sphere_plan.log");
+    plog::init(plog::debug, "sphere_plan.log");
 
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
@@ -29,14 +30,19 @@ int main()
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, scopi::property<dim>().force({{0., -g}}));
 
-        scopi::ScopiSolver<dim, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
+        scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
+        // solver.set_coeff_friction(1.);
         solver.solve(total_it[i]);
 
         auto pos = particles.pos();
-        double tf = dt[i]*(total_it[i]+1);
-        auto analytical_sol = g/2.*std::sin(alpha)*tf*tf * xt::xtensor<double, 1>({std::cos(alpha), -std::sin(alpha)});
+        auto omega = particles.omega();
+        auto  tmp = scopi::analytical_solution_sphere_plan(alpha, 0., dt[i]*(total_it[i]+1), radius, g);
+        auto analytical_sol = tmp.first;
+        auto omega_analytical = tmp.second;
         PLOG_DEBUG << "pos = " << pos(1);
         PLOG_DEBUG << "sol = " << analytical_sol;
+        PLOG_DEBUG << "omega = " << omega(1);
+        PLOG_DEBUG << "sol = " << omega_analytical;
         double error = xt::linalg::norm(pos(1) - analytical_sol, 2) / xt::linalg::norm(analytical_sol);
         PLOG_WARNING << dt[i] << '\t' << error;
     }
