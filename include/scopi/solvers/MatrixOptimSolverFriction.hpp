@@ -24,6 +24,7 @@ namespace scopi
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
+        void set_coeff_friction(double mu);
 
 #ifdef SCOPI_USE_MOSEK
         std::shared_ptr<monty::ndarray<double, 1>> distances_to_mosek_vector(xt::xtensor<double, 1> distances) const;

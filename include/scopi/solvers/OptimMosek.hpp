@@ -25,6 +25,8 @@ namespace scopi{
         double* wadapt_data();
         int get_nb_active_contacts_impl() const;
 
+        void set_coeff_friction(double mu);
+
     private:
 
         mosek::fusion::Matrix::t m_Az;
@@ -153,6 +155,12 @@ namespace scopi{
                 nb_active_contacts++;
         }
         return nb_active_contacts;
+    }
+
+    template<class model_t>
+    void OptimMosek<model_t>::set_coeff_friction(double mu)
+    {
+        model_t::set_coeff_friction(mu);
     }
 }
 #endif

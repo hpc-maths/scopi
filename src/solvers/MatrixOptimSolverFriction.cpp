@@ -12,6 +12,11 @@ namespace scopi
     , m_mu(0.)
     {}
 
+    void MatrixOptimSolverFriction::set_coeff_friction(double mu)
+    {
+        m_mu = mu;
+    }
+
 #ifdef SCOPI_USE_MOSEK
     std::shared_ptr<ndarray<double, 1>> MatrixOptimSolverFriction::distances_to_mosek_vector(xt::xtensor<double, 1> distances) const
     {
