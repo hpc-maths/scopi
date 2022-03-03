@@ -33,7 +33,7 @@ int main()
                 scopi::plan<dim> p({{-radius*std::cos(PI/2.-alpha), -radius*std::sin(PI/2.-alpha)}}, PI/2.-alpha);
                 scopi::sphere<dim> s({{0., 0.}}, radius);
                 particles.push_back(p, scopi::property<dim>().deactivate());
-                particles.push_back(s, scopi::property<dim>().force({{0., -g}}));
+                particles.push_back(s, scopi::property<dim>().force({{0., -g}}).mass(1.));
 
                 scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
                 solver.set_coeff_friction(mu);

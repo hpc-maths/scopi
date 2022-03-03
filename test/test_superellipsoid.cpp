@@ -516,7 +516,7 @@ namespace scopi
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
                 superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
+                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.);
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -568,7 +568,7 @@ namespace scopi
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
                 superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
+                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.);
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -614,7 +614,7 @@ namespace scopi
                         double velocity = distrib_velocity(generator);
 
                         superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
-                        m_particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}));
+                        m_particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}).mass(1.));
 
                         rot = distrib_rot(generator);
                         r = distrib_r(generator);
@@ -624,7 +624,7 @@ namespace scopi
                         velocity = distrib_velocity(generator);
 
                         superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
-                        m_particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}));
+                        m_particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}).mass(1.));
                     }
                 }
             }

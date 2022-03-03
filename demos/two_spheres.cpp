@@ -13,8 +13,8 @@ int main()
 
     scopi::sphere<dim> s1({{-0.2, -0.05}}, 0.1);
     scopi::sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
-    particles.push_back(s1, scopi::property<dim>().desired_velocity({{0.25, 0}}));
-    particles.push_back(s2, scopi::property<dim>().desired_velocity({{-0.25, 0}}));
+    particles.push_back(s1, scopi::property<dim>().desired_velocity({{0.25, 0}}).mass(1.));
+    particles.push_back(s2, scopi::property<dim>().desired_velocity({{-0.25, 0}}).mass(1.));
 
     scopi::ScopiSolver<dim> solver(particles, dt);
     solver.solve(total_it);

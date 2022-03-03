@@ -35,13 +35,13 @@ int main()
             double x = -n + (i + 0.5) + distrib_move_x(generator);
             double y = -n/2. + (j + 0.5) + distrib_move_y(generator);
             scopi::sphere<dim> s1({ {x, y}}, r);
-            particles.push_back(s1);
+            particles.push_back(s1, scopi::property<dim>().mass(1.));
 
             r = distrib_r(generator);
             x = (i + 0.5) + distrib_move_x(generator);
             y = -n/2. + (j + 0.5) + distrib_move_y(generator);
             scopi::sphere<dim> s2({ {x, y}}, r);
-            particles.push_back(s2);
+            particles.push_back(s2, scopi::property<dim>.mass(1.));
         }
     }
 

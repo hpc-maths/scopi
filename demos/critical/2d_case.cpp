@@ -50,7 +50,7 @@ int main()
 
       scopi::sphere<dim> s1( {{x, y}}, {scopi::quaternion(rot)}, r);
       // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
-      particles.push_back(s1, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}));
+      particles.push_back(s1, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}).mass(1.));
 
       // e = distrib_e(generator);
       r = distrib_r(generator);
@@ -61,7 +61,7 @@ int main()
       dist_orig = std::sqrt(x*x+y*y);
       scopi::sphere<dim> s2( {{x, y}}, {scopi::quaternion(rot)}, r);
       // scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r}}, {{1}});
-      particles.push_back(s2, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}));
+      particles.push_back(s2, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}).mass(1.));
 
       // e = distrib_e(generator);
       // r = distrib_r(generator);
@@ -71,7 +71,7 @@ int main()
       // rot = distrib_rot(generator);
       // dist_orig = std::sqrt(x*x+y*y);
       // scopi::superellipsoid<dim> s3({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{e}});
-      // particles.push_back(s3, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}));
+      // particles.push_back(s3, scopi::property<dim>().desired_velocity({{-x/dist_orig, -y/dist_orig}}).mass(1.));
 
     }
 
@@ -89,7 +89,7 @@ int main()
     //     {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
     //     {{e}});
     //   // s1.print();
-    //   particles.push_back(s1, scopi::property<dim>().desired_velocity({{-0.25, 0}}));
+    //   particles.push_back(s1, scopi::property<dim>().desired_velocity({{-0.25, 0}}).mass(1.));
     //
     //   // scopi::sphere<dim> s2(
     //   //   {{distrib_gp2(generator), distrib_y(generator)}},
@@ -99,7 +99,7 @@ int main()
     //     {scopi::quaternion(distrib_rot(generator))}, {{distrib_r(generator), distrib_r(generator)}},
     //     {{e}});
     //   // s2.print();
-    //   particles.push_back(s2, scopi::property<dim>().desired_velocity({{0.25, 0}}));
+    //   particles.push_back(s2, scopi::property<dim>().desired_velocity({{0.25, 0}}).mass(1.));
     //
     // }
 
