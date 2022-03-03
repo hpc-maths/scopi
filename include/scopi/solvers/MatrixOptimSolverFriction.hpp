@@ -194,7 +194,7 @@ namespace scopi
     {
         using namespace mosek::fusion;
         return model->constraint("qc1"
-                , Expr::reshape(Expr::sub(D, Expr::mul(A, X->slice(1 + 6*this->m_nparticles, 1 + 6*this->m_nparticles + 6*this->m_nparticles))), contacts.size(), 4)
+                , Expr::reshape(Expr::sub(D, Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))), contacts.size(), 4)
                 , Domain::inQCone());
     }
 #endif
