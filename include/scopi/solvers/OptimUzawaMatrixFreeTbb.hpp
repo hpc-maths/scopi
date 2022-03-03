@@ -44,13 +44,13 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::gemv_inv_P_impl(const scopi_container<dim>&)
+    void OptimUzawaMatrixFreeTbb::gemv_inv_P_impl(const scopi_container<dim>& particles)
     {
-        // for loops instead of xtensor functions to control exactly the parallelism
-        tbb::parallel_for(std::size_t(0), this->m_nparts, [=](std::size_t i) {
+        auto active_offset = particles.nb_inactive();
+        tbb::parallel_for(std::size_t(0), this->m_nparts, [&](std::size_t i) {
             for (std::size_t d = 0; d < 3; ++d)
             {
-                this->m_U(3*i + d) /= (-1. * this->m_mass); // TODO: add mass into particles
+                this->m_U(3*i + d) /= (-1.*particles.m()(active_offset + i));
                 this->m_U(3*this->m_nparts + 3*i + d) /= (-1. * this->m_moment);
             }
         });

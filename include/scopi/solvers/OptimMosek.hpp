@@ -108,13 +108,14 @@ namespace scopi{
         Az_cols.reserve(6*nparts*2);
         Az_values.reserve(6*nparts*2);
 
+        auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
             for (std::size_t d = 0; d < 2; ++d)
             {
                 Az_rows.push_back(3*i + d);
                 Az_cols.push_back(1 + 3*i + d);
-                Az_values.push_back(std::sqrt(this->m_mass));
+                Az_values.push_back(std::sqrt(particles.m()(active_offset + i)));
                 Az_rows.push_back(3*i + d);
                 Az_cols.push_back(1 + 6*nparts + 3*i + d);
                 Az_values.push_back(-1.);

@@ -44,12 +44,13 @@ namespace scopi{
     template<std::size_t dim>
     void OptimUzawaMatrixFreeOmp::gemv_inv_P_impl(const scopi_container<dim>& particles)
     {
+        auto active_offset = particles.nb_inactive();
         #pragma omp parallel for
         for (std::size_t i = 0; i < particles.nb_active(); ++i)
         {
             for (std::size_t d = 0; d < 3; ++d)
             {
-                this->m_U(3*i + d) /= (-1. * this->m_mass); // TODO: add mass into particles
+                this->m_U(3*i + d) /= (-1.*particles.m()(active_offset + i));
                 this->m_U(3*this->m_nparts + 3*i + d) /= (-1. * this->m_moment);
             }
         }

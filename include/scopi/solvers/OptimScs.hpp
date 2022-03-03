@@ -104,7 +104,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    OptimScs::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>&, double tol)
+    OptimScs::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol)
     : base_type(nparts, dt, 2*3*nparts, 0)
     , MatrixOptimSolver(nparts, dt)
     , m_P_x(6*nparts)
@@ -113,6 +113,7 @@ namespace scopi
     , m_A_p(6*nparts+1)
     , m_sol_x(6*nparts)
     {
+        auto active_offset = particles.nb_inactive();
         std::size_t index = 0;
         for (std::size_t i = 0; i < nparts; ++i)
         {
@@ -120,7 +121,7 @@ namespace scopi
             {
                 m_P_i[index] = 3*i + d;
                 m_P_p[index] = 3*i + d;
-                m_P_x[index] = this->m_mass; // TODO: add mass into particles
+                m_P_x[index] = particles.m()(active_offset + i);
                 index++;
             }
         }

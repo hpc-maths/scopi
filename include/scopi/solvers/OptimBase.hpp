@@ -23,7 +23,6 @@ namespace scopi{
 
         std::size_t m_nparts;
         double m_dt;
-        double m_mass;
         double m_moment;
         xt::xtensor<double, 1> m_c;
         std::size_t m_c_dec;
@@ -63,7 +62,6 @@ namespace scopi{
     OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
     : m_nparts(nparts)
     , m_dt(dt)
-    , m_mass(1.)
     , m_moment(0.1)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)
@@ -96,7 +94,7 @@ namespace scopi{
         {
             for (std::size_t d = 0; d < dim; ++d)
             {
-                m_c(mass_dec + 3*i + d) = -m_mass*desired_velocity(i + active_offset)[d]; // TODO: add mass into particles
+                m_c(mass_dec + 3*i + d) = -particles.m()(active_offset + i)*desired_velocity(i + active_offset)[d];
             }
             auto omega = get_omega(desired_omega(i + active_offset));
             for (std::size_t d = 0; d < 3; ++d)

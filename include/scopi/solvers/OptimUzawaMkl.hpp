@@ -132,13 +132,14 @@ namespace scopi
         invP_csr_row.reserve(6*nparts+1);
         invP_csr_val.reserve(6*nparts);
 
+        auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
             for (std::size_t d = 0; d < 3; ++d)
             {
                 invP_csr_row.push_back(3*i + d);
                 invP_csr_col.push_back(3*i + d);
-                invP_csr_val.push_back(1./this->m_mass); // TODO: add mass into particles
+                invP_csr_val.push_back(1./particles.m()(active_offset + i));
             }
         }
         for (std::size_t i = 0; i < nparts; ++i)

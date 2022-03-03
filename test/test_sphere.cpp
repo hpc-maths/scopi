@@ -410,7 +410,6 @@ namespace scopi
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance);
     }
 
-#if 0
     template <class S>
     class TestTwoSpheresSymmetrical  : public ::testing::Test {
         static constexpr std::size_t dim = 2;
@@ -535,5 +534,4 @@ namespace scopi
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0029.json", "../test/references/2d_case_spheres_vap.json", tolerance);
     }
-#endif
 }
