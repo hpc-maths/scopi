@@ -17,6 +17,7 @@ int main()
 
     double radius = 1.;
     double g = radius;
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia({{PI/4.*radius*radius*radius*radius, PI/4.*radius*radius*radius*radius}});
 
     std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001});//, 0.0005});
     std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000});//, 20000});
@@ -33,7 +34,7 @@ int main()
                 scopi::plan<dim> p({{-radius*std::cos(PI/2.-alpha), -radius*std::sin(PI/2.-alpha)}}, PI/2.-alpha);
                 scopi::sphere<dim> s({{0., 0.}}, radius);
                 particles.push_back(p, scopi::property<dim>().deactivate());
-                particles.push_back(s, scopi::property<dim>().force({{0., -g}}).mass(1.));
+                particles.push_back(s, prop.force({{0., -g}}));
 
                 scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
                 solver.set_coeff_friction(mu);

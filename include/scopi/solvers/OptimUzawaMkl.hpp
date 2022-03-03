@@ -148,7 +148,7 @@ namespace scopi
             {
                 invP_csr_row.push_back(3*nparts + 3*i + d);
                 invP_csr_col.push_back(3*nparts + 3*i + d);
-                invP_csr_val.push_back(1./this->m_moment);
+                invP_csr_val.push_back(1./particles.j()(active_offset + i)(d));
             }
         }
         invP_csr_row.push_back(6*nparts);

@@ -19,11 +19,13 @@ namespace scopi
                 m_particles.push_back(s1, p.velocity({{0.1, 0.2}})
                                            .desired_velocity({{0.01, 0.02}})
                                            .force({{1., 2.}})
-                                           .mass(1.));
+                                           .mass(1.)
+                                           .moment_inertia({{0.1, 0.2}}));
                 m_particles.push_back(s2, p.velocity({{0.4, 0.5}})
                                            .desired_velocity({{0.04, 0.05}})
                                            .force({{4., 5.}})
-                                           .mass(2.));
+                                           .mass(2.)
+                                           .moment_inertia({{0.3, 0.4}}));
             }
             scopi_container<dim> m_particles;
     };
@@ -40,12 +42,14 @@ namespace scopi
                 m_particles.push_back(s1, p.velocity({{0.1, 0.2, 0.3}})
                                            .desired_velocity({{0.01, 0.02, 0.03}})
                                            .force({{1., 2., 3,}})
-                                           .mass(1.));
+                                           .mass(1.)
+                                           .moment_inertia({{0.1, 0.2, 0.3}}));
 
                 m_particles.push_back(s2, p.velocity({{0.4, 0.5, 0.6}})
                                            .desired_velocity({{0.04, 0.05, 0.06}})
                                            .force({{4., 5., 6,}})
-                                           .mass(2.));
+                                           .mass(2.)
+                                           .moment_inertia({{0.4, 0.5, 0.6}}));
             }
             scopi_container<dim> m_particles;
     };
@@ -143,6 +147,27 @@ namespace scopi
         auto m = m_particles.m();
         EXPECT_DOUBLE_EQ(m(0), 1.);
         EXPECT_DOUBLE_EQ(m(1), 2.);
+    }
+
+    // j
+    TEST_F(Container2dTest, j_2d)
+    {
+        auto j = m_particles.j();
+        EXPECT_DOUBLE_EQ(j(0)(0), 0.1);
+        EXPECT_DOUBLE_EQ(j(0)(1), 0.2);
+        EXPECT_DOUBLE_EQ(j(1)(0), 0.3);
+        EXPECT_DOUBLE_EQ(j(1)(1), 0.4);
+    }
+
+    TEST_F(Container3dTest, j_3d)
+    {
+        auto j = m_particles.j();
+        EXPECT_DOUBLE_EQ(j(0)(0), 0.1);
+        EXPECT_DOUBLE_EQ(j(0)(1), 0.2);
+        EXPECT_DOUBLE_EQ(j(0)(2), 0.3);
+        EXPECT_DOUBLE_EQ(j(1)(0), 0.4);
+        EXPECT_DOUBLE_EQ(j(1)(1), 0.5);
+        EXPECT_DOUBLE_EQ(j(1)(2), 0.6);
     }
 
     // v

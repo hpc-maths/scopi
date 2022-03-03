@@ -27,7 +27,7 @@ namespace scopi
                 contact_brute_force cont(2);
                 m_contacts = cont.run(particles, 0);
             }
-            std::vector<scopi::neighbor<2>> m_contacts;
+            std::vector<neighbor<2>> m_contacts;
     };
 
     TEST_F(ContactsBruteForceTest, nbContacts)

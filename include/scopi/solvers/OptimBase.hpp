@@ -23,7 +23,6 @@ namespace scopi{
 
         std::size_t m_nparts;
         double m_dt;
-        double m_moment;
         xt::xtensor<double, 1> m_c;
         std::size_t m_c_dec;
         xt::xtensor<double, 1> m_distances;
@@ -62,7 +61,6 @@ namespace scopi{
     OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
     : m_nparts(nparts)
     , m_dt(dt)
-    , m_moment(0.1)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)
     {}
@@ -99,7 +97,7 @@ namespace scopi{
             auto omega = get_omega(desired_omega(i + active_offset));
             for (std::size_t d = 0; d < 3; ++d)
             {
-                m_c(moment_dec + 3*i + d) = -m_moment*omega(d);
+                m_c(moment_dec + 3*i + d) = -particles.j()(active_offset + i)(d)*omega(d);
             }
         }
     }

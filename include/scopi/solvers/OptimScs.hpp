@@ -131,7 +131,7 @@ namespace scopi
             {
                 m_P_i[index] = 3*nparts + 3*i + d;
                 m_P_p[index] = 3*nparts + 3*i + d;
-                m_P_x[index] = this->m_moment;
+                m_P_x[index] = particles.j()(active_offset + i)(d);
                 index++;
             }
         }

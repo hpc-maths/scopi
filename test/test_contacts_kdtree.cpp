@@ -29,7 +29,7 @@ namespace scopi
                 m_nMatches = cont.get_nMatches();
             }
             std::size_t m_nMatches;
-            std::vector<scopi::neighbor<2>> m_contacts;
+            std::vector<neighbor<2>> m_contacts;
     };
 
     TEST_F(ContactsKdtreeTest, nbContacts)

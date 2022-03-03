@@ -123,7 +123,7 @@ namespace scopi{
 
             Az_rows.push_back(3*nparts + 3*i + 2);
             Az_cols.push_back(1 + 3*nparts + 3*i + 2);
-            Az_values.push_back(std::sqrt(this->m_moment));
+            Az_values.push_back(std::sqrt(particles.j()(active_offset + i)(2)));
 
             Az_rows.push_back(3*nparts + 3*i + 2);
             Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + 2);

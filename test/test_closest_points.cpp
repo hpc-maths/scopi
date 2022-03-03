@@ -951,9 +951,8 @@ namespace scopi
         superellipsoid<dim> e({{-dist*cosRot, dist*sinRot}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2}}, 1);
 
         scopi_container<dim> particles;
-        auto prop = property<dim>().desired_velocity({{0.25, 0}});
-        particles.push_back(e, prop);
-        particles.push_back(s, prop.desired_velocity({{-0.25, 0}}));
+        particles.push_back(e);
+        particles.push_back(s);
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 

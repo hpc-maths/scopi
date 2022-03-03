@@ -11,8 +11,8 @@ int main()
     scopi::scopi_container<dim> particles;
 
     auto prop0 = scopi::property<dim>().deactivate();
-    auto prop1 = scopi::property<dim>().desired_velocity({{0.25, 0, 0}}).mass(1.);
-    auto prop2 = scopi::property<dim>().desired_velocity({{-0.25, 0, 0}}).mass(1.);
+    auto prop1 = scopi::property<dim>().desired_velocity({{0.25, 0, 0}}).mass(1.).moment_inertia({{0.1, 0.1, 0.1}});
+    auto prop2 = scopi::property<dim>().desired_velocity({{-0.25, 0, 0}}).mass(1.).moment_inertia({{0.1, 0.1, 0.1}});
 
     // ellipsoids
 

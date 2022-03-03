@@ -17,9 +17,9 @@ namespace scopi {
             void SetUp() override {
                 sphere<dim> s1({{-0.2, -0.05}}, 0.1);
                 sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
-                auto p = property<dim>().desired_velocity({{0.25, 0}});
-                m_particles.push_back(s1, p.mass(1.));
-                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}).mass(1.));
+                auto p = property<dim>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia({{0.1, 0.1}});
+                m_particles.push_back(s1, p);
+                m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
             double m_dt = .005;
@@ -50,6 +50,7 @@ namespace scopi {
                 std::uniform_real_distribution<double> distrib_move_x(-0.1, 0.1);
                 std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
                 std::uniform_real_distribution<double> distrib_velocity(2., 5.);
+                auto prop = property<dim>().mass(1.).moment_inertia({{0.1, 0.1}});
 
                 for(int i = 0; i < n; ++i)
                 {
@@ -60,14 +61,14 @@ namespace scopi {
                         double y = (j + 0.5) + distrib_move_y(generator);
                         double velocity = distrib_velocity(generator);
                         sphere<dim> s1({{x, y}}, r);
-                        m_particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}).mass(1.));
+                        m_particles.push_back(s1, prop.desired_velocity({{velocity, 0.}}));
 
                         r = distrib_r(generator);
                         x = (n + i + 0.5) + distrib_move_x(generator);
                         y = (j + 0.5) + distrib_move_y(generator);
                         velocity = distrib_velocity(generator);
                         sphere<dim> s2({{x, y}}, r);
-                        m_particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}).mass(1.));
+                        m_particles.push_back(s2, prop.desired_velocity({{-velocity, 0.}}));
                     }
                 }
             }

@@ -487,9 +487,9 @@ namespace scopi
     class TestTwoEllipsoidsSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
-                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.);
+                superellipsoid<2> s1({{-0.2, 0.}}, {quaternion(PI/4)}, {{.1, .05}}, 1);
+                superellipsoid<2> s2({{0.2, 0.}}, {quaternion(-PI/4)}, {{.1, .05}}, 1);
+                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia({{0.1, 0.1}});
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -513,9 +513,9 @@ namespace scopi
     class TestTwoEllipsoidsSpheresSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
-                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                auto p = property<2>().mass(1.);
+                superellipsoid<2> s1({{-0.2, 0.}}, {quaternion(PI/4)}, {{.1, .1}}, 1);
+                superellipsoid<2> s2({{0.2, 0.}}, {quaternion(-PI/4)}, {{.1, .1}}, 1);
+                auto p = property<2>().mass(1.).moment_inertia({{0.1, 0.1}});
                 m_particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -539,9 +539,9 @@ namespace scopi
     class TestTwoEllipsoidsAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
-                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                auto p = property<2>().mass(1.);
+                superellipsoid<2> s1({{-0.2, -0.05}}, {quaternion(PI/4)}, {{.1, .05}}, 1);
+                superellipsoid<2> s2({{0.2, 0.05}}, {quaternion(-PI/4)}, {{.1, .05}}, 1);
+                auto p = property<2>().mass(1.).moment_inertia({{0.1, 0.1}});
                 m_particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -565,9 +565,9 @@ namespace scopi
     class TestTwoEllipsoidsSpheresAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
-                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.);
+                superellipsoid<2> s1({{-0.2, -0.05}}, {quaternion(PI/4)}, {{.1, .1}}, 1);
+                superellipsoid<2> s2({{0.2, 0.05}}, {quaternion(-PI/4)}, {{.1, .1}}, 1);
+                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia({{0.1, 0.1}});
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -600,6 +600,7 @@ namespace scopi
                 std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
                 std::uniform_real_distribution<double> distrib_rot(0, PI);
                 std::uniform_real_distribution<double> distrib_velocity(2., 5.);
+                auto prop = property<dim>().mass(1.).moment_inertia({{0.1, 0.1}});
 
                 for(int i = 0; i < n; ++i)
                 {
@@ -612,8 +613,8 @@ namespace scopi
                         double y = (j + 0.5) + distrib_move_y(generator);
                         double velocity = distrib_velocity(generator);
 
-                        superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
-                        m_particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}).mass(1.));
+                        superellipsoid<dim> s1({ {x, y}}, {quaternion(rot)}, {{r, r2}}, 1);
+                        m_particles.push_back(s1,prop.desired_velocity({{velocity, 0.}}));
 
                         rot = distrib_rot(generator);
                         r = distrib_r(generator);
@@ -622,8 +623,8 @@ namespace scopi
                         y = (j + 0.5) + distrib_move_y(generator);
                         velocity = distrib_velocity(generator);
 
-                        superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
-                        m_particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}).mass(1.));
+                        superellipsoid<dim> s2({ {x, y}}, {quaternion(rot)}, {{r, r2}}, 1);
+                        m_particles.push_back(s2, prop.desired_velocity({{-velocity, 0.}}));
                     }
                 }
             }

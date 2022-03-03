@@ -29,8 +29,9 @@ namespace scopi
         using velocity_type = type::velocity_t<dim>;
         using rotation_type = type::rotation_t<dim>;
         using force_type = type::force_t<dim>;
-        using quaternion_type = type::quaternion_t;
         using mass_type = double;
+        using moment_type = type::moment_t<dim>;
+        using quaternion_type = type::quaternion_t;
 
         scopi_container();
 
@@ -52,6 +53,9 @@ namespace scopi
 
         auto m() const;
         auto m();
+
+        auto j() const;
+        auto j();
 
         auto v() const;
         auto v();
@@ -78,6 +82,7 @@ namespace scopi
         std::vector<quaternion_type> m_quaternions;  // q()
         std::vector<force_type> m_forces;  // f()
         std::vector<mass_type> m_masses;  // f()
+        std::vector<moment_type> m_moments_inertia;  // f()
         std::vector<velocity_type> m_velocities;  // v()
         std::vector<velocity_type> m_desired_velocities;  // vd()
         std::vector<rotation_type> m_omega;  // omega()
@@ -130,6 +135,7 @@ namespace scopi
             m_desired_velocities.push_back(p.desired_velocity());
             m_forces.push_back(p.force());
             m_masses.push_back(p.mass());
+            m_moments_inertia.push_back(p.moment_inertia());
         }
 
         if (!p.is_active())
@@ -167,6 +173,7 @@ namespace scopi
         m_desired_velocities.push_back(m_desired_velocities[i]);
         m_forces.push_back(m_forces[i]);
         m_masses.push_back(m_masses[i]);
+        m_moments_inertia.push_back(m_moments_inertia[i]);
 
         m_shapes_id.push_back(m_shapes_id[i]);
 
@@ -184,6 +191,7 @@ namespace scopi
         m_desired_omega.reserve(size);
         m_forces.reserve(size);
         m_masses.reserve(size);
+        m_moments_inertia.reserve(size);
         m_offset.reserve(size+1);
         m_shapes_id.reserve(size);
     }
@@ -318,6 +326,20 @@ namespace scopi
         return xt::adapt(reinterpret_cast<mass_type*>(m_masses.data()), {m_masses.size()});
     }
 
+    // moment of inertia
+
+    template<std::size_t dim>
+    auto scopi_container<dim>::j() const
+    {
+        return xt::adapt(reinterpret_cast<const moment_type*>(m_moments_inertia.data()), {m_moments_inertia.size()});
+    }
+
+    template<std::size_t dim>
+    auto scopi_container<dim>::j()
+    {
+        return xt::adapt(reinterpret_cast<moment_type*>(m_moments_inertia.data()), {m_moments_inertia.size()});
+    }
+
     template<std::size_t dim>
     void scopi_container<dim>::reset_periodic()
     {
@@ -331,6 +353,7 @@ namespace scopi
         m_desired_omega.resize(size);
         m_forces.resize(size);
         m_masses.resize(size);
+        m_moments_inertia.resize(size);
         m_offset.resize(size+1);
         m_shapes_id.resize(size);
 

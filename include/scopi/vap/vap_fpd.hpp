@@ -15,10 +15,6 @@ namespace scopi
         void update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
 
         vap_fpd(std::size_t Nactive, std::size_t active_ptr, double dt);
-
-        private:
-        // double _moment;
-
     };
 
     template <std::size_t dim>
@@ -26,7 +22,7 @@ namespace scopi
     {
         for (std::size_t i=0; i<m_Nactive; ++i)
         {
-            particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*particles.f()(m_active_ptr + i)/particles.m()(m_active_ptr + i); // TODO: add mass into particles
+            particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*particles.f()(m_active_ptr + i)/particles.m()(m_active_ptr + i);
         }
         // TODO should be dt * (R_i * t_i^{ext , n} - omega'_i * (J_i omega'_i)
         particles.desired_omega() = particles.omega();

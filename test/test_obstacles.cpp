@@ -21,6 +21,7 @@ namespace scopi
         : m_radius(1.)
         , m_s({{0., m_radius}}, m_radius)
         , m_p({{ 0.,  0.}}, PI/2.)
+        , m_prop(property<dim>().mass(1.).moment_inertia({{0.1, 0.1}}))
         {
             m_particles.push_back(m_p, property<dim>().deactivate());
         }
@@ -51,6 +52,7 @@ namespace scopi
         sphere<dim> m_s;
         plan<dim> m_p;
         scopi_container<2> m_particles;
+        property<dim> m_prop; 
     };
 
     template <class S>
@@ -59,7 +61,7 @@ namespace scopi
     {
         protected:
         void SetUp() override {
-            m_particles.push_back(m_s, property<dim>().mass(1.));
+            m_particles.push_back(m_s, m_prop);
         }
     };
 
@@ -78,7 +80,7 @@ namespace scopi
     {
         protected:
         void SetUp() override {
-            m_particles.push_back(m_s, scopi::property<dim>().desired_velocity({{0., -1.}}).mass(1.));
+            m_particles.push_back(m_s, m_prop.desired_velocity({{0., -1.}}));
         }
     };
 
@@ -97,7 +99,7 @@ namespace scopi
     {
         protected:
         void SetUp() override {
-            m_particles.push_back(m_s, scopi::property<dim>().force({{0., -1.}}).mass(1.));
+            m_particles.push_back(m_s, m_prop.force({{0., -1.}}));
         }
     };
 
@@ -119,6 +121,7 @@ namespace scopi
         : m_radius(radius)
         , m_sphere({{ pos_x,  pos_y}}, m_radius)
         , m_obstacle({{ 0.,  0.}}, m_radius)
+        , m_prop(property<dim>().mass(1.).moment_inertia({{0.1, 0.1}}))
         {
             m_particles.push_back(m_obstacle, property<dim>().deactivate());
         }
@@ -149,6 +152,7 @@ namespace scopi
         sphere<dim> m_sphere;
         sphere<dim> m_obstacle;
         scopi_container<2> m_particles;
+        property<dim> m_prop; 
     };
 
     template <class S>
@@ -159,7 +163,7 @@ namespace scopi
         TestSphereSphereFixed()
         : TestSphereSphereBase(1., 0., 2.)
         {
-            m_particles.push_back(m_sphere, property<dim>().mass(1.));
+            m_particles.push_back(m_sphere, m_prop);
         }
     };
 
@@ -180,7 +184,7 @@ namespace scopi
         TestSphereSphereFixedVelocity()
         : TestSphereSphereBase(1., 0., 2.)
         {
-            m_particles.push_back(m_sphere, scopi::property<dim>().desired_velocity({{0., -1.}}).mass(1.));
+            m_particles.push_back(m_sphere, m_prop.desired_velocity({{0., -1.}}));
         }
     };
 
@@ -201,7 +205,7 @@ namespace scopi
         TestSphereSphereFixedForce()
         : TestSphereSphereBase(1., 0., 2.)
         {
-            m_particles.push_back(m_sphere, scopi::property<dim>().force({{0., -1.}}).mass(1.));
+            m_particles.push_back(m_sphere, m_prop.force({{0., -1.}}));
         }
     };
 
@@ -222,7 +226,7 @@ namespace scopi
         TestSphereSphereMoving()
         : TestSphereSphereBase(1., 2.*1./2., 2.*std::sqrt(3.)/2.)
         {
-            m_particles.push_back(m_sphere, scopi::property<dim>().force({{0., -10.}}).mass(1.));
+            m_particles.push_back(m_sphere, m_prop.force({{0., -10.}}));
         }
     };
 
@@ -243,12 +247,13 @@ namespace scopi
         TestInclinedPlan()
         : m_r(1.)
         , m_alpha(PI/4.)
+        , m_prop(property<dim>().mass(1.).moment_inertia({{0.1, 0.1}}))
         {
             plan<dim> p({{-m_r*std::cos(m_alpha), -m_r*std::sin(m_alpha)}}, m_alpha);
             sphere<dim> s({{0., 0.}}, m_r);
 
-            m_particles.push_back(p, scopi::property<dim>().deactivate());
-            m_particles.push_back(s, scopi::property<dim>().force({{0., -m_g}}).mass(1.));
+            m_particles.push_back(p, property<dim>().deactivate());
+            m_particles.push_back(s, m_prop.force({{0., -m_g}}));
         }
 
         double m_r;
@@ -257,6 +262,7 @@ namespace scopi
         scopi_container<dim> m_particles;
         double m_dt = .001;
         std::size_t m_total_it = 1000;
+        property<dim> m_prop; 
     };
 
     TYPED_TEST_SUITE(TestInclinedPlan, solver_types_vap);

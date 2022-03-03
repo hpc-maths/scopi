@@ -15,6 +15,7 @@ int main()
     double dt = .01;
     std::size_t total_it = 2000;
     scopi::scopi_container<dim> particles;
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia({{0.1, 0.1}});
 
     int n = 10; // 2*n*n particles
 
@@ -33,14 +34,14 @@ int main()
             double y = (j + 0.5) + distrib_move_y(generator);
             double velocity = distrib_velocity(generator);
             scopi::sphere<dim> s1({{x, y}}, r);
-            particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}).mass(1.));
+            particles.push_back(s1, prop.desired_velocity({{velocity, 0.}}));
 
             r = distrib_r(generator);
             x = (n + i + 0.5) + distrib_move_x(generator);
             y = (j + 0.5) + distrib_move_y(generator);
             velocity = distrib_velocity(generator);
             scopi::sphere<dim> s2({{x, y}}, r);
-            particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}).mass(1.));
+            particles.push_back(s2, prop.desired_velocity({{-velocity, 0.}}));
         }
     }
 
