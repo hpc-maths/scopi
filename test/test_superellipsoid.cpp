@@ -481,7 +481,6 @@ namespace scopi
         EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
         EXPECT_NEAR(tangent.second(2), 0., 1e-7); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
     }
-    //
 
     // two ellipsoids
     template <class S>
@@ -490,7 +489,7 @@ namespace scopi
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
                 superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
+                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.);
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -516,8 +515,8 @@ namespace scopi
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
                 superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.);
-                m_particles.push_back(s1, p);
+                auto p = property<2>().mass(1.);
+                m_particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
@@ -542,8 +541,8 @@ namespace scopi
             void SetUp() override {
                 superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
                 superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
-                m_particles.push_back(s1, p);
+                auto p = property<2>().mass(1.);
+                m_particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
