@@ -120,7 +120,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    OptimUzawaMkl::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>&)
+    OptimUzawaMkl::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles)
     : base_type(nparts, dt)
     , MatrixOptimSolver(nparts, dt)
     , should_destroy(false)
