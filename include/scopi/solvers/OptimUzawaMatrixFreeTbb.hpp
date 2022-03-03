@@ -19,7 +19,8 @@ namespace scopi
     {
     public:
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeTbb>;
-        OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, double mu = 0.);
+        template <std::size_t dim>
+        OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>& particles);
 
         template <std::size_t dim>
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
@@ -169,5 +170,10 @@ namespace scopi
             }
         );
     }
+
+    template <std::size_t dim>
+    OptimUzawaMatrixFreeTbb::OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>&)
+    : base_type(nparts, dt)
+    {}
 }
 #endif

@@ -15,7 +15,8 @@ namespace scopi{
     public:
         using base_type = OptimBase<OptimMosek>;
 
-        OptimMosek(std::size_t nparts, double dt);
+        template <std::size_t dim>
+        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -88,7 +89,8 @@ namespace scopi{
     }
 
     template<class model_t>
-    OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt)
+    template <std::size_t dim>
+    OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
     , model_t(nparts, dt)
     {
@@ -112,7 +114,7 @@ namespace scopi{
             {
                 Az_rows.push_back(3*i + d);
                 Az_cols.push_back(1 + 3*i + d);
-                Az_values.push_back(std::sqrt(this->m_mass)); // TODO: add mass into particles
+                Az_values.push_back(std::sqrt(this->m_mass));
                 Az_rows.push_back(3*i + d);
                 Az_cols.push_back(1 + 6*nparts + 3*i + d);
                 Az_values.push_back(-1.);

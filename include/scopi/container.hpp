@@ -30,6 +30,7 @@ namespace scopi
         using rotation_type = type::rotation_t<dim>;
         using force_type = type::force_t<dim>;
         using quaternion_type = type::quaternion_t;
+        using mass_type = double;
 
         scopi_container();
 
@@ -48,6 +49,9 @@ namespace scopi
 
         auto f() const;
         auto f();
+
+        auto m() const;
+        auto m();
 
         auto v() const;
         auto v();
@@ -73,6 +77,7 @@ namespace scopi
         std::vector<position_type> m_positions;  // pos()
         std::vector<quaternion_type> m_quaternions;  // q()
         std::vector<force_type> m_forces;  // f()
+        std::vector<mass_type> m_masses;  // f()
         std::vector<velocity_type> m_velocities;  // v()
         std::vector<velocity_type> m_desired_velocities;  // vd()
         std::vector<rotation_type> m_omega;  // omega()
@@ -124,6 +129,7 @@ namespace scopi
             m_desired_omega.push_back(p.desired_omega());
             m_desired_velocities.push_back(p.desired_velocity());
             m_forces.push_back(p.force());
+            m_masses.push_back(p.mass());
         }
 
         if (!p.is_active())
@@ -160,6 +166,7 @@ namespace scopi
         m_desired_omega.push_back(m_desired_omega[i]);
         m_desired_velocities.push_back(m_desired_velocities[i]);
         m_forces.push_back(m_forces[i]);
+        m_masses.push_back(m_masses[i]);
 
         m_shapes_id.push_back(m_shapes_id[i]);
 
@@ -176,6 +183,7 @@ namespace scopi
         m_omega.reserve(size);
         m_desired_omega.reserve(size);
         m_forces.reserve(size);
+        m_masses.reserve(size);
         m_offset.reserve(size+1);
         m_shapes_id.reserve(size);
     }
@@ -296,6 +304,20 @@ namespace scopi
         return xt::adapt(reinterpret_cast<force_type*>(m_forces.data()), {m_forces.size()});
     }
 
+    // mass
+
+    template<std::size_t dim>
+    auto scopi_container<dim>::m() const
+    {
+        return xt::adapt(reinterpret_cast<const mass_type*>(m_masses.data()), {m_masses.size()});
+    }
+
+    template<std::size_t dim>
+    auto scopi_container<dim>::m()
+    {
+        return xt::adapt(reinterpret_cast<mass_type*>(m_masses.data()), {m_masses.size()});
+    }
+
     template<std::size_t dim>
     void scopi_container<dim>::reset_periodic()
     {
@@ -308,6 +330,7 @@ namespace scopi
         m_omega.resize(size);
         m_desired_omega.resize(size);
         m_forces.resize(size);
+        m_masses.resize(size);
         m_offset.resize(size+1);
         m_shapes_id.resize(size);
 

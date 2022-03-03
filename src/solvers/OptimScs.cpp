@@ -4,51 +4,6 @@
 
 namespace scopi
 {
-    OptimScs::OptimScs(std::size_t nparts, double dt, double tol)
-    : base_type(nparts, dt, 2*3*nparts, 0)
-    , MatrixOptimSolver(nparts, dt)
-    , m_P_x(6*nparts)
-    , m_P_i(6*nparts)
-    , m_P_p(6*nparts+1)
-    , m_A_p(6*nparts+1)
-    , m_sol_x(6*nparts)
-    {
-        std::size_t index = 0;
-        for (std::size_t i = 0; i < nparts; ++i)
-        {
-            for (std::size_t d = 0; d < 3; ++d)
-            {
-                m_P_i[index] = 3*i + d;
-                m_P_p[index] = 3*i + d;
-                m_P_x[index] = this->m_mass; // TODO: add mass into particles
-                index++;
-            }
-        }
-        for (std::size_t i = 0; i < nparts; ++i)
-        {
-            for (std::size_t d = 0; d < 3; ++d)
-            {
-                m_P_i[index] = 3*nparts + 3*i + d;
-                m_P_p[index] = 3*nparts + 3*i + d;
-                m_P_x[index] = this->m_moment;
-                index++;
-            }
-        }
-        m_P_p[index] = 6*nparts;
-
-        m_P.x = m_P_x.data();
-        m_P.i = m_P_i.data();
-        m_P.p = m_P_p.data();
-        m_P.m = 6*nparts;
-        m_P.n = 6*nparts;
-
-        scs_set_default_settings(&m_stgs);
-        m_stgs.eps_abs = tol;
-        m_stgs.eps_rel = tol;
-        m_stgs.eps_infeas = tol*1e-3;
-        m_stgs.verbose = 0;
-    }
-
     double* OptimScs::uadapt_data()
     {
         return m_sol.x;

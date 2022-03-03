@@ -13,6 +13,7 @@ namespace scopi
         using velocity_type = type::velocity_t<dim>;
         using rotation_type = type::rotation_t<dim>;
         using force_type = type::force_t<dim>;
+        using mass_type = double;
 
         property& velocity(const velocity_type& v);
         const velocity_type velocity() const;
@@ -27,6 +28,9 @@ namespace scopi
         property& force(const force_type& f);
         const force_type force() const;
 
+        property& mass(const mass_type& m);
+        const mass_type mass() const;
+
         property& deactivate();
         property& activate();
         bool is_active() const;
@@ -37,6 +41,7 @@ namespace scopi
         rotation_type m_omega;
         rotation_type m_domega;
         force_type m_f;
+        mass_type m_m;
         bool m_active = true;
     };
 
@@ -103,6 +108,19 @@ namespace scopi
     auto property<dim>::force() const -> const force_type
     {
         return m_f;
+    }
+
+    template <std::size_t dim>
+    auto property<dim>::mass(const mass_type& m) -> property&
+    {
+        m_m = m;
+        return *this;
+    }
+
+    template <std::size_t dim>
+    auto property<dim>::mass() const -> const mass_type
+    {
+        return m_m;
     }
 
     template <std::size_t dim>
