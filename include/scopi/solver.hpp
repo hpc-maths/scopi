@@ -73,14 +73,14 @@ namespace scopi
 
             tic();
             displacement_obstacles();
-            duration = toc();
+            auto duration = toc();
             PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
 
             auto contacts = compute_contacts();
 
             tic();
             write_output_files(contacts, nite);
-            auto duration = toc();
+            duration = toc();
             PLOG_INFO << "----> CPUTIME : write output files = " << duration;
 
             tic();
