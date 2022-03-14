@@ -116,22 +116,6 @@ namespace scopi
             {
                 normw = 1;
             }
-            m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
-        }
-    }
-
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
-    {
-        for (std::size_t i = 0; i < m_particles.nb_inactive(); ++i)
-        {
-
-            auto  w = get_omega(m_particles.desired_omega()(i));
-            double normw = xt::linalg::norm(w);
-            if (normw == 0)
-            {
-                normw = 1;
-            }
             type::quaternion_t expw;
             expw(0) = std::cos(0.5*normw*m_dt);
             xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
