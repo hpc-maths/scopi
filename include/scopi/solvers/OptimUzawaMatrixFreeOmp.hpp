@@ -50,10 +50,7 @@ namespace scopi{
         {
             for (std::size_t d = 0; d < 3; ++d)
             {
-                this->m_U(3*i + d) /= (-1.*particles.m()(active_offset + i));
-            }
-            for (std::size_t d = 0; d < dim; ++d)
-            {
+                this->m_U(3*i + d) /= (-1.*particles.m()(active_offset + i)); 
                 this->m_U(3*this->m_nparts + 3*i + d) /= (-1.*particles.j()(active_offset + i)(d));
             }
         }
