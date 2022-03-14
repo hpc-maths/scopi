@@ -71,17 +71,51 @@ namespace scopi
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
 
+            tic();
             displacement_obstacles();
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
 
-            PLOG_INFO << "----> create list of contacts " << nite;
             auto contacts = compute_contacts();
 
-            PLOG_INFO << "----> json output files " << nite << std::endl;
+            tic();
             write_output_files(contacts, nite);
+            auto duration = toc();
+            PLOG_INFO << "----> CPUTIME : write output files = " << duration;
 
+            tic();
             m_vap.set_a_priori_velocity(m_particles);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : set vap = " << duration;
+
             m_solver.run(m_particles, contacts, nite);
+
+            tic();
             move_active_particles();
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
+
+            m_solver.run(m_particles, contacts, nite);
+
+            tic();
+            m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update vap = " << duration;
+        }
+    }
+
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
+    {
+        for (std::size_t i = 0; i < m_particles.nb_inactive(); ++i)
+        {
+
+            auto  w = get_omega(m_particles.desired_omega()(i));
+            double normw = xt::linalg::norm(w);
+            if (normw == 0)
+            {
+                normw = 1;
+            }
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
         }
     }
