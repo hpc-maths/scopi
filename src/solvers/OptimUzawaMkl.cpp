@@ -54,6 +54,7 @@ namespace scopi
                            std::vector<double>& invP_csr_val,
                            const scopi_container<2>& particles)
     {
+        auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
             invP_csr_row.push_back(3*nparts + 3*i + 2);
@@ -68,6 +69,7 @@ namespace scopi
                            std::vector<double>& invP_csr_val,
                            const scopi_container<3>& particles)
     {
+        auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
             for (std::size_t d = 0; d < 3; ++d)
