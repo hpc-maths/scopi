@@ -21,7 +21,7 @@ namespace scopi
         : m_radius(1.)
         , m_s({{0., m_radius}}, m_radius)
         , m_p({{ 0.,  0.}}, PI/2.)
-        , m_prop(property<dim>().mass(1.).moment_inertia({{0.1, 0.1, 0.1}}))
+        , m_prop(property<dim>().mass(1.).moment_inertia(0.1))
         {
             m_particles.push_back(m_p, property<dim>().deactivate());
         }
@@ -121,7 +121,7 @@ namespace scopi
         : m_radius(radius)
         , m_sphere({{ pos_x,  pos_y}}, m_radius)
         , m_obstacle({{ 0.,  0.}}, m_radius)
-        , m_prop(property<dim>().mass(1.).moment_inertia({{0.1, 0.1, 0.1}}))
+        , m_prop(property<dim>().mass(1.).moment_inertia(0.1))
         {
             m_particles.push_back(m_obstacle, property<dim>().deactivate());
         }
@@ -247,7 +247,7 @@ namespace scopi
         TestInclinedPlan()
         : m_r(1.)
         , m_alpha(PI/4.)
-        , m_prop(property<dim>().mass(1.).moment_inertia({{0.1, 0.1, 0.1}}))
+        , m_prop(property<dim>().mass(1.).moment_inertia(0.1))
         {
             plan<dim> p({{-m_r*std::cos(m_alpha), -m_r*std::sin(m_alpha)}}, m_alpha);
             sphere<dim> s({{0., 0.}}, m_r);

@@ -17,7 +17,7 @@ int main()
 
     double radius = 1.;
     double g = radius;
-    auto prop = scopi::property<dim>().mass(1.).moment_inertia({{PI/4.*radius*radius*radius*radius, PI/4.*radius*radius*radius*radius}});
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia(PI/4.*radius*radius*radius*radius);
 
     std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001});//, 0.0005});
     std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000});//, 20000});

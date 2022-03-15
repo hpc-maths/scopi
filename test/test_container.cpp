@@ -20,12 +20,12 @@ namespace scopi
                                            .desired_velocity({{0.01, 0.02}})
                                            .force({{1., 2.}})
                                            .mass(1.)
-                                           .moment_inertia({{0.1, 0.2}}));
+                                           .moment_inertia(0.1));
                 m_particles.push_back(s2, p.velocity({{0.4, 0.5}})
                                            .desired_velocity({{0.04, 0.05}})
                                            .force({{4., 5.}})
                                            .mass(2.)
-                                           .moment_inertia({{0.3, 0.4}}));
+                                           .moment_inertia(0.3));
             }
             scopi_container<dim> m_particles;
     };
@@ -153,10 +153,8 @@ namespace scopi
     TEST_F(Container2dTest, j_2d)
     {
         auto j = m_particles.j();
-        EXPECT_DOUBLE_EQ(j(0)(0), 0.1);
-        EXPECT_DOUBLE_EQ(j(0)(1), 0.2);
-        EXPECT_DOUBLE_EQ(j(1)(0), 0.3);
-        EXPECT_DOUBLE_EQ(j(1)(1), 0.4);
+        EXPECT_DOUBLE_EQ(j(0), 0.1);
+        EXPECT_DOUBLE_EQ(j(1), 0.3);
     }
 
     TEST_F(Container3dTest, j_3d)

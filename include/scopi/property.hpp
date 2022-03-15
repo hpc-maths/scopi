@@ -14,7 +14,7 @@ namespace scopi
         using rotation_type = type::rotation_t<dim>;
         using force_type = type::force_t<dim>;
         using mass_type = double;
-        using moment_type = type::moment_t;
+        using moment_type = type::moment_t<dim>;
 
         property& velocity(const velocity_type& v);
         const velocity_type velocity() const;

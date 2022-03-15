@@ -17,7 +17,7 @@ int main()
     double dt = .01;
     std::size_t total_it = 1000;//50000;
     scopi::scopi_container<dim> particles;
-    auto prop = scopi::property<dim>().mass(1.).moment_inertia({{0.1, 0.1}});
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
     std::default_random_engine generator;
     // std::uniform_real_distribution<double> distrib_e(0.6,1.);

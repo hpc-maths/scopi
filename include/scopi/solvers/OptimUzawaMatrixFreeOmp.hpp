@@ -48,11 +48,11 @@ namespace scopi{
         #pragma omp parallel for
         for (std::size_t i = 0; i < particles.nb_active(); ++i)
         {
-            for (std::size_t d = 0; d < 3; ++d)
+            for (std::size_t d = 0; d < dim; ++d)
             {
                 this->m_U(3*i + d) /= (-1.*particles.m()(active_offset + i)); 
-                this->m_U(3*this->m_nparts + 3*i + d) /= (-1.*particles.j()(active_offset + i)(d));
             }
+            this->m_U(3*this->m_nparts + 3*i + 2) /= (-1.*particles.j()(active_offset + i));
         }
     }
 

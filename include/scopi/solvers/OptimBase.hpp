@@ -97,7 +97,7 @@ namespace scopi{
             auto omega = get_omega(desired_omega(i + active_offset));
             for (std::size_t d = 0; d < 3; ++d)
             {
-                m_c(moment_dec + 3*i + d) = -particles.j()(active_offset + i)(d)*omega(d);
+                m_c(moment_dec + 3*i + d) = -particles.j()(active_offset + i)*omega(d);
             }
         }
     }

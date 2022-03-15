@@ -16,7 +16,7 @@ int main()
     double dt = .01;
     std::size_t total_it = 100;
     scopi::scopi_container<dim> particles;
-    auto prop = scopi::property<dim>().mass(1.).moment_inertia({{0.1, 0.1}});
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
     int n = 20; // 2*n*n particles
 

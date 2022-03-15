@@ -111,7 +111,7 @@ namespace scopi{
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
-            for (std::size_t d = 0; d < 2; ++d)
+            for (std::size_t d = 0; d < dim; ++d)
             {
                 Az_rows.push_back(3*i + d);
                 Az_cols.push_back(1 + 3*i + d);
@@ -123,7 +123,7 @@ namespace scopi{
 
             Az_rows.push_back(3*nparts + 3*i + 2);
             Az_cols.push_back(1 + 3*nparts + 3*i + 2);
-            Az_values.push_back(std::sqrt(particles.j()(active_offset + i)(2)));
+            Az_values.push_back(std::sqrt(particles.j()(active_offset + i)));
 
             Az_rows.push_back(3*nparts + 3*i + 2);
             Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + 2);
