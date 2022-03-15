@@ -138,16 +138,13 @@ namespace scopi
             {
                 m_P_i[index] = 3*nparts + 3*i + d;
                 m_P_p[index] = 3*nparts + 3*i + d;
-                m_P_x[index] = particles.j()(active_offset + i);
-                index++;
-            }
-            for (std::size_t d = dim; d < 3; ++d)
-            {
-                m_P_i[index] = 3*nparts + 3*i + d;
-                m_P_p[index] = 3*nparts + 3*i + d;
                 m_P_x[index] = 0.;
                 index++;
             }
+            m_P_i[index] = 3*nparts + 3*i + 2;
+            m_P_p[index] = 3*nparts + 3*i + 2;
+            m_P_x[index] = particles.j()(active_offset + i);
+            index++;
         }
         m_P_p[index] = 6*nparts;
 
