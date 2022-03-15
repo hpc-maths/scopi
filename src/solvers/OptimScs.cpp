@@ -74,5 +74,40 @@ namespace scopi
         }
         csr_rows[0] = 0;
     }
+
+    void OptimScs::set_moment_matrix_impl(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index)
+    {
+        auto active_offset = particles.nb_inactive();
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < 2; ++d)
+            {
+                m_P_i[index] = 3*nparts + 3*i + d;
+                m_P_p[index] = 3*nparts + 3*i + d;
+                m_P_x[index] = 0.;
+                index++;
+            }
+            m_P_i[index] = 3*nparts + 3*i + 2;
+            m_P_p[index] = 3*nparts + 3*i + 2;
+            m_P_x[index] = particles.j()(active_offset + i);
+            index++;
+        }
+    }
+
+    void OptimScs::set_moment_matrix_impl(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index)
+    {
+        auto active_offset = particles.nb_inactive();
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < 2; ++d)
+            {
+                m_P_i[index] = 3*nparts + 3*i + d;
+                m_P_p[index] = 3*nparts + 3*i + d;
+                m_P_x[index] = particles.j()(active_offset + i)(d);
+                index++;
+            }
+        }
+    }
+
 }
 #endif
