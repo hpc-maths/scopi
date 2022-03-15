@@ -183,7 +183,7 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    void set_moment_matrix(std::size_t nparts,
+    void OptimUzawaMkl::set_moment_matrix(std::size_t nparts,
                            std::vector<MKL_INT>& invP_csr_row,
                            std::vector<MKL_INT>& invP_csr_col,
                            std::vector<double>& invP_csr_val,
