@@ -117,21 +117,35 @@ namespace scopi
         std::size_t index = 0;
         for (std::size_t i = 0; i < nparts; ++i)
         {
-            for (std::size_t d = 0; d < 3; ++d)
+            for (std::size_t d = 0; d < dim; ++d)
             {
                 m_P_i[index] = 3*i + d;
                 m_P_p[index] = 3*i + d;
                 m_P_x[index] = particles.m()(active_offset + i);
                 index++;
             }
+            for (std::size_t d = dim; d < 3; ++d)
+            {
+                m_P_i[index] = 3*i + d;
+                m_P_p[index] = 3*i + d;
+                m_P_x[index] = 0.;
+                index++;
+            }
         }
         for (std::size_t i = 0; i < nparts; ++i)
         {
-            for (std::size_t d = 0; d < 3; ++d)
+            for (std::size_t d = 0; d < dim; ++d)
             {
                 m_P_i[index] = 3*nparts + 3*i + d;
                 m_P_p[index] = 3*nparts + 3*i + d;
-                m_P_x[index] = particles.j()(active_offset + i)(d);
+                m_P_x[index] = particles.j()(active_offset + i);
+                index++;
+            }
+            for (std::size_t d = dim; d < 3; ++d)
+            {
+                m_P_i[index] = 3*nparts + 3*i + d;
+                m_P_p[index] = 3*nparts + 3*i + d;
+                m_P_x[index] = 0.;
                 index++;
             }
         }
