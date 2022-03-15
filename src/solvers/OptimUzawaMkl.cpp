@@ -47,5 +47,36 @@ namespace scopi
         }
         std::cout << "_____________________________________________________________________  \n" ;
     }
+
+    void set_moment_matrix_impl(std::size_t nparts,
+                           std::vector<MKL_INT>& invP_csr_row,
+                           std::vector<MKL_INT>& invP_csr_col,
+                           std::vector<double>& invP_csr_val,
+                           const scopi_container<2>& particles)
+    {
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            invP_csr_row.push_back(3*nparts + 3*i + 2);
+            invP_csr_col.push_back(3*nparts + 3*i + 2);
+            invP_csr_val.push_back(1./particles.j()(active_offset + i));
+        }
+    }
+
+    void set_moment_matrix_impl(std::size_t nparts,
+                           std::vector<MKL_INT>& invP_csr_row,
+                           std::vector<MKL_INT>& invP_csr_col,
+                           std::vector<double>& invP_csr_val,
+                           const scopi_container<3>& particles)
+    {
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                invP_csr_row.push_back(3*nparts + 3*i + d);
+                invP_csr_col.push_back(3*nparts + 3*i + d);
+                invP_csr_val.push_back(1./particles.j()(active_offset + i)(d));
+            }
+        }
+    }
 }
 #endif

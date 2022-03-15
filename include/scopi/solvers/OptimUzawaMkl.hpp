@@ -42,6 +42,23 @@ namespace scopi
     private:
         void print_csr_matrix(const sparse_matrix_t);
 
+        template <std::size_t dim>
+        void set_moment_matrix(std::size_t nparts,
+                               std::vector<MKL_INT>& invP_csr_row,
+                               std::vector<MKL_INT>& invP_csr_col,
+                               std::vector<double>& invP_csr_val,
+                               const scopi_container<dim>& particles);
+        void set_moment_matrix_impl(std::size_t nparts,
+                               std::vector<MKL_INT>& invP_csr_row,
+                               std::vector<MKL_INT>& invP_csr_col,
+                               std::vector<double>& invP_csr_val,
+                               const scopi_container<2>& particles);
+        void set_moment_matrix_impl(std::size_t nparts,
+                               std::vector<MKL_INT>& invP_csr_row,
+                               std::vector<MKL_INT>& invP_csr_col,
+                               std::vector<double>& invP_csr_val,
+                               const scopi_container<3>& particles);
+
         sparse_matrix_t m_A;
         struct matrix_descr m_descrA;
         std::vector<MKL_INT> m_A_coo_row;
@@ -142,12 +159,7 @@ namespace scopi
                 invP_csr_val.push_back(1./particles.m()(active_offset + i));
             }
         }
-        for (std::size_t i = 0; i < nparts; ++i)
-        {
-            invP_csr_row.push_back(3*nparts + 3*i + 2);
-            invP_csr_col.push_back(3*nparts + 3*i + 2);
-            invP_csr_val.push_back(1./particles.j()(active_offset + i));
-        }
+        set_moment_matrix(nparts, invP_csr_row, invP_csr_col, invP_csr_val, particles);
         invP_csr_row.push_back(6*nparts);
 
         m_status = mkl_sparse_d_create_csr(&m_inv_P,
@@ -168,6 +180,16 @@ namespace scopi
 
         m_status = mkl_sparse_optimize ( m_inv_P );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
+    }
+
+    template <std::size_t dim>
+    void set_moment_matrix(std::size_t nparts,
+                           std::vector<MKL_INT>& invP_csr_row,
+                           std::vector<MKL_INT>& invP_csr_col,
+                           std::vector<double>& invP_csr_val,
+                           const scopi_container<dim>& particles)
+    {
+        set_moment_matrix_impl(nparts, invP_csr_row, invP_csr_col, invP_csr_val, particles);
     }
 
 }

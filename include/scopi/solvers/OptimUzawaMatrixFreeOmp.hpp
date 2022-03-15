@@ -36,6 +36,7 @@ namespace scopi{
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts);
 
+    private:
         template <std::size_t dim>
         void gemv_inv_P_moment(const scopi_container<dim>& particles,
                                std::size_t active_offset,
