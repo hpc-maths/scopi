@@ -48,7 +48,7 @@ namespace scopi
         std::cout << "_____________________________________________________________________  \n" ;
     }
 
-    void set_moment_matrix_impl(std::size_t nparts,
+    void OptimUzawaMkl::set_moment_matrix_impl(std::size_t nparts,
                            std::vector<MKL_INT>& invP_csr_row,
                            std::vector<MKL_INT>& invP_csr_col,
                            std::vector<double>& invP_csr_val,
@@ -62,7 +62,7 @@ namespace scopi
         }
     }
 
-    void set_moment_matrix_impl(std::size_t nparts,
+    void OptimUzawaMkl::set_moment_matrix_impl(std::size_t nparts,
                            std::vector<MKL_INT>& invP_csr_row,
                            std::vector<MKL_INT>& invP_csr_col,
                            std::vector<double>& invP_csr_val,

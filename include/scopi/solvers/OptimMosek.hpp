@@ -30,6 +30,23 @@ namespace scopi{
 
     private:
 
+        template <std::size_t dim>
+        void set_moment_matrix(std::size_t nparts,
+                               std::vector<int>& Az_rows,
+                               std::vector<int>& Az_cols,
+                               std::vector<double>& Az_values,
+                               const scopi_container<dim>& particles);
+        void set_moment_matrix_impl(std::size_t nparts,
+                               std::vector<int>& Az_rows,
+                               std::vector<int>& Az_cols,
+                               std::vector<double>& Az_values,
+                               const scopi_container<2>& particles);
+        void set_moment_matrix_impl(std::size_t nparts,
+                               std::vector<int>& Az_rows,
+                               std::vector<int>& Az_cols,
+                               std::vector<double>& Az_values,
+                               const scopi_container<3>& particles);
+
         mosek::fusion::Matrix::t m_Az;
         mosek::fusion::Matrix::t m_A;
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
@@ -120,15 +137,9 @@ namespace scopi{
                 Az_cols.push_back(1 + 6*nparts + 3*i + d);
                 Az_values.push_back(-1.);
             }
-
-            Az_rows.push_back(3*nparts + 3*i + 2);
-            Az_cols.push_back(1 + 3*nparts + 3*i + 2);
-            Az_values.push_back(std::sqrt(particles.j()(active_offset + i)));
-
-            Az_rows.push_back(3*nparts + 3*i + 2);
-            Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + 2);
-            Az_values.push_back(-1);
         }
+
+        set_moment_matrix(nparts, Az_rows, Az_cols, Az_values, particles);
 
         m_Az = Matrix::sparse(6*nparts, 1 + 6*nparts + 6*nparts,
                               std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>({Az_rows.size()})),
@@ -164,6 +175,60 @@ namespace scopi{
     void OptimMosek<model_t>::set_coeff_friction(double mu)
     {
         model_t::set_coeff_friction(mu);
+    }
+
+    template<class model_t>
+    template<std::size_t dim>
+    void OptimMosek<model_t>::set_moment_matrix(std::size_t nparts,
+                           std::vector<int>& Az_rows,
+                           std::vector<int>& Az_cols,
+                           std::vector<double>& Az_values,
+                           const scopi_container<dim>& particles)
+    {
+        set_moment_matrix_impl(nparts, Az_rows, Az_cols, Az_values, particles);
+    }
+
+    template<class model_t>
+    void OptimMosek<model_t>::set_moment_matrix_impl(std::size_t nparts,
+                           std::vector<int>& Az_rows,
+                           std::vector<int>& Az_cols,
+                           std::vector<double>& Az_values,
+                           const scopi_container<2>& particles)
+    {
+        auto active_offset = particles.nb_inactive();
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            Az_rows.push_back(3*nparts + 3*i + 2);
+            Az_cols.push_back(1 + 3*nparts + 3*i + 2);
+            Az_values.push_back(std::sqrt(particles.j()(active_offset + i)));
+
+            Az_rows.push_back(3*nparts + 3*i + 2);
+            Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + 2);
+            Az_values.push_back(-1);
+        }
+    }
+
+    template<class model_t>
+    void OptimMosek<model_t>::set_moment_matrix_impl(std::size_t nparts,
+                           std::vector<int>& Az_rows,
+                           std::vector<int>& Az_cols,
+                           std::vector<double>& Az_values,
+                           const scopi_container<3>& particles)
+    {
+        auto active_offset = particles.nb_inactive();
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                Az_rows.push_back(3*nparts + 3*i + d);
+                Az_cols.push_back(1 + 3*nparts + 3*i + d);
+                Az_values.push_back(std::sqrt(particles.j()(active_offset + i)(d)));
+
+                Az_rows.push_back(3*nparts + 3*i + d);
+                Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + d);
+                Az_values.push_back(-1);
+            }
+        }
     }
 }
 #endif
