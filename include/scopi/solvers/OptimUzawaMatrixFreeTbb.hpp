@@ -36,6 +36,17 @@ namespace scopi
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts);
+
+        template <std::size_t dim>
+        void gemv_inv_P_moment(const scopi_container<dim>& particles,
+                               std::size_t active_offset,
+                               std::size_t i);
+        void gemv_inv_P_moment_impl(const scopi_container<2>& particles,
+                               std::size_t active_offset,
+                               std::size_t i);
+        void gemv_inv_P_moment_impl(const scopi_container<3>& particles,
+                               std::size_t active_offset,
+                               std::size_t i);
     };
 
     template<std::size_t dim>
@@ -52,9 +63,17 @@ namespace scopi
             {
                 this->m_U(3*i + d) /= (-1.*particles.m()(active_offset + i)); 
             }
-            this->m_U(3*this->m_nparts + 3*i + 2) /= (-1.*particles.j()(active_offset + i));
+            gemv_inv_P_moment(particles, active_offset, i);
 
         });
+    }
+
+    template<std::size_t dim>
+    void OptimUzawaMatrixFreeTbb::gemv_inv_P_moment(const scopi_container<dim>& particles,
+                                                  std::size_t active_offset,
+                                                  std::size_t i)
+    {
+        gemv_inv_P_moment_impl(particles, active_offset, i);
     }
 
     template<std::size_t dim>
