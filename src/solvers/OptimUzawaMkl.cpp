@@ -57,6 +57,12 @@ namespace scopi
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
+            for (std::size_t d = 0; d < 2; ++d)
+            {
+                invP_csr_row.push_back(3*nparts + 3*i + d);
+                invP_csr_col.push_back(3*nparts + 3*i + d);
+                invP_csr_val.push_back(0.);
+            }
             invP_csr_row.push_back(3*nparts + 3*i + 2);
             invP_csr_col.push_back(3*nparts + 3*i + 2);
             invP_csr_val.push_back(1./particles.j()(active_offset + i));
