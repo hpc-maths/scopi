@@ -95,8 +95,6 @@ namespace scopi
             duration = toc();
             PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
 
-            m_solver.run(m_particles, contacts, nite);
-
             tic();
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
             duration = toc();

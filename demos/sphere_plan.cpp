@@ -1,3 +1,4 @@
+#include <vector>
 #include <xtensor/xmath.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/objects/types/plan.hpp>
@@ -17,10 +18,10 @@ int main()
 
     double radius = 1.;
     double g = radius;
-    auto prop = scopi::property<dim>().mass(1.).moment_inertia(PI/4.*radius*radius*radius*radius);
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
 
-    std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001});//, 0.0005});
-    std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000});//, 20000});
+    std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001, 0.0005});
+    std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000, 20000});
     std::vector<double> mu_vec({0., 0.1, 0.5, 1.});
     std::vector<double> alpha_vec({PI/6., PI/4., PI/3.});
 
@@ -42,16 +43,14 @@ int main()
 
                 auto pos = particles.pos();
                 auto omega = particles.omega();
-                auto  tmp = scopi::analytical_solution_sphere_plan(alpha, mu, dt[i]*(total_it[i]+1), radius, g);
+                auto tmp = scopi::analytical_solution_sphere_plan(alpha, mu, dt[i]*(total_it[i]+1), radius, g);
                 auto analytical_sol = tmp.first;
                 auto omega_analytical = tmp.second;
-                PLOG_DEBUG << "pos = " << pos(1);
-                PLOG_DEBUG << "sol = " << analytical_sol;
-                // PLOG_DEBUG << "omega = " << omega(1);
-                // PLOG_DEBUG << "sol = " << omega_analytical;
-                double error = xt::linalg::norm(pos(1) - analytical_sol, 2) / xt::linalg::norm(analytical_sol);
+                double error = xt::linalg::norm(pos(1) - analytical_sol) / xt::linalg::norm(analytical_sol);
+                auto q = particles.q();
                 PLOG_WARNING << "mu = " << mu << "  alpha = " << alpha << "   dt = " << dt[i] << '\t' << error << '\t' << std::abs((omega(1)-omega_analytical)/omega_analytical);
             }
+            PLOG_WARNING << '\n';
         }
     }
 
