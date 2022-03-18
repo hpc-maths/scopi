@@ -109,6 +109,20 @@ namespace scopi {
             m_particles.push_back(s, prop.force({{0., -m_g}}));
         }
 
+        void check_solution()
+        {
+            auto pos = m_particles.pos();
+            auto omega = m_particles.omega();
+            auto sol = scopi::analytical_solution_sphere_plan(m_alpha, m_mu, m_dt*(m_total_it+1), m_radius, m_g);
+            auto pos_analytical = sol.first;
+            auto omega_analytical = sol.second;
+            double err_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
+            double err_omega = std::abs((omega(1)-omega_analytical)/omega_analytical);
+
+            EXPECT_NEAR(err_pos, std::get<4>(GetParam()), tolerance);
+            EXPECT_NEAR(err_omega, std::get<5>(GetParam()), tolerance);
+        }
+
         scopi_container<dim> m_particles;
         double m_dt;
         std::size_t m_total_it;
@@ -118,22 +132,22 @@ namespace scopi {
         double m_g = 1.;
     };
 
-    TEST_P(TestSphereInclinedPlan, test_sphere_inclined_plan)
+    TEST_P(TestSphereInclinedPlan, test_sphere_inclined_plan_mosek_kd_tree)
     {
         ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact_kdtree, vap_fpd> solver(m_particles, m_dt);
         solver.set_coeff_friction(m_mu);
         solver.solve(m_total_it);
+        
+        check_solution();
+    }
 
-        auto pos = m_particles.pos();
-        auto omega = m_particles.omega();
-        auto sol = scopi::analytical_solution_sphere_plan(m_alpha, m_mu, m_dt*(m_total_it+1), m_radius, m_g);
-        auto pos_analytical = sol.first;
-        auto omega_analytical = sol.second;
-        double err_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
-        double err_omega = std::abs((omega(1)-omega_analytical)/omega_analytical);
-
-        EXPECT_NEAR(err_pos, std::get<4>(GetParam()), tolerance);
-        EXPECT_NEAR(err_omega, std::get<5>(GetParam()), tolerance);
+    TEST_P(TestSphereInclinedPlan, test_sphere_inclined_plan_mosek_brute_force)
+    {
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact_brute_force, vap_fpd> solver(m_particles, m_dt);
+        solver.set_coeff_friction(m_mu);
+        solver.solve(m_total_it);
+        
+        check_solution();
     }
 
     INSTANTIATE_TEST_SUITE_P(
@@ -180,7 +194,7 @@ namespace scopi {
             std::make_tuple(0.05, 200, 0.5, PI/3., 0.0055183, 0.00439788),
             std::make_tuple(0.01, 1000, 0.5, PI/3., 0.00110894, 0.000883063),
             std::make_tuple(0.005, 2000, 0.5, PI/3., 0.000554791, 0.00044186), 
-            std::make_tuple(0.001, 10000, 0.4, PI/3., 0.000110951, 8.88131e-05),
+            std::make_tuple(0.001, 10000, 0.5, PI/3., 0.000110951, 8.88131e-05),
             std::make_tuple(0.0005, 20000, 0.5, PI/3., 5.53708e-05, 4.51978e-05),
 
 
