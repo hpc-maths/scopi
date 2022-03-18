@@ -38,7 +38,7 @@ namespace scopi
     std::shared_ptr<ndarray<double, 1>> MatrixOptimSolverFriction::distances_to_mosek_vector(xt::xtensor<double, 1> distances) const
     {
         // TODO clean
-        auto D_mosek = std::make_shared<ndarray<double, 1>>(distances.data(), shape_t<1>({4*distances.shape(0)}));
+        auto D_mosek = std::make_shared<ndarray<double, 1>>(distances.data(), shape_t<1>(4*distances.shape(0)));
         for (std::size_t i = 0; i < distances.size(); ++i)
         {
             (*D_mosek)[4*i] = distances[i];

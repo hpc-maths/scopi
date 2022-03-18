@@ -65,7 +65,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSpherePlan, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestSpherePlan, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestSpherePlan, sphere_plan)
     {
@@ -84,7 +84,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSpherePlanVelocity, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestSpherePlanVelocity, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestSpherePlanVelocity, sphere_plan_velocity)
     {
@@ -104,7 +104,7 @@ namespace scopi
     };
 
     using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
-    TYPED_TEST_SUITE(TestSpherePlanForce, solver_types_vap);
+    TYPED_TEST_SUITE(TestSpherePlanForce, solver_types_vap, );
 
     TYPED_TEST(TestSpherePlanForce, sphere_plan_force)
     {
@@ -167,7 +167,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSphereSphereFixed, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestSphereSphereFixed, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestSphereSphereFixed, sphere_sphere_fixed)
     {
@@ -188,7 +188,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSphereSphereFixedVelocity, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestSphereSphereFixedVelocity, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestSphereSphereFixedVelocity, sphere_sphere_fixed_velocity)
     {
@@ -209,7 +209,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSphereSphereFixedForce, solver_types_vap);
+    TYPED_TEST_SUITE(TestSphereSphereFixedForce, solver_types_vap, );
 
     TYPED_TEST(TestSphereSphereFixedForce, sphere_sphere_fixed_force)
     {
@@ -230,7 +230,7 @@ namespace scopi
         }
     };
 
-    TYPED_TEST_SUITE(TestSphereSphereMoving, solver_types_vap);
+    TYPED_TEST_SUITE(TestSphereSphereMoving, solver_types_vap, );
 
     TYPED_TEST(TestSphereSphereMoving, sphere_sphere_moving)
     {
@@ -265,7 +265,7 @@ namespace scopi
         property<dim> m_prop; 
     };
 
-    TYPED_TEST_SUITE(TestInclinedPlan, solver_types_vap);
+    TYPED_TEST_SUITE(TestInclinedPlan, solver_types_vap, );
 
     TYPED_TEST(TestInclinedPlan, inclined_plan)
     {

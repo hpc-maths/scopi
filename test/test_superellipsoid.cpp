@@ -499,7 +499,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsSymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsSymmetrical, two_ellipsoids_symmetrical)
     {
@@ -525,7 +525,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresSymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresSymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsSpheresSymmetrical, two_ellipsoids_spheres_symmetrical)
     {
@@ -551,7 +551,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsAsymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsAsymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_asymmetrical)
     {
@@ -577,7 +577,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresAsymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresAsymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_spheres_asymmetrical)
     {
@@ -634,7 +634,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(Test2dCaseSuperellipsoid, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(Test2dCaseSuperellipsoid, solver_with_contact_types<2>, );
 
     TYPED_TEST(Test2dCaseSuperellipsoid, 2d_case_superellipsoid)
     {

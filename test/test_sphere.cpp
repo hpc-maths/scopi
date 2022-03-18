@@ -400,7 +400,7 @@ namespace scopi
             scopi_container<dim> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoSpheresAsymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoSpheresAsymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoSpheresAsymmetrical, two_spheres_asymmetrical)
     {
@@ -427,7 +427,7 @@ namespace scopi
             scopi_container<dim> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoSpheresSymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoSpheresSymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
     {
@@ -477,7 +477,7 @@ namespace scopi
             scopi_container<dim> m_particles;
     };
 
-    TYPED_TEST_SUITE(Test2dCaseSpheres, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(Test2dCaseSpheres, solver_with_contact_types<2>, );
 
     TYPED_TEST(Test2dCaseSpheres, 2d_case_spheres)
     {

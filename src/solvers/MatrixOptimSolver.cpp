@@ -14,7 +14,7 @@ namespace scopi
 #ifdef SCOPI_USE_MOSEK
     std::shared_ptr<ndarray<double, 1>> MatrixOptimSolver::distances_to_mosek_vector(xt::xtensor<double, 1> distances) const
     {
-        return std::make_shared<ndarray<double, 1>>(distances.data(), shape_t<1>({distances.shape(0)}));
+        return std::make_shared<ndarray<double, 1>>(distances.data(), shape_t<1>(distances.shape(0)));
     }
 
     std::size_t MatrixOptimSolver::matrix_first_col_index_mosek() const

@@ -142,9 +142,9 @@ namespace scopi{
         set_moment_matrix(nparts, Az_rows, Az_cols, Az_values, particles);
 
         m_Az = Matrix::sparse(6*nparts, 1 + 6*nparts + 6*nparts,
-                              std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>({Az_rows.size()})),
-                              std::make_shared<ndarray<int, 1>>(Az_cols.data(), shape_t<1>({Az_cols.size()})),
-                              std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>({Az_values.size()})));
+                              std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>(Az_rows.size())),
+                              std::make_shared<ndarray<int, 1>>(Az_cols.data(), shape_t<1>(Az_cols.size())),
+                              std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>(Az_values.size())));
     }
 
     template<class model_t>

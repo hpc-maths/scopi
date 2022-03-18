@@ -30,7 +30,7 @@ namespace scopi
         const force_type force() const;
 
         property& mass(const mass_type& m);
-        const mass_type mass() const;
+        mass_type mass() const;
         property& moment_inertia(const moment_type& m);
         const moment_type moment_inertia() const;
 
@@ -122,7 +122,7 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    auto property<dim>::mass() const -> const mass_type
+    auto property<dim>::mass() const -> mass_type
     {
         return m_m;
     }

@@ -30,7 +30,7 @@ namespace scopi {
             double m_mu = 1./2.;
     };
 
-    TYPED_TEST_SUITE(TestTwoSpheresAsymmetricalFriction, solver_with_contact_types_friction<2>);
+    TYPED_TEST_SUITE(TestTwoSpheresAsymmetricalFriction, solver_with_contact_types_friction<2>, );
 
     TYPED_TEST(TestTwoSpheresAsymmetricalFriction, two_spheres_asymmetrical_friction)
     {
@@ -81,7 +81,7 @@ namespace scopi {
             double m_mu = 1./2.;
     };
 
-    TYPED_TEST_SUITE(Test2dCaseSpheresFriction, solver_with_contact_types_friction<2>);
+    TYPED_TEST_SUITE(Test2dCaseSpheresFriction, solver_with_contact_types_friction<2>, );
 
     TYPED_TEST(Test2dCaseSpheresFriction, 2d_case_spheres_friction)
     {
