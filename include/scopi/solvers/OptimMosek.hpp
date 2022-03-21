@@ -72,7 +72,6 @@ namespace scopi{
 
         // constraints
         auto D_mosek = this->distances_to_mosek_vector(this->m_distances);
-        auto duration1 = toc();
 
         // matrix
         this->create_matrix_constraint_coo(particles, contacts, this->matrix_first_col_index_mosek());
@@ -100,7 +99,7 @@ namespace scopi{
         m_Xlvl = X->level();
         m_dual = qc1->dual();
         auto duration3 = toc();
-        PLOG_INFO << "----> CPUTIME : Mosek solve = " << duration1 + duration3;
+        PLOG_INFO << "----> CPUTIME : Mosek solve = " << duration3;
 
         return model->getSolverIntInfo("intpntIter");
     }
