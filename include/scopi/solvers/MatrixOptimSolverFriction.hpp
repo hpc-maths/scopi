@@ -6,10 +6,6 @@
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xfixed.hpp>
 
-#ifdef SCOPI_USE_MOSEK
-#include <fusion.h>
-#endif
-
 #include "../types.hpp"
 #include "../container.hpp"
 #include "../quaternion.hpp"
@@ -22,7 +18,7 @@ namespace scopi
 
     class MatrixOptimSolverFriction
     {
-        protected:
+    protected:
         MatrixOptimSolverFriction(std::size_t nparticles, double dt);
 
         template <std::size_t dim>
@@ -30,20 +26,6 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
         void set_coeff_friction(double mu);
-
-#ifdef SCOPI_USE_MOSEK
-        std::shared_ptr<monty::ndarray<double, 1>> distances_to_mosek_vector(xt::xtensor<double, 1> distances) const;
-        template <std::size_t dim>
-        std::size_t number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const;
-        std::size_t number_col_matrix_mosek() const;
-        std::size_t matrix_first_col_index_mosek() const;
-        template <std::size_t dim>
-        mosek::fusion::Constraint::t constraint_mosek(std::shared_ptr<monty::ndarray<double, 1>> D,
-                                       mosek::fusion::Matrix::t A,
-                                       mosek::fusion::Variable::t X,
-                                       mosek::fusion::Model::t model,
-                                       const std::vector<neighbor<dim>>& contacts) const;
-#endif
 
         std::size_t m_nparticles;
         double m_dt;
@@ -178,26 +160,5 @@ namespace scopi
         m_A_values.resize(index);
     }
   
-#ifdef SCOPI_USE_MOSEK
-    template <std::size_t dim>
-    std::size_t MatrixOptimSolverFriction::number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const
-    {
-        return 4*contacts.size();
-    }
-
-    template <std::size_t dim>
-    mosek::fusion::Constraint::t MatrixOptimSolverFriction::constraint_mosek(std::shared_ptr<monty::ndarray<double, 1>> D,
-                                   mosek::fusion::Matrix::t A,
-                                   mosek::fusion::Variable::t X,
-                                   mosek::fusion::Model::t model,
-                                   const std::vector<neighbor<dim>>& contacts) const
-    {
-        using namespace mosek::fusion;
-        return model->constraint("qc1"
-                , Expr::reshape(Expr::sub(D, Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))), contacts.size(), 4)
-                , Domain::inQCone());
-    }
-#endif
-
 }
 

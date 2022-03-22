@@ -3,6 +3,7 @@
 #ifdef SCOPI_USE_MOSEK
 #include "OptimBase.hpp"
 #include "MatrixOptimSolver.hpp"
+#include "ConstraintMosek.hpp"
 
 #include <memory>
 #include <fusion.h>
@@ -11,6 +12,7 @@ namespace scopi{
     template<class model_t = MatrixOptimSolver>
     class OptimMosek: public OptimBase<OptimMosek<model_t>>
                     , public model_t
+                    , public ConstraintMosek<model_t>
     {
     public:
         using base_type = OptimBase<OptimMosek>;
@@ -31,17 +33,17 @@ namespace scopi{
     private:
 
         template <std::size_t dim>
-        void set_moment_matrix(std::size_t nparts,
+        void set_moment_mass_matrix(std::size_t nparts,
                                std::vector<int>& Az_rows,
                                std::vector<int>& Az_cols,
                                std::vector<double>& Az_values,
                                const scopi_container<dim>& particles);
-        void set_moment_matrix_impl(std::size_t nparts,
+        void set_moment_mass_matrix_impl(std::size_t nparts,
                                std::vector<int>& Az_rows,
                                std::vector<int>& Az_cols,
                                std::vector<double>& Az_values,
                                const scopi_container<2>& particles);
-        void set_moment_matrix_impl(std::size_t nparts,
+        void set_moment_mass_matrix_impl(std::size_t nparts,
                                std::vector<int>& Az_rows,
                                std::vector<int>& Az_cols,
                                std::vector<double>& Az_values,
@@ -71,16 +73,16 @@ namespace scopi{
         model->objective("minvar", ObjectiveSense::Minimize, Expr::dot(c_mosek, X));
 
         // constraints
-        auto D_mosek = this->distances_to_mosek_vector(this->m_distances);
+        auto D_mosek = this->distances_to_vector(this->m_distances);
 
         // matrix
-        this->create_matrix_constraint_coo(particles, contacts, this->matrix_first_col_index_mosek());
-        m_A = Matrix::sparse(this->number_row_matrix_mosek(contacts), this->number_col_matrix_mosek(),
+        this->create_matrix_constraint_coo(particles, contacts, this->index_first_col_matrix());
+        m_A = Matrix::sparse(this->number_row_matrix(contacts), this->number_col_matrix(),
                              std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
-        Constraint::t qc1 = this->constraint_mosek(D_mosek, m_A, X, model, contacts);
+        Constraint::t qc1 = this->constraint(D_mosek, m_A, X, model, contacts);
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
 
@@ -109,6 +111,7 @@ namespace scopi{
     OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
     , model_t(nparts, dt)
+    , ConstraintMosek<model_t>(nparts)
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -138,7 +141,7 @@ namespace scopi{
             }
         }
 
-        set_moment_matrix(nparts, Az_rows, Az_cols, Az_values, particles);
+        set_moment_mass_matrix(nparts, Az_rows, Az_cols, Az_values, particles);
 
         m_Az = Matrix::sparse(6*nparts, 1 + 6*nparts + 6*nparts,
                               std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>(Az_rows.size())),
@@ -178,17 +181,17 @@ namespace scopi{
 
     template<class model_t>
     template<std::size_t dim>
-    void OptimMosek<model_t>::set_moment_matrix(std::size_t nparts,
+    void OptimMosek<model_t>::set_moment_mass_matrix(std::size_t nparts,
                            std::vector<int>& Az_rows,
                            std::vector<int>& Az_cols,
                            std::vector<double>& Az_values,
                            const scopi_container<dim>& particles)
     {
-        set_moment_matrix_impl(nparts, Az_rows, Az_cols, Az_values, particles);
+        set_moment_mass_matrix_impl(nparts, Az_rows, Az_cols, Az_values, particles);
     }
 
     template<class model_t>
-    void OptimMosek<model_t>::set_moment_matrix_impl(std::size_t nparts,
+    void OptimMosek<model_t>::set_moment_mass_matrix_impl(std::size_t nparts,
                            std::vector<int>& Az_rows,
                            std::vector<int>& Az_cols,
                            std::vector<double>& Az_values,
@@ -208,7 +211,7 @@ namespace scopi{
     }
 
     template<class model_t>
-    void OptimMosek<model_t>::set_moment_matrix_impl(std::size_t nparts,
+    void OptimMosek<model_t>::set_moment_mass_matrix_impl(std::size_t nparts,
                            std::vector<int>& Az_rows,
                            std::vector<int>& Az_cols,
                            std::vector<double>& Az_values,

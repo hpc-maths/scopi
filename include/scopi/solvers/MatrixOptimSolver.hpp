@@ -4,10 +4,6 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 #include <xtensor/xtensor.hpp>
 
-#ifdef SCOPI_USE_MOSEK
-#include <fusion.h>
-#endif
-
 #include "../container.hpp"
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
@@ -17,27 +13,13 @@ namespace scopi
 {
     class MatrixOptimSolver
     {
-        protected:
+    protected:
         MatrixOptimSolver(std::size_t nparts, double dt);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
-
-#ifdef SCOPI_USE_MOSEK
-        std::shared_ptr<monty::ndarray<double, 1>> distances_to_mosek_vector(xt::xtensor<double, 1> distances) const;
-        template <std::size_t dim>
-        std::size_t number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const;
-        std::size_t number_col_matrix_mosek() const;
-        std::size_t matrix_first_col_index_mosek() const;
-        template <std::size_t dim>
-        mosek::fusion::Constraint::t constraint_mosek(std::shared_ptr<monty::ndarray<double, 1>> D,
-                                       mosek::fusion::Matrix::t A,
-                                       mosek::fusion::Variable::t X,
-                                       mosek::fusion::Model::t model,
-                                       const std::vector<neighbor<dim>>& contacts) const;
-#endif
 
         std::size_t m_nparticles;
         double m_dt;
@@ -122,25 +104,6 @@ namespace scopi
         m_A_cols.resize(index);
         m_A_values.resize(index);
     }
-
-#ifdef SCOPI_USE_MOSEK
-    template <std::size_t dim>
-    std::size_t MatrixOptimSolver::number_row_matrix_mosek(const std::vector<neighbor<dim>>& contacts) const
-    {
-        return contacts.size();
-    }
-
-    template <std::size_t dim>
-    mosek::fusion::Constraint::t MatrixOptimSolver::constraint_mosek(std::shared_ptr<monty::ndarray<double, 1>> D,
-                                   mosek::fusion::Matrix::t A,
-                                   mosek::fusion::Variable::t X,
-                                   mosek::fusion::Model::t model,
-                                   const std::vector<neighbor<dim>>&) const
-    {
-        using namespace mosek::fusion;
-        return model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
-    }
-#endif
 
 }
 

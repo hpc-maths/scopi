@@ -103,6 +103,7 @@ set(SCOPI_SRC
     src/solvers/OptimUzawaMkl.cpp
     src/solvers/OptimUzawaMatrixFreeOmp.cpp
     src/solvers/OptimUzawaMatrixFreeTbb.cpp
+    src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/minpack.cpp
