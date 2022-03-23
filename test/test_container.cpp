@@ -5,6 +5,8 @@
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
 
+#include <scopi/vap/vap_fpd.hpp>
+
 namespace scopi
 {
     class Container2dTest  : public ::testing::Test {
@@ -37,13 +39,13 @@ namespace scopi
             {
                 superellipsoid<dim> s1({{-0.2, 0.1, 0.}}, {quaternion(PI/3)}, {{.2, .05, 0.01}}, {{1, 1}});
                 sphere<dim> s2({{ 0.2,  0.05, 0.}}, {quaternion(PI/2)}, 0.1);
-                auto p = property<dim>().omega({{PI/3, PI/3}})
+                auto p = property<dim>().omega({{PI/3, PI/4, PI/6}})
                                         .desired_omega({{PI/12, PI/12}});
                 m_particles.push_back(s1, p.velocity({{0.1, 0.2, 0.3}})
                                            .desired_velocity({{0.01, 0.02, 0.03}})
                                            .force({{1., 2., 3,}})
                                            .mass(1.)
-                                           .moment_inertia({{0.1, 0.2, 0.3}}));
+                                           .moment_inertia({{0.1, 0.1, 0.1}}));
 
                 m_particles.push_back(s2, p.velocity({{0.4, 0.5, 0.6}})
                                            .desired_velocity({{0.04, 0.05, 0.06}})
@@ -161,11 +163,31 @@ namespace scopi
     {
         auto j = m_particles.j();
         EXPECT_DOUBLE_EQ(j(0)(0), 0.1);
-        EXPECT_DOUBLE_EQ(j(0)(1), 0.2);
-        EXPECT_DOUBLE_EQ(j(0)(2), 0.3);
+        EXPECT_DOUBLE_EQ(j(0)(1), 0.1);
+        EXPECT_DOUBLE_EQ(j(0)(2), 0.1);
         EXPECT_DOUBLE_EQ(j(1)(0), 0.4);
         EXPECT_DOUBLE_EQ(j(1)(1), 0.5);
         EXPECT_DOUBLE_EQ(j(1)(2), 0.6);
+    }
+
+    // moment FPD
+    TEST_F(Container2dTest, moment_fpd_2d)
+    {
+        EXPECT_DOUBLE_EQ(cross_product(m_particles, 0), 0.);
+        EXPECT_DOUBLE_EQ(cross_product(m_particles, 1), 0.); // TODO update once the code is fixed for ellipsoids
+    }
+
+    TEST_F(Container3dTest, moment_fpd_3d)
+    {
+        auto cross_product_sphere = cross_product(m_particles, 0);
+        EXPECT_DOUBLE_EQ(cross_product_sphere(0), 0.);
+        EXPECT_DOUBLE_EQ(cross_product_sphere(1), 0.);
+        EXPECT_DOUBLE_EQ(cross_product_sphere(2), 0.);
+
+        auto cross_product_superellipsoid = cross_product(m_particles, 1);
+        EXPECT_DOUBLE_EQ(cross_product_superellipsoid(0), PI*PI/24.*0.1);
+        EXPECT_DOUBLE_EQ(cross_product_superellipsoid(1), -PI*PI/18.*0.2);
+        EXPECT_DOUBLE_EQ(cross_product_superellipsoid(2), PI*PI/12.*0.1);
     }
 
     // v
@@ -194,13 +216,18 @@ namespace scopi
     {
         auto omega = m_particles.omega();
         EXPECT_DOUBLE_EQ(omega(0), PI/3.);
+        EXPECT_DOUBLE_EQ(omega(1), PI/3.);
     }
 
     TEST_F(Container3dTest, omega_3d)
     {
         auto omega = m_particles.omega();
         EXPECT_DOUBLE_EQ(omega(0)[0], PI/3.);
-        EXPECT_DOUBLE_EQ(omega(0)[1], PI/3.);
+        EXPECT_DOUBLE_EQ(omega(0)[1], PI/4.);
+        EXPECT_DOUBLE_EQ(omega(0)[2], PI/6.);
+        EXPECT_DOUBLE_EQ(omega(1)[0], PI/3.);
+        EXPECT_DOUBLE_EQ(omega(1)[1], PI/4.);
+        EXPECT_DOUBLE_EQ(omega(1)[2], PI/6.);
     }
 
     // desired_omega

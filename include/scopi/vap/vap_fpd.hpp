@@ -1,12 +1,13 @@
 #pragma once
 
 #include "base.hpp"
+#include <cstddef>
 
 namespace scopi
 {
     class vap_fpd: public vap_base<vap_fpd>
     {
-        public:
+    public:
         using base_type = vap_base<vap_fpd>;
         template <std::size_t dim>
         void set_a_priori_velocity_impl(scopi_container<dim>& particles);
@@ -15,7 +16,20 @@ namespace scopi
         void update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
 
         vap_fpd(std::size_t Nactive, std::size_t active_ptr, double dt);
+
     };
+
+    namespace detail
+    {
+        type::moment_t<2> cross_product_impl(scopi_container<2>& particles, std::size_t i);
+        type::moment_t<3> cross_product_impl(scopi_container<3>& particles, std::size_t i);
+    }
+
+    template <std::size_t dim>
+    type::moment_t<dim> cross_product(scopi_container<dim>& particles, std::size_t i)
+    {
+        return detail::cross_product_impl(particles, i);
+    }
 
     template <std::size_t dim>
     void vap_fpd::set_a_priori_velocity_impl(scopi_container<dim>& particles)
@@ -24,7 +38,7 @@ namespace scopi
         {
             particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*particles.f()(m_active_ptr + i)/particles.m()(m_active_ptr + i);
             // TODO should be dt * (R_i * t_i^{ext , n} - omega'_i * (J_i omega'_i)
-            particles.desired_omega()(m_active_ptr + i) = particles.omega()(m_active_ptr + i);
+            particles.desired_omega()(m_active_ptr + i) = particles.omega()(m_active_ptr + i) + cross_product(particles, m_active_ptr + i);
         }
     }
 
