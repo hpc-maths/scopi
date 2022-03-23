@@ -50,7 +50,7 @@ int main()
                 auto q = particles.q();
                 PLOG_WARNING << "mu = " << mu << "  alpha = " << alpha << "   dt = " << dt[i] << '\t' << error << '\t' << std::abs((omega(1)-omega_analytical)/omega_analytical);
             }
-            PLOG_WARNING << '\n';
+            PLOG_WARNING << std::endl;
         }
     }
 
