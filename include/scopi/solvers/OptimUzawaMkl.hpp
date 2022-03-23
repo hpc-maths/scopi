@@ -42,18 +42,12 @@ namespace scopi
     private:
         void print_csr_matrix(const sparse_matrix_t);
 
-        template <std::size_t dim>
         void set_moment_matrix(std::size_t nparts,
                                std::vector<MKL_INT>& invP_csr_row,
                                std::vector<MKL_INT>& invP_csr_col,
                                std::vector<double>& invP_csr_val,
-                               const scopi_container<dim>& particles);
-        void set_moment_matrix_impl(std::size_t nparts,
-                               std::vector<MKL_INT>& invP_csr_row,
-                               std::vector<MKL_INT>& invP_csr_col,
-                               std::vector<double>& invP_csr_val,
                                const scopi_container<2>& particles);
-        void set_moment_matrix_impl(std::size_t nparts,
+        void set_moment_matrix(std::size_t nparts,
                                std::vector<MKL_INT>& invP_csr_row,
                                std::vector<MKL_INT>& invP_csr_col,
                                std::vector<double>& invP_csr_val,
@@ -180,16 +174,6 @@ namespace scopi
 
         m_status = mkl_sparse_optimize ( m_inv_P );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
-    }
-
-    template <std::size_t dim>
-    void OptimUzawaMkl::set_moment_matrix(std::size_t nparts,
-                           std::vector<MKL_INT>& invP_csr_row,
-                           std::vector<MKL_INT>& invP_csr_col,
-                           std::vector<double>& invP_csr_val,
-                           const scopi_container<dim>& particles)
-    {
-        set_moment_matrix_impl(nparts, invP_csr_row, invP_csr_col, invP_csr_val, particles);
     }
 
 }

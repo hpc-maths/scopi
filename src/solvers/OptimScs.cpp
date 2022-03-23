@@ -75,7 +75,7 @@ namespace scopi
         csr_rows[0] = 0;
     }
 
-    void OptimScs::set_moment_matrix_impl(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index)
+    void OptimScs::set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index)
     {
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
@@ -94,7 +94,7 @@ namespace scopi
         }
     }
 
-    void OptimScs::set_moment_matrix_impl(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index)
+    void OptimScs::set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index)
     {
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)

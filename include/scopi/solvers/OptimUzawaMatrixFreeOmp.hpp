@@ -37,14 +37,10 @@ namespace scopi{
                              const std::vector<neighbor<dim>>& contacts);
 
     private:
-        template <std::size_t dim>
-        void gemv_inv_P_moment(const scopi_container<dim>& particles,
+        void gemv_inv_P_moment(const scopi_container<2>& particles,
                                std::size_t active_offset,
                                std::size_t i);
-        void gemv_inv_P_moment_impl(const scopi_container<2>& particles,
-                               std::size_t active_offset,
-                               std::size_t i);
-        void gemv_inv_P_moment_impl(const scopi_container<3>& particles,
+        void gemv_inv_P_moment(const scopi_container<3>& particles,
                                std::size_t active_offset,
                                std::size_t i);
     };
@@ -67,14 +63,6 @@ namespace scopi{
             }
             gemv_inv_P_moment(particles, active_offset, i);
         }
-    }
-
-    template<std::size_t dim>
-    void OptimUzawaMatrixFreeOmp::gemv_inv_P_moment(const scopi_container<dim>& particles,
-                                                  std::size_t active_offset,
-                                                  std::size_t i)
-    {
-        gemv_inv_P_moment_impl(particles, active_offset, i);
     }
 
     template <std::size_t dim>

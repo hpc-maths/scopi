@@ -26,10 +26,8 @@ namespace scopi
     private:
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
-        template <std::size_t dim>
-        void set_moment_matrix(std::size_t nparts, const scopi_container<dim>& particles, std::size_t& index);
-        void set_moment_matrix_impl(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
-        void set_moment_matrix_impl(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
+        void set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
+        void set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
         
 
         ScsMatrix m_P;
@@ -152,12 +150,6 @@ namespace scopi
         m_stgs.eps_rel = tol;
         m_stgs.eps_infeas = tol*1e-3;
         m_stgs.verbose = 0;
-    }
-
-    template<std::size_t dim>
-    void OptimScs::set_moment_matrix(std::size_t nparts, const scopi_container<dim>& particles, std::size_t& index)
-    {
-        set_moment_matrix_impl(nparts, particles, index);
     }
 
 }

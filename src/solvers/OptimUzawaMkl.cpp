@@ -48,11 +48,11 @@ namespace scopi
         std::cout << "_____________________________________________________________________  \n" ;
     }
 
-    void OptimUzawaMkl::set_moment_matrix_impl(std::size_t nparts,
-                           std::vector<MKL_INT>& invP_csr_row,
-                           std::vector<MKL_INT>& invP_csr_col,
-                           std::vector<double>& invP_csr_val,
-                           const scopi_container<2>& particles)
+    void OptimUzawaMkl::set_moment_matrix(std::size_t nparts,
+                                          std::vector<MKL_INT>& invP_csr_row,
+                                          std::vector<MKL_INT>& invP_csr_col,
+                                          std::vector<double>& invP_csr_val,
+                                          const scopi_container<2>& particles)
     {
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
@@ -69,11 +69,11 @@ namespace scopi
         }
     }
 
-    void OptimUzawaMkl::set_moment_matrix_impl(std::size_t nparts,
-                           std::vector<MKL_INT>& invP_csr_row,
-                           std::vector<MKL_INT>& invP_csr_col,
-                           std::vector<double>& invP_csr_val,
-                           const scopi_container<3>& particles)
+    void OptimUzawaMkl::set_moment_matrix(std::size_t nparts,
+                                         std::vector<MKL_INT>& invP_csr_row,
+                                         std::vector<MKL_INT>& invP_csr_col,
+                                         std::vector<double>& invP_csr_val,
+                                         const scopi_container<3>& particles)
     {
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
