@@ -13,7 +13,8 @@ namespace scopi
     public:
         using base_type = OptimBase<OptimScs>;
 
-        OptimScs(std::size_t nparts, double dt, double tol = 1e-7);
+        template <std::size_t dim>
+        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol = 1e-7);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -24,6 +25,10 @@ namespace scopi
 
     private:
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
+
+        void set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
+        void set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
+        
 
         ScsMatrix m_P;
         std::vector<scs_float> m_P_x;
@@ -53,6 +58,7 @@ namespace scopi
     int OptimScs::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                  const std::vector<neighbor<dim>>& contacts)
     {
+        tic();
         this->create_matrix_constraint_coo(particles, contacts, 0);
         // COO storage to CSR storage is easy to write
         // The CSC storage of A is the CSR storage of A^T
@@ -90,10 +96,61 @@ namespace scopi
         m_sol.y = m_sol_y.data();
         m_sol_s.resize(this->m_distances.size());
         m_sol.s = m_sol_s.data();
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : SCS matrix = " << duration;
 
+        tic();
         scs(&m_d, &m_k, &m_stgs, &m_sol, &m_info);
+        duration = toc();
+        PLOG_INFO << "----> CPUTIME : SCS solve = " << duration;
 
         return m_info.iter;
     }
+
+    template<std::size_t dim>
+    OptimScs::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol)
+    : base_type(nparts, dt, 2*3*nparts, 0)
+    , MatrixOptimSolver(nparts, dt)
+    , m_P_x(6*nparts)
+    , m_P_i(6*nparts)
+    , m_P_p(6*nparts+1)
+    , m_A_p(6*nparts+1)
+    , m_sol_x(6*nparts)
+    {
+        auto active_offset = particles.nb_inactive();
+        std::size_t index = 0;
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < dim; ++d)
+            {
+                m_P_i[index] = 3*i + d;
+                m_P_p[index] = 3*i + d;
+                m_P_x[index] = particles.m()(active_offset + i);
+                index++;
+            }
+            for (std::size_t d = dim; d < 3; ++d)
+            {
+                m_P_i[index] = 3*i + d;
+                m_P_p[index] = 3*i + d;
+                m_P_x[index] = 0.;
+                index++;
+            }
+        }
+        set_moment_matrix(nparts, particles, index);
+        m_P_p[index] = 6*nparts;
+
+        m_P.x = m_P_x.data();
+        m_P.i = m_P_i.data();
+        m_P.p = m_P_p.data();
+        m_P.m = 6*nparts;
+        m_P.n = 6*nparts;
+
+        scs_set_default_settings(&m_stgs);
+        m_stgs.eps_abs = tol;
+        m_stgs.eps_rel = tol;
+        m_stgs.eps_infeas = tol*1e-3;
+        m_stgs.verbose = 0;
+    }
+
 }
 #endif

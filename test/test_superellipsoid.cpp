@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <random>
 
 #include "test_common.hpp"
 #include "utils.hpp"
@@ -480,16 +481,15 @@ namespace scopi
         EXPECT_DOUBLE_EQ(tangent.second(1), 0.);
         EXPECT_NEAR(tangent.second(2), 0., 1e-7); // EXPECT_DOUBLE_EQ fails because cos(PI/2) != 0
     }
-    //
 
     // two ellipsoids
     template <class S>
     class TestTwoEllipsoidsSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
-                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
+                superellipsoid<2> s1({{-0.2, 0.}}, {quaternion(PI/4)}, {{.1, .05}}, 1);
+                superellipsoid<2> s2({{0.2, 0.}}, {quaternion(-PI/4)}, {{.1, .05}}, 1);
+                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia(0.1);
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -499,7 +499,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsSymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsSymmetrical, two_ellipsoids_symmetrical)
     {
@@ -513,10 +513,10 @@ namespace scopi
     class TestTwoEllipsoidsSpheresSymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, 0.}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
-                superellipsoid<2> s2({{0.2, 0.}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
-                m_particles.push_back(s1, p);
+                superellipsoid<2> s1({{-0.2, 0.}}, {quaternion(PI/4)}, {{.1, .1}}, 1);
+                superellipsoid<2> s2({{0.2, 0.}}, {quaternion(-PI/4)}, {{.1, .1}}, 1);
+                auto p = property<2>().mass(1.).moment_inertia(0.1);
+                m_particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
@@ -525,7 +525,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresSymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresSymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsSpheresSymmetrical, two_ellipsoids_spheres_symmetrical)
     {
@@ -539,10 +539,10 @@ namespace scopi
     class TestTwoEllipsoidsAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .05}}, 1);
-                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .05}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
-                m_particles.push_back(s1, p);
+                superellipsoid<2> s1({{-0.2, -0.05}}, {quaternion(PI/4)}, {{.1, .05}}, 1);
+                superellipsoid<2> s2({{0.2, 0.05}}, {quaternion(-PI/4)}, {{.1, .05}}, 1);
+                auto p = property<2>().mass(1.).moment_inertia(0.1);
+                m_particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
@@ -551,7 +551,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsAsymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsAsymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsAsymmetrical, two_ellipsoids_asymmetrical)
     {
@@ -565,9 +565,9 @@ namespace scopi
     class TestTwoEllipsoidsSpheresAsymmetrical  : public ::testing::Test {
         protected:
             void SetUp() override {
-                superellipsoid<2> s1({{-0.2, -0.05}}, {scopi::quaternion(PI/4)}, {{.1, .1}}, 1);
-                superellipsoid<2> s2({{0.2, 0.05}}, {scopi::quaternion(-PI/4)}, {{.1, .1}}, 1);
-                auto p = property<2>().desired_velocity({{0.25, 0}});
+                superellipsoid<2> s1({{-0.2, -0.05}}, {quaternion(PI/4)}, {{.1, .1}}, 1);
+                superellipsoid<2> s2({{0.2, 0.05}}, {quaternion(-PI/4)}, {{.1, .1}}, 1);
+                auto p = property<2>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia(0.1);
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -577,7 +577,7 @@ namespace scopi
             scopi_container<2> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresAsymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoEllipsoidsSpheresAsymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoEllipsoidsSpheresAsymmetrical, two_ellipsoids_spheres_asymmetrical)
     {
@@ -585,6 +585,63 @@ namespace scopi
         solver.solve(this->m_total_it);
 
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance);
+    }
+
+    template <class S>
+    class Test2dCaseSuperellipsoid  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
+        protected:
+            void SetUp() override {
+                int n = 3; // 2*n*n particles
+                std::minstd_rand0 generator(123);
+                std::uniform_real_distribution<double> distrib_r(0.2, 0.4);
+                std::uniform_real_distribution<double> distrib_r2(0.2, 0.4);
+                std::uniform_real_distribution<double> distrib_move_x(-0.1, 0.1);
+                std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
+                std::uniform_real_distribution<double> distrib_rot(0, PI);
+                std::uniform_real_distribution<double> distrib_velocity(2., 5.);
+                auto prop = property<dim>().mass(1.).moment_inertia(0.1);
+
+                for(int i = 0; i < n; ++i)
+                {
+                    for(int j = 0; j < n; ++j)
+                    {
+                        double rot = distrib_rot(generator);
+                        double r = distrib_r(generator);
+                        double r2 = distrib_r2(generator);
+                        double x = (i + 0.5) + distrib_move_x(generator);
+                        double y = (j + 0.5) + distrib_move_y(generator);
+                        double velocity = distrib_velocity(generator);
+
+                        superellipsoid<dim> s1({ {x, y}}, {quaternion(rot)}, {{r, r2}}, 1);
+                        m_particles.push_back(s1,prop.desired_velocity({{velocity, 0.}}));
+
+                        rot = distrib_rot(generator);
+                        r = distrib_r(generator);
+                        r2 = distrib_r2(generator);
+                        x = (n + i + 0.5) + distrib_move_x(generator);
+                        y = (j + 0.5) + distrib_move_y(generator);
+                        velocity = distrib_velocity(generator);
+
+                        superellipsoid<dim> s2({ {x, y}}, {quaternion(rot)}, {{r, r2}}, 1);
+                        m_particles.push_back(s2, prop.desired_velocity({{-velocity, 0.}}));
+                    }
+                }
+            }
+
+            double m_dt = .01;
+            std::size_t m_total_it = 20;
+            scopi_container<2> m_particles;
+    };
+
+    TYPED_TEST_SUITE(Test2dCaseSuperellipsoid, solver_with_contact_types<2>, );
+
+    TYPED_TEST(Test2dCaseSuperellipsoid, 2d_case_superellipsoid)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
+
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0019.json", "../test/references/2d_case_superellipsoid.json", tolerance);
     }
 
 }

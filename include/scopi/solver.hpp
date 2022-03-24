@@ -41,6 +41,7 @@ namespace scopi
     public:
         ScopiSolver(scopi_container<dim>& particles, double dt);
         void solve(std::size_t total_it);
+        void set_coeff_friction(double mu);
 
     private:
         void displacement_obstacles();
@@ -58,7 +59,7 @@ namespace scopi
     ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
     : m_particles(particles)
     , m_dt(dt)
-    , m_solver(m_particles.nb_active(), m_dt)
+    , m_solver(m_particles.nb_active(), m_dt, particles)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
@@ -70,31 +71,34 @@ namespace scopi
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
 
+            tic();
             displacement_obstacles();
+            auto duration = toc();
+            PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
 
-            PLOG_INFO << "----> create list of contacts " << nite;
             auto contacts = compute_contacts();
 
-            PLOG_INFO << "----> json output files " << nite << std::endl;
+            tic();
             write_output_files(contacts, nite);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : write output files = " << duration;
 
-            // for (std::size_t i=0; i<m_Nactive; ++i)
-            // {
-            //     for (std::size_t d=0; d<dim; ++d)
-            //     {
-            //         particles.pos()(i + active_ptr)(d) += dt*particles.vd()(i + active_ptr)(d);
-            //     }
-            // }
-            //
+            tic();
             m_vap.set_a_priori_velocity(m_particles);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : set vap = " << duration;
 
-            // solver optimization problem
             m_solver.run(m_particles, contacts, nite);
 
-            // move the active particles
+            tic();
             move_active_particles();
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
 
+            tic();
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update vap = " << duration;
         }
     }
 
@@ -119,7 +123,7 @@ namespace scopi
                 m_particles.pos()(i)(d) += m_dt*m_particles.vd()(i)(d);
             }
             m_particles.q()(i) = mult_quaternion(m_particles.q()(i), expw);
-
+            normalize(m_particles.q()(i));
             // std::cout << "obstacle " << i << ": " << m_particles.pos()(0) << " " << m_particles.q()(0) << std::endl;
         }
     }
@@ -189,16 +193,16 @@ namespace scopi
             {
                 m_particles.pos()(i + active_offset)(d) += m_dt*uadapt(i, d);
             }
-            // xt::view(particles.pos(), i) += dt*xt::view(uadapt, i);
 
-            // particles.q()(i) = quaternion(theta(i));
-            // std::cout << expw << " " << particles.q()(i) << std::endl;
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
-            // std::cout << "position" << particles.pos()(i) << std::endl << std::endl;
-            // std::cout << "quaternion " << particles.q()(i) << std::endl << std::endl;
-
         }
+    }
+
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::set_coeff_friction(double mu)
+    {
+        m_solver.set_coeff_friction(mu);
     }
 }
 

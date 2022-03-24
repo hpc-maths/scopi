@@ -24,12 +24,12 @@ namespace scopi
                 particles.push_back(s2);
                 particles.push_back(s3);
 
-                contact_kdtree cont(2., 5.76);
+                contact_kdtree cont(2., 100);
                 m_contacts = cont.run(particles, 0);
                 m_nMatches = cont.get_nMatches();
             }
             std::size_t m_nMatches;
-            std::vector<scopi::neighbor<2>> m_contacts;
+            std::vector<neighbor<2>> m_contacts;
     };
 
     TEST_F(ContactsKdtreeTest, nbContacts)

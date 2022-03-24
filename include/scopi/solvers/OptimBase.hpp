@@ -23,8 +23,6 @@ namespace scopi{
 
         std::size_t m_nparts;
         double m_dt;
-        double m_mass;
-        double m_moment;
         xt::xtensor<double, 1> m_c;
         std::size_t m_c_dec;
         xt::xtensor<double, 1> m_distances;
@@ -45,19 +43,15 @@ namespace scopi{
 
     template<class Derived>
     template<std::size_t dim>
-    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t nite)
+    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t)
     {
         tic();
         create_vector_c(particles);
         create_vector_distances(contacts);
-        auto duration4 = toc();
-        PLOG_INFO << "----> CPUTIME : matrices = " << duration4;
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
-        PLOG_INFO << "----> Create optimization problem " << nite;
-        tic();
         auto nbIter = solve_optimization_problem(particles, contacts);
-        auto duration5 = toc();
-        PLOG_INFO << "----> CPUTIME : solve = " << duration5;
         PLOG_INFO << "iterations : " << nbIter;
         PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
     }
@@ -67,8 +61,6 @@ namespace scopi{
     OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
     : m_nparts(nparts)
     , m_dt(dt)
-    , m_mass(1.)
-    , m_moment(0.1)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)
     {}
@@ -100,12 +92,12 @@ namespace scopi{
         {
             for (std::size_t d = 0; d < dim; ++d)
             {
-                m_c(mass_dec + 3*i + d) = -m_mass*desired_velocity(i + active_offset)[d]; // TODO: add mass into particles
+                m_c(mass_dec + 3*i + d) = -particles.m()(active_offset + i)*desired_velocity(i + active_offset)[d];
             }
             auto omega = get_omega(desired_omega(i + active_offset));
             for (std::size_t d = 0; d < 3; ++d)
             {
-                m_c(moment_dec + 3*i + d) = -m_moment*omega(d);
+                m_c(moment_dec + 3*i + d) = -particles.j()(active_offset + i)*omega(d);
             }
         }
     }

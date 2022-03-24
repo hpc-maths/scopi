@@ -1,11 +1,14 @@
 #include <gtest/gtest.h>
+#include <random>
 
 #include "test_common.hpp"
 #include "utils.hpp"
 
 #include <scopi/objects/types/sphere.hpp>
+#include <scopi/vap/vap_fpd.hpp>
 #include <scopi/container.hpp>
 #include <scopi/solver.hpp>
+#include <scopi/property.hpp>
 
 namespace scopi
 {
@@ -323,9 +326,7 @@ namespace scopi
         EXPECT_DOUBLE_EQ(rotation_matrix(2, 1), 0.);
         EXPECT_DOUBLE_EQ(rotation_matrix(2, 2), 1.);
     }
-    //
 
-    // point
     // point
     TEST_F(Sphere2dTest, point_x_2d)
     {
@@ -389,8 +390,8 @@ namespace scopi
             void SetUp() override {
                 sphere<dim> s1({{-0.2, -0.05}}, 0.1);
                 sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
-                auto p = property<dim>().desired_velocity({{0.25, 0}});
-                m_particles.push_back(s1, p);
+                auto p = property<dim>().mass(1.).moment_inertia(0.1);
+                m_particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
 
@@ -399,7 +400,7 @@ namespace scopi
             scopi_container<dim> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoSpheresAsymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoSpheresAsymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoSpheresAsymmetrical, two_spheres_asymmetrical)
     {
@@ -416,7 +417,7 @@ namespace scopi
             void SetUp() override {
                 sphere<dim> s1({{-0.2, 0.}}, 0.1);
                 sphere<dim> s2({{ 0.2, 0.}}, 0.1);
-                auto p = property<dim>().desired_velocity({{0.25, 0}});
+                auto p = property<dim>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia(0.1);
                 m_particles.push_back(s1, p);
                 m_particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
             }
@@ -426,7 +427,7 @@ namespace scopi
             scopi_container<dim> m_particles;
     };
 
-    TYPED_TEST_SUITE(TestTwoSpheresSymmetrical, solver_with_contact_types<2>);
+    TYPED_TEST_SUITE(TestTwoSpheresSymmetrical, solver_with_contact_types<2>, );
 
     TYPED_TEST(TestTwoSpheresSymmetrical, two_spheres_symmetrical)
     {
@@ -436,4 +437,53 @@ namespace scopi
         EXPECT_PRED3(diffFile, "./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance);
     }
 
+    // critical_2d
+    template <class S>
+    class Test2dCaseSpheres  : public ::testing::Test {
+        static constexpr std::size_t dim = 2;
+        protected:
+            void SetUp() override {
+                int n = 3; // 2*n*n particles
+                std::minstd_rand0 generator(123);
+                std::uniform_real_distribution<double> distrib_r(0.2, 0.4);
+                std::uniform_real_distribution<double> distrib_move_x(-0.1, 0.1);
+                std::uniform_real_distribution<double> distrib_move_y(-0.1, 0.1);
+                std::uniform_real_distribution<double> distrib_velocity(2., 5.);
+                auto prop = property<dim>().mass(1.).moment_inertia(0.1);
+
+                for(int i = 0; i < n; ++i)
+                {
+                    for(int j = 0; j < n; ++j)
+                    {
+                        double r = distrib_r(generator);
+                        double x = (i + 0.5) + distrib_move_x(generator);
+                        double y = (j + 0.5) + distrib_move_y(generator);
+                        double velocity = distrib_velocity(generator);
+                        sphere<dim> s1({{x, y}}, r);
+                        m_particles.push_back(s1, prop.desired_velocity({{velocity, 0.}}));
+
+                        r = distrib_r(generator);
+                        x = (n + i + 0.5) + distrib_move_x(generator);
+                        y = (j + 0.5) + distrib_move_y(generator);
+                        velocity = distrib_velocity(generator);
+                        sphere<dim> s2({{x, y}}, r);
+                        m_particles.push_back(s2, prop.desired_velocity({{-velocity, 0.}}));
+                    }
+                }
+            }
+
+            double m_dt = .01;
+            std::size_t m_total_it = 20;
+            scopi_container<dim> m_particles;
+    };
+
+    TYPED_TEST_SUITE(Test2dCaseSpheres, solver_with_contact_types<2>, );
+
+    TYPED_TEST(Test2dCaseSpheres, 2d_case_spheres)
+    {
+        TypeParam solver(this->m_particles, this->m_dt);
+        solver.solve(this->m_total_it);
+
+        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0019.json", "../test/references/2d_case_spheres.json", tolerance);
+    }
 }

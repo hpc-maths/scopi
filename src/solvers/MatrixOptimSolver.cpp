@@ -2,7 +2,9 @@
 
 namespace scopi
 {
-    MatrixOptimSolver::MatrixOptimSolver(std::size_t, double dt)
-    : m_dt(dt)
+    MatrixOptimSolver::MatrixOptimSolver(std::size_t nparticles, double dt)
+    : m_nparticles(nparticles)
+    , m_dt(dt)
     {}
+
 }

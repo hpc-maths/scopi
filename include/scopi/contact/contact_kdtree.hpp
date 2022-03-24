@@ -73,11 +73,11 @@ namespace scopi
 
             tic();
 
-            #pragma omp parallel for //num_threads(8)
+            m_nMatches = 0;
+            #pragma omp parallel for reduction(+:m_nMatches) //num_threads(8)
 
             for (std::size_t i = active_ptr; i < particles.size() - 1; ++i)
             {
-
                 // for (std::size_t j = i + 1; j < particles.size(); ++j)
                 // {
                 //     auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
@@ -104,17 +104,18 @@ namespace scopi
 
                 std::vector<std::pair<std::size_t, double>> ret_matches;
 
-                m_nMatches = index.radiusSearch(query_pt, m_kd_tree_radius, ret_matches,
+                auto nMatches_loc = index.radiusSearch(query_pt, m_kd_tree_radius, ret_matches,
                     nanoflann::SearchParams());
 
                 //std::cout << i << " nMatches = " << nMatches << std::endl;
 
-                for (std::size_t ic = 0; ic < m_nMatches; ++ic) {
+                for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
 
                     std::size_t j = ret_matches[ic].first;
                     //double dist = ret_matches[ic].second;
                     if (i < j)  { //&& (j>=active_ptr)
                       auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+                      m_nMatches++;
                       if (neigh.dij < m_dmax) {
                           neigh.i = i;
                           neigh.j = j;
@@ -145,7 +146,7 @@ namespace scopi
             }
 
             duration = toc();
-            PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << std::endl;
+            PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << " compute " << m_nMatches << " distances" << std::endl;
 
 
 

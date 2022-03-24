@@ -98,11 +98,12 @@ set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
     src/solvers/MatrixOptimSolver.cpp
-    src/solvers/OptimMosek.cpp
+    src/solvers/MatrixOptimSolverFriction.cpp
     src/solvers/OptimScs.cpp
+    src/solvers/OptimUzawaMkl.cpp
     src/solvers/OptimUzawaMatrixFreeOmp.cpp
     src/solvers/OptimUzawaMatrixFreeTbb.cpp
-    src/solvers/OptimUzawaMkl.cpp
+    src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/minpack.cpp
@@ -116,7 +117,7 @@ target_include_directories(scopi PUBLIC
                                  $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
                                  $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(scopi PUBLIC xtensor
+                             target_link_libraries(scopi PUBLIC xtensor
                                    nlohmann_json::nlohmann_json
                                    fmt::fmt
                                         #   nanoflann::nanoflann
@@ -192,6 +193,7 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeOmp.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimScs.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/MatrixOptimSolver.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/solvers/MatrixOptimSolverFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeTbb.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMkl.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaBase.hpp

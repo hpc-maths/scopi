@@ -18,6 +18,9 @@ namespace scopi
         using force_t = position_t<dim>;
 
         template<std::size_t dim>
+        using moment_t = typename std::conditional<dim == 2, double, xt::xtensor_fixed<double, xt::xshape<dim>>>::type;
+
+        template<std::size_t dim>
         using matrix_rotation_t = xt::xtensor_fixed<double, xt::xshape<dim, dim>>;
 
         template<std::size_t dim>

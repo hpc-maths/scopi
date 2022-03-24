@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OptimUzawaBase.hpp"
+#include <cstddef>
 #include <omp.h>
 
 #include <xtensor/xadapt.hpp>
@@ -17,7 +18,8 @@ namespace scopi{
     {
     public:
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeOmp>;
-        OptimUzawaMatrixFreeOmp(std::size_t nparts, double dt);
+        template <std::size_t dim>
+        OptimUzawaMatrixFreeOmp(std::size_t nparts, double dt, const scopi_container<dim>& particles);
 
         template <std::size_t dim>
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
@@ -33,6 +35,14 @@ namespace scopi{
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts);
+
+    private:
+        void gemv_inv_P_moment(const scopi_container<2>& particles,
+                               std::size_t active_offset,
+                               std::size_t i);
+        void gemv_inv_P_moment(const scopi_container<3>& particles,
+                               std::size_t active_offset,
+                               std::size_t i);
     };
 
     template <std::size_t dim>
@@ -43,14 +53,15 @@ namespace scopi{
     template<std::size_t dim>
     void OptimUzawaMatrixFreeOmp::gemv_inv_P_impl(const scopi_container<dim>& particles)
     {
+        auto active_offset = particles.nb_inactive();
         #pragma omp parallel for
         for (std::size_t i = 0; i < particles.nb_active(); ++i)
         {
-            for (std::size_t d = 0; d < 3; ++d)
+            for (std::size_t d = 0; d < dim; ++d)
             {
-                this->m_U(3*i + d) /= (-1. * this->m_mass); // TODO: add mass into particles
-                this->m_U(3*this->m_nparts + 3*i + d) /= (-1. * this->m_moment);
+                this->m_U(3*i + d) /= (-1.*particles.m()(active_offset + i)); 
             }
+            gemv_inv_P_moment(particles, active_offset, i);
         }
     }
 
@@ -164,5 +175,10 @@ namespace scopi{
             }
         }
     }
+
+    template <std::size_t dim>
+    OptimUzawaMatrixFreeOmp::OptimUzawaMatrixFreeOmp(std::size_t nparts, double dt, const scopi_container<dim>&)
+    : base_type(nparts, dt)
+    {}
 
 }

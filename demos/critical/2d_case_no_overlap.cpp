@@ -17,6 +17,7 @@ int main()
     double dt = .01;
     std::size_t total_it = 100;
     scopi::scopi_container<dim> particles;
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
     int n = 20; // 2*n*n particles
 
@@ -40,7 +41,7 @@ int main()
             double velocity = distrib_velocity(generator);
 
             scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
-            particles.push_back(s1, scopi::property<dim>().desired_velocity({{velocity, 0.}}));
+            particles.push_back(s1, prop.desired_velocity({{velocity, 0.}}));
 
             rot = distrib_rot(generator);
             r = distrib_r(generator);
@@ -50,7 +51,7 @@ int main()
             velocity = distrib_velocity(generator);
 
             scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, 1);
-            particles.push_back(s2, scopi::property<dim>().desired_velocity({{-velocity, 0.}}));
+            particles.push_back(s2, prop.desired_velocity({{-velocity, 0.}}));
         }
     }
 

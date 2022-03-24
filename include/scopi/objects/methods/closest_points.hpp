@@ -693,13 +693,6 @@ namespace scopi
         return neighbor<dim>();
     }
 
-    // GLOBULE - SPHERE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner> g, const sphere<dim, owner> s)
-    {
-        return closest_points(s, g);
-    }
-
     // SPHERE - PLAN
     template<std::size_t dim, bool owner>
     auto closest_points(const sphere<dim, owner>& s, const plan<dim, owner>& p)
@@ -726,7 +719,10 @@ namespace scopi
     template<std::size_t dim, bool owner>
     auto closest_points(const plan<dim, owner>& p, const sphere<dim, owner>& s)
     {
-        return closest_points(s, p);
+        auto neigh = closest_points(s, p);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
     }
 
     // SUPERELLIPSOID 3D - SPHERE 3D
@@ -1055,11 +1051,14 @@ namespace scopi
         return neigh;
     }
 
-    // SPHERES 3D - SUPERELLIPSOID 3D
+    // SPHERE 3D - SUPERELLIPSOID 3D
     template<bool owner>
-    auto closest_points(const superellipsoid<3, owner>& s1, const sphere<3, owner>& s2)
+    auto closest_points(const superellipsoid<3, owner>& s2, const sphere<3, owner>& s1)
     {
-        return closest_points(s2, s1);
+        auto neigh = closest_points(s1, s2);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
     }
 
     // SUPERELLIPSOID 2D - SPHERE 2D
@@ -1199,11 +1198,14 @@ namespace scopi
       return neigh;
     }
 
-    // SPHERE 2D - SUPERELLIPSOID 2D
+    // SUPERELLIPSOID 2D - SPHERE 2D
     template<bool owner>
-    auto closest_points(const superellipsoid<2, owner> s1, const sphere<2, owner> s2)
+    auto closest_points(const superellipsoid<2, owner> superellipsoid, const sphere<2, owner> sphere)
     {
-        return closest_points(s2, s1);
+        auto neigh = closest_points(sphere, superellipsoid);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
     }
 
     // SUPERELLIPSOID 3D - PLAN 3D
@@ -1488,7 +1490,10 @@ namespace scopi
     template<bool owner>
     auto closest_points(const plan<3, owner> p2, const superellipsoid<3, owner> s1)
     {
-        return closest_points(s1, p2);
+        auto neigh = closest_points(s1, p2);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
     }
 
     // SUPERELLIPSOID 2D - DROITE 2D
@@ -1629,8 +1634,7 @@ namespace scopi
       xt::xtensor_fixed<double, xt::xshape<2>> u0 = {binit(indmin(0,0)), ainit(indmin(1,0))};
       // std::cout << "newton_GradF(u0,args) = " << newton_GradF(u0,args) << " newton_F(u0,args) = " << newton_F(u0,args) << std::endl;
       auto [ u, info ] = newton_method(u0,newton_F,newton_GradF,args,200,1.0e-10,1.0e-7);
-      std::cout << "info = " << info << std::endl;
-      exit(0);
+      // std::cout << "info = " << info << std::endl;
       if (info==-1){
         std::cout << "\ns1 : " << std::endl;
         s1.print();
@@ -1638,7 +1642,6 @@ namespace scopi
         d2.print();
         std::cout << "s1.pos = " << s1.pos() << " s1.rotation = " << xt::flatten(s1.rotation()) << std::endl;
         std::cout << "d2.pos = " << d2.pos() << " d2.rotation = " << xt::flatten(d2.rotation()) << std::endl;
-        exit(0);
       }
       neigh.pi = s1.point(u(0));
       neigh.pj = d2.point(u(1));
@@ -1647,11 +1650,14 @@ namespace scopi
       return neigh;
     }
 
-    // SUPERELLIPSOID 2D - DROITE 2D
+    // DROITE 2D - SUPERELLIPSOID 2D
     template<bool owner>
     auto closest_points(const plan<2, owner> d2, const superellipsoid<2, owner> s1)
     {
-        return closest_points(s1, d2);
+        auto neigh = closest_points(s1, d2);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
     }
 
     // SUPERELLIPSOID - GLOBULE
@@ -1662,11 +1668,14 @@ namespace scopi
         return neighbor<dim>();
     }
 
-    // GLOBULE - SUPERELLIPSOID
+    // GLOBULE  - SUPERELLIPSOID
     template<std::size_t dim, bool owner>
     auto closest_points(const globule<dim, owner> g, const superellipsoid<dim, owner> s)
     {
-        return closest_points(s, g);
+        auto neigh = closest_points(s, g);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
     }
 
     // GLOBULE - PLAN
@@ -1674,13 +1683,6 @@ namespace scopi
     auto closest_points(const globule<dim, owner>, const plan<dim, owner>)
     {
         return neighbor<dim>();
-    }
-
-    // PLAN - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner> p, const globule<dim, owner> g)
-    {
-        return closest_points(g, p);
     }
 
     template <std::size_t dim>
@@ -1705,9 +1707,9 @@ namespace scopi
         const object<dim, owner>,
         mpl::vector<const sphere<dim, owner>,
                     const superellipsoid<dim, owner>,
-                    const globule<dim, owner>,
+                    // const globule<dim, owner>,
                     const plan<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
-        symmetric_dispatch
+        antisymmetric_dispatch
     >;
 }

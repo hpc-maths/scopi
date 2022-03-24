@@ -33,9 +33,8 @@ animate();
 const sphereObject = function () {
     const position = new THREE.Vector3();
     const rotation = new THREE.Euler();
-    const quaternion = new THREE.Quaternion();
     const scale = new THREE.Vector3();
-    return function (obj, matrix) {
+    return function (obj, matrix, quaternion) {
         position.x = obj.position[0];
         position.y = obj.position[1];
 
@@ -66,6 +65,24 @@ const sphereObject = function () {
     };
 }();
 
+const planObject = function() {
+    let xB = 0.;
+    let yB = 0.;
+    return function(obj, plan) {
+        const c = obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1];
+        plan.push(new THREE.Vector3(obj.position[0], obj.position[0], 0.));
+        if (obj.normal[1] === 0.) { // vertical straight line
+            xB = c/obj.normal[0];
+            yB = obj.position[0] + 30;
+        }
+        else {
+            xB = 30.;
+            yB = (c - obj.normal[0] * xB) / obj.normal[1];
+        }
+        plan.push(new THREE.Vector3(xB, yB, 0.));
+    };
+}();
+
 function drawObjects() {
 
     if (options.current_frame < oFiles.length) {
@@ -81,14 +98,50 @@ function drawObjects() {
             const material = new THREE.MeshBasicMaterial({ color: 'red' });
             var mesh = new THREE.InstancedMesh(geometry, material, objects.length);
             scene.add(mesh);
-
+            const plan = [];
+            const rot = []
 
             const matrix = new THREE.Matrix4();
+            const quaternion = new THREE.Quaternion();
+            let center = new THREE.Vector3();
+            let vec = new THREE.Vector3();
 
             objects.forEach((obj, index) => {
-                sphereObject(obj, matrix);
-                mesh.setMatrixAt(index, matrix);
+                if (obj.type === "plan") {
+                    planObject(obj, plan);
+                }
+                else {
+                    sphereObject(obj, matrix, quaternion);
+                    mesh.setMatrixAt(index, matrix);
+
+                    center = new THREE.Vector3(obj.position[0], obj.position[1], 0.);
+                    rot.push(center);
+                    if (typeof obj.radius === "number") {
+                        vec = new THREE.Vector3(obj.radius, 0., 0.);
+                    }
+                    else {
+                        vec = new THREE.Vector3(obj.radius[0], 0., 0.);
+                    }
+                    vec.applyQuaternion(quaternion);
+                    vec.add(center);
+                    rot.push(vec);
+                }
+
             });
+            const line_geometry_plan = new THREE.BufferGeometry().setFromPoints(plan);
+            const line_material_plan = new THREE.LineBasicMaterial({
+                color: 'red',
+            });
+            var line_mesh_plan = new THREE.LineSegments(line_geometry_plan, line_material_plan);
+            scene.add(line_mesh_plan);
+
+            const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
+            const line_material_rot = new THREE.LineBasicMaterial({
+                color: 'blue',
+                depthTest: false
+            });
+            var line_mesh_rot = new THREE.LineSegments(line_geometry_rot, line_material_rot);
+            scene.add(line_mesh_rot);
 
             const points = [];
             contacts.forEach((obj, index) => {

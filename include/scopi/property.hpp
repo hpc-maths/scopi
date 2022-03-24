@@ -13,6 +13,8 @@ namespace scopi
         using velocity_type = type::velocity_t<dim>;
         using rotation_type = type::rotation_t<dim>;
         using force_type = type::force_t<dim>;
+        using mass_type = double;
+        using moment_type = type::moment_t<dim>;
 
         property& velocity(const velocity_type& v);
         const velocity_type velocity() const;
@@ -27,6 +29,11 @@ namespace scopi
         property& force(const force_type& f);
         const force_type force() const;
 
+        property& mass(const mass_type& m);
+        mass_type mass() const;
+        property& moment_inertia(const moment_type& m);
+        const moment_type moment_inertia() const;
+
         property& deactivate();
         property& activate();
         bool is_active() const;
@@ -37,6 +44,8 @@ namespace scopi
         rotation_type m_omega;
         rotation_type m_domega;
         force_type m_f;
+        mass_type m_m;
+        moment_type m_j;
         bool m_active = true;
     };
 
@@ -106,6 +115,32 @@ namespace scopi
     }
 
     template <std::size_t dim>
+    auto property<dim>::mass(const mass_type& m) -> property&
+    {
+        m_m = m;
+        return *this;
+    }
+
+    template <std::size_t dim>
+    auto property<dim>::mass() const -> mass_type
+    {
+        return m_m;
+    }
+
+    template <std::size_t dim>
+    auto property<dim>::moment_inertia(const moment_type& j) -> property&
+    {
+        m_j = j;
+        return *this;
+    }
+
+    template <std::size_t dim>
+    auto property<dim>::moment_inertia() const -> const moment_type
+    {
+        return m_j;
+    }
+
+    template <std::size_t dim>
     auto property<dim>::activate() -> property&
     {
         m_active = true;
@@ -115,7 +150,7 @@ namespace scopi
     template <std::size_t dim>
     auto property<dim>::deactivate() -> property&
     {
-        m_active = true;
+        m_active = false;
         return *this;
     }
 
