@@ -7,6 +7,7 @@
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
+#include <xtensor/xnoalias.hpp>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
