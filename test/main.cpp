@@ -1,10 +1,3 @@
-#include <plog/Log.h>
-#include "plog/Initializers/RollingFileInitializer.h"
-#include <gtest/gtest.h>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest/doctest.h"
 
-int main(int argc, char* argv[])
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    plog::init(plog::none);
-    return RUN_ALL_TESTS();
-}
