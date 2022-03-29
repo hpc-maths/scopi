@@ -125,7 +125,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            xt::noalias(cmax) = double((xt::amin(m_R))(0));
+            cmax = double((xt::amin(m_R))(0));
             duration = toc();
             time_compute_cmax += duration;
             time_solve += duration;
