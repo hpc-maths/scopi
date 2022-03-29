@@ -88,7 +88,7 @@ namespace scopi{
         while ( (cmax<=-m_tol) && (cc <= m_max_iter) )
         {
             tic();
-            m_U = this->m_c;
+            xt::noalias(m_U) = this->m_c;
             auto duration = toc();
             time_assign_u += duration;
             time_solve += duration;
@@ -106,7 +106,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            m_R = this->m_distances - m_dmin;
+            xt::noalias(m_R) = this->m_distances - m_dmin;
             duration = toc();
             time_assign_r += duration;
             time_solve += duration;
@@ -118,13 +118,13 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            m_L = xt::maximum( m_L-m_rho*m_R, 0);
+            xt::noalias(m_L) = xt::maximum( m_L-m_rho*m_R, 0);
             duration = toc();
             time_assign_l += duration;
             time_solve += duration;
 
             tic();
-            cmax = double((xt::amin(m_R))(0));
+            xt::noalias(cmax) = double((xt::amin(m_R))(0));
             duration = toc();
             time_compute_cmax += duration;
             time_solve += duration;
