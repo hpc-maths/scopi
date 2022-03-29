@@ -44,6 +44,9 @@ endif()
 
 # Dependencies
 # ============
+if(SCOPI_USE_TBB)
+    set(XTENSOR_USE_TBB 1)
+endif()
 find_package(xtensor REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
