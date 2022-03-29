@@ -8,14 +8,12 @@ set(COMMON_BASE
 set(SCOPI_TESTS
     # test_sphere.cpp
     # test_superellipsoid.cpp
-    # test_closest_points.cpp
+    test_closest_points.cpp
     # test_container.cpp
     # test_contacts_kdtree.cpp
     # test_contacts_brute_force.cpp
     # test_obstacles.cpp
     # test_friction.cpp
-    test_test.cpp
-    test_test2.cpp
 )
 
 foreach(filename IN LISTS SCOPI_TESTS)

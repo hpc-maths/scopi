@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include "doctest/doctest.h"
 #include "utils.hpp"
 
 #include <scopi/objects/types/sphere.hpp>
@@ -9,7 +9,7 @@
 namespace scopi
 {
     // distance sphere - sphere
-    TEST(closest_points, sphere_sphere_2d)
+    TEST_CASE("closest_points, sphere_sphere_2d")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s1({{-0.2, 0.0}}, 0.1);
@@ -17,16 +17,16 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_EQ(out.pi(0), -0.1);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pj(0), 0.1);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.nij(0), -1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_sphere_2d_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_sphere_2d_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         double dist = 0.3;
@@ -37,16 +37,16 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.4);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.4));
     }
 
-    TEST(closest_points, sphere_sphere_2d_dispatch)
+    TEST_CASE("closest_points, sphere_sphere_2d_dispatch")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s1({{-0.2, 0.0}}, 0.1);
@@ -58,16 +58,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_EQ(out.pi(0), -0.1);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pj(0), 0.1);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.nij(0), -1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_sphere_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_sphere_2d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         double dist = 0.3;
@@ -82,16 +82,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.4);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.4));
     }
 
-    TEST(closest_points, sphere_sphere_3d)
+    TEST_CASE("closest_points, sphere_sphere_3d")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s1({{-0.2, 0.0, 0.0}}, 0.1);
@@ -99,19 +99,19 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_EQ(out.pi(0), -0.1);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pi(2), 0.);
-        EXPECT_EQ(out.pj(0), 0.1);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.pj(2), 0.);
-        EXPECT_EQ(out.nij(0), -1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.nij(2), 0.);
-        EXPECT_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_sphere_3d_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_sphere_3d_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         double dist = 0.3;
@@ -122,19 +122,19 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.4);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.4));
     }
 
-    TEST(closest_points, sphere_sphere_3d_dispatch)
+    TEST_CASE("closest_points, sphere_sphere_3d_dispatch")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s1({{-0.2, 0.0, 0.0}}, 0.1);
@@ -146,19 +146,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_EQ(out.pi(0), -0.1);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pi(2), 0.);
-        EXPECT_EQ(out.pj(0), 0.1);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.pj(2), 0.);
-        EXPECT_EQ(out.nij(0), -1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.nij(2), 0.);
-        EXPECT_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_sphere_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_sphere_3d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         double dist = 0.3;
@@ -173,20 +173,20 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.2*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.4);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.4));
     }
 
     // distance sphere - plan
-    TEST(closest_points, sphere_plan_2d)
+    TEST_CASE("closest_points, sphere_plan_2d")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -194,16 +194,16 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_2d_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_plan_2d_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -214,16 +214,16 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_2d_rotation_90_deg)
+    TEST_CASE("closest_points, sphere_plan_2d_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -231,16 +231,16 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), 1.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(1.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST(closest_points, sphere_plan_2d_dispatch)
+    TEST_CASE("closest_points, sphere_plan_2d_dispatch")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -252,16 +252,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_plan_2d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -276,16 +276,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_2d_dispatch_rotation_90_deg)
+    TEST_CASE("closest_points, sphere_plan_2d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -297,16 +297,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), 1.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(1.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST(closest_points, sphere_plan_3d)
+    TEST_CASE("closest_points, sphere_plan_3d")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -314,19 +314,19 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_EQ(out.pi(0), 0.1);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pi(2), 0.);
-        EXPECT_EQ(out.pj(0), 0.3);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.pj(2), 0.);
-        EXPECT_EQ(out.nij(0), -1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_3d_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_plan_3d_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -337,19 +337,19 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_3d_rotation_90_deg)
+    TEST_CASE("closest_points, sphere_plan_3d_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
@@ -357,19 +357,19 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), 1.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(1.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST(closest_points, sphere_plan_3d_dispatch)
+    TEST_CASE("closest_points, sphere_plan_3d_dispatch")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -381,19 +381,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_EQ(out.pi(0), 0.1);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pi(2), 0.);
-        EXPECT_EQ(out.pj(0), 0.3);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.pj(2), 0.);
-        EXPECT_EQ(out.nij(0), -1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_plan_3d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -408,19 +408,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_plan_3d_dispatch_rotation_90_deg)
+    TEST_CASE("closest_points, sphere_plan_3d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
@@ -432,20 +432,20 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.1);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.2);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), 1.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(1.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
     // distance plan - sphere
-    TEST(closest_points, plan_sphere_2d)
+    TEST_CASE("closest_points, plan_sphere_2d")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -453,16 +453,16 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), 1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_2d_rotation_30_deg)
+    TEST_CASE("closest_points, plan_sphere_2d_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -473,16 +473,16 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_2d_rotation_90_deg)
+    TEST_CASE("closest_points, plan_sphere_2d_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -490,16 +490,16 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), -1.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.2));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.1));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(-1.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST(closest_points, plan_sphere_2d_dispatch)
+    TEST_CASE("closest_points, plan_sphere_2d_dispatch")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -511,16 +511,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), 1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, plan_sphere_2d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -535,16 +535,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_2d_dispatch_rotation_90_deg)
+    TEST_CASE("closest_points, plan_sphere_2d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s({{0.0, 0.0}}, 0.1);
@@ -556,16 +556,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), -1.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.2));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.1));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(-1.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST(closest_points, plan_sphere_3d)
+    TEST_CASE("closest_points, plan_sphere_3d")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -573,19 +573,19 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_EQ(out.pi(0), 0.3);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pi(2), 0.);
-        EXPECT_EQ(out.pj(0), 0.1);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.pj(2), 0.);
-        EXPECT_EQ(out.nij(0), 1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_3d_rotation_30_deg)
+    TEST_CASE("closest_points, plan_sphere_3d_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -596,19 +596,19 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_3d_rotation_90_deg)
+    TEST_CASE("closest_points, plan_sphere_3d_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
@@ -616,19 +616,19 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.2));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(-1.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST(closest_points, plan_sphere_3d_dispatch)
+    TEST_CASE("closest_points, plan_sphere_3d_dispatch")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -640,19 +640,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_EQ(out.pi(0), 0.3);
-        EXPECT_EQ(out.pi(1), 0.);
-        EXPECT_EQ(out.pi(2), 0.);
-        EXPECT_EQ(out.pj(0), 0.1);
-        EXPECT_EQ(out.pj(1), 0.);
-        EXPECT_EQ(out.pj(2), 0.);
-        EXPECT_EQ(out.nij(0), 1.);
-        EXPECT_EQ(out.nij(1), 0.);
-        EXPECT_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, plan_sphere_3d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
@@ -667,19 +667,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_sphere_3d_dispatch_rotation_90_deg)
+    TEST_CASE("closest_points, plan_sphere_3d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
@@ -691,38 +691,40 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pi(1), -0.2);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.pj(1), -0.1);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), 0., 1e-7);
-        EXPECT_DOUBLE_EQ(out.nij(1), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.1);
+        REQUIRE(out.pi(0) == doctest::Approx(0.));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.2));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(0.));
+        REQUIRE(out.nij(1) == doctest::Approx(-1.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
     // distance sphere - superellipsoid
-    TEST(closest_points, sphere_superellipsoid_2d)
+    TEST_CASE("closest_points, sphere_superellipsoid_2d")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
         superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
 
         auto out = closest_points(s, e);
 
-        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.nij(0), -1., 1e-7);
-        EXPECT_NEAR(out.nij(1), 0., 1e-5);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1).epsilon(1e-7));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_superellipsoid_2d_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_superellipsoid_2d_rotation_30_deg")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -732,17 +734,18 @@ namespace scopi
 
         auto out = closest_points(s, e);
 
-        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_NEAR(out.dij, 0.6, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot).epsilon(1e-5));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
-    TEST(closest_points, sphere_superellipsoid_2d_dispatch)
+    TEST_CASE("closest_points, sphere_superellipsoid_2d_dispatch")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
         superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
@@ -753,17 +756,18 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.nij(0), -1., 1e-7);
-        EXPECT_NEAR(out.nij(1), 0., 1e-5);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_superellipsoid_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_superellipsoid_2d_dispatch_rotation_30_deg")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -777,36 +781,37 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_NEAR(out.dij, 0.6, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
-    TEST(closest_points, sphere_superellipsoid_3d)
+    TEST_CASE("closest_points, sphere_superellipsoid_3d")
     {
+        // FIXME
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
 
         auto out = closest_points(s, e);
 
-        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pi(2), 0., 1e-4);
-        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-4);
-        EXPECT_NEAR(out.pj(2), 0., 1e-4);
-        EXPECT_NEAR(out.nij(0), -1., 1e-6);
-        EXPECT_NEAR(out.nij(1), 0., 1e-3);
-        EXPECT_NEAR(out.nij(2), 0., 1e-3);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_superellipsoid_3d_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_superellipsoid_3d_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -818,20 +823,21 @@ namespace scopi
 
         auto out = closest_points(s, e);
 
-        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_NEAR(out.dij, 0.6, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
-    TEST(closest_points, sphere_superellipsoid_3d_dispatch)
+    TEST_CASE("closest_points, sphere_superellipsoid_3d_dispatch")
     {
+        // FIXME
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
@@ -842,19 +848,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pi(2), 0., 1e-4);
-        EXPECT_NEAR(out.pj(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-4);
-        EXPECT_NEAR(out.pj(2), 0., 1e-4);
-        EXPECT_NEAR(out.nij(0), -1., 1e-6);
-        EXPECT_NEAR(out.nij(1), 0., 1e-3);
-        EXPECT_NEAR(out.nij(2), 0., 1e-3);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, sphere_superellipsoid_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, sphere_superellipsoid_3d_dispatch_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -870,38 +876,40 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_NEAR(out.dij, 0.6, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
     // distance superellipsoid - sphere
-    TEST(closest_points, superellipsoid_sphere_2d)
+    TEST_CASE("closest_points, superellipsoid_sphere_2d")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
         superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
 
         auto out = closest_points(e, s);
 
-        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.nij(0), 1., 1e-7);
-        EXPECT_NEAR(out.nij(1), 0., 1e-5);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_sphere_2d_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_sphere_2d_rotation_30_deg")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -911,17 +919,18 @@ namespace scopi
 
         auto out = closest_points(e, s);
 
-        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.pj(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), -0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.nij(0), -cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), sinRot, 1e-5);
-        EXPECT_NEAR(out.dij, 0.6, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
-    TEST(closest_points, superellipsoid_sphere_2d_dispatch)
+    TEST_CASE("closest_points, superellipsoid_sphere_2d_dispatch")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
         superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
@@ -932,17 +941,18 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.nij(0), 1., 1e-7);
-        EXPECT_NEAR(out.nij(1), 0., 1e-5);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_sphere_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_sphere_2d_dispatch_rotation_30_deg")
     {
+        // FIXME
         constexpr std::size_t dim = 2;
         double dist = 0.4;
         double cosRot = std::sqrt(3.)/2.;
@@ -956,36 +966,37 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.pj(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), -0.3*sinRot, 1e-5);
-        EXPECT_NEAR(out.nij(0), -cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), sinRot, 1e-5);
-        EXPECT_NEAR(out.dij, 0.6, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
-    TEST(closest_points, superellipsoid_sphere_3d)
+    TEST_CASE("closest_points, superellipsoid_sphere_3d")
     {
+        // FIXME
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
 
         auto out = closest_points(e, s);
 
-        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-4);
-        EXPECT_NEAR(out.pi(2), 0., 1e-4);
-        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(2), 0., 1e-4);
-        EXPECT_NEAR(out.nij(0), 1., 1e-6);
-        EXPECT_NEAR(out.nij(1), 0., 1e-3);
-        EXPECT_NEAR(out.nij(2), 0., 1e-3);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_sphere_3d_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_sphere_3d_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -997,20 +1008,21 @@ namespace scopi
 
         auto out = closest_points(e, s);
 
-        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_NEAR(out.dij, 0.6, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
-    TEST(closest_points, superellipsoid_sphere_3d_dispatch)
+    TEST_CASE("closest_points, superellipsoid_sphere_3d_dispatch")
     {
+        // FIXME
         constexpr std::size_t dim = 3;
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
@@ -1021,19 +1033,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0.1, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0., 1e-4);
-        EXPECT_NEAR(out.pi(2), 0., 1e-4);
-        EXPECT_NEAR(out.pj(0), -0.1, 1e-7);
-        EXPECT_NEAR(out.pj(1), 0., 1e-5);
-        EXPECT_NEAR(out.pj(2), 0., 1e-4);
-        EXPECT_NEAR(out.nij(0), 1., 1e-6);
-        EXPECT_NEAR(out.nij(1), 0., 1e-3);
-        EXPECT_NEAR(out.nij(2), 0., 1e-3);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_sphere_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_sphere_3d_dispatch_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1049,20 +1061,20 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), 0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pi(1), -0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_NEAR(out.pj(0), -0.3*cosRot, 1e-5);
-        EXPECT_NEAR(out.pj(1), 0.3*sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_NEAR(out.nij(0), cosRot, 1e-5);
-        EXPECT_NEAR(out.nij(1), -sinRot, 1e-5);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
     // distance superellipsoid - superellipsoid
-    TEST(closest_points, superellipsoid_superellipsoid_2d)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_2d")
     {
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s1({{-0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
@@ -1070,16 +1082,16 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.1);
-        EXPECT_NEAR(out.pi(1), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1);
-        EXPECT_NEAR(out.pj(1), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_NEAR(out.nij(1), 0., 1e-8);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_superellipsoid_2d_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_2d_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         double dist = 0.4;
@@ -1090,16 +1102,16 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-7);
-        EXPECT_NEAR(out.pj(0), 0.2*cosRot, 1e-7);
-        EXPECT_NEAR(out.pj(1), -0.2*sinRot, 1e-7);
-        EXPECT_NEAR(out.nij(0), -cosRot, 1e-7);
-        EXPECT_NEAR(out.nij(1), sinRot, 1e-7);
-        EXPECT_NEAR(out.dij, 0.5, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.5));
     }
 
-    TEST(closest_points, superellipsoid_superellipsoid_2d_dispatch)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_2d_dispatch")
     {
         constexpr std::size_t dim = 2;
         superellipsoid<dim> s1({{-0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
@@ -1111,16 +1123,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.1);
-        EXPECT_NEAR(out.pi(1), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1);
-        EXPECT_NEAR(out.pj(1), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_NEAR(out.nij(1), 0., 1e-8);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_superellipsoid_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_2d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         double dist = 0.4;
@@ -1135,16 +1147,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-7);
-        EXPECT_NEAR(out.pj(0), 0.2*cosRot, 1e-7);
-        EXPECT_NEAR(out.pj(1), -0.2*sinRot, 1e-7);
-        EXPECT_NEAR(out.nij(0), -cosRot, 1e-7);
-        EXPECT_NEAR(out.nij(1), sinRot, 1e-7);
-        EXPECT_NEAR(out.dij, 0.5, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.5));
     }
 
-    TEST(closest_points, superellipsoid_superellipsoid_3d)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_3d")
     {
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s1({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
@@ -1152,19 +1164,19 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.1);
-        EXPECT_NEAR(out.pi(1), 0., 1e-8);
-        EXPECT_NEAR(out.pi(2), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1);
-        EXPECT_NEAR(out.pj(1), 0., 1e-8);
-        EXPECT_NEAR(out.pj(2), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_NEAR(out.nij(1), 0., 1e-8);
-        EXPECT_NEAR(out.nij(2), 0., 1e-8);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_superellipsoid_3d_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_3d_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         double dist = 0.4;
@@ -1175,19 +1187,19 @@ namespace scopi
 
         auto out = closest_points(s1, s2);
 
-        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-7);
-        EXPECT_NEAR(out.pi(2), 0., 1e-16);
-        EXPECT_NEAR(out.pj(0), 0.2*cosRot, 1e-7);
-        EXPECT_NEAR(out.pj(1), -0.2*sinRot, 1e-7);
-        EXPECT_NEAR(out.pj(2), 0., 1e-16);
-        EXPECT_NEAR(out.nij(0), -cosRot, 1e-7);
-        EXPECT_NEAR(out.nij(1), sinRot, 1e-7);
-        EXPECT_NEAR(out.nij(2), 0., 1e-16);
-        EXPECT_NEAR(out.dij, 0.5, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.5));
     }
 
-    TEST(closest_points, superellipsoid_superellipsoid_3d_dispatch)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_3d_dispatch")
     {
         constexpr std::size_t dim = 3;
         superellipsoid<dim> s1({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
@@ -1199,19 +1211,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), -0.1);
-        EXPECT_NEAR(out.pi(1), 0., 1e-8);
-        EXPECT_NEAR(out.pi(2), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.1);
-        EXPECT_NEAR(out.pj(1), 0., 1e-8);
-        EXPECT_NEAR(out.pj(2), 0., 1e-8);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_NEAR(out.nij(1), 0., 1e-8);
-        EXPECT_NEAR(out.nij(2), 0., 1e-8);
-        EXPECT_NEAR(out.dij, 0.2, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.1));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_superellipsoid_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_superellipsoid_3d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         double dist = 0.4;
@@ -1226,20 +1238,20 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_NEAR(out.pi(0), -0.3*cosRot, 1e-7);
-        EXPECT_NEAR(out.pi(1), 0.3*sinRot, 1e-7);
-        EXPECT_NEAR(out.pi(2), 0., 1e-16);
-        EXPECT_NEAR(out.pj(0), 0.2*cosRot, 1e-7);
-        EXPECT_NEAR(out.pj(1), -0.2*sinRot, 1e-7);
-        EXPECT_NEAR(out.pj(2), 0., 1e-16);
-        EXPECT_NEAR(out.nij(0), -cosRot, 1e-7);
-        EXPECT_NEAR(out.nij(1), sinRot, 1e-7);
-        EXPECT_NEAR(out.nij(2), 0., 1e-16);
-        EXPECT_NEAR(out.dij, 0.5, 1e-7);
+        REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.2*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(-0.2*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.5));
     }
 
     // distance superellipsoid - plan
-    TEST(closest_points, superellipsoid_plan_2d)
+    TEST_CASE("closest_points, superellipsoid_plan_2d")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1248,16 +1260,16 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_plan_2d_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_plan_2d_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1269,16 +1281,16 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_plan_2d_dispatch)
+    TEST_CASE("closest_points, superellipsoid_plan_2d_dispatch")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1291,16 +1303,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_plan_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_plan_2d_dispatch_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1316,16 +1328,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_plan_3d)
+    TEST_CASE("closest_points, superellipsoid_plan_3d")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1334,19 +1346,19 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_plan_3d_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_plan_3d_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1358,19 +1370,19 @@ namespace scopi
 
         auto out = closest_points(s, p);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_plan_3d_dispatch)
+    TEST_CASE("closest_points, superellipsoid_plan_3d_dispatch")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1383,19 +1395,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, superellipsoid_plan_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, superellipsoid_plan_3d_dispatch_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1411,20 +1423,20 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
     // distance plan - superellipsoid
-    TEST(closest_points, plan_superellipsoid_2d)
+    TEST_CASE("closest_points, plan_superellipsoid_2d")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1433,16 +1445,16 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_superellipsoid_2d_rotation_30_deg)
+    TEST_CASE("closest_points, plan_superellipsoid_2d_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1454,16 +1466,16 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_superellipsoid_2d_dispatch)
+    TEST_CASE("closest_points, plan_superellipsoid_2d_dispatch")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1476,16 +1488,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_superellipsoid_2d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, plan_superellipsoid_2d_dispatch_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 2;
@@ -1501,16 +1513,16 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_superellipsoid_3d)
+    TEST_CASE("closest_points, plan_superellipsoid_3d")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1519,19 +1531,19 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_superellipsoid_3d_rotation_30_deg)
+    TEST_CASE("closest_points, plan_superellipsoid_3d_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1543,19 +1555,19 @@ namespace scopi
 
         auto out = closest_points(p, s);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_superellipsoid_3d_dispatch)
+    TEST_CASE("closest_points, plan_superellipsoid_3d_dispatch")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1568,19 +1580,19 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -1.);
-        EXPECT_DOUBLE_EQ(out.nij(1), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST(closest_points, plan_superellipsoid_3d_dispatch_rotation_30_deg)
+    TEST_CASE("closest_points, plan_superellipsoid_3d_dispatch_rotation_30_deg")
     {
         // FIXME Newton does not converge
         constexpr std::size_t dim = 3;
@@ -1596,15 +1608,15 @@ namespace scopi
 
         auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
-        EXPECT_DOUBLE_EQ(out.pi(0), 0.1*cosRot);
-        EXPECT_DOUBLE_EQ(out.pi(1), 0.1*sinRot);
-        EXPECT_DOUBLE_EQ(out.pi(2), 0.);
-        EXPECT_DOUBLE_EQ(out.pj(0), 0.3*cosRot);
-        EXPECT_DOUBLE_EQ(out.pj(1), 0.3*sinRot);
-        EXPECT_DOUBLE_EQ(out.pj(2), 0.);
-        EXPECT_DOUBLE_EQ(out.nij(0), -cosRot);
-        EXPECT_DOUBLE_EQ(out.nij(1), -sinRot);
-        EXPECT_DOUBLE_EQ(out.nij(2), 0.);
-        EXPECT_DOUBLE_EQ(out.dij, 0.2);
+        REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
+        REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
+        REQUIRE(out.pi(2) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(0.3*cosRot));
+        REQUIRE(out.pj(1) == doctest::Approx(0.3*sinRot));
+        REQUIRE(out.pj(2) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(-cosRot));
+        REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
+        REQUIRE(out.nij(2) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(0.2));
     }
 }
