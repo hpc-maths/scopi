@@ -13,7 +13,7 @@ set(SCOPI_TESTS
     test_contacts_kdtree.cpp
     test_contacts_brute_force.cpp
     test_obstacles.cpp
-    # test_friction.cpp
+    test_friction.cpp
 )
 
 foreach(filename IN LISTS SCOPI_TESTS)
