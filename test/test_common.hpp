@@ -1,7 +1,5 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <scopi/solver.hpp>
 
 #include <scopi/solvers/OptimMosek.hpp>
@@ -25,25 +23,9 @@ namespace scopi
         ScopiSolver<dim, OptimUzawaMkl, contact, vap>, \
         ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact, vap>, \
         ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact, vap>, \
-        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction with mu = 0
 
     #define SOLVER_WITH_CONTACT_FRICTION(dim, contact, vap) \
         ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction
 
-    template<std::size_t dim, class vap_t = vap_fixed>
-    using solver_types = ::testing::Types<
-                            SOLVER_WITH_CONTACT(dim, contact_kdtree, vap_t)
-                             >;
-
-    template<std::size_t dim, class vap_t = vap_fixed>
-    using solver_with_contact_types = ::testing::Types<
-                            SOLVER_WITH_CONTACT(dim, contact_kdtree, vap_t),
-                            SOLVER_WITH_CONTACT(dim, contact_brute_force, vap_t)
-                             >;
-
-    template<std::size_t dim, class vap_t = vap_fixed>
-    using solver_with_contact_types_friction = ::testing::Types<
-                            SOLVER_WITH_CONTACT_FRICTION(dim, contact_kdtree, vap_t),
-                            SOLVER_WITH_CONTACT_FRICTION(dim, contact_brute_force, vap_t)
-                             >;
 }

@@ -6,7 +6,7 @@ set(COMMON_BASE
 )
 
 set(SCOPI_TESTS
-    # test_sphere.cpp
+    test_sphere.cpp
     # test_superellipsoid.cpp
     test_closest_points.cpp
     test_container.cpp
