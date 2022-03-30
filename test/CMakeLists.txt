@@ -9,7 +9,7 @@ set(SCOPI_TESTS
     # test_sphere.cpp
     # test_superellipsoid.cpp
     test_closest_points.cpp
-    # test_container.cpp
+    test_container.cpp
     # test_contacts_kdtree.cpp
     # test_contacts_brute_force.cpp
     # test_obstacles.cpp
