@@ -33,7 +33,6 @@ namespace scopi
 
         SUBCASE("pos container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -43,7 +42,6 @@ namespace scopi
 
         SUBCASE("pos index container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -69,7 +67,6 @@ namespace scopi
 
         SUBCASE("q container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -81,7 +78,6 @@ namespace scopi
 
         SUBCASE("q index container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -138,7 +134,6 @@ namespace scopi
 
         SUBCASE("pos container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -148,7 +143,6 @@ namespace scopi
 
         SUBCASE("pos index container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -174,7 +168,6 @@ namespace scopi
 
         SUBCASE("q container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -186,7 +179,6 @@ namespace scopi
 
         SUBCASE("q index container")
         {
-            constexpr std::size_t dim = 2;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -232,7 +224,6 @@ namespace scopi
 
         SUBCASE("pos container")
         {
-            constexpr std::size_t dim = 3;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -243,7 +234,6 @@ namespace scopi
 
         SUBCASE("pos index container")
         {
-            constexpr std::size_t dim = 3;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -307,7 +297,6 @@ namespace scopi
 
         SUBCASE("pos container")
         {
-            constexpr std::size_t dim = 3;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -318,7 +307,6 @@ namespace scopi
 
         SUBCASE("pos index container")
         {
-            constexpr std::size_t dim = 3;
             scopi_container<dim> particles;
             particles.push_back(s, p);
 
@@ -386,13 +374,14 @@ namespace scopi
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("critical 2d spheres", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
-        int n = 3; // 2*n*n particles
         double dt = .01;
         std::size_t total_it = 20;
         scopi_container<dim> particles;
+
+        int n = 3; // 2*n*n particles
         std::minstd_rand0 generator(123);
         std::uniform_real_distribution<double> distrib_r(0.2, 0.4);
         std::uniform_real_distribution<double> distrib_move_x(-0.1, 0.1);
