@@ -176,54 +176,41 @@ namespace scopi
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
     }
 
-
-
-
-# if 0
-    template <class S>
-    class TestInclinedPlan  : public ::testing::Test 
+    TEST_CASE_TEMPLATE("sphere inclined plan", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fpd), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fpd))
     {
-        protected:
+        std::tuple<double, double> data;
+        std::vector<std::tuple<double, double>>
+            data_container({std::make_tuple(PI/6., 0.000499746),
+                            std::make_tuple(PI/4., 0.000499748),
+                            std::make_tuple(PI/3., 0.000499729)});
+
+        DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
+
         static constexpr std::size_t dim = 2;
-        TestInclinedPlan()
-        : m_r(1.)
-        , m_alpha(PI/4.)
-        , prop(property<dim>().mass(1.).moment_inertia(0.1))
-        {
-            plan<dim> p({{-m_r*std::cos(m_alpha), -m_r*std::sin(m_alpha)}}, m_alpha);
-            sphere<dim> s({{0., 0.}}, m_r);
+        double radius = 1.;
+        double g = 1.;
+        double dt = 0.005;
+        std::size_t total_it = 2000;
+        double alpha = std::get<0>(data);
 
-            particles.push_back(p, property<dim>().deactivate());
-            particles.push_back(s, prop.force({{0., -m_g}}));
-        }
+        auto prop = property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
+        plan<dim> p({{-radius*std::cos(PI/2.-alpha), -radius*std::sin(PI/2.-alpha)}}, PI/2.-alpha);
+        sphere<dim> s({{0., 0.}}, radius);
 
-        double m_r;
-        double m_alpha;
-        double m_g = 1.;
         scopi_container<dim> particles;
-        double dt = .001;
-        std::size_t total_it = 1000;
-        property<dim> prop; 
-    };
+        particles.push_back(p, property<dim>().deactivate());
+        particles.push_back(s, prop.force({{0., -g}}));
 
-    TYPED_TEST_SUITE(TestInclinedPlan, solver_types_vap, );
+        SolverType solver(particles, dt);
+        solver.solve(total_it);
 
-    TYPED_TEST(TestInclinedPlan, inclined_plan)
-    {
-        GTEST_SKIP();
-        TypeParam solver(this->particles, this->dt);
-        solver.solve(this->total_it);
+        auto pos = particles.pos();
+        auto omega = particles.omega();
+        auto sol = scopi::analytical_solution_sphere_plan(alpha, 0., dt*(total_it+1), radius, g);
+        auto pos_analytical = sol.first;
+        double err_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
 
-        auto pos = this->particles.pos();
-        double tf = this->dt*(this->total_it+1);
-        auto analytical_sol = this->m_g/2.*std::sin(this->m_alpha)*tf*tf * xt::xtensor<double, 1>({std::cos(this->m_alpha), -std::sin(this->m_alpha)});
-        PLOG_DEBUG << "pos = " << pos(1);
-        PLOG_DEBUG << "sol = " << analytical_sol;
-        double error = xt::linalg::norm(pos(1) - analytical_sol, 2) / xt::linalg::norm(analytical_sol);
-        PLOG_INFO << "error = " << error;
-        EXPECT_NEAR(error, 0., 1e-2);
-        // EXPECT_NEAR(pos(1)(0), x*std::cos(this->m_alpha), tolerance);
-        // EXPECT_NEAR(pos(1)(1), -x*std::sin(this->m_alpha), tolerance);
+        REQUIRE(err_pos == doctest::Approx(std::get<1>(data)));
+        REQUIRE(omega(1) == doctest::Approx(0.));
     }
-#endif
 }
