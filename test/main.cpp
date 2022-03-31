@@ -4,10 +4,17 @@
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
-int main()
+int main(int argc, char** argv)
 {
-    doctest::Context context;
     plog::init(plog::none, "tests.log");
+
+    doctest::Context context;
+
+    context.applyCommandLine(argc, argv);
+
+    // overrides
+    context.setOption("no-breaks", true);             // don't break in the debugger when assertions fail
+
     int res = context.run(); // run
 
     if(context.shouldExit()) // important - query flags (and --exit) rely on the user doing this
@@ -18,3 +25,4 @@ int main()
 
     return res + client_stuff_return_code; // the result from doctest is propagated here as well
 }
+
