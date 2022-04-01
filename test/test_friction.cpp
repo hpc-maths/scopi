@@ -82,23 +82,23 @@ namespace scopi {
     {
         std::tuple<double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double>>
-            data_container({std::make_tuple(0.1, PI/6., 0.000508866, 0.000485907),
-                            std::make_tuple(0.1, PI/4., 0.000513437, 0.000464869),
-                            std::make_tuple(0.1, PI/3., 0.000516023, 0.000428305),
-                            std::make_tuple(0.5, PI/6., 0.00049975, 0.000499785),
-                            std::make_tuple(0.5, PI/4., 0.000499728, 0.000500104),
-                            std::make_tuple(0.5, PI/3., 0.000554791, 0.00044186), 
-                            std::make_tuple(1., PI/6., 0.000499751, 0.000499752), 
-                            std::make_tuple(1., PI/4., 0.000499751, 0.00049976),
-                            std::make_tuple(1., PI/3., 0.000499735, 0.000499765)});
+            data_container({std::make_tuple(0.1, PI/6., 0.0050654, 0.00483714),
+                            std::make_tuple(0.1, PI/4., 0.00511045, 0.00462686),
+                            std::make_tuple(0.1, PI/3., 0.00513597, 0.00426266),
+                            std::make_tuple(0.5, PI/6., 0.00497512, 0.00497512), 
+                            std::make_tuple(0.5, PI/4., 0.00497512, 0.00497513),
+                            std::make_tuple(0.5, PI/3., 0.0055183, 0.00439788),
+                            std::make_tuple(1., PI/6., 0.00497512, 0.00497512),
+                            std::make_tuple(1., PI/4., 0.00497512, 0.00497512),
+                            std::make_tuple(1., PI/3., 0.00497512, 0.00497514)});
 
         DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
 
         static constexpr std::size_t dim = 2;
         double radius = 1.;
         double g = 1.;
-        double dt = 0.005;
-        std::size_t total_it = 2000;
+        double dt = 0.05;
+        std::size_t total_it = 200;
         double mu = std::get<0>(data);
         double alpha = std::get<1>(data);
 

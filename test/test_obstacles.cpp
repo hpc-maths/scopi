@@ -180,17 +180,17 @@ namespace scopi
     {
         std::tuple<double, double> data;
         std::vector<std::tuple<double, double>>
-            data_container({std::make_tuple(PI/6., 0.000499746),
-                            std::make_tuple(PI/4., 0.000499748),
-                            std::make_tuple(PI/3., 0.000499729)});
+            data_container({std::make_tuple(PI/6., 0.000999003),
+                            std::make_tuple(PI/4., 0.000999005),
+                            std::make_tuple(PI/3., 0.000998989)});
 
         DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
 
         static constexpr std::size_t dim = 2;
         double radius = 1.;
         double g = 1.;
-        double dt = 0.005;
-        std::size_t total_it = 2000;
+        double dt = 0.01;
+        std::size_t total_it = 1000;
         double alpha = std::get<0>(data);
 
         auto prop = property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
