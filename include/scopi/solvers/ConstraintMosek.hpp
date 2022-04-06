@@ -5,6 +5,7 @@
 
 #include "MatrixOptimSolver.hpp"
 #include "MatrixOptimSolverFriction.hpp"
+#include "MatrixOptimSolverViscosity.hpp"
 
 namespace scopi
 {
@@ -94,5 +95,68 @@ namespace scopi
                 , Domain::inQCone());
     }
 
+
+
+
+
+    // template<>
+    template<std::size_t dim>
+    class ConstraintMosek<MatrixOptimSolverViscosity<dim>>
+    {
+    protected:
+        ConstraintMosek(std::size_t nparts);
+        std::shared_ptr<monty::ndarray<double, 1>> distances_to_vector(xt::xtensor<double, 1> distances) const;
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
+        std::size_t number_col_matrix() const;
+        std::size_t index_first_col_matrix() const;
+        mosek::fusion::Constraint::t constraint(std::shared_ptr<monty::ndarray<double, 1>> D,
+                                       mosek::fusion::Matrix::t A,
+                                       mosek::fusion::Variable::t X,
+                                       mosek::fusion::Model::t model,
+                                       const std::vector<neighbor<dim>>& contacts) const;
+
+    private:
+        std::size_t m_nparticles;
+    };
+
+    template <std::size_t dim>
+    std::size_t ConstraintMosek<MatrixOptimSolverViscosity<dim>>::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
+    {
+        return contacts.size();
+    }
+
+    template <std::size_t dim>
+    mosek::fusion::Constraint::t ConstraintMosek<MatrixOptimSolverViscosity<dim>>::constraint(std::shared_ptr<monty::ndarray<double, 1>> D,
+                                   mosek::fusion::Matrix::t A,
+                                   mosek::fusion::Variable::t X,
+                                   mosek::fusion::Model::t model,
+                                   const std::vector<neighbor<dim>>&) const
+    {
+        using namespace mosek::fusion;
+        return model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
+    }
+
+    template <std::size_t dim>
+    ConstraintMosek<MatrixOptimSolverViscosity<dim>>::ConstraintMosek(std::size_t nparticles)
+    : m_nparticles(nparticles)
+    {}
+
+    template <std::size_t dim>
+    std::shared_ptr<monty::ndarray<double, 1>> ConstraintMosek<MatrixOptimSolverViscosity<dim>>::distances_to_vector(xt::xtensor<double, 1> distances) const
+    {
+        return std::make_shared<monty::ndarray<double, 1>>(distances.data(), monty::shape_t<1>(distances.shape(0)));
+    }
+
+    template <std::size_t dim>
+    std::size_t ConstraintMosek<MatrixOptimSolverViscosity<dim>>::index_first_col_matrix() const
+    {
+        return 1;
+    }
+
+    template <std::size_t dim>
+    std::size_t ConstraintMosek<MatrixOptimSolverViscosity<dim>>::number_col_matrix() const
+    {
+        return 1 + 6*m_nparticles + 6*m_nparticles;
+    }
 }
 #endif
