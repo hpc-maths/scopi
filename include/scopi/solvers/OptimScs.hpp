@@ -7,11 +7,10 @@
 
 namespace scopi
 {
-    class OptimScs: public OptimBase<OptimScs>
-                  , public MatrixOptimSolver
+    class OptimScs: public OptimBase<OptimScs, MatrixOptimSolver>
     {
     public:
-        using base_type = OptimBase<OptimScs>;
+        using base_type = OptimBase<OptimScs, MatrixOptimSolver>;
 
         template <std::size_t dim>
         OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol = 1e-7);
@@ -110,7 +109,6 @@ namespace scopi
     template<std::size_t dim>
     OptimScs::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol)
     : base_type(nparts, dt, 2*3*nparts, 0)
-    , MatrixOptimSolver(nparts, dt)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
     , m_P_p(6*nparts+1)

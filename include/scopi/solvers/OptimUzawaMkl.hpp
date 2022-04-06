@@ -2,7 +2,6 @@
 
 #ifdef SCOPI_USE_MKL
 #include "OptimUzawaBase.hpp"
-#include "MatrixOptimSolver.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
 #include <stdio.h>
@@ -15,7 +14,6 @@
 namespace scopi
 {
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl>
-                       , public MatrixOptimSolver
     {
     public:
         using base_type = OptimUzawaBase<OptimUzawaMkl>;
@@ -133,7 +131,6 @@ namespace scopi
     template<std::size_t dim>
     OptimUzawaMkl::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles)
     : base_type(nparts, dt)
-    , MatrixOptimSolver(nparts, dt)
     , should_destroy(false)
     {
         std::vector<MKL_INT> invP_csr_row;

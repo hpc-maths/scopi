@@ -19,6 +19,8 @@ namespace scopi{
         void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t nite);
         auto get_uadapt();
         auto get_wadapt();
+        void set_coeff_friction(double mu);
+
 
     protected:
         OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
@@ -132,5 +134,12 @@ namespace scopi{
     {
         return static_cast<const Derived&>(*this).get_nb_active_contacts_impl();
     }
+
+    template<class Derived, class model_t>
+    void OptimBase<Derived, model_t>::set_coeff_friction(double mu)
+    {
+        model_t::set_coeff_friction(mu);
+    }
+
 }
 

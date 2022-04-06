@@ -13,10 +13,10 @@
 
 namespace scopi{
     template<class Derived>
-    class OptimUzawaBase: public OptimBase<Derived>
+    class OptimUzawaBase: public OptimBase<Derived, MatrixOptimSolver>
     {
     public:
-        using base_type = OptimBase<Derived>;
+        using base_type = OptimBase<Derived, MatrixOptimSolver>;
         OptimUzawaBase(std::size_t nparts, double dt, double tol = 1e-9);
 
         template <std::size_t dim>

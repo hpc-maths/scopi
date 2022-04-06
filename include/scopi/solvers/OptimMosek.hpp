@@ -27,8 +27,6 @@ namespace scopi{
         double* wadapt_data();
         int get_nb_active_contacts_impl() const;
 
-        void set_coeff_friction(double mu);
-
     private:
 
         void set_moment_mass_matrix(std::size_t nparts,
@@ -163,12 +161,6 @@ namespace scopi{
                 nb_active_contacts++;
         }
         return nb_active_contacts;
-    }
-
-    template<class model_t>
-    void OptimMosek<model_t>::set_coeff_friction(double mu)
-    {
-        model_t::set_coeff_friction(mu);
     }
 
     template<class model_t>
