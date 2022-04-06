@@ -1,6 +1,7 @@
 #pragma once
 
 #include <plog/Log.h>
+#include <vector>
 #include "plog/Initializers/RollingFileInitializer.h"
 
 #include "../container.hpp"
@@ -20,7 +21,10 @@ namespace scopi{
         auto get_uadapt();
         auto get_wadapt();
         void set_coeff_friction(double mu);
-
+        template<std::size_t dim>
+        void set_gamma(std::vector<neighbor<dim>> contacts);
+        template<std::size_t dim>
+        void update_gamma(std::vector<neighbor<dim>> contacts);
 
     protected:
         OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
@@ -139,6 +143,20 @@ namespace scopi{
     void OptimBase<Derived, model_t>::set_coeff_friction(double mu)
     {
         model_t::set_coeff_friction(mu);
+    }
+
+    template<class Derived, class model_t>
+    template<std::size_t dim>
+    void OptimBase<Derived, model_t>::set_gamma(std::vector<neighbor<dim>> contacts)
+    {
+        model_t::set_gamma(contacts);
+    }
+
+    template<class Derived, class model_t>
+    template<std::size_t dim>
+    void OptimBase<Derived, model_t>::update_gamma(std::vector<neighbor<dim>> contacts)
+    {
+        model_t::update_gamma(contacts);
     }
 
 }

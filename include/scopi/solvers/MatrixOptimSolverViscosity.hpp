@@ -21,6 +21,8 @@ namespace scopi
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
+        void update_gamma(const std::vector<neighbor<dim>>& contacts);
+        void set_gamma(const std::vector<neighbor<dim>>& contacts);
 
         std::size_t m_nparticles;
         double m_dt;
@@ -116,5 +118,12 @@ namespace scopi
     , m_dt(dt)
     {}
 
+    template<std::size_t dim>
+    void MatrixOptimSolverViscosity<dim>::set_gamma(const std::vector<neighbor<dim>>& contacts)
+    {}
+
+    template<std::size_t dim>
+    void MatrixOptimSolverViscosity<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts)
+    {}
 }
 

@@ -13,6 +13,7 @@ namespace scopi
 {
     class MatrixOptimSolver
     {
+
     protected:
         MatrixOptimSolver(std::size_t nparts, double dt);
 
@@ -20,6 +21,11 @@ namespace scopi
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
+        template <std::size_t dim>
+        void update_gamma(const std::vector<neighbor<dim>>& contacts);
+        template <std::size_t dim>
+        void set_gamma(const std::vector<neighbor<dim>>& contacts);
+
 
         std::size_t m_nparticles;
         double m_dt;
@@ -105,5 +111,12 @@ namespace scopi
         m_A_values.resize(index);
     }
 
+    template <std::size_t dim>
+    void MatrixOptimSolver::set_gamma(const std::vector<neighbor<dim>>&)
+    {}
+
+    template <std::size_t dim>
+    void MatrixOptimSolver::update_gamma(const std::vector<neighbor<dim>>&)
+    {}
 }
 

@@ -79,6 +79,11 @@ namespace scopi
             auto contacts = compute_contacts();
 
             tic();
+            m_solver.set_gamma(contacts);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : set gamma = " << duration;
+
+            tic();
             write_output_files(contacts, nite);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : write output files = " << duration;
@@ -94,6 +99,11 @@ namespace scopi
             move_active_particles();
             duration = toc();
             PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
+
+            tic();
+            m_solver.update_gamma(contacts);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
             tic();
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());

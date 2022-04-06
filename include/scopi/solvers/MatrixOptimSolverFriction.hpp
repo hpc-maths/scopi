@@ -18,6 +18,7 @@ namespace scopi
 
     class MatrixOptimSolverFriction
     {
+
     protected:
         MatrixOptimSolverFriction(std::size_t nparticles, double dt);
 
@@ -26,6 +27,10 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
         void set_coeff_friction(double mu);
+        template <std::size_t dim>
+        void update_gamma(const std::vector<neighbor<dim>>& contacts);
+        template <std::size_t dim>
+        void set_gamma(const std::vector<neighbor<dim>>& contacts);
 
         std::size_t m_nparticles;
         double m_dt;
@@ -159,6 +164,14 @@ namespace scopi
         m_A_cols.resize(index);
         m_A_values.resize(index);
     }
+
+    template <std::size_t dim>
+    void MatrixOptimSolverFriction::set_gamma(const std::vector<neighbor<dim>>&)
+    {}
+
+    template <std::size_t dim>
+    void MatrixOptimSolverFriction::update_gamma(const std::vector<neighbor<dim>>&)
+    {}
   
 }
 
