@@ -10,12 +10,11 @@
 
 namespace scopi{
     template<class model_t = MatrixOptimSolver>
-    class OptimMosek: public OptimBase<OptimMosek<model_t>>
-                    , public model_t
+    class OptimMosek: public OptimBase<OptimMosek<model_t>, model_t>
                     , public ConstraintMosek<model_t>
     {
     public:
-        using base_type = OptimBase<OptimMosek>;
+        using base_type = OptimBase<OptimMosek, model_t>;
 
         template <std::size_t dim>
         OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles);
@@ -104,7 +103,6 @@ namespace scopi{
     template <std::size_t dim>
     OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
-    , model_t(nparts, dt)
     , ConstraintMosek<model_t>(nparts)
     {
         using namespace mosek::fusion;

@@ -8,9 +8,11 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 
+#include "MatrixOptimSolver.hpp"
+
 namespace scopi{
-    template <class Derived>
-    class OptimBase
+    template <class Derived, class model_t = MatrixOptimSolver>
+    class OptimBase : public model_t
     {
     public:
         template<std::size_t dim>
@@ -41,9 +43,9 @@ namespace scopi{
         int get_nb_active_contacts() const;
     };
 
-    template<class Derived>
+    template<class Derived, class model_t>
     template<std::size_t dim>
-    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t)
+    void OptimBase<Derived, model_t>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t)
     {
         tic();
         create_vector_c(particles);
@@ -57,17 +59,18 @@ namespace scopi{
     }
 
 
-    template<class Derived>
-    OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
-    : m_nparts(nparts)
+    template<class Derived, class model_t>
+    OptimBase<Derived, model_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
+    : model_t(nparts, dt)
+    , m_nparts(nparts)
     , m_dt(dt)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)
     {}
 
-    template<class Derived>
+    template<class Derived, class model_t>
     template<std::size_t dim>
-    void OptimBase<Derived>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void OptimBase<Derived, model_t>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         m_distances = xt::zeros<double>({contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
@@ -76,9 +79,9 @@ namespace scopi{
         }
     }
 
-    template<class Derived>
+    template<class Derived, class model_t>
     template<std::size_t dim>
-    void OptimBase<Derived>::create_vector_c(const scopi_container<dim>& particles)
+    void OptimBase<Derived, model_t>::create_vector_c(const scopi_container<dim>& particles)
     {
         std::size_t mass_dec = m_c_dec;
         std::size_t moment_dec = mass_dec + 3*particles.nb_active();
@@ -102,30 +105,30 @@ namespace scopi{
         }
     }
 
-    template<class Derived>
+    template<class Derived, class model_t>
     template<std::size_t dim>
-    int OptimBase<Derived>::solve_optimization_problem(const scopi_container<dim>& particles,
+    int OptimBase<Derived, model_t>::solve_optimization_problem(const scopi_container<dim>& particles,
                                                  const std::vector<neighbor<dim>>& contacts)
     {
         return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts);
     }
 
-    template<class Derived>
-    auto OptimBase<Derived>::get_uadapt()
+    template<class Derived, class model_t>
+    auto OptimBase<Derived, model_t>::get_uadapt()
     {
         auto data = static_cast<Derived&>(*this).uadapt_data();
         return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
     }
 
-    template<class Derived>
-    auto OptimBase<Derived>::get_wadapt()
+    template<class Derived, class model_t>
+    auto OptimBase<Derived, model_t>::get_wadapt()
     {
         auto data = static_cast<Derived&>(*this).wadapt_data();
         return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
     }
 
-    template<class Derived>
-    int OptimBase<Derived>::get_nb_active_contacts() const
+    template<class Derived, class model_t>
+    int OptimBase<Derived, model_t>::get_nb_active_contacts() const
     {
         return static_cast<const Derived&>(*this).get_nb_active_contacts_impl();
     }
