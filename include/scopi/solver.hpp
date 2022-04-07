@@ -40,7 +40,7 @@ namespace scopi
     {
     public:
         ScopiSolver(scopi_container<dim>& particles, double dt);
-        void solve(std::size_t total_it);
+        void solve(std::size_t total_it, std::size_t initial_iter = 0);
         void set_coeff_friction(double mu);
 
     private:
@@ -64,10 +64,10 @@ namespace scopi
     {}
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it)
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
-        for (std::size_t nite = 0; nite < total_it; ++nite)
+        for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
 

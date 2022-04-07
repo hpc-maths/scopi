@@ -7,6 +7,7 @@ set(SCOPI_EXAMPLES
    two_spheres.cpp
    two_spheres_periodic.cpp
    sphere_plan.cpp
+   viscosity.cpp
 )
 
 include(generator)
