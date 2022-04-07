@@ -24,6 +24,7 @@ namespace scopi
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
         void update_gamma(const std::vector<neighbor<dim>>& contacts);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
         std::size_t m_nparticles;
         double m_dt;
@@ -31,10 +32,12 @@ namespace scopi
         std::vector<int> m_A_rows;
         std::vector<int> m_A_cols;
         std::vector<double> m_A_values;
+        xt::xtensor<double, 1> m_distances;
 
         std::vector<neighbor<dim>> m_contacts_old;
         std::vector<double> m_gamma;
         std::vector<double> m_gamma_old;
+        std::size_t m_nb_gamma_neg;
     };
 
     template<std::size_t dim>
@@ -45,10 +48,9 @@ namespace scopi
         std::size_t active_offset = particles.nb_inactive();
         std::size_t u_size = 3*contacts.size()*2;
         std::size_t w_size = 3*contacts.size()*2;
-        std::size_t nb_positive_constraints = u_size + w_size;
-        m_A_rows.resize(2*nb_positive_constraints);
-        m_A_cols.resize(2*nb_positive_constraints);
-        m_A_values.resize(2*nb_positive_constraints);
+        m_A_rows.resize(2*(u_size + w_size));
+        m_A_cols.resize(2*(u_size + w_size));
+        m_A_values.resize(2*(u_size + w_size));
 
         std::size_t ic = 0;
         std::size_t index = 0;
@@ -64,7 +66,7 @@ namespace scopi
                     index++;
                     if (m_gamma[ic] < 0.)
                     {
-                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                         m_A_values[index] = m_dt*c.nij[d];
                         index++;
@@ -82,7 +84,7 @@ namespace scopi
                     index++;
                     if (m_gamma[ic] < 0.)
                     {
-                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                         m_A_values[index] = -m_dt*c.nij[d];
                         index++;
@@ -107,7 +109,7 @@ namespace scopi
                     index++;
                     if (m_gamma[ic] < 0.)
                     {
-                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
@@ -127,7 +129,7 @@ namespace scopi
                     index++;
                     if (m_gamma[ic] < 0.)
                     {
-                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
@@ -180,6 +182,13 @@ namespace scopi
             for (auto& g : m_gamma)
                 g = 0.;
         }
+
+        m_nb_gamma_neg = 0;
+        for (auto& g : m_gamma)
+        {
+            if (g < 0.)
+                m_nb_gamma_neg++;
+        }
     }
 
     template<std::size_t dim>
@@ -196,13 +205,21 @@ namespace scopi
     template<std::size_t dim>
     std::size_t MatrixOptimSolverViscosity<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
-        std::size_t nb_gamma_neg = 0;
-        for (auto& g : m_gamma)
+        return contacts.size() + m_nb_gamma_neg;
+    }
+
+    template<std::size_t dim>
+    void MatrixOptimSolverViscosity<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    {
+        m_distances = xt::zeros<double>({contacts.size() + m_nb_gamma_neg});
+        for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            if (g < 0.)
-                nb_gamma_neg++;
+            m_distances[i] = contacts[i].dij;
+            if(m_gamma[i] < 0.)
+            {
+                m_distances[contacts.size() + i] = -contacts[i].dij;
+            }
         }
-        return contacts.size() + nb_gamma_neg;
     }
 }
 

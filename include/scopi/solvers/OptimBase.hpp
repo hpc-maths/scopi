@@ -33,12 +33,8 @@ namespace scopi{
         double m_dt;
         xt::xtensor<double, 1> m_c;
         std::size_t m_c_dec;
-        xt::xtensor<double, 1> m_distances;
 
     private:
-        template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
-
         template<std::size_t dim>
         void create_vector_c(const scopi_container<dim>& particles);
 
@@ -55,7 +51,7 @@ namespace scopi{
     {
         tic();
         create_vector_c(particles);
-        create_vector_distances(contacts);
+        this->create_vector_distances(contacts);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
@@ -73,17 +69,6 @@ namespace scopi{
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)
     {}
-
-    template<class Derived, class model_t>
-    template<std::size_t dim>
-    void OptimBase<Derived, model_t>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
-    {
-        m_distances = xt::zeros<double>({contacts.size()});
-        for (std::size_t i = 0; i < contacts.size(); ++i)
-        {
-            m_distances[i] = contacts[i].dij;
-        }
-    }
 
     template<class Derived, class model_t>
     template<std::size_t dim>

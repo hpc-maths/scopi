@@ -19,7 +19,6 @@ namespace scopi
     {
     protected:
         ConstraintMosek(std::size_t nparts);
-        std::shared_ptr<monty::ndarray<double, 1>> distances_to_vector(xt::xtensor<double, 1> distances) const;
         std::size_t number_col_matrix() const;
         std::size_t index_first_col_matrix() const;
         template <std::size_t dim>
@@ -52,7 +51,6 @@ namespace scopi
     {
     protected:
         ConstraintMosek(std::size_t nparts);
-        std::shared_ptr<monty::ndarray<double, 1>> distances_to_vector(xt::xtensor<double, 1> distances) const;
         std::size_t number_col_matrix() const;
         std::size_t index_first_col_matrix() const;
         template <std::size_t dim>
@@ -88,7 +86,6 @@ namespace scopi
     {
     protected:
         ConstraintMosek(std::size_t nparts);
-        std::shared_ptr<monty::ndarray<double, 1>> distances_to_vector(xt::xtensor<double, 1> distances) const;
         std::size_t number_col_matrix() const;
         std::size_t index_first_col_matrix() const;
         mosek::fusion::Constraint::t constraint(std::shared_ptr<monty::ndarray<double, 1>> D,
@@ -116,12 +113,6 @@ namespace scopi
     ConstraintMosek<MatrixOptimSolverViscosity<dim>>::ConstraintMosek(std::size_t nparticles)
     : m_nparticles(nparticles)
     {}
-
-    template <std::size_t dim>
-    std::shared_ptr<monty::ndarray<double, 1>> ConstraintMosek<MatrixOptimSolverViscosity<dim>>::distances_to_vector(xt::xtensor<double, 1> distances) const
-    {
-        return std::make_shared<monty::ndarray<double, 1>>(distances.data(), monty::shape_t<1>(distances.shape(0)));
-    }
 
     template <std::size_t dim>
     std::size_t ConstraintMosek<MatrixOptimSolverViscosity<dim>>::index_first_col_matrix() const

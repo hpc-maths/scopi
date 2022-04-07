@@ -64,7 +64,7 @@ namespace scopi{
         model->objective("minvar", ObjectiveSense::Minimize, Expr::dot(c_mosek, X));
 
         // constraints
-        auto D_mosek = this->distances_to_vector(this->m_distances);
+        auto D_mosek = std::make_shared<monty::ndarray<double, 1>>(this->m_distances.data(), monty::shape_t<1>(this->m_distances.shape(0)));
 
         // matrix
         this->create_matrix_constraint_coo(particles, contacts, this->index_first_col_matrix());

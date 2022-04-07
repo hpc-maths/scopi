@@ -27,6 +27,8 @@ namespace scopi
         void set_gamma(const std::vector<neighbor<dim>>& contacts);
         template <std::size_t dim>
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
+        template<std::size_t dim>
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
         std::size_t m_nparticles;
         double m_dt;
@@ -34,6 +36,8 @@ namespace scopi
         std::vector<int> m_A_rows;
         std::vector<int> m_A_cols;
         std::vector<double> m_A_values;
+        xt::xtensor<double, 1> m_distances;
+
     };
 
     template<std::size_t dim>
@@ -125,5 +129,16 @@ namespace scopi
     {
         return contacts.size();
     }
+
+    template<std::size_t dim>
+    void MatrixOptimSolver::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    {
+        m_distances = xt::zeros<double>({contacts.size()});
+        for (std::size_t i = 0; i < contacts.size(); ++i)
+        {
+            m_distances[i] = contacts[i].dij;
+        }
+    }
+
 }
 
