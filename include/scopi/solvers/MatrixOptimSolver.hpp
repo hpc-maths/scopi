@@ -25,7 +25,8 @@ namespace scopi
         void update_gamma(const std::vector<neighbor<dim>>& contacts);
         template <std::size_t dim>
         void set_gamma(const std::vector<neighbor<dim>>& contacts);
-
+        template <std::size_t dim>
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
 
         std::size_t m_nparticles;
         double m_dt;
@@ -118,5 +119,11 @@ namespace scopi
     template <std::size_t dim>
     void MatrixOptimSolver::update_gamma(const std::vector<neighbor<dim>>&)
     {}
+
+    template <std::size_t dim>
+    std::size_t MatrixOptimSolver::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    {
+        return contacts.size();
+    }
 }
 

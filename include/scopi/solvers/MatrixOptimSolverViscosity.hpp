@@ -23,6 +23,7 @@ namespace scopi
                                           std::size_t firstCol);
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
         void update_gamma(const std::vector<neighbor<dim>>& contacts);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
 
         std::size_t m_nparticles;
         double m_dt;
@@ -44,9 +45,10 @@ namespace scopi
         std::size_t active_offset = particles.nb_inactive();
         std::size_t u_size = 3*contacts.size()*2;
         std::size_t w_size = 3*contacts.size()*2;
-        m_A_rows.resize(u_size + w_size);
-        m_A_cols.resize(u_size + w_size);
-        m_A_values.resize(u_size + w_size);
+        std::size_t nb_positive_constraints = u_size + w_size;
+        m_A_rows.resize(2*nb_positive_constraints);
+        m_A_cols.resize(2*nb_positive_constraints);
+        m_A_values.resize(2*nb_positive_constraints);
 
         std::size_t ic = 0;
         std::size_t index = 0;
@@ -60,6 +62,13 @@ namespace scopi
                     m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                     m_A_values[index] = -m_dt*c.nij[d];
                     index++;
+                    if (m_gamma[ic] < 0.)
+                    {
+                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
+                        m_A_values[index] = m_dt*c.nij[d];
+                        index++;
+                    }
                 }
             }
 
@@ -71,6 +80,13 @@ namespace scopi
                     m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                     m_A_values[index] = m_dt*c.nij[d];
                     index++;
+                    if (m_gamma[ic] < 0.)
+                    {
+                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
+                        m_A_values[index] = -m_dt*c.nij[d];
+                        index++;
+                    }
                 }
             }
 
@@ -89,6 +105,13 @@ namespace scopi
                     m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                     m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
+                    if (m_gamma[ic] < 0.)
+                    {
+                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                        m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                        index++;
+                    }
                 }
             }
 
@@ -102,6 +125,13 @@ namespace scopi
                     m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                     m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
+                    if (m_gamma[ic] < 0.)
+                    {
+                        m_A_rows[index] = nb_positive_constraints + ic;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                        m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                        index++;
+                    }
                 }
             }
 
@@ -147,7 +177,7 @@ namespace scopi
         }
         else
         {
-            for(auto& g : m_gamma)
+            for (auto& g : m_gamma)
                 g = 0.;
         }
     }
@@ -161,6 +191,18 @@ namespace scopi
         {
             m_gamma_old[i] = m_gamma[i]; // TODO m_gamma_old[i] = m_gamma[i] - m_dt * lambda[i]
         }
+    }
+
+    template<std::size_t dim>
+    std::size_t MatrixOptimSolverViscosity<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    {
+        std::size_t nb_gamma_neg = 0;
+        for (auto& g : m_gamma)
+        {
+            if (g < 0.)
+                nb_gamma_neg++;
+        }
+        return contacts.size() + nb_gamma_neg;
     }
 }
 
