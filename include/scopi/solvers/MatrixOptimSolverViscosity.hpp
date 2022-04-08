@@ -16,7 +16,7 @@ namespace scopi
     class MatrixOptimSolverViscosity
     {
     protected:
-        MatrixOptimSolverViscosity(std::size_t nparts, double dt);
+        MatrixOptimSolverViscosity(std::size_t nparts, double dt, double tol=1e-11);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
@@ -38,6 +38,7 @@ namespace scopi
         std::vector<double> m_gamma;
         std::vector<double> m_gamma_old;
         std::size_t m_nb_gamma_neg;
+        double m_tol;
     };
 
     template<std::size_t dim>
@@ -64,7 +65,7 @@ namespace scopi
                     m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                     m_A_values[index] = -m_dt*c.nij[d];
                     index++;
-                    if (m_gamma[ic] < 0.)
+                    if (m_gamma[ic] < -m_tol)
                     {
                         m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
@@ -82,7 +83,7 @@ namespace scopi
                     m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                     m_A_values[index] = m_dt*c.nij[d];
                     index++;
-                    if (m_gamma[ic] < 0.)
+                    if (m_gamma[ic] < -m_tol)
                     {
                         m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
@@ -107,7 +108,7 @@ namespace scopi
                     m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                     m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
-                    if (m_gamma[ic] < 0.)
+                    if (m_gamma[ic] < -m_tol)
                     {
                         m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
@@ -127,7 +128,7 @@ namespace scopi
                     m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                     m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
-                    if (m_gamma[ic] < 0.)
+                    if (m_gamma[ic] < -m_tol)
                     {
                         m_A_rows[index] = contacts.size() + ic;
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
@@ -145,9 +146,10 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    MatrixOptimSolverViscosity<dim>::MatrixOptimSolverViscosity(std::size_t nparticles, double dt)
+    MatrixOptimSolverViscosity<dim>::MatrixOptimSolverViscosity(std::size_t nparticles, double dt, double tol)
     : m_nparticles(nparticles)
     , m_dt(dt)
+    , m_tol(tol)
     {}
 
     template<std::size_t dim>
@@ -186,7 +188,7 @@ namespace scopi
         m_nb_gamma_neg = 0;
         for (auto& g : m_gamma)
         {
-            if (g < 0.)
+            if (g < -m_tol)
                 m_nb_gamma_neg++;
         }
     }
@@ -200,7 +202,7 @@ namespace scopi
         for (std::size_t i = 0; i < m_gamma_old.size(); ++i)
         {
             double f_contact;
-            if (m_gamma[i] < 0.)
+            if (m_gamma[i] < -m_tol)
             {
                 f_contact = lambda(i) - lambda(m_gamma.size() + nb_gamma_neg);
                 nb_gamma_neg++;
@@ -210,8 +212,8 @@ namespace scopi
                 f_contact = lambda(i);
             }
             m_gamma_old[i] = std::min(0., m_gamma[i] - m_dt * f_contact);
-            if (m_gamma_old[i] > -1e-8)
-                m_gamma_old[i] = 0.;
+            // if (m_gamma_old[i] > -1e-8)
+            //     m_gamma_old[i] = 0.;
             PLOG_WARNING << m_gamma[i];
         }
     }
@@ -229,7 +231,7 @@ namespace scopi
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             m_distances[i] = contacts[i].dij;
-            if(m_gamma[i] < 0.)
+            if(m_gamma[i] < -m_tol)
             {
                 m_distances[contacts.size() + i] = -contacts[i].dij;
             }
