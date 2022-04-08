@@ -22,7 +22,7 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
-        void update_gamma(const std::vector<neighbor<dim>>& contacts);
+        void update_gamma(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
@@ -192,13 +192,27 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolverViscosity<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts)
+    void MatrixOptimSolverViscosity<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda)
     {
         m_contacts_old = contacts;
         m_gamma_old.resize(m_gamma.size());
+        std::size_t nb_gamma_neg = 0;
         for (std::size_t i = 0; i < m_gamma_old.size(); ++i)
         {
-            m_gamma_old[i] = m_gamma[i]; // TODO m_gamma_old[i] = m_gamma[i] - m_dt * lambda[i]
+            double f_contact;
+            if (m_gamma[i] < 0.)
+            {
+                f_contact = lambda(i) - lambda(m_gamma.size() + nb_gamma_neg);
+                nb_gamma_neg++;
+            }
+            else
+            {
+                f_contact = lambda(i);
+            }
+            m_gamma_old[i] = std::min(0., m_gamma[i] - m_dt * f_contact);
+            if (m_gamma_old[i] > -1e-8)
+                m_gamma_old[i] = 0.;
+            PLOG_WARNING << m_gamma[i];
         }
     }
 

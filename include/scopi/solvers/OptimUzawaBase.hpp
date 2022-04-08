@@ -25,6 +25,7 @@ namespace scopi{
 
         auto uadapt_data();
         auto wadapt_data();
+        auto lagrange_multiplier_data();
 
         int get_nb_active_contacts_impl() const;
 
@@ -157,6 +158,12 @@ namespace scopi{
     auto OptimUzawaBase<Derived>::wadapt_data()
     {
         return m_U.data() + 3*this->m_nparts;
+    }
+
+    template<class Derived>
+    auto OptimUzawaBase<Derived>::lagrange_multiplier_data()
+    {
+        return m_L.data();
     }
 
     template<class Derived>

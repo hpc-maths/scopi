@@ -20,6 +20,8 @@ namespace scopi{
         void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t nite);
         auto get_uadapt();
         auto get_wadapt();
+        template<std::size_t dim>
+        auto get_lagrange_multiplier(std::vector<neighbor<dim>> contacts);
         void set_coeff_friction(double mu);
         template<std::size_t dim>
         void set_gamma(std::vector<neighbor<dim>> contacts);
@@ -119,6 +121,14 @@ namespace scopi{
     }
 
     template<class Derived, class model_t>
+    template<std::size_t dim>
+    auto OptimBase<Derived, model_t>::get_lagrange_multiplier(std::vector<neighbor<dim>> contacts)
+    {
+        auto data = static_cast<Derived&>(*this).lagrange_multiplier_data();
+        return xt::adapt(reinterpret_cast<double*>(data), {this->number_row_matrix(contacts), 1UL});
+    }
+
+    template<class Derived, class model_t>
     int OptimBase<Derived, model_t>::get_nb_active_contacts() const
     {
         return static_cast<const Derived&>(*this).get_nb_active_contacts_impl();
@@ -141,7 +151,7 @@ namespace scopi{
     template<std::size_t dim>
     void OptimBase<Derived, model_t>::update_gamma(std::vector<neighbor<dim>> contacts)
     {
-        model_t::update_gamma(contacts);
+        model_t::update_gamma(contacts, get_lagrange_multiplier(contacts));
     }
 
 }

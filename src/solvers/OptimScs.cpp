@@ -14,6 +14,11 @@ namespace scopi
         return m_sol.x + 3*this->m_nparts;
     }
 
+    double* OptimScs::lagrange_multiplier_data()
+    {
+        return m_sol.y;
+    }
+
     int OptimScs::get_nb_active_contacts_impl() const
     {
         int nb_active_contacts = 0;

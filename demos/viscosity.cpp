@@ -18,7 +18,7 @@ int main()
 
     double radius = 1.;
     double g = radius;
-    double h = 2.*radius;
+    double h = 1.5*radius;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
 
     double dt = 0.05;
@@ -30,15 +30,10 @@ int main()
     particles.push_back(p, scopi::property<dim>().deactivate());
     particles.push_back(s, prop.force({{0., -g}}));
 
-    {
-        scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
-        solver.solve(total_it);
-    }
-    {
-        particles.f()(1)(1) *= -1.;
-        scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
-        solver.solve(2*total_it, total_it);
-    }
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    solver.solve(total_it);
+    particles.f()(1)(1) *= -1.;
+    solver.solve(5*total_it, total_it);
 
     return 0;
 }

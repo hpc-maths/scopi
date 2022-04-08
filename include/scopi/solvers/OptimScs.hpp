@@ -20,6 +20,7 @@ namespace scopi
                                             const std::vector<neighbor<dim>>& contacts);
         double* uadapt_data();
         double* wadapt_data();
+        double* lagrange_multiplier_data();
         int get_nb_active_contacts_impl() const;
 
     private:

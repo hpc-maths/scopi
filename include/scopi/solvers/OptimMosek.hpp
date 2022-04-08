@@ -25,6 +25,7 @@ namespace scopi{
 
         double* uadapt_data();
         double* wadapt_data();
+        double* lagrange_multiplier_data();
         int get_nb_active_contacts_impl() const;
 
     private:
@@ -91,6 +92,10 @@ namespace scopi{
 
         m_Xlvl = X->level();
         m_dual = qc1->dual();
+        for (auto& x : *m_dual)
+        {
+            x *= -1.;
+        }
         auto duration3 = toc();
         PLOG_INFO << "----> CPUTIME : Mosek solve = " << duration3;
 
@@ -143,6 +148,12 @@ namespace scopi{
     double* OptimMosek<model_t>::uadapt_data()
     {
         return m_Xlvl->raw() + 1;
+    }
+
+    template<class model_t>
+    double* OptimMosek<model_t>::lagrange_multiplier_data()
+    {
+        return m_dual->raw();
     }
 
     template<class model_t>
