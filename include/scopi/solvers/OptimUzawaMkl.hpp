@@ -4,6 +4,7 @@
 #include "OptimUzawaBase.hpp"
 #include "mkl_service.h"
 #include "mkl_spblas.h"
+#include "../problems/MatrixOptimSolver.hpp"
 #include <stdio.h>
 
 #include <xtensor/xadapt.hpp>
@@ -13,7 +14,7 @@
 
 namespace scopi
 {
-    template <class model_t>
+    template <class model_t = MatrixOptimSolver>
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<model_t>, model_t>
     {
     public:
