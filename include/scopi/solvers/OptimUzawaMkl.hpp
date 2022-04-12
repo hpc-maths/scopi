@@ -13,10 +13,11 @@
 
 namespace scopi
 {
-    class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl>
+    template <class model_t>
+    class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<model_t>, model_t>
     {
     public:
-        using base_type = OptimUzawaBase<OptimUzawaMkl>;
+        using base_type = OptimUzawaBase<OptimUzawaMkl<model_t>>;
 
         template <std::size_t dim>
         OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles);
@@ -63,8 +64,9 @@ namespace scopi
 
     };
 
+    template <class model_t>
     template<std::size_t dim>
-    void OptimUzawaMkl::init_uzawa_impl(const scopi_container<dim>& particles,
+    void OptimUzawaMkl<model_t>::init_uzawa_impl(const scopi_container<dim>& particles,
                                         const std::vector<scopi::neighbor<dim>>& contacts)
     {
         if(should_destroy)
@@ -78,7 +80,7 @@ namespace scopi
         sparse_matrix_t A_coo;
         m_status =  mkl_sparse_d_create_coo(&A_coo,
                                            SPARSE_INDEX_BASE_ZERO,
-                                           contacts.size(), // number of rows
+                                           this->number_row_matrix(contacts), // number of rows
                                            6*this->m_nparts, // number of cols
                                            this->m_A_values.size(), // number of non-zero elements
                                            this->m_A_rows.data(),
@@ -105,31 +107,35 @@ namespace scopi
         should_destroy = true;
     }
 
+    template <class model_t>
     template<std::size_t dim>
-    void OptimUzawaMkl::gemv_inv_P_impl(const scopi_container<dim>&)
+    void OptimUzawaMkl<model_t>::gemv_inv_P_impl(const scopi_container<dim>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_U.data(), 0., this->m_U.data()); // U = - P^-1 * U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status;
     }
 
+    template <class model_t>
     template<std::size_t dim>
-    void OptimUzawaMkl::gemv_A_impl(const scopi_container<dim>&,
+    void OptimUzawaMkl<model_t>::gemv_A_impl(const scopi_container<dim>&,
                                          const std::vector<neighbor<dim>>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_A, m_descrA, this->m_U.data(), 1., this->m_R.data()); // R = - A * U + R
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for R = - A * U + R: " << m_status;
     }
 
+    template <class model_t>
     template<std::size_t dim>
-    void OptimUzawaMkl::gemv_transpose_A_impl(const scopi_container<dim>&,
+    void OptimUzawaMkl<model_t>::gemv_transpose_A_impl(const scopi_container<dim>&,
                                                    const std::vector<neighbor<dim>>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, this->m_L.data(), 1., this->m_U.data()); // U = A^T * L + U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status;
     }
 
+    template <class model_t>
     template<std::size_t dim>
-    OptimUzawaMkl::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles)
+    OptimUzawaMkl<model_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles)
     : base_type(nparts, dt)
     , should_destroy(false)
     {
@@ -173,5 +179,91 @@ namespace scopi
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
     }
 
+    template <class model_t>
+    OptimUzawaMkl<model_t>::~OptimUzawaMkl()
+    {
+        m_status = mkl_sparse_destroy ( m_A );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix A: " << m_status;
+        m_status = mkl_sparse_destroy ( m_inv_P );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix P^-1: " << m_status;
+    }
+
+    template <class model_t>
+    void OptimUzawaMkl<model_t>::print_csr_matrix(const sparse_matrix_t A)
+    {
+        MKL_INT* csr_row_begin_ptr = NULL;
+        MKL_INT* csr_row_end_ptr = NULL;
+        MKL_INT* csr_col_ptr = NULL;
+        double* csr_val_ptr = NULL;
+        sparse_index_base_t indexing;
+        MKL_INT nbRows;
+        MKL_INT nbCols;
+        m_status = mkl_sparse_d_export_csr(A,
+                                           &indexing,
+                                           &nbRows,
+                                           &nbCols,
+                                           &csr_row_begin_ptr,
+                                           &csr_row_end_ptr,
+                                           &csr_col_ptr,
+                                           &csr_val_ptr);
+
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_export_csr: " << m_status;
+
+        std::cout << "\nMatrix with " << nbRows << " rows and " << nbCols << " columns\n";
+        std::cout << "RESULTANT MATRIX:\nrow# : (column, value) (column, value)\n";
+        int ii = 0;
+        for( int i = 0; i < nbRows; i++ )
+        {
+            std::cout << "row#" << i << ": ";
+            for(MKL_INT j = csr_row_begin_ptr[i]; j < csr_row_end_ptr[i]; j++ )
+            {
+                std::cout << " (" << csr_col_ptr[ii] << ", " << csr_val_ptr[ii] << ")";
+                ii++;
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "_____________________________________________________________________  \n" ;
+    }
+
+    template <class model_t>
+    void OptimUzawaMkl<model_t>::set_moment_matrix(std::size_t nparts,
+                                          std::vector<MKL_INT>& invP_csr_row,
+                                          std::vector<MKL_INT>& invP_csr_col,
+                                          std::vector<double>& invP_csr_val,
+                                          const scopi_container<2>& particles)
+    {
+        auto active_offset = particles.nb_inactive();
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < 2; ++d)
+            {
+                invP_csr_row.push_back(3*nparts + 3*i + d);
+                invP_csr_col.push_back(3*nparts + 3*i + d);
+                invP_csr_val.push_back(0.);
+            }
+            invP_csr_row.push_back(3*nparts + 3*i + 2);
+            invP_csr_col.push_back(3*nparts + 3*i + 2);
+            invP_csr_val.push_back(1./particles.j()(active_offset + i));
+        }
+    }
+
+    template <class model_t>
+    void OptimUzawaMkl<model_t>::set_moment_matrix(std::size_t nparts,
+                                         std::vector<MKL_INT>& invP_csr_row,
+                                         std::vector<MKL_INT>& invP_csr_col,
+                                         std::vector<double>& invP_csr_val,
+                                         const scopi_container<3>& particles)
+    {
+        auto active_offset = particles.nb_inactive();
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                invP_csr_row.push_back(3*nparts + 3*i + d);
+                invP_csr_col.push_back(3*nparts + 3*i + d);
+                invP_csr_val.push_back(1./particles.j()(active_offset + i)(d));
+            }
+        }
+    }
 }
 #endif

@@ -103,7 +103,6 @@ set(SCOPI_SRC
     src/problems/MatrixOptimSolver.cpp
     src/problems/MatrixOptimSolverFriction.cpp
     src/solvers/OptimScs.cpp
-    src/solvers/OptimUzawaMkl.cpp
     src/solvers/OptimUzawaMatrixFreeOmp.cpp
     src/solvers/OptimUzawaMatrixFreeTbb.cpp
     src/solvers/ConstraintMosek.cpp
