@@ -21,6 +21,7 @@
 
 namespace scopi
 {
+#ifdef SCOPI_USE_MKL
     #define SOLVER_WITH_CONTACT(dim, contact, vap) \
         ScopiSolver<dim, OptimMosek<>, contact, vap>, \
         ScopiSolver<dim, OptimScs, contact, vap>, \
@@ -28,6 +29,14 @@ namespace scopi
         ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact, vap>, \
         ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact, vap>, \
         ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction with mu = 0
+#else
+    #define SOLVER_WITH_CONTACT(dim, contact, vap) \
+        ScopiSolver<dim, OptimMosek<>, contact, vap>, \
+        ScopiSolver<dim, OptimScs, contact, vap>, \
+        ScopiSolver<dim, OptimUzawaMatrixFreeTbb, contact, vap>, \
+        ScopiSolver<dim, OptimUzawaMatrixFreeOmp, contact, vap>, \
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction with mu = 0
+#endif
 
     #define SOLVER_WITH_CONTACT_FRICTION(dim, contact, vap) \
         ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction
