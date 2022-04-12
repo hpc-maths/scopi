@@ -16,7 +16,7 @@ namespace scopi
     class MatrixOptimSolverViscosity
     {
     protected:
-        MatrixOptimSolverViscosity(std::size_t nparts, double dt, double tol=1e-11);
+        MatrixOptimSolverViscosity(std::size_t nparts, double dt, double tol=1e-10);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
@@ -212,9 +212,11 @@ namespace scopi
                 f_contact = lambda(i);
             }
             m_gamma_old[i] = std::min(0., m_gamma[i] - m_dt * f_contact);
+            if(m_gamma_old[i] > -m_tol)
+                m_gamma_old[i] = 0.;
             // if (m_gamma_old[i] > -1e-8)
             //     m_gamma_old[i] = 0.;
-            PLOG_WARNING << m_gamma[i];
+            PLOG_WARNING << m_gamma[i] << "    " << contacts[0].dij;
         }
     }
 

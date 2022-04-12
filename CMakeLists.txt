@@ -100,8 +100,8 @@ endif()
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
-    src/solvers/MatrixOptimSolver.cpp
-    src/solvers/MatrixOptimSolverFriction.cpp
+    src/problems/MatrixOptimSolver.cpp
+    src/problems/MatrixOptimSolverFriction.cpp
     src/solvers/OptimScs.cpp
     src/solvers/OptimUzawaMkl.cpp
     src/solvers/OptimUzawaMatrixFreeOmp.cpp

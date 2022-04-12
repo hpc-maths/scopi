@@ -2,7 +2,7 @@
 
 #ifdef SCOPI_USE_MOSEK
 #include "OptimBase.hpp"
-#include "MatrixOptimSolver.hpp"
+#include "../problems/MatrixOptimSolver.hpp"
 #include "ConstraintMosek.hpp"
 
 #include <memory>

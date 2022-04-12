@@ -4,7 +4,7 @@
 #include <scopi/property.hpp>
 #include <scopi/solvers/OptimMosek.hpp>
 #include <scopi/vap/vap_fpd.hpp>
-#include <scopi/solvers/MatrixOptimSolverViscosity.hpp>
+#include <scopi/problems/MatrixOptimSolverViscosity.hpp>
 
 int main()
 {

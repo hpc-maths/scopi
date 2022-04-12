@@ -7,7 +7,7 @@
 
 #include <scopi/solvers/OptimMosek.hpp>
 #include <scopi/vap/vap_fpd.hpp>
-#include <scopi/solvers/MatrixOptimSolverFriction.hpp>
+#include <scopi/problems/MatrixOptimSolverFriction.hpp>
 
 int main()
 {

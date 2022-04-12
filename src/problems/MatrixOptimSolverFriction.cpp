@@ -1,4 +1,4 @@
-#include "scopi/solvers/MatrixOptimSolverFriction.hpp"
+#include "scopi/problems/MatrixOptimSolverFriction.hpp"
 
 namespace scopi
 {

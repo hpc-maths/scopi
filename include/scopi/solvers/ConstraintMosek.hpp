@@ -3,9 +3,9 @@
 #ifdef SCOPI_USE_MOSEK
 #include <fusion.h>
 
-#include "MatrixOptimSolver.hpp"
-#include "MatrixOptimSolverFriction.hpp"
-#include "MatrixOptimSolverViscosity.hpp"
+#include "../problems/MatrixOptimSolver.hpp"
+#include "../problems/MatrixOptimSolverFriction.hpp"
+#include "../problems/MatrixOptimSolverViscosity.hpp"
 
 namespace scopi
 {

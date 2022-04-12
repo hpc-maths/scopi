@@ -9,7 +9,7 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 
-#include "MatrixOptimSolver.hpp"
+#include "../problems/MatrixOptimSolver.hpp"
 
 namespace scopi{
     template <class Derived, class model_t = MatrixOptimSolver>

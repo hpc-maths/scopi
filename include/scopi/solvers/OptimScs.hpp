@@ -2,7 +2,7 @@
 
 #ifdef SCOPI_USE_SCS
 #include "OptimBase.hpp"
-#include "MatrixOptimSolver.hpp"
+#include "../problems/MatrixOptimSolver.hpp"
 #include <scs.h>
 
 namespace scopi

@@ -5,14 +5,16 @@
 
 #include <scopi/solvers/OptimMosek.hpp>
 #include <scopi/solvers/OptimScs.hpp>
+#ifdef SCOPI_USE_MKL
 #include <scopi/solvers/OptimUzawaMkl.hpp>
+#endif
 #include <scopi/solvers/OptimUzawaMatrixFreeOmp.hpp>
 #include <scopi/solvers/OptimUzawaMatrixFreeTbb.hpp>
 
 #include <scopi/contact/contact_kdtree.hpp>
 #include <scopi/contact/contact_brute_force.hpp>
 
-#include <scopi/solvers/MatrixOptimSolverFriction.hpp>
+#include <scopi/problems/MatrixOptimSolverFriction.hpp>
 
 #include <scopi/vap/vap_fixed.hpp>
 #include <scopi/vap/vap_fpd.hpp>
@@ -52,10 +54,12 @@ TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimScs, scopi::contact_kdtree, sco
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimScs, scopi::contact_brute_force, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimScs, scopi::contact_brute_force, scopi::vap_fpd>);
 
+#ifdef SCOPI_USE_MKL
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fpd>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fpd>);
+#endif
 
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fpd>);

@@ -1,4 +1,4 @@
-#include "scopi/solvers/MatrixOptimSolver.hpp"
+#include "scopi/problems/MatrixOptimSolver.hpp"
 
 namespace scopi
 {
