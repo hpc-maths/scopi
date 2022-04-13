@@ -29,7 +29,7 @@ namespace scopi{
         void update_gamma(std::vector<neighbor<dim>> contacts);
 
     protected:
-        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
+        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, double tol_model = 0.);
 
         std::size_t m_nparts;
         double m_dt;
@@ -64,8 +64,8 @@ namespace scopi{
 
 
     template<class Derived, class model_t>
-    OptimBase<Derived, model_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
-    : model_t(nparts, dt)
+    OptimBase<Derived, model_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, double tol_model)
+    : model_t(nparts, dt, tol_model)
     , m_nparts(nparts)
     , m_dt(dt)
     , m_c(xt::zeros<double>({cSize}))

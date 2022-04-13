@@ -105,7 +105,7 @@ namespace scopi{
     template<class model_t>
     template <std::size_t dim>
     OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
-    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
+    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, 1e-11)
     , ConstraintMosek<model_t>(nparts)
     {
         using namespace mosek::fusion;

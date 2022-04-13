@@ -16,7 +16,7 @@ namespace scopi
     class MatrixOptimSolverViscosity
     {
     protected:
-        MatrixOptimSolverViscosity(std::size_t nparts, double dt, double tol=1e-10);
+        MatrixOptimSolverViscosity(std::size_t nparts, double dt, double tol);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
