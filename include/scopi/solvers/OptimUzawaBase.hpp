@@ -28,6 +28,7 @@ namespace scopi{
         auto lagrange_multiplier_data();
 
         int get_nb_active_contacts_impl() const;
+        void set_rho_uzawa(double rho);
 
     protected:
         template <std::size_t dim>
@@ -201,5 +202,11 @@ namespace scopi{
                                              const std::vector<neighbor<dim>>& contacts)
     {
         static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts);
+    }
+
+    template<class Derived, class model_t>
+    void OptimUzawaBase<Derived, model_t>::set_rho_uzawa(double rho)
+    {
+        m_rho = rho;
     }
 }
