@@ -39,6 +39,7 @@ namespace scopi
         std::vector<double> m_gamma_old;
         std::size_t m_nb_gamma_neg;
         double m_tol;
+        double m_gamma_min;
     };
 
     template<std::size_t dim>
@@ -150,6 +151,7 @@ namespace scopi
     : m_nparticles(nparticles)
     , m_dt(dt)
     , m_tol(tol)
+    , m_gamma_min(-3.)
     {}
 
     template<std::size_t dim>
@@ -211,11 +213,10 @@ namespace scopi
             {
                 f_contact = lambda(i);
             }
-            m_gamma_old[i] = std::min(0., m_gamma[i] - m_dt * f_contact);
+            m_gamma_old[i] = std::max(m_gamma_min, std::min(0., m_gamma[i] - m_dt * f_contact));
+            // for Mosek
             if(m_gamma_old[i] > -m_tol)
                 m_gamma_old[i] = 0.;
-            // if (m_gamma_old[i] > -1e-8)
-            //     m_gamma_old[i] = 0.;
             PLOG_WARNING << m_gamma[i];
         }
     }
