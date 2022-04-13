@@ -216,7 +216,7 @@ namespace scopi
                 m_gamma_old[i] = 0.;
             // if (m_gamma_old[i] > -1e-8)
             //     m_gamma_old[i] = 0.;
-            PLOG_WARNING << m_gamma[i] << "    " << contacts[0].dij;
+            PLOG_WARNING << m_gamma[i];
         }
     }
 

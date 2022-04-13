@@ -18,7 +18,7 @@ namespace scopi
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<model_t>, model_t>
     {
     public:
-        using base_type = OptimUzawaBase<OptimUzawaMkl<model_t>>;
+        using base_type = OptimUzawaBase<OptimUzawaMkl<model_t>, model_t>;
 
         template <std::size_t dim>
         OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles);

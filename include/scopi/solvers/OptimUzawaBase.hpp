@@ -16,7 +16,7 @@ namespace scopi{
     class OptimUzawaBase: public OptimBase<Derived, model_t>
     {
     public:
-        using base_type = OptimBase<Derived, MatrixOptimSolver>;
+        using base_type = OptimBase<Derived, model_t>;
         OptimUzawaBase(std::size_t nparts, double dt, double tol = 1e-9);
 
         template <std::size_t dim>
