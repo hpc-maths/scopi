@@ -48,7 +48,7 @@ namespace scopi{
 
         const double m_tol;
         const std::size_t m_max_iter;
-        const double m_rho;
+        double m_rho;
         const double m_dmin;
         xt::xtensor<double, 1> m_U;
         xt::xtensor<double, 1> m_L;
