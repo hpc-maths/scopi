@@ -263,7 +263,7 @@ namespace scopi
     , m_dt(dt)
     , m_tol(tol)
     , m_gamma_min(-3.)
-    , m_mu(1.)
+    , m_mu(0.)
     {}
 
     template<std::size_t dim>
@@ -316,17 +316,27 @@ namespace scopi
         m_contacts_old = contacts;
         m_gamma_old.resize(m_gamma.size());
         std::size_t nb_gamma_neg = 0;
-        for (std::size_t i = 0; i < m_gamma_old.size(); ++i)
+        std::size_t nb_gamma_min = 0;
+
+        for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             double f_contact;
-            if (m_gamma[i] < -m_tol)
+            if (m_gamma[i] != m_gamma_min)
             {
-                f_contact = lambda(i) - lambda(m_gamma.size() + nb_gamma_neg);
-                nb_gamma_neg++;
+                if(m_gamma[i] < -m_tol)
+                {
+                    f_contact = lambda(i) - lambda(m_gamma.size() - m_nb_gamma_min + nb_gamma_neg);
+                    nb_gamma_neg++;
+                }
+                else
+                {
+                    f_contact = lambda(i);
+                }
             }
             else
             {
-                f_contact = lambda(i);
+                f_contact = lambda(m_gamma.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*nb_gamma_min);
+                nb_gamma_min++;
             }
             m_gamma_old[i] = std::max(m_gamma_min, std::min(0., m_gamma[i] - m_dt * f_contact));
             // for Mosek

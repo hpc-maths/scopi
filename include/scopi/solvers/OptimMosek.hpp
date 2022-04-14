@@ -96,8 +96,8 @@ namespace scopi{
         m_Xlvl = X->level();
         // FIXME only for MatrixOptimSolverViscosity
         // m_dual = qc1->dual();
-        m_dual = std::make_shared<monty::ndarray<double, 1>>(qc1->dual()->raw(), shape_t<1>({contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg() + this->get_nb_gamma_min()}));
-        for (std::size_t i = 0; i < this->get_nb_gamma_min(); ++i)
+        m_dual = std::make_shared<monty::ndarray<double, 1>>(qc1->dual()->raw(), shape_t<1>({this->number_row_matrix(contacts)}));
+        for (std::size_t i = 0; i < 4*this->get_nb_gamma_min(); ++i)
         {
             m_dual->raw()[contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg() + i] = -qc4->dual()->raw()[i];
         }
