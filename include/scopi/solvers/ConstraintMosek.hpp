@@ -136,11 +136,12 @@ namespace scopi
     {
         using namespace mosek::fusion;
         using namespace monty;
-        auto D_restricted = std::make_shared<ndarray<double, 1>>(D->raw()+(contacts.size() - nb_gamma_min + nb_gamma_neg), shape_t<1>(4*nb_gamma_min));
+        auto D_restricted = std::make_shared<ndarray<double, 1>>(D->raw()+(contacts.size() - nb_gamma_min + nb_gamma_neg), shape_t<1>(2*4*nb_gamma_min));
+
         return model->constraint("qc4", 
                 Expr::reshape(
-                    Expr::sub(D_restricted, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - nb_gamma_min + nb_gamma_neg, contacts.size() - nb_gamma_min + nb_gamma_neg + 4*nb_gamma_min) ),
-                    nb_gamma_min, 4),
+                    Expr::sub(D_restricted, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - nb_gamma_min + nb_gamma_neg, contacts.size() - nb_gamma_min + nb_gamma_neg + 2*4*nb_gamma_min) ),
+                    2*nb_gamma_min, 4),
                 Domain::inQCone());
     }
 

@@ -53,11 +53,10 @@ namespace scopi
                                                               std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t u_size = 3*contacts.size()*2;
-        std::size_t w_size = 3*contacts.size()*2;
-        m_A_rows.resize(2*(u_size + w_size));
-        m_A_cols.resize(2*(u_size + w_size));
-        m_A_values.resize(2*(u_size + w_size));
+        std::size_t size = 6 * number_row_matrix(contacts);
+        m_A_rows.resize(size);
+        m_A_cols.resize(size);
+        m_A_values.resize(size);
 
         std::size_t ic = 0;
         std::size_t index = 0;
@@ -157,12 +156,29 @@ namespace scopi
                         m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                         m_A_values[index] = -m_dt*c.nij[d];
                         index++;
+
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
+                        m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
+                        m_A_values[index] = m_dt*c.nij[d];
+                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
                         for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                         {
                             m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
+                            m_A_values[index] = -m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            if(ind_row == ind_col)
+                            {
+                                m_A_values[index] += m_dt*m_mu;
+                            }
+                            index++;
+                        }
+
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
                             m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
                             m_A_values[index] = -m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
@@ -182,12 +198,29 @@ namespace scopi
                         m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                         m_A_values[index] = m_dt*c.nij[d];
                         index++;
+
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
+                        m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
+                        m_A_values[index] = -m_dt*c.nij[d];
+                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
                         for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                         {
                             m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
+                            m_A_values[index] = m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            if(ind_row == ind_col)
+                            {
+                                m_A_values[index] -= m_dt*m_mu;
+                            }
+                            index++;
+                        }
+
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
                             m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
                             m_A_values[index] = m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
@@ -214,12 +247,25 @@ namespace scopi
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
+
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                        m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
                         for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                         {
                             m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                            m_A_values[index] = -m_mu*m_dt*dot(ind_row, ind_col) + m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            index++;
+                        }
+
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
                             m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
                             m_A_values[index] = -m_mu*m_dt*dot(ind_row, ind_col) + m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
@@ -237,6 +283,11 @@ namespace scopi
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
+
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                        m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
@@ -247,14 +298,22 @@ namespace scopi
                             m_A_values[index] = m_mu*m_dt*dot(ind_row, ind_col) - m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
                         }
+
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                            m_A_values[index] = m_mu*m_dt*dot(ind_row, ind_col) - m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            index++;
+                        }
                     }
                 }
             }
             ++ic;
         }
-        m_A_rows.resize(index);
-        m_A_cols.resize(index);
-        m_A_values.resize(index);
+        // m_A_rows.resize(index);
+        // m_A_cols.resize(index);
+        // m_A_values.resize(index);
     }
 
     template<std::size_t dim>
@@ -335,7 +394,8 @@ namespace scopi
             }
             else
             {
-                f_contact = lambda(m_gamma.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*nb_gamma_min);
+                f_contact = lambda(m_gamma.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*nb_gamma_min)
+                -  lambda(m_gamma.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*nb_gamma_min);
                 nb_gamma_min++;
             }
             m_gamma_old[i] = std::max(m_gamma_min, std::min(0., m_gamma[i] - m_dt * f_contact));
@@ -349,13 +409,13 @@ namespace scopi
     template<std::size_t dim>
     std::size_t MatrixOptimSolverViscosity<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
-        return contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min;
+        return contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 2*4*m_nb_gamma_min;
     }
 
     template<std::size_t dim>
     void MatrixOptimSolverViscosity<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
-        m_distances = xt::zeros<double>({contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min});
+        m_distances = xt::zeros<double>({contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 2*4*m_nb_gamma_min});
         std::size_t index_dry = 0;
         std::size_t index_friciton = 0;
         for (std::size_t i = 0; i < contacts.size(); ++i)
@@ -372,6 +432,7 @@ namespace scopi
             else
             {
                 m_distances[contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*index_friciton] = contacts[i].dij;
+                m_distances[contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min + 4*index_friciton] = -contacts[i].dij;
                 index_friciton++;
             }
         }
