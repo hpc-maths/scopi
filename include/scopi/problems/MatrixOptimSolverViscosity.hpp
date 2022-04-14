@@ -26,6 +26,9 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
+        std::size_t get_nb_gamma_neg() const;
+        std::size_t get_nb_gamma_min() const;
+
         std::size_t m_nparticles;
         double m_dt;
 
@@ -38,8 +41,10 @@ namespace scopi
         std::vector<double> m_gamma;
         std::vector<double> m_gamma_old;
         std::size_t m_nb_gamma_neg;
+        std::size_t m_nb_gamma_min;
         double m_tol;
         double m_gamma_min;
+        double m_mu;
     };
 
     template<std::size_t dim>
@@ -58,87 +63,193 @@ namespace scopi
         std::size_t index = 0;
         for (auto &c: contacts)
         {
-            if (c.i >= active_offset)
+            if (m_gamma[ic] != m_gamma_min)
             {
-                for (std::size_t d = 0; d < 3; ++d)
+                if (c.i >= active_offset)
                 {
-                    m_A_rows[index] = ic;
-                    m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
-                    m_A_values[index] = -m_dt*c.nij[d];
-                    index++;
-                    if (m_gamma[ic] < -m_tol)
+                    for (std::size_t d = 0; d < 3; ++d)
                     {
-                        m_A_rows[index] = contacts.size() + ic;
+                        m_A_rows[index] = ic;
                         m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
-                        m_A_values[index] = m_dt*c.nij[d];
-                        index++;
-                    }
-                }
-            }
-
-            if (c.j >= active_offset)
-            {
-                for (std::size_t d = 0; d < 3; ++d)
-                {
-                    m_A_rows[index] = ic;
-                    m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
-                    m_A_values[index] = m_dt*c.nij[d];
-                    index++;
-                    if (m_gamma[ic] < -m_tol)
-                    {
-                        m_A_rows[index] = contacts.size() + ic;
-                        m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                         m_A_values[index] = -m_dt*c.nij[d];
                         index++;
+                        if (m_gamma[ic] < -m_tol)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
+                            m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
+                            m_A_values[index] = m_dt*c.nij[d];
+                            index++;
+                        }
                     }
                 }
-            }
 
-            auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
-            auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
-            auto Ri = rotation_matrix<3>(particles.q()(c.i));
-            auto Rj = rotation_matrix<3>(particles.q()(c.j));
-
-            if (c.i >= active_offset)
-            {
-                std::size_t ind_part = c.i - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                for (std::size_t ip = 0; ip < 3; ++ip)
+                if (c.j >= active_offset)
                 {
-                    m_A_rows[index] = ic;
-                    m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                    m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
-                    if (m_gamma[ic] < -m_tol)
+                    for (std::size_t d = 0; d < 3; ++d)
                     {
-                        m_A_rows[index] = contacts.size() + ic;
+                        m_A_rows[index] = ic;
+                        m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
+                        m_A_values[index] = m_dt*c.nij[d];
+                        index++;
+                        if (m_gamma[ic] < -m_tol)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
+                            m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
+                            m_A_values[index] = -m_dt*c.nij[d];
+                            index++;
+                        }
+                    }
+                }
+
+                auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
+                auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
+                auto Ri = rotation_matrix<3>(particles.q()(c.i));
+                auto Rj = rotation_matrix<3>(particles.q()(c.j));
+
+                if (c.i >= active_offset)
+                {
+                    std::size_t ind_part = c.i - active_offset;
+                    auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+                    for (std::size_t ip = 0; ip < 3; ++ip)
+                    {
+                        m_A_rows[index] = ic;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                        m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                        index++;
+                        if (m_gamma[ic] < -m_tol)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
+                            m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                            m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                            index++;
+                        }
+                    }
+                }
+
+                if (c.j >= active_offset)
+                {
+                    std::size_t ind_part = c.j - active_offset;
+                    auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+                    for (std::size_t ip = 0; ip < 3; ++ip)
+                    {
+                        m_A_rows[index] = ic;
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
+                        if (m_gamma[ic] < -m_tol)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
+                            m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                            m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                            index++;
+                        }
                     }
                 }
-            }
 
-            if (c.j >= active_offset)
+            }
+            else
             {
-                std::size_t ind_part = c.j - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                for (std::size_t ip = 0; ip < 3; ++ip)
+                if (c.i >= active_offset)
                 {
-                    m_A_rows[index] = ic;
-                    m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                    m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
-                    if (m_gamma[ic] < -m_tol)
+                    for (std::size_t d = 0; d < 3; ++d)
                     {
-                        m_A_rows[index] = contacts.size() + ic;
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic;
+                        m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
+                        m_A_values[index] = -m_dt*c.nij[d];
+                        index++;
+                    }
+                    for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                    {
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
+                            m_A_values[index] = -m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            if(ind_row == ind_col)
+                            {
+                                m_A_values[index] += m_dt*m_mu;
+                            }
+                            index++;
+                        }
+                    }
+                }
+
+                if (c.j >= active_offset)
+                {
+                    for (std::size_t d = 0; d < 3; ++d)
+                    {
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic;
+                        m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
+                        m_A_values[index] = m_dt*c.nij[d];
+                        index++;
+                    }
+                    for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                    {
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
+                            m_A_values[index] = m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            if(ind_row == ind_col)
+                            {
+                                m_A_values[index] -= m_dt*m_mu;
+                            }
+                            index++;
+                        }
+                    }
+                }
+
+                auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
+                auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
+                auto Ri = rotation_matrix<3>(particles.q()(c.i));
+                auto Rj = rotation_matrix<3>(particles.q()(c.j));
+
+                if (c.i >= active_offset)
+                {
+                    std::size_t ind_part = c.i - active_offset;
+                    auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+                    for (std::size_t ip = 0; ip < 3; ++ip)
+                    {
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic;
                         m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         m_A_values[index] = m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
                     }
+                    for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                    {
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                            m_A_values[index] = -m_mu*m_dt*dot(ind_row, ind_col) + m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            index++;
+                        }
+                    }
+                }
+
+                if (c.j >= active_offset)
+                {
+                    std::size_t ind_part = c.j - active_offset;
+                    auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+                    for (std::size_t ip = 0; ip < 3; ++ip)
+                    {
+                        m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic;
+                        m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
+                        m_A_values[index] = -m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
+                        index++;
+                    }
+                    for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+                    {
+                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+                        {
+                            m_A_rows[index] = contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*ic + 1 + ind_row;
+                            m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
+                            m_A_values[index] = m_mu*m_dt*dot(ind_row, ind_col) - m_mu*m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            index++;
+                        }
+                    }
                 }
             }
-
             ++ic;
         }
         m_A_rows.resize(index);
@@ -152,6 +263,7 @@ namespace scopi
     , m_dt(dt)
     , m_tol(tol)
     , m_gamma_min(-3.)
+    , m_mu(1.)
     {}
 
     template<std::size_t dim>
@@ -188,10 +300,13 @@ namespace scopi
         }
 
         m_nb_gamma_neg = 0;
+        m_nb_gamma_min = 0;
         for (auto& g : m_gamma)
         {
-            if (g < -m_tol)
+            if (g < -m_tol && g > m_gamma_min)
                 m_nb_gamma_neg++;
+            else if (g == m_gamma_min)
+                m_nb_gamma_min++;
         }
     }
 
@@ -224,21 +339,45 @@ namespace scopi
     template<std::size_t dim>
     std::size_t MatrixOptimSolverViscosity<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
-        return contacts.size() + m_nb_gamma_neg;
+        return contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min;
     }
 
     template<std::size_t dim>
     void MatrixOptimSolverViscosity<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
-        m_distances = xt::zeros<double>({contacts.size() + m_nb_gamma_neg});
+        m_distances = xt::zeros<double>({contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*m_nb_gamma_min});
+        std::size_t index_dry = 0;
+        std::size_t index_friciton = 0;
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            m_distances[i] = contacts[i].dij;
-            if(m_gamma[i] < -m_tol)
+            if (m_gamma[i] != m_gamma_min)
             {
-                m_distances[contacts.size() + i] = -contacts[i].dij;
+                m_distances[index_dry] = contacts[i].dij;
+                if(m_gamma[i] < -m_tol)
+                {
+                    m_distances[contacts.size() - m_nb_gamma_min + index_dry] = -contacts[i].dij;
+                }
+                index_dry++;
+            }
+            else
+            {
+                m_distances[contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 4*index_friciton] = contacts[i].dij;
+                index_friciton++;
             }
         }
     }
+
+    template<std::size_t dim>
+    std::size_t MatrixOptimSolverViscosity<dim>::get_nb_gamma_neg() const
+    {
+        return m_nb_gamma_neg;
+    }
+
+    template<std::size_t dim>
+    std::size_t MatrixOptimSolverViscosity<dim>::get_nb_gamma_min() const
+    {
+        return m_nb_gamma_min;
+    }
+
 }
 

@@ -74,9 +74,12 @@ namespace scopi{
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
-        Constraint::t qc1 = this->constraint(D_mosek, m_A, X, model, contacts);
+        // FIXME only for MatrixOptimSolverViscosity
+        Constraint::t qc1 = this->constraint(D_mosek, m_A, X, model, contacts, this->get_nb_gamma_neg(), this->get_nb_gamma_min());
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
+        // FIXME only for MatrixOptimSolverViscosity
+        auto qc4 = this->extraConstraint(D_mosek, m_A, X, model, contacts, this->get_nb_gamma_neg(), this->get_nb_gamma_min());
 
         // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
         // model->setSolverParam("numThreads", thread_qty);
@@ -86,12 +89,18 @@ namespace scopi{
         model->setSolverParam("intpntCoTolRelGap", 1e-11);
 
         // model->setSolverParam("intpntCoTolDfeas", 1e-6);
-        // model->setLogHandler([](const std::string & msg) { std::cout << msg << std::flush; } );
+        model->setLogHandler([](const std::string & msg) {PLOG_VERBOSE << msg << std::flush; } );
         //solve
         model->solve();
 
         m_Xlvl = X->level();
-        m_dual = qc1->dual();
+        // FIXME only for MatrixOptimSolverViscosity
+        // m_dual = qc1->dual();
+        m_dual = std::make_shared<monty::ndarray<double, 1>>(qc1->dual()->raw(), shape_t<1>({contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg() + this->get_nb_gamma_min()}));
+        for (std::size_t i = 0; i < this->get_nb_gamma_min(); ++i)
+        {
+            m_dual->raw()[contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg() + i] = -qc4->dual()->raw()[i];
+        }
         for (auto& x : *m_dual)
         {
             x *= -1.;
@@ -105,7 +114,7 @@ namespace scopi{
     template<class model_t>
     template <std::size_t dim>
     OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
-    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, 1e-11)
+    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, 1e-6)
     , ConstraintMosek<model_t>(nparts)
     {
         using namespace mosek::fusion;
