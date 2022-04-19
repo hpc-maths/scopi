@@ -29,10 +29,10 @@ int main()
     scopi::plan<dim> p({{0., 0.}}, PI/2.);
     scopi::sphere<dim> s({{0., h}}, radius);
     particles.push_back(p, scopi::property<dim>().deactivate());
-    particles.push_back(s, prop.force({{0., -g}}));
+    particles.push_back(s, prop.force({{g, -g}}));
 
-    scopi::ScopiSolver<dim, scopi::OptimUzawaMkl<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
-    solver.set_rho_uzawa(200.);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    // solver.set_rho_uzawa(200.);
     solver.solve(total_it);
     particles.f()(1)(1) *= -1.;
     solver.solve(5*total_it, total_it);
