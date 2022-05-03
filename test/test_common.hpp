@@ -67,10 +67,10 @@ TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimScs, 
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimScs, scopi::contact_brute_force, scopi::vap_fpd>);
 
 #ifdef SCOPI_USE_MKL
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl<>, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl<>, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl<>, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl<>, scopi::contact_brute_force, scopi::vap_fpd>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fpd>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fpd>);
 #endif
 
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolver, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fixed>);
