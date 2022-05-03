@@ -145,11 +145,14 @@ namespace scopi
     {
         using namespace mosek::fusion;
         using namespace monty;
-        auto D_restricted = std::make_shared<ndarray<double, 1>>(D->raw(), shape_t<1>({contacts.size() - nb_gamma_min + nb_gamma_neg}));
-        m_qc1 = model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))->slice(0, contacts.size() - nb_gamma_min + nb_gamma_neg), Domain::lessThan(D_restricted));
+
+        auto D_restricted_1 = std::make_shared<ndarray<double, 1>>(D->raw(), shape_t<1>({contacts.size() - nb_gamma_min + nb_gamma_neg}));
+        m_qc1 = model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))->slice(0, contacts.size() - nb_gamma_min + nb_gamma_neg), Domain::lessThan(D_restricted_1));
+
+        auto D_restricted_4 = std::make_shared<ndarray<double, 1>>(D->raw()+(contacts.size() - nb_gamma_min + nb_gamma_neg), shape_t<1>(2*4*nb_gamma_min));
         m_qc4 = model->constraint("qc4", 
                 Expr::reshape(
-                    Expr::sub(D_restricted, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - nb_gamma_min + nb_gamma_neg, contacts.size() - nb_gamma_min + nb_gamma_neg + 2*4*nb_gamma_min) ),
+                    Expr::sub(D_restricted_4, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - nb_gamma_min + nb_gamma_neg, contacts.size() - nb_gamma_min + nb_gamma_neg + 2*4*nb_gamma_min) ),
                     2*nb_gamma_min, 4),
                 Domain::inQCone());
     }
