@@ -57,7 +57,7 @@ namespace scopi{
 
     template<class Derived, class model_t>
     OptimUzawaBase<Derived, model_t>::OptimUzawaBase(std::size_t nparts, double dt, double tol)
-    : base_type(nparts, dt, 2*3*nparts, 0, 0.)
+    : base_type(nparts, dt, 2*3*nparts, 0)
     , m_tol(tol)
     , m_max_iter(40000)
     , m_rho(2000.)

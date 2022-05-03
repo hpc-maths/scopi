@@ -9,12 +9,12 @@
 #include <fusion.h>
 
 namespace scopi{
-    template<class model_t = MatrixOptimSolver>
-    class OptimMosek: public OptimBase<OptimMosek<model_t>, model_t>
-                    , public ConstraintMosek<model_t>
+    template<class problem_t = MatrixOptimSolver>
+    class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
+                    , public ConstraintMosek<problem_t>
     {
     public:
-        using base_type = OptimBase<OptimMosek, model_t>;
+        using base_type = OptimBase<OptimMosek, problem_t>;
 
         template <std::size_t dim>
         OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles);
@@ -47,9 +47,9 @@ namespace scopi{
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
     };
 
-    template<class model_t>
+    template<class problem_t>
     template<std::size_t dim>
-    int OptimMosek<model_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+    int OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                     const std::vector<neighbor<dim>>& contacts)
     {
         using namespace mosek::fusion;
@@ -111,11 +111,11 @@ namespace scopi{
         return model->getSolverIntInfo("intpntIter");
     }
 
-    template<class model_t>
+    template<class problem_t>
     template <std::size_t dim>
-    OptimMosek<model_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
-    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, 1e-6)
-    , ConstraintMosek<model_t>(nparts)
+    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
+    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
+    , ConstraintMosek<problem_t>(nparts)
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -153,26 +153,26 @@ namespace scopi{
                               std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>(Az_values.size())));
     }
 
-    template<class model_t>
-    double* OptimMosek<model_t>::uadapt_data()
+    template<class problem_t>
+    double* OptimMosek<problem_t>::uadapt_data()
     {
         return m_Xlvl->raw() + 1;
     }
 
-    template<class model_t>
-    double* OptimMosek<model_t>::lagrange_multiplier_data()
+    template<class problem_t>
+    double* OptimMosek<problem_t>::lagrange_multiplier_data()
     {
         return m_dual->raw();
     }
 
-    template<class model_t>
-    double* OptimMosek<model_t>::wadapt_data()
+    template<class problem_t>
+    double* OptimMosek<problem_t>::wadapt_data()
     {
         return m_Xlvl->raw() + 1 + 3*this->m_nparts;
     }
 
-    template<class model_t>
-    int OptimMosek<model_t>::get_nb_active_contacts_impl() const
+    template<class problem_t>
+    int OptimMosek<problem_t>::get_nb_active_contacts_impl() const
     {
         int nb_active_contacts = 0;
         for (auto x : *m_dual)
@@ -183,8 +183,8 @@ namespace scopi{
         return nb_active_contacts;
     }
 
-    template<class model_t>
-    void OptimMosek<model_t>::set_moment_mass_matrix(std::size_t nparts,
+    template<class problem_t>
+    void OptimMosek<problem_t>::set_moment_mass_matrix(std::size_t nparts,
                                                      std::vector<int>& Az_rows,
                                                      std::vector<int>& Az_cols,
                                                      std::vector<double>& Az_values,
@@ -203,8 +203,8 @@ namespace scopi{
         }
     }
 
-    template<class model_t>
-    void OptimMosek<model_t>::set_moment_mass_matrix(std::size_t nparts,
+    template<class problem_t>
+    void OptimMosek<problem_t>::set_moment_mass_matrix(std::size_t nparts,
                                                      std::vector<int>& Az_rows,
                                                      std::vector<int>& Az_cols,
                                                      std::vector<double>& Az_values,

@@ -15,10 +15,11 @@
 
 namespace scopi
 {
-    class OptimUzawaMatrixFreeTbb : public OptimUzawaBase<OptimUzawaMatrixFreeTbb>
+    template<class problem_t = MatrixOptimSolver>
+    class OptimUzawaMatrixFreeTbb : public OptimUzawaBase<OptimUzawaMatrixFreeTbb<problem_t>, problem_t>
     {
     public:
-        using base_type = OptimUzawaBase<OptimUzawaMatrixFreeTbb>;
+        using base_type = OptimUzawaBase<OptimUzawaMatrixFreeTbb<problem_t>, problem_t>;
         template <std::size_t dim>
         OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>& particles);
 
@@ -46,13 +47,15 @@ namespace scopi
                                std::size_t i);
     };
 
+    template <class problem_t>
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::init_uzawa_impl(const scopi_container<dim>&,
+    void OptimUzawaMatrixFreeTbb<problem_t>::init_uzawa_impl(const scopi_container<dim>&,
                                                   const std::vector<neighbor<dim>>&)
     {}
 
+    template <class problem_t>
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::gemv_inv_P_impl(const scopi_container<dim>& particles)
+    void OptimUzawaMatrixFreeTbb<problem_t>::gemv_inv_P_impl(const scopi_container<dim>& particles)
     {
         auto active_offset = particles.nb_inactive();
         tbb::parallel_for(std::size_t(0), this->m_nparts, [&](std::size_t i) {
@@ -65,8 +68,9 @@ namespace scopi
         });
     }
 
+    template <class problem_t>
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::gemv_A_impl(const scopi_container<dim>& particles,
+    void OptimUzawaMatrixFreeTbb<problem_t>::gemv_A_impl(const scopi_container<dim>& particles,
                                               const std::vector<neighbor<dim>>& contacts)
     {
         std::size_t active_offset = particles.nb_inactive();
@@ -117,8 +121,9 @@ namespace scopi
         });
     }
 
+    template <class problem_t>
     template<std::size_t dim>
-    void OptimUzawaMatrixFreeTbb::gemv_transpose_A_impl(const scopi_container<dim>& particles,
+    void OptimUzawaMatrixFreeTbb<problem_t>::gemv_transpose_A_impl(const scopi_container<dim>& particles,
                                                         const std::vector<neighbor<dim>>& contacts)
     {
         std::size_t active_offset = particles.nb_inactive();
@@ -180,9 +185,29 @@ namespace scopi
         );
     }
 
+    template <class problem_t>
     template <std::size_t dim>
-    OptimUzawaMatrixFreeTbb::OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>&)
+    OptimUzawaMatrixFreeTbb<problem_t>::OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>&)
     : base_type(nparts, dt)
     {}
+
+    template <class problem_t>
+    void OptimUzawaMatrixFreeTbb<problem_t>::gemv_inv_P_moment(const scopi_container<2>& particles,
+                                                    std::size_t active_offset,
+                                                    std::size_t i)
+    {
+        this->m_U(3*this->m_nparts + 3*i + 2) /= (-1.*particles.j()(active_offset + i));
+    }
+
+    template <class problem_t>
+    void OptimUzawaMatrixFreeTbb<problem_t>::gemv_inv_P_moment(const scopi_container<3>& particles,
+                                                    std::size_t active_offset,
+                                                    std::size_t i)
+    {
+        for (std::size_t d = 0; d < 3; ++d)
+        {
+            this->m_U(3*this->m_nparts + 3*i + d) /= (-1.*particles.j()(active_offset + i)(d));
+        }
+    }
 }
 #endif

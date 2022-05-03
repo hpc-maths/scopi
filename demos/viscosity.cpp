@@ -31,7 +31,7 @@ int main()
     particles.push_back(p, scopi::property<dim>().deactivate());
     particles.push_back(s, prop.force({{g, -g}}));
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    scopi::ScopiSolver<dim, scopi::MatrixOptimSolverViscosity<dim>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
     // solver.set_rho_uzawa(200.);
     solver.solve(total_it);
     particles.f()(1)(1) *= -1.;

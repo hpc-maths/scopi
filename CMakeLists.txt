@@ -102,9 +102,6 @@ set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 set(SCOPI_SRC
     src/problems/MatrixOptimSolver.cpp
     src/problems/MatrixOptimSolverFriction.cpp
-    src/solvers/OptimScs.cpp
-    src/solvers/OptimUzawaMatrixFreeOmp.cpp
-    src/solvers/OptimUzawaMatrixFreeTbb.cpp
     src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp

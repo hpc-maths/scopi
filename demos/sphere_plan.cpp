@@ -37,7 +37,7 @@ int main()
                 particles.push_back(p, scopi::property<dim>().deactivate());
                 particles.push_back(s, prop.force({{0., -g}}));
 
-                scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
+                scopi::ScopiSolver<dim, scopi::MatrixOptimSolverFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
                 solver.set_coeff_friction(mu);
                 solver.solve(total_it[i]);
 

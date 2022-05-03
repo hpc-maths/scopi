@@ -21,7 +21,7 @@ int main()
     particles.push_back(s1, prop.velocity({0.3, 0.75}));
     particles.push_back(s2, prop.velocity({0., 0.}));
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    scopi::ScopiSolver<dim, scopi::MatrixOptimSolverViscosity<dim>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;

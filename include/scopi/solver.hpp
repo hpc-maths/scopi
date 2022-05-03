@@ -21,6 +21,7 @@
 #include "quaternion.hpp"
 
 #include "solvers/OptimUzawaMatrixFreeOmp.hpp"
+#include "problems/MatrixOptimSolver.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
 
@@ -32,7 +33,8 @@ namespace scopi
 {
 
     template<std::size_t dim,
-             class optim_solver_t = OptimUzawaMatrixFreeOmp,
+             class problem_t = MatrixOptimSolver,
+             template <class> class optim_solver_t = OptimUzawaMatrixFreeOmp,
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed
              >
@@ -52,20 +54,20 @@ namespace scopi
         void move_active_particles();
         scopi_container<dim>& m_particles;
         double m_dt;
-        optim_solver_t m_solver;
+        optim_solver_t<problem_t> m_solver;
         vap_t m_vap;
     };
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
+    ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
     : m_particles(particles)
     , m_dt(dt)
     , m_solver(m_particles.nb_active(), m_dt, particles)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
@@ -113,8 +115,8 @@ namespace scopi
         }
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
     {
         for (std::size_t i = 0; i < m_particles.nb_inactive(); ++i)
         {
@@ -139,8 +141,8 @@ namespace scopi
         }
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
+    std::vector<neighbor<dim>> ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
         // // contact_brute_force cont(2);
         // contact_t cont(2., 10.);
@@ -150,8 +152,8 @@ namespace scopi
         return contacts;
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         nl::json json_output;
 
@@ -182,8 +184,8 @@ namespace scopi
         file.close();
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::move_active_particles()
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::move_active_particles()
     {
         std::size_t active_offset = m_particles.nb_inactive();
         auto uadapt = m_solver.get_uadapt();
@@ -210,14 +212,14 @@ namespace scopi
         }
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::set_coeff_friction(double mu)
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_coeff_friction(double mu)
     {
         m_solver.set_coeff_friction(mu);
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::set_rho_uzawa(double rho)
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_rho_uzawa(double rho)
     {
         m_solver.set_rho_uzawa(rho);
     }
