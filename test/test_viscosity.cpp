@@ -32,7 +32,7 @@ namespace scopi {
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, prop.force({{g, -g}}));
 
-        scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::MatrixOptimSolverViscosity<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+        SolverType solver(particles, dt);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);

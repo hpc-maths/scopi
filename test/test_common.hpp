@@ -39,10 +39,10 @@ namespace scopi
 #endif
 
     #define SOLVER_WITH_CONTACT_FRICTION(dim, contact, vap) \
-        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap>
+        ScopiSolver<dim, MatrixOptimSolverFriction, OptimMosek, contact, vap>
 
     #define SOLVER_WITH_CONTACT_VISCOSITY(dim, contact, vap) \
-        ScopiSolver<dim, OptimMosek<MatrixOptimSolverViscosity<dim>>, contact, vap>
+        ScopiSolver<dim, MatrixOptimSolverViscosity<dim>, OptimMosek, contact, vap>
                                                                               
     #define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \
         static size_t _doctest_subcase_idx = 0; \
@@ -87,3 +87,8 @@ TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverFriction, scopi::Op
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
+
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverViscosity<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverViscosity<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverViscosity<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::MatrixOptimSolverViscosity<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
