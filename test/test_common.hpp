@@ -39,7 +39,10 @@ namespace scopi
 #endif
 
     #define SOLVER_WITH_CONTACT_FRICTION(dim, contact, vap) \
-        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap> // friction
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverFriction>, contact, vap>
+
+    #define SOLVER_WITH_CONTACT_VISCOSITY(dim, contact, vap) \
+        ScopiSolver<dim, OptimMosek<MatrixOptimSolverViscosity<dim>>, contact, vap>
                                                                               
     #define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \
         static size_t _doctest_subcase_idx = 0; \
@@ -52,7 +55,7 @@ namespace scopi
 }
 
 // does not compile if this is inside the namespace
-// TODO to be aitomated
+// TODO to be automated
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimMosek<scopi::MatrixOptimSolver>, scopi::contact_kdtree, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimMosek<scopi::MatrixOptimSolver>, scopi::contact_kdtree, scopi::vap_fpd>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::OptimMosek<scopi::MatrixOptimSolver>, scopi::contact_brute_force, scopi::vap_fixed>);

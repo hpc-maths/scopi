@@ -14,6 +14,7 @@ set(SCOPI_TESTS
     test_contacts_brute_force.cpp
     test_obstacles.cpp
     test_friction.cpp
+    test_viscosity.cpp
 )
 
 foreach(filename IN LISTS SCOPI_TESTS)

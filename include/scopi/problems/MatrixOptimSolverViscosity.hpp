@@ -322,7 +322,7 @@ namespace scopi
     , m_dt(dt)
     , m_tol(tol)
     , m_gamma_min(-3.)
-    , m_mu(0.)
+    , m_mu(1.)
     {}
 
     template<std::size_t dim>
