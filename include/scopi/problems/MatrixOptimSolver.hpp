@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 #include <xtensor/xtensor.hpp>
@@ -29,6 +30,9 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+
+        std::size_t get_nb_gamma_neg();
+        std::size_t get_nb_gamma_min();
 
         std::size_t m_nparticles;
         double m_dt;

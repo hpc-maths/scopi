@@ -44,7 +44,6 @@ namespace scopi{
         mosek::fusion::Matrix::t m_Az;
         mosek::fusion::Matrix::t m_A;
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
-        std::shared_ptr<monty::ndarray<double,1>> m_dual;
     };
 
     template<class problem_t>
@@ -74,12 +73,9 @@ namespace scopi{
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
-        // FIXME only for MatrixOptimSolverViscosity
-        Constraint::t qc1 = this->constraint(D_mosek, m_A, X, model, contacts, this->get_nb_gamma_neg(), this->get_nb_gamma_min());
+        this->add_constraints(D_mosek, m_A, X, model, contacts, this->get_nb_gamma_neg(), this->get_nb_gamma_min());
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
-        // FIXME only for MatrixOptimSolverViscosity
-        auto qc4 = this->extraConstraint(D_mosek, m_A, X, model, contacts, this->get_nb_gamma_neg(), this->get_nb_gamma_min());
 
         // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
         // model->setSolverParam("numThreads", thread_qty);
@@ -94,14 +90,8 @@ namespace scopi{
         model->solve();
 
         m_Xlvl = X->level();
-        // FIXME only for MatrixOptimSolverViscosity
-        // m_dual = qc1->dual();
-        m_dual = std::make_shared<monty::ndarray<double, 1>>(qc1->dual()->raw(), shape_t<1>({this->number_row_matrix(contacts)}));
-        for (std::size_t i = 0; i < 2*4*this->get_nb_gamma_min(); ++i)
-        {
-            m_dual->raw()[contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg() + i] = -qc4->dual()->raw()[i];
-        }
-        for (auto& x : *m_dual)
+        this->update_dual(this->number_row_matrix(contacts), contacts.size(), this->get_nb_gamma_neg(), this->get_nb_gamma_min());
+        for (auto& x : *this->m_dual)
         {
             x *= -1.;
         }
@@ -162,7 +152,7 @@ namespace scopi{
     template<class problem_t>
     double* OptimMosek<problem_t>::lagrange_multiplier_data()
     {
-        return m_dual->raw();
+        return this->m_dual->raw();
     }
 
     template<class problem_t>
@@ -175,7 +165,7 @@ namespace scopi{
     int OptimMosek<problem_t>::get_nb_active_contacts_impl() const
     {
         int nb_active_contacts = 0;
-        for (auto x : *m_dual)
+        for (auto x : *(this->m_dual))
         {
             if(std::abs(x) > 1e-3)
                 nb_active_contacts++;

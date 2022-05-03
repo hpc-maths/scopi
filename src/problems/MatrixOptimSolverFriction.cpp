@@ -30,4 +30,14 @@ namespace scopi
     {
         m_mu = mu;
     }
+
+    std::size_t MatrixOptimSolverFriction::get_nb_gamma_neg()
+    {
+        return 0;
+    }
+
+    std::size_t MatrixOptimSolverFriction::get_nb_gamma_min()
+    {
+        return 0;
+    }
 }

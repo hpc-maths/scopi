@@ -19,6 +19,14 @@ namespace scopi
         return 1 + 6*m_nparticles + 6*m_nparticles;
     }
 
+    void ConstraintMosek<MatrixOptimSolver>::update_dual(std::size_t,
+                                                         std::size_t,
+                                                         std::size_t,
+                                                         std::size_t)
+    {
+        m_dual = m_qc1->dual();
+    }
+
 
 
 
@@ -35,6 +43,14 @@ namespace scopi
     std::size_t ConstraintMosek<MatrixOptimSolverFriction>::number_col_matrix() const
     {
         return 6*m_nparticles;
+    }
+
+    void ConstraintMosek<MatrixOptimSolverFriction>::update_dual(std::size_t,
+                                                                 std::size_t,
+                                                                 std::size_t,
+                                                                 std::size_t)
+    {
+        m_dual = m_qc1->dual();
     }
 }
 #endif

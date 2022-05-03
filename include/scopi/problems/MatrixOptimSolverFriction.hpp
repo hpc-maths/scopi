@@ -36,6 +36,9 @@ namespace scopi
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
+        std::size_t get_nb_gamma_neg();
+        std::size_t get_nb_gamma_min();
+
         std::size_t m_nparticles;
         double m_dt;
         double m_mu;
