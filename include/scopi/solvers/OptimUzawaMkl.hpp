@@ -181,8 +181,6 @@ namespace scopi
     template <class problem_t>
     OptimUzawaMkl<problem_t>::~OptimUzawaMkl()
     {
-        m_status = mkl_sparse_destroy ( m_A );
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix A: " << m_status;
         m_status = mkl_sparse_destroy ( m_inv_P );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix P^-1: " << m_status;
     }
