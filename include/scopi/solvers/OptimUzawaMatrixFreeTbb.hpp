@@ -37,6 +37,7 @@ namespace scopi
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts);
+        void finalize_uzawa_impl();
 
     private:
         void gemv_inv_P_moment(const scopi_container<2>& particles,
@@ -51,6 +52,10 @@ namespace scopi
     template<std::size_t dim>
     void OptimUzawaMatrixFreeTbb<problem_t>::init_uzawa_impl(const scopi_container<dim>&,
                                                   const std::vector<neighbor<dim>>&)
+    {}
+
+    template <class problem_t>
+    void OptimUzawaMatrixFreeTbb<problem_t>::finalize_uzawa_impl()
     {}
 
     template <class problem_t>

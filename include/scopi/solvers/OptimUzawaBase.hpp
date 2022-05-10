@@ -45,6 +45,7 @@ namespace scopi{
         template <std::size_t dim>
         void init_uzawa(const scopi_container<dim>& particles,
                         const std::vector<neighbor<dim>>& contacts);
+        void finalize_uzawa();
 
         const double m_tol;
         const std::size_t m_max_iter;
@@ -147,6 +148,8 @@ namespace scopi{
         PLOG_INFO << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l;
         PLOG_INFO << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax;
 
+        finalize_uzawa();
+
         return cc;
     }
 
@@ -203,6 +206,12 @@ namespace scopi{
                                              const std::vector<neighbor<dim>>& contacts)
     {
         static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts);
+    }
+
+    template<class Derived, class model_t>
+    void OptimUzawaBase<Derived, model_t>::finalize_uzawa()
+    {
+        static_cast<Derived&>(*this).finalize_uzawa_impl();
     }
 
     template<class Derived, class model_t>

@@ -27,6 +27,7 @@ namespace scopi
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts);
+        void finalize_uzawa_impl();
 
         template <std::size_t dim>
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
@@ -61,7 +62,6 @@ namespace scopi
         sparse_matrix_t m_inv_P;
         struct matrix_descr m_descr_inv_P;
         sparse_status_t m_status;
-        bool should_destroy;
 
     };
 
@@ -70,12 +70,6 @@ namespace scopi
     void OptimUzawaMkl<problem_t>::init_uzawa_impl(const scopi_container<dim>& particles,
                                         const std::vector<scopi::neighbor<dim>>& contacts)
     {
-        if(should_destroy)
-        {
-            m_status = mkl_sparse_destroy ( m_A );
-            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix A: " << m_status;
-        }
-
         this->create_matrix_constraint_coo(particles, contacts, 0);
 
         sparse_matrix_t A_coo;
@@ -104,8 +98,13 @@ namespace scopi
 
         m_status = mkl_sparse_optimize ( m_A );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix A: " << m_status;
+    }
 
-        should_destroy = true;
+    template <class problem_t>
+    void OptimUzawaMkl<problem_t>::finalize_uzawa_impl()
+    {
+        m_status = mkl_sparse_destroy ( m_A );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix A: " << m_status;
     }
 
     template <class problem_t>
@@ -138,7 +137,6 @@ namespace scopi
     template<std::size_t dim>
     OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles)
     : base_type(nparts, dt)
-    , should_destroy(false)
     {
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;
