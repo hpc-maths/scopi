@@ -12,11 +12,11 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi{
-    template<class Derived, class model_t = MatrixOptimSolver>
-    class OptimUzawaBase: public OptimBase<Derived, model_t>
+    template<class Derived, class problem_t = MatrixOptimSolver>
+    class OptimUzawaBase: public OptimBase<Derived, problem_t>
     {
     public:
-        using base_type = OptimBase<Derived, model_t>;
+        using base_type = OptimBase<Derived, problem_t>;
         OptimUzawaBase(std::size_t nparts, double dt, double tol = 1e-9);
 
         template <std::size_t dim>
@@ -56,8 +56,8 @@ namespace scopi{
         xt::xtensor<double, 1> m_R;
     };
 
-    template<class Derived, class model_t>
-    OptimUzawaBase<Derived, model_t>::OptimUzawaBase(std::size_t nparts, double dt, double tol)
+    template<class Derived, class problem_t>
+    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, double tol)
     : base_type(nparts, dt, 2*3*nparts, 0)
     , m_tol(tol)
     , m_max_iter(40000)
@@ -66,9 +66,9 @@ namespace scopi{
     , m_U(xt::zeros<double>({6*nparts}))
     {}
 
-    template<class Derived, class model_t>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    int OptimUzawaBase<Derived, model_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+    int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                            const std::vector<neighbor<dim>>& contacts)
     {
         tic();
@@ -153,69 +153,69 @@ namespace scopi{
         return cc;
     }
 
-    template<class Derived, class model_t>
-    auto OptimUzawaBase<Derived, model_t>::uadapt_data()
+    template<class Derived, class problem_t>
+    auto OptimUzawaBase<Derived, problem_t>::uadapt_data()
     {
         return m_U.data();
     }
 
-    template<class Derived, class model_t>
-    auto OptimUzawaBase<Derived, model_t>::wadapt_data()
+    template<class Derived, class problem_t>
+    auto OptimUzawaBase<Derived, problem_t>::wadapt_data()
     {
         return m_U.data() + 3*this->m_nparts;
     }
 
-    template<class Derived, class model_t>
-    auto OptimUzawaBase<Derived, model_t>::lagrange_multiplier_data()
+    template<class Derived, class problem_t>
+    auto OptimUzawaBase<Derived, problem_t>::lagrange_multiplier_data()
     {
         return m_L.data();
     }
 
-    template<class Derived, class model_t>
-    int OptimUzawaBase<Derived, model_t>::get_nb_active_contacts_impl() const
+    template<class Derived, class problem_t>
+    int OptimUzawaBase<Derived, problem_t>::get_nb_active_contacts_impl() const
     {
         return xt::sum(xt::where(m_L > 0., xt::ones_like(m_L), xt::zeros_like(m_L)))();
     }
 
-    template<class Derived, class model_t>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived, model_t>::gemv_inv_P(const scopi_container<dim>& particles)
+    void OptimUzawaBase<Derived, problem_t>::gemv_inv_P(const scopi_container<dim>& particles)
     {
         static_cast<Derived&>(*this).gemv_inv_P_impl(particles);
     }
 
-    template<class Derived, class model_t>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived, model_t>::gemv_A(const scopi_container<dim>& particles,
+    void OptimUzawaBase<Derived, problem_t>::gemv_A(const scopi_container<dim>& particles,
                                    const std::vector<neighbor<dim>>& contacts)
     {
         static_cast<Derived&>(*this).gemv_A_impl(particles, contacts);
     }
 
-    template<class Derived, class model_t>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived, model_t>::gemv_transpose_A(const scopi_container<dim>& particles,
+    void OptimUzawaBase<Derived, problem_t>::gemv_transpose_A(const scopi_container<dim>& particles,
                                              const std::vector<neighbor<dim>>& contacts)
     {
         static_cast<Derived&>(*this).gemv_transpose_A_impl(particles, contacts);
     }
 
-    template<class Derived, class model_t>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived, model_t>::init_uzawa(const scopi_container<dim>& particles,
+    void OptimUzawaBase<Derived, problem_t>::init_uzawa(const scopi_container<dim>& particles,
                                              const std::vector<neighbor<dim>>& contacts)
     {
         static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts);
     }
 
-    template<class Derived, class model_t>
-    void OptimUzawaBase<Derived, model_t>::finalize_uzawa()
+    template<class Derived, class problem_t>
+    void OptimUzawaBase<Derived, problem_t>::finalize_uzawa()
     {
         static_cast<Derived&>(*this).finalize_uzawa_impl();
     }
 
-    template<class Derived, class model_t>
-    void OptimUzawaBase<Derived, model_t>::set_rho_uzawa(double rho)
+    template<class Derived, class problem_t>
+    void OptimUzawaBase<Derived, problem_t>::set_rho_uzawa(double rho)
     {
         m_rho = rho;
     }

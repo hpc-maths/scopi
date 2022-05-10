@@ -9,7 +9,7 @@
 
 namespace scopi
 {
-    template<class model_t>
+    template<class problem_t>
     class ConstraintMosek
     {
     };
