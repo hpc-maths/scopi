@@ -27,10 +27,6 @@ namespace scopi
     private:
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
-        void set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
-        void set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
-        
-
         ScsMatrix m_P;
         std::vector<scs_float> m_P_x;
         std::vector<scs_int> m_P_i;
@@ -138,7 +134,18 @@ namespace scopi
                 index++;
             }
         }
-        set_moment_matrix(nparts, particles, index);
+        for (std::size_t i = 0; i < nparts; ++i)
+        {
+            auto omega = get_omega(particles.j()(active_offset + i));
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                m_P_i[index] = 3*nparts + 3*i + d;
+                m_P_p[index] = 3*nparts + 3*i + d;
+                m_P_x[index] = omega(d);
+                index++;
+            }
+            index++;
+        }
         m_P_p[index] = 6*nparts;
 
         m_P.x = m_P_x.data();
@@ -235,40 +242,5 @@ namespace scopi
         csr_rows[0] = 0;
     }
 
-    template <class problem_t>
-    void OptimScs<problem_t>::set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index)
-    {
-        auto active_offset = particles.nb_inactive();
-        for (std::size_t i = 0; i < nparts; ++i)
-        {
-            for (std::size_t d = 0; d < 2; ++d)
-            {
-                m_P_i[index] = 3*nparts + 3*i + d;
-                m_P_p[index] = 3*nparts + 3*i + d;
-                m_P_x[index] = 0.;
-                index++;
-            }
-            m_P_i[index] = 3*nparts + 3*i + 2;
-            m_P_p[index] = 3*nparts + 3*i + 2;
-            m_P_x[index] = particles.j()(active_offset + i);
-            index++;
-        }
-    }
-
-    template <class problem_t>
-    void OptimScs<problem_t>::set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index)
-    {
-        auto active_offset = particles.nb_inactive();
-        for (std::size_t i = 0; i < nparts; ++i)
-        {
-            for (std::size_t d = 0; d < 2; ++d)
-            {
-                m_P_i[index] = 3*nparts + 3*i + d;
-                m_P_p[index] = 3*nparts + 3*i + d;
-                m_P_x[index] = particles.j()(active_offset + i)(d);
-                index++;
-            }
-        }
-    }
 }
 #endif
