@@ -363,9 +363,13 @@ namespace scopi
         for (auto& g : m_gamma)
         {
             if (g < -m_tol && g > m_gamma_min)
+            {
                 m_nb_gamma_neg++;
+            }
             else if (g == m_gamma_min)
+            {
                 m_nb_gamma_min++;
+            }
         }
     }
 
@@ -400,7 +404,9 @@ namespace scopi
             }
             m_gamma_old[i] = std::max(m_gamma_min, std::min(0., m_gamma[i] - m_dt * f_contact));
             // for Mosek
-            if(m_gamma_old[i] > -m_tol)
+            if (m_gamma_old[i] - m_gamma_min < m_tol)
+                m_gamma_old[i] = m_gamma_min;
+            if (m_gamma_old[i] > -m_tol)
                 m_gamma_old[i] = 0.;
             PLOG_WARNING << m_gamma[i];
         }
