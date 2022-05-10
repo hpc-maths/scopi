@@ -138,6 +138,7 @@ namespace scopi{
 
         PLOG_ERROR_IF(cc >= m_max_iter) << "Uzawa does not converge";
 
+        PLOG_INFO << "----> CPUTIME : solve (total) = " << time_solve;
         PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
         PLOG_INFO << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A;
         PLOG_INFO << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P;
