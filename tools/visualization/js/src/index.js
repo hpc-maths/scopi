@@ -70,8 +70,8 @@ const planObject = function() {
     let yB = 0.;
     return function(obj, plan) {
         const c = obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1];
-        plan.push(new THREE.Vector3(obj.position[0], obj.position[0], 0.));
-        if (obj.normal[1] === 0.) { // vertical straight line
+        // plan.push(new THREE.Vector3(obj.position[0], obj.position[0], 0.));
+        if (obj.normal[1] === 0.) { // vertical straight line 
             xB = c/obj.normal[0];
             yB = obj.position[0] + 30;
         }
@@ -79,7 +79,54 @@ const planObject = function() {
             xB = 30.;
             yB = (c - obj.normal[0] * xB) / obj.normal[1];
         }
-        plan.push(new THREE.Vector3(xB, yB, 0.));
+        // plan.push(new THREE.Vector3(xB, yB, 0.));
+
+
+
+        var point1 = {
+            x : obj.position[0],
+            y : obj.position[0],
+        };
+
+        var point2 = {
+            x : xB,
+            y : yB,
+        };
+
+        var a = (point2.y - point1.y) / (point2.x - point1.x);
+        var b = (point1.y * point2.x - point2.y * point1.x) / (point2.x - point1.x);
+
+        var canvasWidth = window.innerWidth;
+        var canvasHeight = window.innerHeight;
+
+        var leftSideY = b;
+        var rightSideY = (canvasWidth * a) + b;
+        var topSideX = (-b) / a;
+        var bottomSideX = (canvasHeight - b) / a;
+
+        // vertical line
+        if ([Infinity, -Infinity].includes(a)) {
+            topSideX = bottomSideX = point1.x;
+        }
+        // same points
+        if (a !== a) {
+            throw new Error("point1 and point2 are the same")
+        }
+
+        console.log(leftSideY);
+
+        const edgePoints = [
+            {x: 0, y: leftSideY},
+            {x: canvasWidth, y: rightSideY},
+            {x: topSideX, y: 0},
+            {x: bottomSideX, y: canvasHeight}
+        ].filter(({x, y}) => x >= 0 && x <= canvasWidth && y >= 0 && y <= canvasHeight);
+
+        plan.push(new THREE.Vector3(edgePoints[0].x, edgePoints[0].y, 0));
+        plan.push(new THREE.Vector3(edgePoints[1].x, edgePoints[1].y, 0));
+
+// context.moveTo(edgePoints[0].x , edgePoints[0].y || 0);
+// context.lineTo(edgePoints[1].x || point2.x, edgePoints[1].y || canvasHeight);
     };
 }();
 

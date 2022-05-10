@@ -5,6 +5,8 @@
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
 
+#include <scopi/vap/vap_fpd.hpp>
+
 namespace scopi
 {
     TEST_CASE("Container 2d")
@@ -106,6 +108,16 @@ namespace scopi
             REQUIRE(vd(1)(0) == doctest::Approx(0.04));
             REQUIRE(vd(1)(1) == doctest::Approx(0.05));
         }
+
+        SUBCASE("moments fpd sphere")
+        {
+            REQUIRE(cross_product_vap_fpd(particles, 1) == doctest::Approx(0.));
+        }
+
+        SUBCASE("moments fpd superellipsoid")
+        {
+            REQUIRE(cross_product_vap_fpd(particles, 0) == doctest::Approx(0.));
+        }
     }
 
     TEST_CASE("Container 3d")
@@ -126,7 +138,7 @@ namespace scopi
                                    .desired_velocity({{0.04, 0.05, 0.06}})
                                    .force({{4., 5., 6,}})
                                    .mass(2.)
-                                   .moment_inertia({{0.4, 0.5, 0.6}}));
+                                   .moment_inertia({0.1, 0.1, 0.1}));
 
         SUBCASE("size")
         {
@@ -181,9 +193,9 @@ namespace scopi
             REQUIRE(j(0)(0) == doctest::Approx(0.1));
             REQUIRE(j(0)(1) == doctest::Approx(0.2));
             REQUIRE(j(0)(2) == doctest::Approx(0.3));
-            REQUIRE(j(1)(0) == doctest::Approx(0.4));
-            REQUIRE(j(1)(1) == doctest::Approx(0.5));
-            REQUIRE(j(1)(2) == doctest::Approx(0.6));
+            REQUIRE(j(1)(0) == doctest::Approx(0.1));
+            REQUIRE(j(1)(1) == doctest::Approx(0.1));
+            REQUIRE(j(1)(2) == doctest::Approx(0.1));
         }
 
         SUBCASE("v")
@@ -228,6 +240,22 @@ namespace scopi
             REQUIRE(vd(1)(0) == doctest::Approx(0.04));
             REQUIRE(vd(1)(1) == doctest::Approx(0.05));
             REQUIRE(vd(1)(2) == doctest::Approx(0.06));
+        }
+
+        SUBCASE("moments fpd sphere")
+        {
+            auto cross_product_sphere = cross_product_vap_fpd(particles, 1);
+            REQUIRE(cross_product_sphere(0) == doctest::Approx(0.));
+            REQUIRE(cross_product_sphere(1) == doctest::Approx(0.));
+            REQUIRE(cross_product_sphere(2) == doctest::Approx(0.));
+        }
+
+        SUBCASE("moments fpd superellipsoid")
+        {
+            auto cross_product_superellipsoid = cross_product_vap_fpd(particles, 0);
+            REQUIRE(cross_product_superellipsoid(0) == doctest::Approx(PI*PI/20.*0.1));
+            REQUIRE(cross_product_superellipsoid(1) == doctest::Approx(-PI*PI/15.*0.2));
+            REQUIRE(cross_product_superellipsoid(2) == doctest::Approx(PI*PI/12.*0.1));
         }
     }
 }

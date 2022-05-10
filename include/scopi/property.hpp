@@ -31,7 +31,7 @@ namespace scopi
 
         property& mass(const mass_type& m);
         mass_type mass() const;
-        property& moment_inertia(const moment_type& m);
+        property& moment_inertia(const moment_type& m); // TODO fix moments for a sphere
         const moment_type moment_inertia() const;
 
         property& deactivate();
