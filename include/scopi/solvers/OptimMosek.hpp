@@ -98,6 +98,12 @@ namespace scopi{
         auto duration3 = toc();
         PLOG_INFO << "----> CPUTIME : Mosek solve = " << duration3;
 
+        /*
+        auto u = std::make_shared<monty::ndarray<double, 1>>(m_Xlvl->raw()+1, shape_t<1>(m_A->numColumns()));
+        auto y = std::make_shared<monty::ndarray<double, 1>>(D_mosek->raw(), shape_t<1>(m_A->numRows()));
+        mosek::LinAlg::gemv(false, m_A->numRows(), m_A->numColumns(), -1., m_A->transpose()->getDataAsArray(), u, 1.,  y);
+        */
+
         return model->getSolverIntInfo("intpntIter");
     }
 
