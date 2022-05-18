@@ -5,8 +5,7 @@ namespace scopi
 {
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0)
     {
-        // TODO replace omega by theta
-        double x_normal, omega;
+        double x_normal, theta;
         double t_impact = std::sqrt(2*(y0-r)/(g*std::cos(alpha)));
         if (t > t_impact)
         {
@@ -17,15 +16,15 @@ namespace scopi
             if(std::tan(alpha) <= 3*mu)
             {
                 x_normal = g*std::sin(alpha)*t2*t2/3. + 2.*v_t_m*t2/3. + x_impact;
-                omega = -2.*g*std::sin(alpha)*t2/(3.*r) - 2*v_t_m/(3.*r);
+                theta = -g*std::sin(alpha)*t2*t2/(3.*r) - 2*v_t_m*t2/(3.*r);
             }
             else
             {
                 x_normal = g*(std::sin(alpha) - mu*std::cos(alpha))*t2*t2/2. + (v_t_m + mu*v_n_m)*t2 + x_impact;
-                omega = -2.*mu*g*std::cos(alpha)*t2/r + 2*mu*v_n_m/r;
+                theta = -mu*g*std::cos(alpha)*t2*t2/r + 2*mu*v_n_m*t2/r;
             }
             xt::xtensor<double, 1> x = xt::xtensor<double, 1>({x_normal*std::cos(alpha) + r*std::sin(alpha), -x_normal*std::sin(alpha) + r*std::cos(alpha)});
-            return std::make_pair(x, omega);
+            return std::make_pair(x, theta);
         }
         else
         {

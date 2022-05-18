@@ -44,12 +44,22 @@ int main()
                 solver.solve(total_it[i]);
 
                 auto pos = particles.pos();
-                auto omega = particles.omega();
+                auto q = particles.q();
                 auto tmp = scopi::analytical_solution_sphere_plan(alpha, mu, dt[i]*(total_it[i]+1), radius, g, h);
-                auto analytical_sol = tmp.first;
+                auto pos_analytical = tmp.first;
+                auto q_analytical = scopi::quaternion(tmp.second);
+                double error_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
+                double error_q = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
+
+                auto v = particles.v();
+                auto omega = particles.omega();
+                tmp = scopi::analytical_solution_sphere_plan_velocity(alpha, mu, dt[i]*(total_it[i]+1), radius, g, h);
+                auto v_analytical = tmp.first;
                 auto omega_analytical = tmp.second;
-                double error = xt::linalg::norm(pos(1) - analytical_sol) / xt::linalg::norm(analytical_sol);
-                PLOG_WARNING << "mu = " << mu << "  alpha = " << alpha << "   dt = " << dt[i] << '\t' << error << '\t' << std::abs((omega(1)-omega_analytical)/omega_analytical);
+                double error_v = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
+                double error_omega = std::abs(omega(1) - omega_analytical) / omega_analytical;
+
+                PLOG_WARNING << "mu = " << mu << "  alpha = " << alpha << "   dt = " << dt[i] << '\t' << error_pos << '\t' << error_q << '\t' << error_v << '\t' << error_omega;
 
             }
             PLOG_WARNING << std::endl;
