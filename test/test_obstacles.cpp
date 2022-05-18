@@ -178,11 +178,11 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("sphere inclined plan", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fpd), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fpd))
     {
-        std::tuple<double, double> data;
-        std::vector<std::tuple<double, double>>
-            data_container({std::make_tuple(PI/6., 0.000999003),
-                            std::make_tuple(PI/4., 0.000999005),
-                            std::make_tuple(PI/3., 0.000998989)});
+        std::tuple<double, double, double, double> data;
+        std::vector<std::tuple<double, double, double, double>>
+            data_container({std::make_tuple(PI/6., 0.000998789, 0., 0.0010002),
+                            std::make_tuple(PI/4., 0.00100008, 0., 0.00100119),
+                            std::make_tuple(PI/3., 0.00100105, 0., 0.0010027)});
 
         DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
 
@@ -191,11 +191,12 @@ namespace scopi
         double g = 1.;
         double dt = 0.01;
         std::size_t total_it = 1000;
+        double h = 2.*radius;
         double alpha = std::get<0>(data);
 
         auto prop = property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
-        plan<dim> p({{-radius*std::cos(PI/2.-alpha), -radius*std::sin(PI/2.-alpha)}}, PI/2.-alpha);
-        sphere<dim> s({{0., 0.}}, radius);
+        plan<dim> p({{0., 0.}}, PI/2.-alpha);
+        sphere<dim> s({{h*std::sin(alpha), h*std::cos(alpha)}}, radius);
 
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
@@ -205,12 +206,21 @@ namespace scopi
         solver.solve(total_it);
 
         auto pos = particles.pos();
+        auto q = particles.q();
+        auto tmp = analytical_solution_sphere_plan(alpha, 0., dt*(total_it+1), radius, g, h);
+        auto pos_analytical = tmp.first;
+        auto q_analytical = quaternion(tmp.second);
+        double error_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
+        double error_q = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
+        auto v = particles.v();
         auto omega = particles.omega();
-        auto sol = scopi::analytical_solution_sphere_plan(alpha, 0., dt*(total_it+1), radius, g);
-        auto pos_analytical = sol.first;
-        double err_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
+        tmp = analytical_solution_sphere_plan_velocity(alpha, 0., dt*(total_it+1), radius, g, h);
+        auto v_analytical = tmp.first;
+        double error_v = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
 
-        REQUIRE(err_pos == doctest::Approx(std::get<1>(data)));
+        REQUIRE(error_pos == doctest::Approx(std::get<1>(data)));
+        REQUIRE(error_q == doctest::Approx(std::get<2>(data)));
+        REQUIRE(error_v == doctest::Approx(std::get<3>(data)));
         REQUIRE(omega(1) == doctest::Approx(0.));
     }
 }

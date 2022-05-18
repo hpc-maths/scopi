@@ -35,7 +35,7 @@ int main()
             {
                 scopi::scopi_container<dim> particles;
                 scopi::plan<dim> p({{0., 0.}}, PI/2.-alpha);
-                scopi::sphere<dim> s({{h*std::cos(PI/2.-alpha), h*std::sin(PI/2.-alpha)}}, radius);
+                scopi::sphere<dim> s({{h*std::sin(alpha), h*std::cos(alpha)}}, radius);
                 particles.push_back(p, scopi::property<dim>().deactivate());
                 particles.push_back(s, prop.force({{0., -g}}));
 
@@ -57,7 +57,7 @@ int main()
                 auto v_analytical = tmp.first;
                 auto omega_analytical = tmp.second;
                 double error_v = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
-                double error_omega = std::abs(omega(1) - omega_analytical) / omega_analytical;
+                double error_omega = std::abs((omega(1) - omega_analytical) / omega_analytical);
 
                 PLOG_WARNING << "mu = " << mu << "  alpha = " << alpha << "   dt = " << dt[i] << '\t' << error_pos << '\t' << error_q << '\t' << error_v << '\t' << error_omega;
 
