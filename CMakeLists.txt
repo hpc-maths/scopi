@@ -197,6 +197,8 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithoutFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithFriction.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousBase.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWitouthFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWithFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/quaternion.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/minpack.hpp

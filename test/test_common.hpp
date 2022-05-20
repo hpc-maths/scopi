@@ -14,7 +14,10 @@
 #include <scopi/contact/contact_kdtree.hpp>
 #include <scopi/contact/contact_brute_force.hpp>
 
+#include <scopi/problems/DryWithoutFriction.hpp>
 #include <scopi/problems/DryWithFriction.hpp>
+#include <scopi/problems/ViscousWithoutFriction.hpp>
+#include <scopi/problems/ViscousWithFriction.hpp>
 
 #include <scopi/vap/vap_fixed.hpp>
 #include <scopi/vap/vap_fpd.hpp>
