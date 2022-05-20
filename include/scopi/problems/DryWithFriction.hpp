@@ -17,11 +17,11 @@ namespace scopi
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0);
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0);
 
-    class MatrixOptimSolverFriction
+    class DryWithFriction
     {
 
     protected:
-        MatrixOptimSolverFriction(std::size_t nparticles, double dt);
+        DryWithFriction(std::size_t nparticles, double dt);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
@@ -51,7 +51,7 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void MatrixOptimSolverFriction::create_matrix_constraint_coo(const scopi_container<dim>& particles,
+    void DryWithFriction::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                               const std::vector<neighbor<dim>>& contacts,
                                                               std::size_t firstCol)
     {
@@ -175,21 +175,21 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    void MatrixOptimSolverFriction::set_gamma(const std::vector<neighbor<dim>>&)
+    void DryWithFriction::set_gamma(const std::vector<neighbor<dim>>&)
     {}
 
     template <std::size_t dim>
-    void MatrixOptimSolverFriction::update_gamma(const std::vector<neighbor<dim>>&, xt::xtensor<double, 1>)
+    void DryWithFriction::update_gamma(const std::vector<neighbor<dim>>&, xt::xtensor<double, 1>)
     {}
   
     template <std::size_t dim>
-    std::size_t MatrixOptimSolverFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
         return 4*contacts.size();
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolverFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)

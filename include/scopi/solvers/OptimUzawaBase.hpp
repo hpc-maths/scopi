@@ -12,7 +12,7 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi{
-    template<class Derived, class problem_t = MatrixOptimSolver>
+    template<class Derived, class problem_t = DryWithoutFriction>
     class OptimUzawaBase: public OptimBase<Derived, problem_t>
     {
     public:

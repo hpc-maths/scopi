@@ -9,10 +9,10 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 
-#include "../problems/MatrixOptimSolver.hpp"
+#include "../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
-    template <class Derived, class problem_t = MatrixOptimSolver>
+    template <class Derived, class problem_t = DryWithoutFriction>
     class OptimBase : public problem_t
     {
     public:

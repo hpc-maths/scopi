@@ -15,7 +15,7 @@
 
 namespace scopi
 {
-    template<class problem_t = MatrixOptimSolver>
+    template<class problem_t = DryWithoutFriction>
     class OptimUzawaMatrixFreeTbb : public OptimUzawaBase<OptimUzawaMatrixFreeTbb<problem_t>, problem_t>
     {
     public:

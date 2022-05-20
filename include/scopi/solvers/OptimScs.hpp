@@ -2,16 +2,16 @@
 
 #ifdef SCOPI_USE_SCS
 #include "OptimBase.hpp"
-#include "../problems/MatrixOptimSolver.hpp"
+#include "../problems/DryWithoutFriction.hpp"
 #include <scs.h>
 
 namespace scopi
 {
-    template <class problem_t = MatrixOptimSolver>
-    class OptimScs: public OptimBase<OptimScs<problem_t>, MatrixOptimSolver>
+    template <class problem_t = DryWithoutFriction>
+    class OptimScs: public OptimBase<OptimScs<problem_t>, DryWithoutFriction>
     {
     public:
-        using base_type = OptimBase<OptimScs<problem_t>, MatrixOptimSolver>;
+        using base_type = OptimBase<OptimScs<problem_t>, DryWithoutFriction>;
 
         template <std::size_t dim>
         OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol = 1e-7);

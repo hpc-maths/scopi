@@ -2,14 +2,14 @@
 
 #ifdef SCOPI_USE_MOSEK
 #include "OptimBase.hpp"
-#include "../problems/MatrixOptimSolver.hpp"
+#include "../problems/DryWithoutFriction.hpp"
 #include "ConstraintMosek.hpp"
 
 #include <memory>
 #include <fusion.h>
 
 namespace scopi{
-    template<class problem_t = MatrixOptimSolver>
+    template<class problem_t = DryWithoutFriction>
     class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
                     , public ConstraintMosek<problem_t>
     {

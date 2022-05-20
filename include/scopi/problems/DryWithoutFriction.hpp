@@ -12,11 +12,11 @@
 
 namespace scopi
 {
-    class MatrixOptimSolver
+    class DryWithoutFriction
     {
 
     protected:
-        MatrixOptimSolver(std::size_t nparts, double dt);
+        DryWithoutFriction(std::size_t nparts, double dt);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
@@ -76,7 +76,7 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void MatrixOptimSolver::create_matrix_constraint_coo(const scopi_container<dim>& particles,
+    void DryWithoutFriction::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                               const std::vector<neighbor<dim>>& contacts,
                                                               std::size_t firstCol)
     {
@@ -152,21 +152,21 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    void MatrixOptimSolver::set_gamma(const std::vector<neighbor<dim>>&)
+    void DryWithoutFriction::set_gamma(const std::vector<neighbor<dim>>&)
     {}
 
     template <std::size_t dim>
-    void MatrixOptimSolver::update_gamma(const std::vector<neighbor<dim>>&, xt::xtensor<double, 1>)
+    void DryWithoutFriction::update_gamma(const std::vector<neighbor<dim>>&, xt::xtensor<double, 1>)
     {}
 
     template <std::size_t dim>
-    std::size_t MatrixOptimSolver::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    std::size_t DryWithoutFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
         return contacts.size();
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolver::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void DryWithoutFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         m_distances = xt::zeros<double>({contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
@@ -176,7 +176,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolver::matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
+    void DryWithoutFriction::matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
                                                    xt::xtensor<double, 1>& U,
                                                    std::size_t active_offset,
                                                    std::size_t row)
@@ -189,7 +189,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolver::matrix_free_gemv_A(const neighbor<dim>& c,
+    void DryWithoutFriction::matrix_free_gemv_A(const neighbor<dim>& c,
                                                const scopi_container<dim>& particles,
                                                const xt::xtensor<double, 1>& U,
                                                xt::xtensor<double, 1>& R,
@@ -240,7 +240,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolver::matrix_free_gemv_transpose_A(const neighbor<dim>& c,
+    void DryWithoutFriction::matrix_free_gemv_transpose_A(const neighbor<dim>& c,
                                                          const scopi_container<dim>& particles,
                                                          const xt::xtensor<double, 1>& L,
                                                          xt::xtensor<double, 1>& U,

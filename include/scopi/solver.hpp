@@ -21,7 +21,7 @@
 #include "quaternion.hpp"
 
 #include "solvers/OptimUzawaMatrixFreeOmp.hpp"
-#include "problems/MatrixOptimSolver.hpp"
+#include "problems/DryWithoutFriction.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
 
@@ -33,7 +33,7 @@ namespace scopi
 {
 
     template<std::size_t dim,
-             class problem_t = MatrixOptimSolver,
+             class problem_t = DryWithoutFriction,
              template <class> class optim_solver_t = OptimUzawaMatrixFreeOmp,
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed

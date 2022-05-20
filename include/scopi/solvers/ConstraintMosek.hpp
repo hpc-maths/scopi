@@ -3,9 +3,9 @@
 #ifdef SCOPI_USE_MOSEK
 #include <fusion.h>
 
-#include "../problems/MatrixOptimSolver.hpp"
-#include "../problems/MatrixOptimSolverFriction.hpp"
-#include "../problems/MatrixOptimSolverViscosity.hpp"
+#include "../problems/DryWithoutFriction.hpp"
+#include "../problems/DryWithFriction.hpp"
+#include "../problems/ViscousWithFriction.hpp"
 
 namespace scopi
 {
@@ -15,7 +15,7 @@ namespace scopi
     };
 
     template<>
-    class ConstraintMosek<MatrixOptimSolver>
+    class ConstraintMosek<DryWithoutFriction>
     {
     protected:
         ConstraintMosek(std::size_t nparts);
@@ -43,7 +43,7 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void ConstraintMosek<MatrixOptimSolver>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+    void ConstraintMosek<DryWithoutFriction>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                                                              mosek::fusion::Matrix::t A,
                                                              mosek::fusion::Variable::t X,
                                                              mosek::fusion::Model::t model,
@@ -61,7 +61,7 @@ namespace scopi
 
 
     template<>
-    class ConstraintMosek<MatrixOptimSolverFriction>
+    class ConstraintMosek<DryWithFriction>
     {
     protected:
         ConstraintMosek(std::size_t nparts);
@@ -88,7 +88,7 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void ConstraintMosek<MatrixOptimSolverFriction>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+    void ConstraintMosek<DryWithFriction>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                                                                      mosek::fusion::Matrix::t A,
                                                                      mosek::fusion::Variable::t X,
                                                                      mosek::fusion::Model::t model,
@@ -107,7 +107,7 @@ namespace scopi
 
 
     template<std::size_t dim>
-    class ConstraintMosek<MatrixOptimSolverViscosity<dim>>
+    class ConstraintMosek<ViscousWithFriction<dim>>
     {
     protected:
         ConstraintMosek(std::size_t nparts);
@@ -135,7 +135,7 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void ConstraintMosek<MatrixOptimSolverViscosity<dim>>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+    void ConstraintMosek<ViscousWithFriction<dim>>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                                                                            mosek::fusion::Matrix::t A,
                                                                            mosek::fusion::Variable::t X,
                                                                            mosek::fusion::Model::t model,
@@ -158,24 +158,24 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    ConstraintMosek<MatrixOptimSolverViscosity<dim>>::ConstraintMosek(std::size_t nparticles)
+    ConstraintMosek<ViscousWithFriction<dim>>::ConstraintMosek(std::size_t nparticles)
     : m_nparticles(nparticles)
     {}
 
     template <std::size_t dim>
-    std::size_t ConstraintMosek<MatrixOptimSolverViscosity<dim>>::index_first_col_matrix() const
+    std::size_t ConstraintMosek<ViscousWithFriction<dim>>::index_first_col_matrix() const
     {
         return 0;
     }
 
     template <std::size_t dim>
-    std::size_t ConstraintMosek<MatrixOptimSolverViscosity<dim>>::number_col_matrix() const
+    std::size_t ConstraintMosek<ViscousWithFriction<dim>>::number_col_matrix() const
     {
         return 6*m_nparticles;
     }
 
     template <std::size_t dim>
-    void ConstraintMosek<MatrixOptimSolverViscosity<dim>>::update_dual(std::size_t nb_row_matrix,
+    void ConstraintMosek<ViscousWithFriction<dim>>::update_dual(std::size_t nb_row_matrix,
                                                                        std::size_t nb_contacts,
                                                                        std::size_t nb_gamma_neg,
                                                                        std::size_t nb_gamma_min)

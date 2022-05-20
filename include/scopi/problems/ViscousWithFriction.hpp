@@ -13,10 +13,10 @@
 namespace scopi
 {
     template<std::size_t dim>
-    class MatrixOptimSolverViscosity
+    class ViscousWithFriction
     {
     protected:
-        MatrixOptimSolverViscosity(std::size_t nparts, double dt);
+        ViscousWithFriction(std::size_t nparts, double dt);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
@@ -48,7 +48,7 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void MatrixOptimSolverViscosity<dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
+    void ViscousWithFriction<dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                               const std::vector<neighbor<dim>>& contacts,
                                                               std::size_t firstCol)
     {
@@ -317,7 +317,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    MatrixOptimSolverViscosity<dim>::MatrixOptimSolverViscosity(std::size_t nparticles, double dt)
+    ViscousWithFriction<dim>::ViscousWithFriction(std::size_t nparticles, double dt)
     : m_nparticles(nparticles)
     , m_dt(dt)
     , m_tol(1e-6)
@@ -326,7 +326,7 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    void MatrixOptimSolverViscosity<dim>::set_gamma(const std::vector<neighbor<dim>>& contacts_new)
+    void ViscousWithFriction<dim>::set_gamma(const std::vector<neighbor<dim>>& contacts_new)
     {
         m_gamma.resize(contacts_new.size());
         if(m_contacts_old.size() > 0)
@@ -374,7 +374,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolverViscosity<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda)
+    void ViscousWithFriction<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda)
     {
         m_contacts_old = contacts;
         m_gamma_old.resize(m_gamma.size());
@@ -413,13 +413,13 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t MatrixOptimSolverViscosity<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    std::size_t ViscousWithFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
         return contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 2*4*m_nb_gamma_min;
     }
 
     template<std::size_t dim>
-    void MatrixOptimSolverViscosity<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void ViscousWithFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         m_distances = xt::zeros<double>({contacts.size() - m_nb_gamma_min + m_nb_gamma_neg + 2*4*m_nb_gamma_min});
         std::size_t index_dry = 0;
@@ -445,13 +445,13 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t MatrixOptimSolverViscosity<dim>::get_nb_gamma_neg() const
+    std::size_t ViscousWithFriction<dim>::get_nb_gamma_neg() const
     {
         return m_nb_gamma_neg;
     }
 
     template<std::size_t dim>
-    std::size_t MatrixOptimSolverViscosity<dim>::get_nb_gamma_min() const
+    std::size_t ViscousWithFriction<dim>::get_nb_gamma_min() const
     {
         return m_nb_gamma_min;
     }

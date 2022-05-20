@@ -4,7 +4,7 @@
 #include <scopi/property.hpp>
 #include <scopi/solvers/OptimMosek.hpp>
 #include <scopi/vap/vap_fpd.hpp>
-#include <scopi/problems/MatrixOptimSolverViscosity.hpp>
+#include <scopi/problems/ViscousWithFriction.hpp>
 
 int main()
 {
@@ -21,7 +21,7 @@ int main()
     particles.push_back(s1, prop.velocity({0.3, 0.75}));
     particles.push_back(s2, prop.velocity({0., 0.}));
 
-    scopi::ScopiSolver<dim, scopi::MatrixOptimSolverViscosity<dim>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    scopi::ScopiSolver<dim, scopi::ViscousWithFriction<dim>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;

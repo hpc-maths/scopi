@@ -100,8 +100,8 @@ endif()
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
-    src/problems/MatrixOptimSolver.cpp
-    src/problems/MatrixOptimSolverFriction.cpp
+    src/problems/DryWithoutFriction.cpp
+    src/problems/DryWithFriction.cpp
     src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
@@ -191,12 +191,13 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimMosek.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeOmp.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimScs.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/MatrixOptimSolver.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/MatrixOptimSolverFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeTbb.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMkl.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimBase.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithoutFriction.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithFriction.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWithFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/quaternion.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/minpack.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/property.hpp

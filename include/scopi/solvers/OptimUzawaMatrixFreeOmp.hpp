@@ -14,7 +14,7 @@
 #include "../utils.hpp"
 
 namespace scopi{
-    template<class problem_t = MatrixOptimSolver>
+    template<class problem_t = DryWithoutFriction>
     class OptimUzawaMatrixFreeOmp : public OptimUzawaBase<OptimUzawaMatrixFreeOmp<problem_t>, problem_t>
     {
     public:
