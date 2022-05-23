@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 #include <vector>
@@ -12,7 +13,7 @@
 
 namespace scopi
 {
-    template<class Derived, std::size_t dim>
+    template<std::size_t dim>
     class ViscousBase
     {
     protected:
@@ -39,21 +40,13 @@ namespace scopi
         double m_tol;
     };
 
-    template<class Derived, std::size_t dim>
-    void ViscousBase<Derived, dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                              const std::vector<neighbor<dim>>& contacts,
-                                                              std::size_t firstCol)
-    {
-        static_cast<Derived&>(*this).create_matrix_constraint_coo_impl(particles, contacts, firstCol);
-    }
-
-    template<class Derived, std::size_t dim>
-    ViscousBase<Derived, dim>::ViscousBase()
+    template<std::size_t dim>
+    ViscousBase<dim>::ViscousBase()
     : m_tol(1e-6)
     {}
 
-    template<class Derived, std::size_t dim>
-    void ViscousBase<Derived, dim>::set_gamma_base(const std::vector<neighbor<dim>>& contacts_new)
+    template<std::size_t dim>
+    void ViscousBase<dim>::set_gamma_base(const std::vector<neighbor<dim>>& contacts_new)
     {
         m_gamma.resize(contacts_new.size());
         if(m_contacts_old.size() > 0)
@@ -86,39 +79,10 @@ namespace scopi
         }
     }
 
-    template<class Derived, std::size_t dim>
-    void ViscousBase<Derived, dim>::update_gamma(const std::vector<neighbor<dim>>& contacts,
-                                                 xt::xtensor<double, 1> lambda,
-                                                 const scopi_container<dim>& particles,
-                                                 const xt::xtensor<double, 2>& u)
-    {
-        static_cast<Derived&>(*this).update_gamma_impl(contacts, lambda, particles, u);
-    }
-
-
-    template<class Derived, std::size_t dim>
-    std::size_t ViscousBase<Derived, dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
-    {
-        return static_cast<Derived&>(*this).number_row_matrix_impl(contacts);
-    }
-
-    template<class Derived, std::size_t dim>
-    void ViscousBase<Derived, dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
-    {
-        static_cast<Derived&>(*this).create_vector_distances_impl(contacts);
-    }
-
-    template<class Derived, std::size_t dim>
-    std::size_t ViscousBase<Derived, dim>::get_nb_gamma_neg() const
+    template<std::size_t dim>
+    std::size_t ViscousBase<dim>::get_nb_gamma_neg() const
     {
         return m_nb_gamma_neg;
     }
-
-    template<class Derived, std::size_t dim>
-    std::size_t ViscousBase<Derived, dim>::get_nb_gamma_min()
-    {
-        return static_cast<Derived&>(*this).get_nb_gamma_min_impl();
-    }
-
 }
 

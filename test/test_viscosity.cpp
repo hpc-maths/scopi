@@ -60,6 +60,7 @@ namespace scopi {
         particles.push_back(s, prop.force({{g, -g}}));
 
         SolverType solver(particles, dt);
+        solver.set_coeff_friction(0.1);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);

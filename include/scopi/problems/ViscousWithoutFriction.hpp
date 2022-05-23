@@ -18,34 +18,32 @@ namespace scopi
 {
     template<std::size_t dim>
     class ViscousWithoutFriction: public ProblemBase
-                                , public ViscousBase<ViscousWithoutFriction<dim>, dim>
+                                , public ViscousBase<dim>
                                 , public WithoutFrictionBase
     {
     public:
-        using base_type = ViscousBase<ViscousWithoutFriction, dim>;
-
         ViscousWithoutFriction(std::size_t nparts, double dt);
 
-        void create_matrix_constraint_coo_impl(const scopi_container<dim>& particles,
-                                               const std::vector<neighbor<dim>>& contacts,
-                                               std::size_t firstCol);
-        void update_gamma_impl(const std::vector<neighbor<dim>>& contacts,
-                               xt::xtensor<double, 1> lambda,
-                               const scopi_container<dim>& particles,
-                               const xt::xtensor<double, 2>& u);
-        std::size_t number_row_matrix_impl(const std::vector<neighbor<dim>>& contacts);
-        void create_vector_distances_impl(const std::vector<neighbor<dim>>& contacts);
+        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
+                                          const std::vector<neighbor<dim>>& contacts,
+                                          std::size_t firstCol);
+        void update_gamma(const std::vector<neighbor<dim>>& contacts,
+                          xt::xtensor<double, 1> lambda,
+                          const scopi_container<dim>& particles,
+                          const xt::xtensor<double, 2>& u);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
-        std::size_t get_nb_gamma_min_impl();
+        std::size_t get_nb_gamma_min();
 
     protected:
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
     };
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::create_matrix_constraint_coo_impl(const scopi_container<dim>& particles,
-                                                                        const std::vector<neighbor<dim>>& contacts,
-                                                                        std::size_t firstCol)
+    void ViscousWithoutFriction<dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
+                                                                   const std::vector<neighbor<dim>>& contacts,
+                                                                   std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
         std::size_t u_size = 3*contacts.size()*2;
@@ -145,11 +143,10 @@ namespace scopi
         this->m_A_values.resize(index);
     }
 
-
     template<std::size_t dim>
     ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt)
     : ProblemBase(nparticles, dt)
-    , base_type()
+    , ViscousBase<dim>()
     , WithoutFrictionBase()
     {}
 
@@ -166,10 +163,10 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::update_gamma_impl(const std::vector<neighbor<dim>>& contacts,
-                                                        xt::xtensor<double, 1> lambda,
-                                                        const scopi_container<dim>&,
-                                                        const xt::xtensor<double, 2>&)
+    void ViscousWithoutFriction<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts,
+                                                   xt::xtensor<double, 1> lambda,
+                                                   const scopi_container<dim>&,
+                                                   const xt::xtensor<double, 2>&)
     {
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
@@ -198,13 +195,13 @@ namespace scopi
 
 
     template<std::size_t dim>
-    std::size_t ViscousWithoutFriction<dim>::number_row_matrix_impl(const std::vector<neighbor<dim>>& contacts)
+    std::size_t ViscousWithoutFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
         return contacts.size() + this->m_nb_gamma_neg;
     }
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::create_vector_distances_impl(const std::vector<neighbor<dim>>& contacts)
+    void ViscousWithoutFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         this->m_distances = xt::zeros<double>({contacts.size() + this->m_nb_gamma_neg});
         for (std::size_t i = 0; i < contacts.size(); ++i)
@@ -218,7 +215,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t ViscousWithoutFriction<dim>::get_nb_gamma_min_impl()
+    std::size_t ViscousWithoutFriction<dim>::get_nb_gamma_min()
     {
         return 0;
     }
