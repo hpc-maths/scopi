@@ -5,6 +5,7 @@
 
 #include "../problems/DryWithoutFriction.hpp"
 #include "../problems/DryWithFriction.hpp"
+#include "../problems/ViscousWithoutFriction.hpp"
 #include "../problems/ViscousWithFriction.hpp"
 
 namespace scopi
@@ -101,6 +102,80 @@ namespace scopi
                 , Expr::reshape(Expr::sub(D, Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))), contacts.size(), 4)
                 , Domain::inQCone());
     }
+
+
+
+
+
+
+    template<std::size_t dim>
+    class ConstraintMosek<ViscousWithoutFriction<dim>>
+    {
+    protected:
+        ConstraintMosek(std::size_t nparts);
+        std::size_t number_col_matrix() const;
+        std::size_t index_first_col_matrix() const;
+
+        void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+                             mosek::fusion::Matrix::t A,
+                             mosek::fusion::Variable::t X,
+                             mosek::fusion::Model::t model,
+                             const std::vector<neighbor<dim>>& contacts,
+                             std::size_t nb_gamma_neg,
+                             std::size_t nb_gamma_min);
+        void update_dual(std::size_t nb_row_matrix,
+                         std::size_t nb_contacts,
+                         std::size_t nb_gamma_neg,
+                         std::size_t nb_gamma_min);
+
+        std::shared_ptr<monty::ndarray<double,1>> m_dual;
+
+    private:
+        std::size_t m_nparticles;
+        mosek::fusion::Constraint::t m_qc1;
+    };
+
+    template <std::size_t dim>
+    void ConstraintMosek<ViscousWithoutFriction<dim>>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+                                                                       mosek::fusion::Matrix::t A,
+                                                                       mosek::fusion::Variable::t X,
+                                                                       mosek::fusion::Model::t model,
+                                                                       const std::vector<neighbor<dim>>&,
+                                                                       std::size_t,
+                                                                       std::size_t)
+    {
+        using namespace mosek::fusion;
+        using namespace monty;
+
+        m_qc1 = model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
+    }
+
+    template <std::size_t dim>
+    ConstraintMosek<ViscousWithoutFriction<dim>>::ConstraintMosek(std::size_t nparticles)
+    : m_nparticles(nparticles)
+    {}
+
+    template <std::size_t dim>
+    std::size_t ConstraintMosek<ViscousWithoutFriction<dim>>::index_first_col_matrix() const
+    {
+        return 1;
+    }
+
+    template <std::size_t dim>
+    std::size_t ConstraintMosek<ViscousWithoutFriction<dim>>::number_col_matrix() const
+    {
+        return 1 + 6*m_nparticles + 6*m_nparticles;
+    }
+
+    template <std::size_t dim>
+    void ConstraintMosek<ViscousWithoutFriction<dim>>::update_dual(std::size_t,
+                                                                       std::size_t,
+                                                                       std::size_t,
+                                                                       std::size_t)
+    {
+        m_dual = m_qc1->dual();
+    }
+
 
 
 
