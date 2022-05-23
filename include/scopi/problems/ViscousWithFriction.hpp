@@ -24,7 +24,10 @@ namespace scopi
         void create_matrix_constraint_coo_impl(const scopi_container<dim>& particles,
                                                const std::vector<neighbor<dim>>& contacts,
                                                std::size_t firstCol);
-        void update_gamma_impl(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda);
+        void update_gamma_impl(const std::vector<neighbor<dim>>& contacts,
+                               xt::xtensor<double, 1> lambda,
+                               const scopi_container<dim>& particles,
+                               const xt::xtensor<double, 2>& u);
         std::size_t number_row_matrix_impl(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances_impl(const std::vector<neighbor<dim>>& contacts);
 
@@ -147,29 +150,12 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                         this->m_A_values[index] = -this->m_dt*c.nij[d];
                         index++;
-
-                        this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
-                        this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
-                        this->m_A_values[index] = this->m_dt*c.nij[d];
-                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
                         for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
-                            this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
-                            this->m_A_values[index] = -this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
-                            if(ind_row == ind_col)
-                            {
-                                this->m_A_values[index] += this->m_dt*m_mu;
-                            }
-                            index++;
-                        }
-
-                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                        {
-                            this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
                             this->m_A_values[index] = -this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
@@ -189,29 +175,12 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                         this->m_A_values[index] = this->m_dt*c.nij[d];
                         index++;
-
-                        this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
-                        this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
-                        this->m_A_values[index] = -this->m_dt*c.nij[d];
-                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
                         for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
-                            this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
-                            this->m_A_values[index] = this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
-                            if(ind_row == ind_col)
-                            {
-                                this->m_A_values[index] -= this->m_dt*m_mu;
-                            }
-                            index++;
-                        }
-
-                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                        {
-                            this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
                             this->m_A_values[index] = this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
@@ -238,25 +207,12 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
                         this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
-
-                        this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
-                        this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
-                        this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
                         for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
-                            this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
-                            this->m_A_values[index] = -m_mu*this->m_dt*dot(ind_row, ind_col) + m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
-                            index++;
-                        }
-
-                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                        {
-                            this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
                             this->m_A_values[index] = -m_mu*this->m_dt*dot(ind_row, ind_col) + m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
@@ -274,25 +230,12 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
                         this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
-
-                        this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic;
-                        this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
-                        this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                        index++;
                     }
                     for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                     {
                         for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
-                            this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
-                            this->m_A_values[index] = m_mu*this->m_dt*dot(ind_row, ind_col) - m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
-                            index++;
-                        }
-
-                        for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                        {
-                            this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
                             this->m_A_values[index] = m_mu*this->m_dt*dot(ind_row, ind_col) - m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
@@ -334,7 +277,10 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void ViscousWithFriction<dim>::update_gamma_impl(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda)
+    void ViscousWithFriction<dim>::update_gamma_impl(const std::vector<neighbor<dim>>& contacts,
+                                                     xt::xtensor<double, 1> lambda,
+                                                     const scopi_container<dim>& particles,
+                                                     const xt::xtensor<double, 2>& u)
     {
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
@@ -360,6 +306,10 @@ namespace scopi
             {
                 f_contact = lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ind_gamma_min)
                     -  lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*this->m_nb_gamma_min + 4*ind_gamma_min);
+                if (f_contact == 0.)
+                {
+                    f_contact = xt::linalg::dot(particles.f()(contacts[i].j), contacts[i].nij) - xt::linalg::dot(xt::view(u, contacts[i].j, xt::all()) - particles.v()(contacts[i].j), contacts[i].nij)/this->m_dt;
+                }
                 ind_gamma_min++;
             }
             this->m_gamma_old[i] = std::max(m_gamma_min, std::min(0., this->m_gamma[i] - this->m_dt * f_contact));

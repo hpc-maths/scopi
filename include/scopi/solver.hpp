@@ -104,7 +104,7 @@ namespace scopi
             PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
 
             tic();
-            m_solver.update_gamma(contacts);
+            m_solver.update_gamma(contacts, m_particles);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 

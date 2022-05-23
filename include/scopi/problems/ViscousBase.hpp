@@ -22,7 +22,10 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
         void set_gamma_base(const std::vector<neighbor<dim>>& contacts_new);
-        void update_gamma(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda);
+        void update_gamma(const std::vector<neighbor<dim>>& contacts,
+                          xt::xtensor<double, 1> lambda,
+                          const scopi_container<dim>& particles,
+                          const xt::xtensor<double, 2>& u);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
@@ -94,9 +97,12 @@ namespace scopi
     }
 
     template<class Derived, std::size_t dim>
-    void ViscousBase<Derived, dim>::update_gamma(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda)
+    void ViscousBase<Derived, dim>::update_gamma(const std::vector<neighbor<dim>>& contacts,
+                                                 xt::xtensor<double, 1> lambda,
+                                                 const scopi_container<dim>& particles,
+                                                 const xt::xtensor<double, 2>& u)
     {
-        static_cast<Derived&>(*this).update_gamma_impl(contacts, lambda);
+        static_cast<Derived&>(*this).update_gamma_impl(contacts, lambda, particles, u);
     }
 
 

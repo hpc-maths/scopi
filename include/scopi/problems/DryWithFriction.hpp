@@ -29,7 +29,10 @@ namespace scopi
                                           std::size_t firstCol);
         void set_coeff_friction(double mu);
         template <std::size_t dim>
-        void update_gamma(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda);
+        void update_gamma(const std::vector<neighbor<dim>>& contacts,
+                          xt::xtensor<double, 1> lambda,
+                          const scopi_container<dim>& particles,
+                          const xt::xtensor<double, 2>& u);
         template <std::size_t dim>
         void set_gamma(const std::vector<neighbor<dim>>& contacts);
         template <std::size_t dim>
@@ -179,7 +182,10 @@ namespace scopi
     {}
 
     template <std::size_t dim>
-    void DryWithFriction::update_gamma(const std::vector<neighbor<dim>>&, xt::xtensor<double, 1>)
+    void DryWithFriction::update_gamma(const std::vector<neighbor<dim>>&,
+                                       xt::xtensor<double, 1>,
+                                       const scopi_container<dim>&,
+                                       const xt::xtensor<double, 2>&)
     {}
   
     template <std::size_t dim>

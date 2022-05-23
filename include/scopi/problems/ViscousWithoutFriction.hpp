@@ -24,7 +24,10 @@ namespace scopi
         void create_matrix_constraint_coo_impl(const scopi_container<dim>& particles,
                                                const std::vector<neighbor<dim>>& contacts,
                                                std::size_t firstCol);
-        void update_gamma_impl(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda);
+        void update_gamma_impl(const std::vector<neighbor<dim>>& contacts,
+                               xt::xtensor<double, 1> lambda,
+                               const scopi_container<dim>& particles,
+                               const xt::xtensor<double, 2>& u);
         std::size_t number_row_matrix_impl(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances_impl(const std::vector<neighbor<dim>>& contacts);
 
@@ -156,7 +159,10 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::update_gamma_impl(const std::vector<neighbor<dim>>& contacts, xt::xtensor<double, 1> lambda)
+    void ViscousWithoutFriction<dim>::update_gamma_impl(const std::vector<neighbor<dim>>& contacts,
+                                                        xt::xtensor<double, 1> lambda,
+                                                        const scopi_container<dim>&,
+                                                        const xt::xtensor<double, 2>&)
     {
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
