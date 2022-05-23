@@ -25,7 +25,7 @@
 namespace scopi
 {
 #ifdef SCOPI_USE_MKL
-    #define SOLVER_WITH_CONTACT(dim, contact, vap) \
+    #define SOLVER_DRY_WITHOUT_FRICTION(dim, contact, vap) \
         ScopiSolver<dim, DryWithoutFriction, OptimMosek, contact, vap>, \
         ScopiSolver<dim, DryWithoutFriction, OptimScs, contact, vap>, \
         ScopiSolver<dim, DryWithoutFriction, OptimUzawaMkl, contact, vap>, \
@@ -33,7 +33,7 @@ namespace scopi
         ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeOmp, contact, vap>, \
         ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap> // friction with mu = 0
 #else
-    #define SOLVER_WITH_CONTACT(dim, contact, vap) \
+    #define SOLVER_DRY_WITHOUT_FRICTION(dim, contact, vap) \
         ScopiSolver<dim, DryWithoutFriction, OptimMosek, contact, vap>, \
         ScopiSolver<dim, DryWithoutFriction, OptimScs, contact, vap>, \
         ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeTbb, contact, vap>, \
@@ -41,10 +41,14 @@ namespace scopi
         ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap> // friction with mu = 0
 #endif
 
-    #define SOLVER_WITH_CONTACT_FRICTION(dim, contact, vap) \
+    #define SOLVER_DRY_WITH_FRICTION(dim, contact, vap) \
         ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap>
 
-    #define SOLVER_WITH_CONTACT_VISCOSITY(dim, contact, vap) \
+    // TODO add Uzawa and ViscsousWithFriction with mu = 0
+    #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
+        ScopiSolver<dim, ViscousWithoutFriction<dim>, OptimMosek, contact, vap>
+
+    #define SOLVER_VISCOUS_WITH_FRICTION(dim, contact, vap) \
         ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact, vap>
                                                                               
     #define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \

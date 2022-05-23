@@ -32,7 +32,7 @@ namespace scopi
         REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    TEST_CASE_TEMPLATE("sphere plan", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("sphere plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
 
@@ -64,7 +64,7 @@ namespace scopi
         }
     }
 
-    TEST_CASE_TEMPLATE("sphere plan force", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fpd), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere plan force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
         static constexpr std::size_t dim = 2;
 
@@ -104,7 +104,7 @@ namespace scopi
         REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere fixed", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("sphere sphere fixed", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -135,7 +135,7 @@ namespace scopi
         }
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere fixed force", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fpd), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere sphere fixed force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -155,7 +155,7 @@ namespace scopi
         check_result_sphere_sphere(particles);
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere moving", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fpd), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere sphere moving", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -176,7 +176,7 @@ namespace scopi
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere inclined plan", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fpd), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere inclined plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
         std::tuple<double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double>>

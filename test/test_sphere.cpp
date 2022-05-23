@@ -334,7 +334,7 @@ namespace scopi
         REQUIRE(rotation_matrix(2, 2) == doctest::Approx(1.));
     }
 
-    TEST_CASE_TEMPLATE("two spheres asymetrical", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two spheres asymetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -354,7 +354,7 @@ namespace scopi
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("two spheres symetrical", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two spheres symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -374,7 +374,7 @@ namespace scopi
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d spheres", SolverType, SOLVER_WITH_CONTACT(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("critical 2d spheres", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
         double dt = .01;

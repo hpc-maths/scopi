@@ -13,7 +13,7 @@
 
 namespace scopi {
 
-    TEST_CASE_TEMPLATE("two spheres asymetrical friction", SolverType, SOLVER_WITH_CONTACT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two spheres asymetrical friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -35,7 +35,7 @@ namespace scopi {
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d spheres friction", SolverType, SOLVER_WITH_CONTACT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_WITH_CONTACT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("critical 2d spheres friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
     {
         static constexpr std::size_t dim = 2;
         double dt = .01;
@@ -78,7 +78,7 @@ namespace scopi {
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere inclined plan friction", SolverType, SOLVER_WITH_CONTACT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_WITH_CONTACT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere inclined plan friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
         std::tuple<double, double, double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double, double, double>>
