@@ -64,23 +64,9 @@ namespace scopi
 
 
     DryWithFriction::DryWithFriction(std::size_t nparticles, double dt)
-    : m_nparticles(nparticles)
-    , m_dt(dt)
-    , m_mu(0.)
+    : ProblemBase(nparticles, dt) 
+    , DryBase()
+    , WithFrictionBase()
     {}
 
-    void DryWithFriction::set_coeff_friction(double mu)
-    {
-        m_mu = mu;
-    }
-
-    std::size_t DryWithFriction::get_nb_gamma_neg()
-    {
-        return 0;
-    }
-
-    std::size_t DryWithFriction::get_nb_gamma_min()
-    {
-        return 0;
-    }
 }

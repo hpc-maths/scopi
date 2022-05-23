@@ -9,12 +9,17 @@
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
+
+#include "ProblemBase.hpp"
 #include "ViscousBase.hpp"
+#include "WithoutFrictionBase.hpp"
 
 namespace scopi
 {
     template<std::size_t dim>
-    class ViscousWithoutFriction: public ViscousBase<ViscousWithoutFriction<dim>, dim>
+    class ViscousWithoutFriction: public ProblemBase
+                                , public ViscousBase<ViscousWithoutFriction<dim>, dim>
+                                , public WithoutFrictionBase
     {
     public:
         using base_type = ViscousBase<ViscousWithoutFriction, dim>;
@@ -143,7 +148,9 @@ namespace scopi
 
     template<std::size_t dim>
     ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt)
-    : base_type(nparticles, dt)
+    : ProblemBase(nparticles, dt)
+    , base_type()
+    , WithoutFrictionBase()
     {}
 
     template<std::size_t dim>

@@ -16,7 +16,7 @@ namespace scopi
     class ViscousBase
     {
     protected:
-        ViscousBase(std::size_t nparts, double dt);
+        ViscousBase();
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
@@ -31,14 +31,6 @@ namespace scopi
 
         std::size_t get_nb_gamma_neg() const;
         std::size_t get_nb_gamma_min();
-
-        std::size_t m_nparticles;
-        double m_dt;
-
-        std::vector<int> m_A_rows;
-        std::vector<int> m_A_cols;
-        std::vector<double> m_A_values;
-        xt::xtensor<double, 1> m_distances;
 
         std::vector<neighbor<dim>> m_contacts_old;
         std::vector<double> m_gamma;
@@ -56,10 +48,8 @@ namespace scopi
     }
 
     template<class Derived, std::size_t dim>
-    ViscousBase<Derived, dim>::ViscousBase(std::size_t nparticles, double dt)
-    : m_nparticles(nparticles)
-    , m_dt(dt)
-    , m_tol(1e-6)
+    ViscousBase<Derived, dim>::ViscousBase()
+    : m_tol(1e-6)
     {}
 
     template<class Derived, std::size_t dim>

@@ -9,12 +9,17 @@
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
+
+#include "ProblemBase.hpp"
 #include "ViscousBase.hpp"
+#include "WithFrictionBase.hpp"
 
 namespace scopi
 {
     template<std::size_t dim>
-    class ViscousWithFriction: public ViscousBase<ViscousWithFriction<dim>, dim>
+    class ViscousWithFriction: public ProblemBase
+                             , public ViscousBase<ViscousWithFriction<dim>, dim>
+                             , public WithFrictionBase
     {
     public:
         using base_type = ViscousBase<ViscousWithFriction, dim>;
@@ -39,7 +44,6 @@ namespace scopi
 
         std::size_t m_nb_gamma_min;
         double m_gamma_min;
-        double m_mu;
 
         std::vector<double> m_lambda;
         std::vector<bool> m_test_friction;
@@ -161,10 +165,10 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
-                            this->m_A_values[index] = -this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            this->m_A_values[index] = -this->m_dt*this->m_mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
                             {
-                                this->m_A_values[index] += this->m_dt*m_mu;
+                                this->m_A_values[index] += this->m_dt*this->m_mu;
                             }
                             index++;
                         }
@@ -186,10 +190,10 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
-                            this->m_A_values[index] = this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            this->m_A_values[index] = this->m_dt*this->m_mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
                             {
-                                this->m_A_values[index] -= this->m_dt*m_mu;
+                                this->m_A_values[index] -= this->m_dt*this->m_mu;
                             }
                             index++;
                         }
@@ -218,7 +222,7 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
-                            this->m_A_values[index] = -m_mu*this->m_dt*dot(ind_row, ind_col) + m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            this->m_A_values[index] = -this->m_mu*this->m_dt*dot(ind_row, ind_col) + this->m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
                         }
                     }
@@ -241,7 +245,7 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
-                            this->m_A_values[index] = m_mu*this->m_dt*dot(ind_row, ind_col) - m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            this->m_A_values[index] = this->m_mu*this->m_dt*dot(ind_row, ind_col) - this->m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
                         }
                     }
@@ -256,9 +260,10 @@ namespace scopi
 
     template<std::size_t dim>
     ViscousWithFriction<dim>::ViscousWithFriction(std::size_t nparticles, double dt)
-    : base_type(nparticles, dt)
+    : ProblemBase(nparticles, dt)
+    , base_type()
+    , WithFrictionBase()
     , m_gamma_min(-3.)
-    , m_mu(0.1)
     {}
 
     template<std::size_t dim>
