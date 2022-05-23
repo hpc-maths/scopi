@@ -245,9 +245,9 @@ namespace scopi
             }
             ++ic;
         }
-        // m_A_rows.resize(index);
-        // m_A_cols.resize(index);
-        // m_A_values.resize(index);
+        this->m_A_rows.resize(index);
+        this->m_A_cols.resize(index);
+        this->m_A_values.resize(index);
     }
 
     template<std::size_t dim>
@@ -306,9 +306,9 @@ namespace scopi
             {
                 f_contact = lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ind_gamma_min)
                     -  lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*this->m_nb_gamma_min + 4*ind_gamma_min);
-                if (f_contact == 0.)
+                if (f_contact < this->m_tol)
                 {
-                    f_contact = xt::linalg::dot(particles.f()(contacts[i].j), contacts[i].nij) - xt::linalg::dot(xt::view(u, contacts[i].j, xt::all()) - particles.v()(contacts[i].j), contacts[i].nij)/this->m_dt;
+                    f_contact = xt::linalg::dot(particles.f()(contacts[i].j), contacts[i].nij)(0) - xt::linalg::dot(xt::view(u, contacts[i].j, xt::range(_, dim)) - particles.v()(contacts[i].j), contacts[i].nij)(0)/this->m_dt;
                 }
                 ind_gamma_min++;
             }
@@ -325,13 +325,13 @@ namespace scopi
     template<std::size_t dim>
     std::size_t ViscousWithFriction<dim>::number_row_matrix_impl(const std::vector<neighbor<dim>>& contacts)
     {
-        return contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 2*4*m_nb_gamma_min;
+        return contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min;
     }
 
     template<std::size_t dim>
     void ViscousWithFriction<dim>::create_vector_distances_impl(const std::vector<neighbor<dim>>& contacts)
     {
-        this->m_distances = xt::zeros<double>({contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 2*4*m_nb_gamma_min});
+        this->m_distances = xt::zeros<double>({contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min});
         std::size_t index_dry = 0;
         std::size_t index_friciton = 0;
         for (std::size_t i = 0; i < contacts.size(); ++i)
@@ -348,7 +348,6 @@ namespace scopi
             else
             {
                 this->m_distances[contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*index_friciton] = contacts[i].dij;
-                this->m_distances[contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min + 4*index_friciton] = -contacts[i].dij;
                 index_friciton++;
             }
         }
