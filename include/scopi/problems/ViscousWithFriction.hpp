@@ -28,6 +28,7 @@ namespace scopi
                                xt::xtensor<double, 1> lambda,
                                const scopi_container<dim>& particles,
                                const xt::xtensor<double, 2>& u);
+        void finalize_gamma();
         std::size_t number_row_matrix_impl(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances_impl(const std::vector<neighbor<dim>>& contacts);
 
@@ -39,6 +40,9 @@ namespace scopi
         std::size_t m_nb_gamma_min;
         double m_gamma_min;
         double m_mu;
+
+        std::vector<double> m_lambda;
+        std::vector<bool> m_test_friction;
     };
 
     template<std::size_t dim>
@@ -56,7 +60,7 @@ namespace scopi
         std::size_t index = 0;
         for (auto &c: contacts)
         {
-            if (this->m_gamma[ic] != m_gamma_min)
+            if (this->m_gamma[ic] != m_gamma_min || !m_test_friction[ic])
             {
                 if (c.i >= active_offset)
                 {
@@ -274,6 +278,9 @@ namespace scopi
                 m_nb_gamma_min++;
             }
         }
+
+        m_test_friction.resize(contacts_new.size());
+        std::fill(m_test_friction.begin(), m_test_friction.end(), false);
     }
 
     template<std::size_t dim>
@@ -282,8 +289,11 @@ namespace scopi
                                                      const scopi_container<dim>& particles,
                                                      const xt::xtensor<double, 2>& u)
     {
+        // TODO will work only for sphere and plan test
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
+        m_lambda.resize(this->m_gamma.size());
+        std::fill(m_lambda.begin(), m_lambda.end(), 0.); // not sure we need to do that
         std::size_t ind_gamma_neg = 0;
         std::size_t ind_gamma_min = 0;
 
@@ -310,15 +320,31 @@ namespace scopi
                 {
                     f_contact = xt::linalg::dot(particles.f()(contacts[i].j), contacts[i].nij)(0) - xt::linalg::dot(xt::view(u, contacts[i].j, xt::range(_, dim)) - particles.v()(contacts[i].j), contacts[i].nij)(0)/this->m_dt;
                 }
-                ind_gamma_min++;
+                m_lambda[i] = f_contact;
+                m_test_friction[i] = true;
+                ind_gamma_min++; 
             }
-            this->m_gamma_old[i] = std::max(m_gamma_min, std::min(0., this->m_gamma[i] - this->m_dt * f_contact));
+            if (! m_test_friction[i])
+                this->m_gamma_old[i] = std::max(m_gamma_min, std::min(0., this->m_gamma[i] - this->m_dt * f_contact));
+            else
+                this->m_gamma_old[i] = 0.;
             // for Mosek
             if (this->m_gamma_old[i] - m_gamma_min < this->m_tol)
                 this->m_gamma_old[i] = m_gamma_min;
             if (this->m_gamma_old[i] > -this->m_tol)
                 this->m_gamma_old[i] = 0.;
-            PLOG_WARNING << this->m_gamma[i];
+            // PLOG_WARNING << this->m_gamma[i];
+        }
+    }
+
+    template<std::size_t dim>
+    void ViscousWithFriction<dim>::finalize_gamma()
+    {
+        for (std::size_t ic = 0; ic < m_test_friction.size(); ++ic)
+        {
+            if (m_test_friction[ic])
+                this->m_gamma_old[ic] = std::max(m_gamma_min, std::min(0., this->m_gamma[ic] - this->m_dt * m_lambda[ic]));
+            PLOG_WARNING << this->m_gamma[ic];
         }
     }
 

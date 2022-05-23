@@ -99,14 +99,32 @@ namespace scopi
             m_solver.run(m_particles, contacts, nite);
 
             tic();
-            move_active_particles();
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
-
-            tic();
             m_solver.update_gamma(contacts, m_particles);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
+
+            // calcul nouvelles vap
+            auto uadapt = m_solver.get_uadapt();
+            auto wadapt = m_solver.get_wadapt();
+            for (std::size_t i=0; i<m_particles.nb_active(); ++i)
+            {
+                for (std::size_t d=0; d<dim; ++d)
+                {
+                    m_particles.vd()(i + m_particles.nb_inactive())(d) = uadapt(i, d);
+                }
+                m_particles.omega()(i + m_particles.nb_inactive()) = wadapt(i, 2);
+            }
+
+            // projection (deuxième solve)
+            m_solver.run(m_particles, contacts, nite);
+
+            // update gamma si besoin
+            m_solver.finalize_gamma();
+
+            tic();
+            move_active_particles();
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
 
             tic();
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
