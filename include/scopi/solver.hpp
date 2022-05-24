@@ -185,27 +185,33 @@ namespace scopi
             this->m_solver.run(this->m_particles, contacts, nite);
 
             tic();
-            this->m_solver.update_gamma(contacts, this->m_particles);
+            bool should_project = this->m_solver.compute_reaction_force(contacts, this->m_solver.get_lagrange_multiplier(contacts), this->m_particles, this->m_solver.get_uadapt());
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
-            // calcul nouvelles vap
-            auto uadapt = this->m_solver.get_uadapt();
-            auto wadapt = this->m_solver.get_wadapt();
-            for (std::size_t i=0; i< this->m_particles.nb_active(); ++i)
+            if (should_project)
             {
-                for (std::size_t d=0; d<dim; ++d)
+                // calcul nouvelles vap
+                auto uadapt = this->m_solver.get_uadapt();
+                auto wadapt = this->m_solver.get_wadapt();
+                for (std::size_t i=0; i< this->m_particles.nb_active(); ++i)
                 {
-                    this->m_particles.vd()(i + this->m_particles.nb_inactive())(d) = uadapt(i, d);
+                    for (std::size_t d=0; d<dim; ++d)
+                    {
+                        this->m_particles.vd()(i + this->m_particles.nb_inactive())(d) = uadapt(i, d);
+                    }
+                    this->m_particles.omega()(i + this->m_particles.nb_inactive()) = wadapt(i, 2);
                 }
-                this->m_particles.omega()(i + this->m_particles.nb_inactive()) = wadapt(i, 2);
+
+                // projection (deuxième solve)
+                this->m_solver.run(this->m_particles, contacts, nite);
             }
 
-            // projection (deuxième solve)
-            this->m_solver.run(this->m_particles, contacts, nite);
-
             // update gamma si besoin
-            this->m_solver.finalize_gamma();
+            tic();
+            this->m_solver.update_gamma(contacts, this->m_particles);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
             tic();
             this->move_active_particles();

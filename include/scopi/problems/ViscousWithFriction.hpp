@@ -31,7 +31,10 @@ namespace scopi
                           xt::xtensor<double, 1> lambda,
                           const scopi_container<dim>& particles,
                           const xt::xtensor<double, 2>& u);
-        void finalize_gamma();
+        bool compute_reaction_force(const std::vector<neighbor<dim>>& contacts,
+                                    xt::xtensor<double, 1> lambda,
+                                    const scopi_container<dim>& particles,
+                                    const xt::xtensor<double, 2>& u);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
@@ -44,7 +47,7 @@ namespace scopi
         double m_gamma_min;
 
         std::vector<double> m_lambda;
-        std::vector<bool> m_test_friction;
+        std::vector<bool> m_remove_friction_in_constraint;
     };
 
     template<std::size_t dim>
@@ -62,7 +65,7 @@ namespace scopi
         std::size_t index = 0;
         for (auto &c: contacts)
         {
-            if (this->m_gamma[ic] != m_gamma_min || !m_test_friction[ic])
+            if (this->m_gamma[ic] != m_gamma_min || m_remove_friction_in_constraint[ic])
             {
                 if (c.i >= active_offset)
                 {
@@ -282,8 +285,48 @@ namespace scopi
             }
         }
 
-        m_test_friction.resize(contacts_new.size());
-        std::fill(m_test_friction.begin(), m_test_friction.end(), false);
+        m_remove_friction_in_constraint.resize(contacts_new.size());
+        std::fill(m_remove_friction_in_constraint.begin(), m_remove_friction_in_constraint.end(), false);
+    }
+
+    template<std::size_t dim>
+    bool ViscousWithFriction<dim>::compute_reaction_force(const std::vector<neighbor<dim>>& contacts,
+                                                          xt::xtensor<double, 1> lambda,
+                                                          const scopi_container<dim>& particles,
+                                                          const xt::xtensor<double, 2>& u)
+    {
+        // TODO will work only for sphere and plan test
+        this->m_contacts_old = contacts;
+        this->m_gamma_old.resize(this->m_gamma.size());
+        m_lambda.resize(this->m_gamma.size());
+        std::size_t ind_gamma_neg = 0;
+        std::size_t ind_gamma_min = 0;
+        bool should_project = false;
+
+        for (std::size_t ic = 0; ic < contacts.size(); ++ic)
+        {
+            if (this->m_gamma[ic] != m_gamma_min)
+            {
+                if (this->m_gamma[ic] < - this->m_tol)
+                {
+                    ind_gamma_neg++;
+                }
+            }
+            else
+            {
+                double f_contact = lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ind_gamma_min)
+                    -  lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*this->m_nb_gamma_min + 4*ind_gamma_min);
+                if (f_contact < this->m_tol)
+                {
+                    f_contact = xt::linalg::dot(particles.f()(contacts[ic].j), contacts[ic].nij)(0) - xt::linalg::dot(xt::view(u, contacts[ic].j, xt::range(_, dim)) - particles.v()(contacts[ic].j), contacts[ic].nij)(0)/this->m_dt;
+                    m_lambda[ic] = f_contact;
+                    m_remove_friction_in_constraint[ic] = true;
+                    should_project = true;
+                }
+                ind_gamma_min++; 
+            }
+        }
+        return should_project;
     }
 
     template<std::size_t dim>
@@ -292,61 +335,41 @@ namespace scopi
                                                 const scopi_container<dim>& particles,
                                                 const xt::xtensor<double, 2>& u)
     {
-        // TODO will work only for sphere and plan test
-        this->m_contacts_old = contacts;
-        this->m_gamma_old.resize(this->m_gamma.size());
-        m_lambda.resize(this->m_gamma.size());
-        std::fill(m_lambda.begin(), m_lambda.end(), 0.); // not sure we need to do that
         std::size_t ind_gamma_neg = 0;
         std::size_t ind_gamma_min = 0;
-
-        for (std::size_t i = 0; i < contacts.size(); ++i)
+        // TODO check indices for multi particles
+        for (std::size_t ic = 0; ic < this->m_gamma.size(); ++ic)
         {
             double f_contact;
-            if (this->m_gamma[i] != m_gamma_min)
+            if (this->m_gamma[ic] != m_gamma_min)
             {
-                if(this->m_gamma[i] < -this->m_tol)
+                if(this->m_gamma[ic] < -this->m_tol)
                 {
-                    f_contact = lambda(i) - lambda(this->m_gamma.size() - m_nb_gamma_min + ind_gamma_neg);
+                    f_contact = lambda(ic) - lambda(this->m_gamma.size() - m_nb_gamma_min + ind_gamma_neg);
                     ind_gamma_neg++;
                 }
                 else
                 {
-                    f_contact = lambda(i);
+                    f_contact = lambda(ic);
                 }
+            }
+            else if (m_remove_friction_in_constraint[ic])
+            {
+                f_contact = m_lambda[ic];
+                ind_gamma_neg++; 
             }
             else
             {
                 f_contact = lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ind_gamma_min)
                     -  lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*this->m_nb_gamma_min + 4*ind_gamma_min);
-                if (f_contact < this->m_tol)
-                {
-                    f_contact = xt::linalg::dot(particles.f()(contacts[i].j), contacts[i].nij)(0) - xt::linalg::dot(xt::view(u, contacts[i].j, xt::range(_, dim)) - particles.v()(contacts[i].j), contacts[i].nij)(0)/this->m_dt;
-                }
-                m_lambda[i] = f_contact;
-                m_test_friction[i] = true;
                 ind_gamma_min++; 
             }
-            if (! m_test_friction[i])
-                this->m_gamma_old[i] = std::max(m_gamma_min, std::min(0., this->m_gamma[i] - this->m_dt * f_contact));
-            else
-                this->m_gamma_old[i] = 0.;
+            this->m_gamma_old[ic] = std::max(m_gamma_min, std::min(0., this->m_gamma[ic] - this->m_dt * f_contact));
             // for Mosek
-            if (this->m_gamma_old[i] - m_gamma_min < this->m_tol)
-                this->m_gamma_old[i] = m_gamma_min;
-            if (this->m_gamma_old[i] > -this->m_tol)
-                this->m_gamma_old[i] = 0.;
-            // PLOG_WARNING << this->m_gamma[i];
-        }
-    }
-
-    template<std::size_t dim>
-    void ViscousWithFriction<dim>::finalize_gamma()
-    {
-        for (std::size_t ic = 0; ic < m_test_friction.size(); ++ic)
-        {
-            if (m_test_friction[ic])
-                this->m_gamma_old[ic] = std::max(m_gamma_min, std::min(0., this->m_gamma[ic] - this->m_dt * m_lambda[ic]));
+            if (this->m_gamma_old[ic] - m_gamma_min < this->m_tol)
+                this->m_gamma_old[ic] = m_gamma_min;
+            if (this->m_gamma_old[ic] > -this->m_tol)
+                this->m_gamma_old[ic] = 0.;
             PLOG_WARNING << this->m_gamma[ic];
         }
     }
@@ -365,7 +388,7 @@ namespace scopi
         std::size_t index_friciton = 0;
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            if (this->m_gamma[i] != m_gamma_min)
+            if (this->m_gamma[i] != m_gamma_min || m_remove_friction_in_constraint[i])
             {
                 this->m_distances[index_dry] = contacts[i].dij;
                 if(this->m_gamma[i] < -this->m_tol)
