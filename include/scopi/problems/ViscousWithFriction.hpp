@@ -318,12 +318,21 @@ namespace scopi
                     -  lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*this->m_nb_gamma_min + 4*ind_gamma_min);
                 if (f_contact < this->m_tol)
                 {
-                    f_contact = xt::linalg::dot(particles.f()(contacts[ic].j), contacts[ic].nij)(0) - xt::linalg::dot(xt::view(u, contacts[ic].j, xt::range(_, dim)) - particles.v()(contacts[ic].j), contacts[ic].nij)(0)/this->m_dt;
+                    f_contact = xt::linalg::dot(xt::view(u, contacts[ic].j, xt::range(_, dim)) - particles.v()(contacts[ic].j), contacts[ic].nij)(0)/this->m_dt - xt::linalg::dot(particles.f()(contacts[ic].j), contacts[ic].nij)(0);
                     m_lambda[ic] = f_contact;
                     m_remove_friction_in_constraint[ic] = true;
                     should_project = true;
                 }
                 ind_gamma_min++; 
+            }
+        }
+
+        for (std::size_t ic = 0; ic < contacts.size(); ++ic)
+        {
+            if (m_remove_friction_in_constraint[ic])
+            {
+                this->m_nb_gamma_neg++;
+                m_nb_gamma_min--;
             }
         }
         return should_project;
@@ -356,6 +365,8 @@ namespace scopi
             else if (m_remove_friction_in_constraint[ic])
             {
                 f_contact = m_lambda[ic];
+                // f_contact = lambda(ic) - lambda(this->m_gamma.size() - m_nb_gamma_min + ind_gamma_neg);
+                // #pragma message ("HACK")
                 ind_gamma_neg++; 
             }
             else
