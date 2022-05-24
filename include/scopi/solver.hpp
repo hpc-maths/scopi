@@ -21,7 +21,9 @@
 #include "quaternion.hpp"
 
 #include "solvers/OptimUzawaMatrixFreeOmp.hpp"
+#include "solvers/OptimMosek.hpp"
 #include "problems/DryWithoutFriction.hpp"
+#include "problems/ViscousWithFriction.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
 
@@ -38,15 +40,16 @@ namespace scopi
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed
              >
-    class ScopiSolver
+    class ScopiSolverBase
     {
+    protected:
+        ScopiSolverBase(scopi_container<dim>& particles, double dt);
     public:
-        ScopiSolver(scopi_container<dim>& particles, double dt);
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
         void set_coeff_friction(double mu);
         void set_rho_uzawa(double rho);
 
-    private:
+    protected:
         void displacement_obstacles();
 
         std::vector<neighbor<dim>> compute_contacts();
@@ -58,16 +61,50 @@ namespace scopi
         vap_t m_vap;
     };
 
+    template<std::size_t dim,
+             class problem_t = DryWithoutFriction,
+             template <class> class optim_solver_t = OptimUzawaMatrixFreeOmp,
+             class contact_t = contact_kdtree,
+             class vap_t = vap_fixed
+             >
+    class ScopiSolver: public ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>
+    {
+    public:
+        ScopiSolver(scopi_container<dim>& particles, double dt);
+    };
+
+    template<std::size_t dim,
+             class contact_t,
+             class vap_t
+             >
+    class ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>: public ScopiSolverBase<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>
+    {
+    public:
+        ScopiSolver(scopi_container<dim>& particles, double dt);
+        void solve(std::size_t total_it, std::size_t initial_iter = 0);
+    };
+
+
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
+    ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolverBase(scopi_container<dim>& particles, double dt)
     : m_particles(particles)
     , m_dt(dt)
     , m_solver(m_particles.nb_active(), m_dt, particles)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
+    template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
+    ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
+    : ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>(particles, dt)
+    {}
+
+    template<std::size_t dim, class contact_t, class vap_t>
+    ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
+    : ScopiSolverBase<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>(particles, dt)
+    {}
+
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
+    void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
@@ -99,32 +136,14 @@ namespace scopi
             m_solver.run(m_particles, contacts, nite);
 
             tic();
-            m_solver.update_gamma(contacts, m_particles);
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
-
-            // calcul nouvelles vap
-            auto uadapt = m_solver.get_uadapt();
-            auto wadapt = m_solver.get_wadapt();
-            for (std::size_t i=0; i<m_particles.nb_active(); ++i)
-            {
-                for (std::size_t d=0; d<dim; ++d)
-                {
-                    m_particles.vd()(i + m_particles.nb_inactive())(d) = uadapt(i, d);
-                }
-                m_particles.omega()(i + m_particles.nb_inactive()) = wadapt(i, 2);
-            }
-
-            // projection (deuxième solve)
-            m_solver.run(m_particles, contacts, nite);
-
-            // update gamma si besoin
-            m_solver.finalize_gamma();
-
-            tic();
             move_active_particles();
             duration = toc();
             PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
+
+            tic();
+            m_solver.update_gamma(contacts, m_particles);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
             tic();
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
@@ -133,8 +152,75 @@ namespace scopi
         }
     }
 
+    template<std::size_t dim, class contact_t, class vap_t>
+    void ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
+    {
+        // Time Loop
+        for (std::size_t nite = initial_iter; nite < total_it; ++nite)
+        {
+            PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
+
+            tic();
+            this->displacement_obstacles();
+            auto duration = toc();
+            PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
+
+            auto contacts = this->compute_contacts();
+
+            tic();
+            this->m_solver.set_gamma(contacts);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : set gamma = " << duration;
+
+            tic();
+            this->write_output_files(contacts, nite);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : write output files = " << duration;
+
+            tic();
+            this->m_vap.set_a_priori_velocity(this->m_particles);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : set vap = " << duration;
+
+            this->m_solver.run(this->m_particles, contacts, nite);
+
+            tic();
+            this->m_solver.update_gamma(contacts, this->m_particles);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
+
+            // calcul nouvelles vap
+            auto uadapt = this->m_solver.get_uadapt();
+            auto wadapt = this->m_solver.get_wadapt();
+            for (std::size_t i=0; i< this->m_particles.nb_active(); ++i)
+            {
+                for (std::size_t d=0; d<dim; ++d)
+                {
+                    this->m_particles.vd()(i + this->m_particles.nb_inactive())(d) = uadapt(i, d);
+                }
+                this->m_particles.omega()(i + this->m_particles.nb_inactive()) = wadapt(i, 2);
+            }
+
+            // projection (deuxième solve)
+            this->m_solver.run(this->m_particles, contacts, nite);
+
+            // update gamma si besoin
+            this->m_solver.finalize_gamma();
+
+            tic();
+            this->move_active_particles();
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
+
+            tic();
+            this->m_vap.update_velocity(this->m_particles, this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update vap = " << duration;
+        }
+    }
+
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
+    void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
     {
         for (std::size_t i = 0; i < m_particles.nb_inactive(); ++i)
         {
@@ -160,7 +246,7 @@ namespace scopi
     }
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
-    std::vector<neighbor<dim>> ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::compute_contacts()
+    std::vector<neighbor<dim>> ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
         // // contact_brute_force cont(2);
         // contact_t cont(2., 10.);
@@ -171,7 +257,7 @@ namespace scopi
     }
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
+    void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         nl::json json_output;
 
@@ -203,7 +289,7 @@ namespace scopi
     }
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::move_active_particles()
+    void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::move_active_particles()
     {
         std::size_t active_offset = m_particles.nb_inactive();
         auto uadapt = m_solver.get_uadapt();
@@ -231,15 +317,16 @@ namespace scopi
     }
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_coeff_friction(double mu)
+    void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_coeff_friction(double mu)
     {
         m_solver.set_coeff_friction(mu);
     }
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
-    void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_rho_uzawa(double rho)
+    void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_rho_uzawa(double rho)
     {
         m_solver.set_rho_uzawa(rho);
     }
+
 }
 
