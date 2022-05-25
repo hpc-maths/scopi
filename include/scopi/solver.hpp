@@ -158,6 +158,7 @@ namespace scopi
         // Time Loop
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
+            std::cout << std::endl << nite << "   ";
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
 
             tic();
@@ -189,7 +190,7 @@ namespace scopi
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
-            if (should_project)
+            // if (should_project)
             {
                 // calcul nouvelles vap
                 auto uadapt = this->m_solver.get_uadapt();
@@ -207,7 +208,7 @@ namespace scopi
                 this->m_solver.run(this->m_particles, contacts, nite);
             }
 
-            // update gamma si besoin
+            // update gamma
             tic();
             this->m_solver.update_gamma(contacts, this->m_particles);
             duration = toc();
