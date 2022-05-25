@@ -162,7 +162,6 @@ namespace scopi
         // Time Loop
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
-            std::cout << std::endl << nite << "   ";
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
 
             tic();
@@ -187,21 +186,20 @@ namespace scopi
             duration = toc();
             PLOG_INFO << "----> CPUTIME : set vap = " << duration;
 
+            this->m_solver.setup_first_resolution();
             this->m_solver.run(this->m_particles, contacts, nite);
 
             tic();
-            this->m_solver.compute_reaction_force(contacts, this->m_solver.get_lagrange_multiplier(contacts), this->m_particles, this->m_solver.get_uadapt());
+            this->m_solver.correct_lambda(contacts, this->m_solver.get_lagrange_multiplier(contacts), this->m_particles, this->m_solver.get_uadapt());
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
-            // calcul nouvelles vap
             m_vap_projection.set_u_w(this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
             m_vap_projection.set_a_priori_velocity(this->m_particles);
+            this->m_solver.setup_projection();
 
-            // projection (deuxième solve)
             this->m_solver.run(this->m_particles, contacts, nite);
 
-            // update gamma
             tic();
             this->m_solver.update_gamma(contacts, this->m_particles);
             duration = toc();
