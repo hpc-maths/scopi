@@ -26,7 +26,7 @@ namespace scopi{
         template<std::size_t dim>
         void set_gamma(std::vector<neighbor<dim>> contacts);
         template<std::size_t dim>
-        void update_gamma(std::vector<neighbor<dim>> contacts, const scopi_container<dim>& particles);
+        void update_gamma(std::vector<neighbor<dim>> contacts);
 
     protected:
         OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
@@ -149,9 +149,9 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template<std::size_t dim>
-    void OptimBase<Derived, problem_t>::update_gamma(std::vector<neighbor<dim>> contacts, const scopi_container<dim>& particles)
+    void OptimBase<Derived, problem_t>::update_gamma(std::vector<neighbor<dim>> contacts)
     {
-        problem_t::update_gamma(contacts, get_lagrange_multiplier(contacts), particles, get_uadapt());
+        problem_t::update_gamma(contacts, get_lagrange_multiplier(contacts));
     }
 
 }

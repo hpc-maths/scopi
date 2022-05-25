@@ -28,9 +28,7 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
         void update_gamma(const std::vector<neighbor<dim>>& contacts,
-                          xt::xtensor<double, 1> lambda,
-                          const scopi_container<dim>& particles,
-                          const xt::xtensor<double, 2>& u);
+                          xt::xtensor<double, 1> lambda);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
@@ -164,9 +162,7 @@ namespace scopi
 
     template<std::size_t dim>
     void ViscousWithoutFriction<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts,
-                                                   xt::xtensor<double, 1> lambda,
-                                                   const scopi_container<dim>&,
-                                                   const xt::xtensor<double, 2>&)
+                                                   xt::xtensor<double, 1> lambda)
     {
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());

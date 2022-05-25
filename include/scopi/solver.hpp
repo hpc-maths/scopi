@@ -145,7 +145,7 @@ namespace scopi
             PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
 
             tic();
-            m_solver.update_gamma(contacts, m_particles);
+            m_solver.update_gamma(contacts);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
@@ -201,7 +201,7 @@ namespace scopi
             this->m_solver.run(this->m_particles, contacts, nite);
 
             tic();
-            this->m_solver.update_gamma(contacts, this->m_particles);
+            this->m_solver.update_gamma(contacts);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 

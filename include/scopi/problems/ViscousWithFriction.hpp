@@ -28,9 +28,7 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
         void update_gamma(const std::vector<neighbor<dim>>& contacts,
-                          xt::xtensor<double, 1> lambda,
-                          const scopi_container<dim>& particles,
-                          const xt::xtensor<double, 2>& u);
+                          xt::xtensor<double, 1> lambda);
         void correct_lambda(const std::vector<neighbor<dim>>& contacts,
                                     xt::xtensor<double, 1> lambda,
                                     const scopi_container<dim>& particles,
@@ -343,14 +341,10 @@ namespace scopi
 
     template<std::size_t dim>
     void ViscousWithFriction<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts,
-                                                xt::xtensor<double, 1> lambda,
-                                                const scopi_container<dim>& particles,
-                                                const xt::xtensor<double, 2>& u)
+                                                xt::xtensor<double, 1>)
     {
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
-        std::size_t ind_gamma_neg = 0;
-        std::size_t ind_gamma_min = 0;
         for (std::size_t ic = 0; ic < this->m_gamma.size(); ++ic)
         {
             this->m_gamma_old[ic] = std::max(m_gamma_min, std::min(0., this->m_gamma[ic] - this->m_dt * m_lambda[ic]));
