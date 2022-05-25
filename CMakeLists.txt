@@ -109,6 +109,7 @@ set(SCOPI_SRC
     src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
+    src/vap/vap_projection.cpp
     src/minpack.cpp
     src/quaternion.cpp
     src/utils.cpp
@@ -218,6 +219,7 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_fpd.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/vap/base.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_fixed.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_projection.hpp
 )
 
 include(installation)

@@ -26,6 +26,7 @@
 #include "problems/ViscousWithFriction.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
+#include "vap/vap_projection.hpp"
 
 namespace nl = nlohmann;
 
@@ -82,6 +83,8 @@ namespace scopi
     public:
         ScopiSolver(scopi_container<dim>& particles, double dt);
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
+    private:
+        vap_projection m_vap_projection;
     };
 
 
@@ -101,6 +104,7 @@ namespace scopi
     template<std::size_t dim, class contact_t, class vap_t>
     ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
     : ScopiSolverBase<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>(particles, dt)
+    , m_vap_projection(this->m_particles.nb_active(), this->m_particles.nb_inactive(), this->m_dt)
     {}
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t,class contact_t, class vap_t>
@@ -186,27 +190,16 @@ namespace scopi
             this->m_solver.run(this->m_particles, contacts, nite);
 
             tic();
-            bool should_project = this->m_solver.compute_reaction_force(contacts, this->m_solver.get_lagrange_multiplier(contacts), this->m_particles, this->m_solver.get_uadapt());
+            this->m_solver.compute_reaction_force(contacts, this->m_solver.get_lagrange_multiplier(contacts), this->m_particles, this->m_solver.get_uadapt());
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
-            // if (should_project)
-            {
-                // calcul nouvelles vap
-                auto uadapt = this->m_solver.get_uadapt();
-                auto wadapt = this->m_solver.get_wadapt();
-                for (std::size_t i=0; i< this->m_particles.nb_active(); ++i)
-                {
-                    for (std::size_t d=0; d<dim; ++d)
-                    {
-                        this->m_particles.vd()(i + this->m_particles.nb_inactive())(d) = uadapt(i, d);
-                    }
-                    this->m_particles.omega()(i + this->m_particles.nb_inactive()) = wadapt(i, 2);
-                }
+            // calcul nouvelles vap
+            m_vap_projection.set_u_w(this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
+            m_vap_projection.set_a_priori_velocity(this->m_particles);
 
-                // projection (deuxième solve)
-                this->m_solver.run(this->m_particles, contacts, nite);
-            }
+            // projection (deuxième solve)
+            this->m_solver.run(this->m_particles, contacts, nite);
 
             // update gamma
             tic();
