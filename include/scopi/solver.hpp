@@ -49,7 +49,6 @@ namespace scopi
     public:
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
         void set_coeff_friction(double mu);
-        void set_rho_uzawa(double rho);
 
     protected:
         void displacement_obstacles();
@@ -319,12 +318,6 @@ namespace scopi
     void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_coeff_friction(double mu)
     {
         m_solver.set_coeff_friction(mu);
-    }
-
-    template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
-    void ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::set_rho_uzawa(double rho)
-    {
-        m_solver.set_rho_uzawa(rho);
     }
 
 }
