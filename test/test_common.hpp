@@ -24,32 +24,38 @@
 
 namespace scopi
 {
+    template <class first, class second>
+    struct TypePair
+    {
+        using SolverType = first;
+        using OptimParamsType = second;
+    };
 #ifdef SCOPI_USE_MKL
     #define SOLVER_DRY_WITHOUT_FRICTION(dim, contact, vap) \
-        ScopiSolver<dim, DryWithoutFriction, OptimMosek, contact, vap>, \
-        ScopiSolver<dim, DryWithoutFriction, OptimScs, contact, vap>, \
-        ScopiSolver<dim, DryWithoutFriction, OptimUzawaMkl, contact, vap>, \
-        ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeTbb, contact, vap>, \
-        ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeOmp, contact, vap>, \
-        ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap> // friction with mu = 0
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimMosek, contact, vap>, OptimParams<OptimMosek>> \
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimScs, contact, vap>, OptimParams<OptimScs>> \
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimUzawaMkl, contact, vap>, OptimParams<OptimUzawaMkl>, \
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeTbb, contact, vap>, OptimParams<OptimUzawaMatrixFreeTbb>>, \
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeOmp, contact, vap>, OptimParams<OptimUzawaMatrixFreeOmp>>, \
+        TypePair<ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap>, OptimParams<OptimMosek>> // friction with mu = 0
 #else
     #define SOLVER_DRY_WITHOUT_FRICTION(dim, contact, vap) \
-        ScopiSolver<dim, DryWithoutFriction, OptimMosek, contact, vap>, \
-        ScopiSolver<dim, DryWithoutFriction, OptimScs, contact, vap>, \
-        ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeTbb, contact, vap>, \
-        ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeOmp, contact, vap>, \
-        ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap> // friction with mu = 0
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimMosek, contact, vap>, OptimParams<OptimMosek>>, \
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimScs, contact, vap>, OptimParams<OptimScs>>, \
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeTbb, contact, vap>, OptimParams<OptimUzawaMatrixFreeTbb>>, \
+        TypePair<ScopiSolver<dim, DryWithoutFriction, OptimUzawaMatrixFreeOmp, contact, vap>, OptimParams<OptimUzawaMatrixFreeOmp>>, \
+        TypePair<ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap>, OptimParams<OptimMosek>> // friction with mu = 0
 #endif
 
     #define SOLVER_DRY_WITH_FRICTION(dim, contact, vap) \
-        ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap>
+        TypePair<ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap>, OptimParams<OptimMosek>>
 
     // TODO add Uzawa and ViscsousWithFriction with mu = 0
     #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
-        ScopiSolver<dim, ViscousWithoutFriction<dim>, OptimMosek, contact, vap>
+        TypePair<ScopiSolver<dim, ViscousWithoutFriction<dim>, OptimMosek, contact, vap>, OptimParams<OptimMosek>>
 
     #define SOLVER_VISCOUS_WITH_FRICTION(dim, contact, vap) \
-        ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact, vap>
+        TypePair<ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact, vap>, OptimParams<OptimMosek>>
                                                                               
     #define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \
         static size_t _doctest_subcase_idx = 0; \

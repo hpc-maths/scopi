@@ -16,13 +16,7 @@ namespace scopi{
 
     template<>
     class OptimParams<OptimMosek>
-    {
-    public:
-        void test()
-        {
-            std::cout << "OptimParams<OptimMosek>::test" << std::endl;
-        };
-    };
+    {};
 
     template<class problem_t = DryWithoutFriction>
     class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
@@ -71,7 +65,6 @@ namespace scopi{
         using namespace mosek::fusion;
         using namespace monty;
 
-        m_params.test();
         tic();
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
