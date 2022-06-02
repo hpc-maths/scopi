@@ -4,11 +4,22 @@
 #include "OptimBase.hpp"
 #include "../problems/DryWithoutFriction.hpp"
 #include "ConstraintMosek.hpp"
+#include "../params/ParamsSolver.hpp"
 
 #include <memory>
 #include <fusion.h>
 
 namespace scopi{
+
+    template<class problem_t>
+    class OptimMosek;
+
+    template<>
+    class ParamsSolver<OptimMosek>
+    {
+        void test() {};
+    };
+
     template<class problem_t = DryWithoutFriction>
     class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
                     , public ConstraintMosek<problem_t>
@@ -44,6 +55,8 @@ namespace scopi{
         mosek::fusion::Matrix::t m_Az;
         mosek::fusion::Matrix::t m_A;
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
+
+        ParamsSolver<OptimMosek> m_params;
     };
 
     template<class problem_t>
