@@ -201,6 +201,7 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMkl.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimBase.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/params/ParamsSolver.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/ProblemBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/DryBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousBase.hpp
