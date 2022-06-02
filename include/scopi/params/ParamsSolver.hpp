@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <iostream>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
