@@ -17,7 +17,11 @@ namespace scopi{
     template<>
     class ParamsSolver<OptimMosek>
     {
-        void test() {};
+    public:
+        void test()
+        {
+            std::cout << "ParamsSolver<OptimMosek>::test" << std::endl;
+        };
     };
 
     template<class problem_t = DryWithoutFriction>
@@ -28,7 +32,7 @@ namespace scopi{
         using base_type = OptimBase<OptimMosek, problem_t>;
 
         template <std::size_t dim>
-        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles);
+        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimMosek> params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -67,6 +71,7 @@ namespace scopi{
         using namespace mosek::fusion;
         using namespace monty;
 
+        m_params.test();
         tic();
         Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
         // variables
@@ -122,9 +127,10 @@ namespace scopi{
 
     template<class problem_t>
     template <std::size_t dim>
-    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
+    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimMosek> params)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
     , ConstraintMosek<problem_t>(nparts)
+    , m_params(params)
     {
         using namespace mosek::fusion;
         using namespace monty;

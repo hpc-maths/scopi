@@ -27,6 +27,7 @@
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
 #include "vap/vap_projection.hpp"
+#include "params/ParamsSolver.hpp"
 
 namespace nl = nlohmann;
 
@@ -44,7 +45,7 @@ namespace scopi
     class ScopiSolverBase
     {
     protected:
-        ScopiSolverBase(scopi_container<dim>& particles, double dt);
+        ScopiSolverBase(scopi_container<dim>& particles, double dt, ParamsSolver<optim_solver_t>);
     public:
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
         void set_coeff_friction(double mu);
@@ -71,7 +72,7 @@ namespace scopi
     class ScopiSolver: public ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>
     {
     public:
-        ScopiSolver(scopi_container<dim>& particles, double dt);
+        ScopiSolver(scopi_container<dim>& particles, double dt, ParamsSolver<optim_solver_t>);
     };
 
     template<std::size_t dim,
@@ -81,7 +82,7 @@ namespace scopi
     class ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>: public ScopiSolverBase<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>
     {
     public:
-        ScopiSolver(scopi_container<dim>& particles, double dt);
+        ScopiSolver(scopi_container<dim>& particles, double dt, ParamsSolver<OptimMosek>);
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
     private:
         vap_projection m_vap_projection;
@@ -89,21 +90,21 @@ namespace scopi
 
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolverBase(scopi_container<dim>& particles, double dt)
+    ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolverBase(scopi_container<dim>& particles, double dt, ParamsSolver<optim_solver_t> params)
     : m_particles(particles)
     , m_dt(dt)
-    , m_solver(m_particles.nb_active(), m_dt, particles)
+    , m_solver(m_particles.nb_active(), m_dt, particles, params)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
     template<std::size_t dim, class problem_t, template <class> class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
-    : ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>(particles, dt)
+    ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, ParamsSolver<optim_solver_t> params)
+    : ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>(particles, dt, params)
     {}
 
     template<std::size_t dim, class contact_t, class vap_t>
-    ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
-    : ScopiSolverBase<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>(particles, dt)
+    ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, ParamsSolver<OptimMosek> params)
+    : ScopiSolverBase<dim, ViscousWithFriction<dim>, OptimMosek, contact_t, vap_t>(particles, dt, params)
     , m_vap_projection(this->m_particles.nb_active(), this->m_particles.nb_inactive(), this->m_dt)
     {}
 

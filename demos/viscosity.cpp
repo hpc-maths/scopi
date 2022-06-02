@@ -31,7 +31,9 @@ int main()
     particles.push_back(p, scopi::property<dim>().deactivate());
     particles.push_back(s, prop.force({{g, -g}}));
 
-    scopi::ScopiSolver<dim, scopi::ViscousWithFriction<dim>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    scopi::ParamsSolver<scopi::OptimMosek> params;
+
+    scopi::ScopiSolver<dim, scopi::ViscousWithFriction<dim>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
     // solver.set_rho_uzawa(200.);
     solver.solve(total_it);
     particles.f()(1)(1) *= -1.;
