@@ -4,7 +4,7 @@
 #include "OptimBase.hpp"
 #include "../problems/DryWithoutFriction.hpp"
 #include "ConstraintMosek.hpp"
-#include "../params/ParamsSolver.hpp"
+#include "../params/OptimParams.hpp"
 
 #include <memory>
 #include <fusion.h>
@@ -15,12 +15,12 @@ namespace scopi{
     class OptimMosek;
 
     template<>
-    class ParamsSolver<OptimMosek>
+    class OptimParams<OptimMosek>
     {
     public:
         void test()
         {
-            std::cout << "ParamsSolver<OptimMosek>::test" << std::endl;
+            std::cout << "OptimParams<OptimMosek>::test" << std::endl;
         };
     };
 
@@ -32,7 +32,7 @@ namespace scopi{
         using base_type = OptimBase<OptimMosek, problem_t>;
 
         template <std::size_t dim>
-        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimMosek>& params);
+        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -60,7 +60,7 @@ namespace scopi{
         mosek::fusion::Matrix::t m_A;
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
 
-        ParamsSolver<OptimMosek> m_params;
+        OptimParams<OptimMosek> m_params;
     };
 
     template<class problem_t>
@@ -127,7 +127,7 @@ namespace scopi{
 
     template<class problem_t>
     template <std::size_t dim>
-    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimMosek>& params)
+    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& params)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
     , ConstraintMosek<problem_t>(nparts)
     , m_params(params)

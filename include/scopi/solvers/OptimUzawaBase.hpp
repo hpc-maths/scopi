@@ -11,7 +11,7 @@
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
-#include "../params/ParamsSolver.hpp"
+#include "../params/OptimParams.hpp"
 
 namespace scopi{
     template<class Derived, class problem_t = DryWithoutFriction>
@@ -20,7 +20,7 @@ namespace scopi{
     public:
         using base_type = OptimBase<Derived, problem_t>;
         template <template <class> class solver_t>
-        OptimUzawaBase(std::size_t nparts, double dt, ParamsSolver<solver_t>& params);
+        OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -54,13 +54,13 @@ namespace scopi{
         xt::xtensor<double, 1> m_L;
         xt::xtensor<double, 1> m_R;
 
-        ParamsSolverUzawaBase m_params;
+        OptimParamsUzawaBase m_params;
 
     };
 
     template<class Derived, class problem_t>
     template <template <class> class solver_t>
-    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, ParamsSolver<solver_t>& params)
+    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& params)
     : base_type(nparts, dt, 2*3*nparts, 0)
     , m_dmin(0.)
     , m_U(xt::zeros<double>({6*nparts}))

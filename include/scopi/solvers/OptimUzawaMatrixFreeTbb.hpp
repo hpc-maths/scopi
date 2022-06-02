@@ -19,7 +19,7 @@ namespace scopi
     class OptimUzawaMatrixFreeTbb;
 
     template<>
-    class ParamsSolver<OptimUzawaMatrixFreeTbb> : public ParamsSolverUzawaBase
+    class OptimParams<OptimUzawaMatrixFreeTbb> : public OptimParamsUzawaBase
     {};
 
     template<class problem_t = DryWithoutFriction>
@@ -28,7 +28,7 @@ namespace scopi
     public:
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeTbb<problem_t>, problem_t>;
         template <std::size_t dim>
-        OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimUzawaMatrixFreeTbb>& params);
+        OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMatrixFreeTbb>& params);
 
         template <std::size_t dim>
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
@@ -98,7 +98,7 @@ namespace scopi
 
     template <class problem_t>
     template <std::size_t dim>
-    OptimUzawaMatrixFreeTbb<problem_t>::OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>&, ParamsSolver<OptimUzawaMatrixFreeTbb>& params)
+    OptimUzawaMatrixFreeTbb<problem_t>::OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>&, OptimParams<OptimUzawaMatrixFreeTbb>& params)
     : base_type(nparts, dt, params)
     {}
 

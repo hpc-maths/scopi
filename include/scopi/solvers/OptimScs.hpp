@@ -11,11 +11,11 @@ namespace scopi
     class OptimScs;
 
     template<>
-    class ParamsSolver<OptimScs>
+    class OptimParams<OptimScs>
     {
     public:
-        ParamsSolver();
-        ParamsSolver(ParamsSolver<OptimScs>& params);
+        OptimParams();
+        OptimParams(OptimParams<OptimScs>& params);
 
         double m_tol;
         double m_tol_infeas;
@@ -28,7 +28,7 @@ namespace scopi
         using base_type = OptimBase<OptimScs<problem_t>, DryWithoutFriction>;
 
         template <std::size_t dim>
-        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimScs>& params);
+        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -68,7 +68,7 @@ namespace scopi
         OptimScs(const OptimScs &);
         OptimScs & operator=(const OptimScs &);
 
-        ParamsSolver<OptimScs> m_params;
+        OptimParams<OptimScs> m_params;
     };
 
     template <class problem_t>
@@ -127,7 +127,7 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimScs>& params)
+    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& params)
     : base_type(nparts, dt, 2*3*nparts, 0)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
