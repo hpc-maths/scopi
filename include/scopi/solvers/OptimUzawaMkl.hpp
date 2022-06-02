@@ -14,6 +14,13 @@
 
 namespace scopi
 {
+    template<class problem_t>
+    class OptimUzawaMkl;
+
+    template<>
+    class ParamsSolver<OptimUzawaMkl> : public ParamsSolverUzawaBase
+    {};
+
     template <class problem_t = DryWithoutFriction>
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>
     {
@@ -21,7 +28,7 @@ namespace scopi
         using base_type = OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>;
 
         template <std::size_t dim>
-        OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles);
+        OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimUzawaMkl>& params);
         ~OptimUzawaMkl();
 
         template <std::size_t dim>
@@ -135,8 +142,8 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles)
-    : base_type(nparts, dt)
+    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, ParamsSolver<OptimUzawaMkl>& params)
+    : base_type(nparts, dt, params)
     {
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;

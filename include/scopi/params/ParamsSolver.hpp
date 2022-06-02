@@ -10,5 +10,18 @@ namespace scopi
     class ParamsSolver
     {
     };
+
+    class ParamsSolverUzawaBase
+    {
+    public:
+        void test()
+        {
+            std::cout << "ParamsSolver<OptimUzawa>::test" << std::endl;
+        };
+
+        ParamsSolverUzawaBase() {};
+        template<template <class> class solver_t>
+        ParamsSolverUzawaBase(ParamsSolver<solver_t> params) {std::cout << "ctor with template template parameters" << std::endl;};
+    };
 }
 

@@ -16,7 +16,9 @@ int main()
     particles.push_back(s1, scopi::property<dim>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia(0.1));
     particles.push_back(s2, scopi::property<dim>().desired_velocity({{-0.25, 0}}).mass(1.).moment_inertia(0.1));
 
-    scopi::ScopiSolver<dim> solver(particles, dt);
+    scopi::ParamsSolver<scopi::OptimUzawaMatrixFreeOmp> params;
+
+    scopi::ScopiSolver<dim> solver(particles, dt, params);
     solver.solve(total_it);
 
     return 0;

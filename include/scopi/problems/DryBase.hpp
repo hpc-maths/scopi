@@ -15,9 +15,7 @@ namespace scopi
     public:
         template <std::size_t dim>
         void update_gamma(const std::vector<neighbor<dim>>& contacts,
-                          xt::xtensor<double, 1> lambda,
-                          const scopi_container<dim>& particles,
-                          const xt::xtensor<double, 2>& u);
+                          xt::xtensor<double, 1> lambda);
 
         template <std::size_t dim>
         void set_gamma(const std::vector<neighbor<dim>>& contacts);
@@ -29,9 +27,7 @@ namespace scopi
 
     template <std::size_t dim>
     void DryBase::update_gamma(const std::vector<neighbor<dim>>&,
-                               xt::xtensor<double, 1>,
-                               const scopi_container<dim>&,
-                               const xt::xtensor<double, 2>&)
+                               xt::xtensor<double, 1>)
     {}
 
     template <std::size_t dim>
