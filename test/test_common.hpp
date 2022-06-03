@@ -81,63 +81,29 @@ namespace scopi
 
 }
 
-// does not compile if this is inside the namespace
-// TODO to be automated
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
+#define TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact, vap) \
+    TYPE_TO_STRING(scopi::SolverWithParams<scopi::ScopiSolver<dim, scopi::problem, scopi::solver, scopi::contact, scopi::vap>, scopi::OptimParams<scopi::solver>, scopi::ProblemParams<scopi::problem>>)
+#define TYPE_TO_STRING_CONTACTS_VAP(solver, problem, dim)\
+    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fixed); \
+    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fpd); \
+    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_brute_force, vap_fixed); \
+    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_brute_force, vap_fpd);
 
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimScs, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimScs, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimScs, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimScs, scopi::contact_brute_force, scopi::vap_fpd>);
-
+TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, DryWithoutFriction, 2)
+TYPE_TO_STRING_CONTACTS_VAP(OptimScs, DryWithoutFriction, 2)
 #ifdef SCOPI_USE_MKL
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fpd>);
+TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMkl, DryWithoutFriction, 2)
 #endif
+TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeTbb, DryWithoutFriction, 2)
+TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeOmp, DryWithoutFriction, 2)
 
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_brute_force, scopi::vap_fpd>);
+TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, DryWithFriction, 2)
 
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithoutFriction, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_brute_force, scopi::vap_fpd>);
-
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
-
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
-
-#ifdef SCOPI_USE_MKL 
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fpd>);
+TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, ViscousWithoutFriction<2>, 2)
+#ifdef SCOPI_USE_MKL
+TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMkl, ViscousWithoutFriction<2>, 2)
 #endif
+TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<2>, 2)
+TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<2>, 2)
 
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_brute_force, scopi::vap_fpd>);
-
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_brute_force, scopi::vap_fpd>);
-
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithFriction<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
-TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithFriction<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
+TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, ViscousWithFriction<2>, 2)

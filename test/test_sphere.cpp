@@ -360,7 +360,6 @@ namespace scopi
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance));
     }
 
-    /*
     TEST_CASE_TEMPLATE("two spheres symetrical", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
         using SolverType = typename SolverAndParams::SolverType;
@@ -433,5 +432,4 @@ namespace scopi
 
         CHECK(diffFile("./Results/scopi_objects_0019.json", "../test/references/2d_case_spheres.json", tolerance));
     }
-*/
 }
