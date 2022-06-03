@@ -60,7 +60,6 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
-    private:
         ProblemParams<DryWithoutFriction> m_params;
     };
 

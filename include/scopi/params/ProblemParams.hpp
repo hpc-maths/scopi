@@ -10,5 +10,7 @@ namespace scopi
     template<class problem_t>
     class ProblemParams
     {
+    private:
+        ProblemParams();
     };
 }

@@ -10,6 +10,8 @@ namespace scopi
     template<template <class> class solver_t>
     class OptimParams
     {
+    private:
+        OptimParams();
     };
 
     class OptimParamsUzawaBase
