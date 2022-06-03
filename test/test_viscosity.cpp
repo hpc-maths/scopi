@@ -13,6 +13,18 @@
 
 namespace scopi {
 
+    template <class OptimParamsType>
+    void set_params_test(OptimParamsType&)
+    {}
+
+#ifdef SCOPI_USE_MKL
+    template <>
+    void set_params_test<OptimParams<OptimUzawaMkl>>(OptimParams<OptimUzawaMkl>& params)
+    {
+        params.m_rho = 200.;
+    }
+#endif
+
     TEST_CASE_TEMPLATE("sphere plan viscosity", SolverAndParams, SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
         using SolverType = typename SolverAndParams::SolverType;
