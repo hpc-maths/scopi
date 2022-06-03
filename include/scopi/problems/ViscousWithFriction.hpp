@@ -347,7 +347,7 @@ namespace scopi
             else
             {
                 m_lambda[ic] = lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ind_gamma_min);
-                if (m_lambda[ic] < this->m_tol)
+                if (m_lambda[ic] < m_params.m_tol)
                 {
                     m_lambda[ic] = + xt::linalg::dot(xt::view(u, contacts[ic].j, xt::range(_, dim)) - particles.v()(contacts[ic].j), contacts[ic].nij)(0)/this->m_dt;
                 }
