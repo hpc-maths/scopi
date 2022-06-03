@@ -33,7 +33,8 @@ namespace scopi
 
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
-                             const std::vector<neighbor<dim>>& contacts);
+                             const std::vector<neighbor<dim>>& contacts,
+                             problem_t& problem);
         void finalize_uzawa_impl();
 
         template <std::size_t dim>
@@ -77,19 +78,20 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::init_uzawa_impl(const scopi_container<dim>& particles,
-                                        const std::vector<scopi::neighbor<dim>>& contacts)
+                                                  const std::vector<scopi::neighbor<dim>>& contacts,
+                                                  problem_t& problem)
     {
-        this->create_matrix_constraint_coo(particles, contacts, 0);
+        problem.create_matrix_constraint_coo(particles, contacts, 0);
 
         sparse_matrix_t A_coo;
         m_status =  mkl_sparse_d_create_coo(&A_coo,
                                            SPARSE_INDEX_BASE_ZERO,
-                                           this->number_row_matrix(contacts), // number of rows
+                                           problem.number_row_matrix(contacts), // number of rows
                                            6*this->m_nparts, // number of cols
-                                           this->m_A_values.size(), // number of non-zero elements
-                                           this->m_A_rows.data(),
-                                           this->m_A_cols.data(),
-                                           this->m_A_values.data());
+                                           problem.m_A_values.size(), // number of non-zero elements
+                                           problem.m_A_rows.data(),
+                                           problem.m_A_cols.data(),
+                                           problem.m_A_values.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_create_coo for matrix A: " << m_status;
 
         m_status = mkl_sparse_convert_csr(A_coo,

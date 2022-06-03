@@ -50,7 +50,8 @@ namespace scopi{
 
         template <std::size_t dim>
         void init_uzawa(const scopi_container<dim>& particles,
-                        const std::vector<neighbor<dim>>& contacts);
+                        const std::vector<neighbor<dim>>& contacts, 
+                        problem_t& problem);
         void finalize_uzawa();
 
         const double m_dmin;
@@ -78,7 +79,7 @@ namespace scopi{
                                                                             problem_t& problem)
     {
         tic();
-        init_uzawa(particles, contacts);
+        init_uzawa(particles, contacts, problem);
         auto duration = toc();
         m_L = xt::zeros<double>({problem.number_row_matrix(contacts)});
         m_R = xt::zeros<double>({problem.number_row_matrix(contacts)});
@@ -211,9 +212,10 @@ namespace scopi{
     template<class Derived, class problem_t>
     template <std::size_t dim>
     void OptimUzawaBase<Derived, problem_t>::init_uzawa(const scopi_container<dim>& particles,
-                                             const std::vector<neighbor<dim>>& contacts)
+                                                        const std::vector<neighbor<dim>>& contacts,
+                                                        problem_t& problem)
     {
-        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts);
+        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts, problem);
     }
 
     template<class Derived, class problem_t>
