@@ -17,12 +17,25 @@
 namespace scopi
 {
     template<std::size_t dim>
+    class ViscousWithoutFriction;
+
+    template<std::size_t dim>
+    class ProblemParams<ViscousWithoutFriction<dim>>
+    {
+    public:
+        ProblemParams();
+        ProblemParams(ProblemParams<ViscousWithoutFriction<dim>>& params);
+
+        double m_tol;
+    };
+
+    template<std::size_t dim>
     class ViscousWithoutFriction: public ProblemBase
                                 , public ViscousBase<dim>
                                 , public WithoutFrictionBase
     {
     public:
-        ViscousWithoutFriction(std::size_t nparts, double dt);
+        ViscousWithoutFriction(std::size_t nparts, double dt, ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
@@ -36,6 +49,9 @@ namespace scopi
 
     protected:
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
+
+    private:
+        ProblemParams<ViscousWithoutFriction<dim>> m_params;
     };
 
     template<std::size_t dim>
@@ -62,7 +78,7 @@ namespace scopi
                     this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                     this->m_A_values[index] = -this->m_dt*c.nij[d];
                     index++;
-                    if (this->m_gamma[ic] < -this->m_tol)
+                    if (this->m_gamma[ic] < -m_params.m_tol)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
@@ -80,7 +96,7 @@ namespace scopi
                     this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                     this->m_A_values[index] = this->m_dt*c.nij[d];
                     index++;
-                    if (this->m_gamma[ic] < -this->m_tol)
+                    if (this->m_gamma[ic] < -m_params.m_tol)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
@@ -105,7 +121,7 @@ namespace scopi
                     this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
                     this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
-                    if (this->m_gamma[ic] < -this->m_tol)
+                    if (this->m_gamma[ic] < -m_params.m_tol)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
@@ -125,7 +141,7 @@ namespace scopi
                     this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
                     this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                     index++;
-                    if (this->m_gamma[ic] < -this->m_tol)
+                    if (this->m_gamma[ic] < -m_params.m_tol)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
@@ -142,10 +158,11 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt)
+    ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt, ProblemParams<ViscousWithoutFriction<dim>>& problem_params)
     : ProblemBase(nparticles, dt)
     , ViscousBase<dim>()
     , WithoutFrictionBase()
+    , m_params(problem_params)
     {}
 
     template<std::size_t dim>
@@ -155,7 +172,7 @@ namespace scopi
         this->m_nb_gamma_neg = 0;
         for (auto& g : this->m_gamma)
         {
-            if (g < -this->m_tol)
+            if (g < -m_params.m_tol)
                 this->m_nb_gamma_neg++;
         }
     }
@@ -170,7 +187,7 @@ namespace scopi
         for (std::size_t i = 0; i < this->m_gamma_old.size(); ++i)
         {
             double f_contact;
-            if (this->m_gamma[i] < -this->m_tol)
+            if (this->m_gamma[i] < -m_params.m_tol)
             {
                 f_contact = lambda(i) - lambda(this->m_gamma.size() + ind_gamma_neg);
                 ind_gamma_neg++;
@@ -180,9 +197,9 @@ namespace scopi
                 f_contact = lambda(i);
             }
             this->m_gamma_old[i] = std::min(0., this->m_gamma[i] - this->m_dt * f_contact);
-            if (this->m_gamma_old[i] > -this->m_tol)
+            if (this->m_gamma_old[i] > -m_params.m_tol)
                 this->m_gamma_old[i] = 0.;
-            // if (this->m_gamma_old[i] > -this->m_tol)
+            // if (this->m_gamma_old[i] > -m_params.m_tol)
             //     this->m_gamma_old[i] = 0.;
 
             PLOG_WARNING << this->m_gamma[i];
@@ -203,7 +220,7 @@ namespace scopi
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             this->m_distances[i] = contacts[i].dij;
-            if(this->m_gamma[i] < -this->m_tol)
+            if(this->m_gamma[i] < -m_params.m_tol)
             {
                 this->m_distances[contacts.size() + i] = -contacts[i].dij;
             }
@@ -215,6 +232,17 @@ namespace scopi
     {
         return 0;
     }
+
+
+    template<std::size_t dim>
+    ProblemParams<ViscousWithoutFriction<dim>>::ProblemParams()
+    : m_tol(1e-6)
+    {}
+
+    template<std::size_t dim>
+    ProblemParams<ViscousWithoutFriction<dim>>::ProblemParams(ProblemParams<ViscousWithoutFriction<dim>>& params)
+    : m_tol(params.m_tol)
+    {}
 
 }
 

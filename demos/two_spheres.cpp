@@ -17,10 +17,11 @@ int main()
     particles.push_back(s1, scopi::property<dim>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia(0.1));
     particles.push_back(s2, scopi::property<dim>().desired_velocity({{-0.25, 0}}).mass(1.).moment_inertia(0.1));
 
-    scopi::OptimParams<scopi::OptimUzawaMatrixFreeOmp> params;
-    params.m_max_iter = 1000;
+    scopi::OptimParams<scopi::OptimUzawaMatrixFreeOmp> optim_params;
+    optim_params.m_max_iter = 1000;
+    scopi::ProblemParams<scopi::DryWithoutFriction> problem_params;
 
-    scopi::ScopiSolver<dim> solver(particles, dt, params);
+    scopi::ScopiSolver<dim> solver(particles, dt, optim_params, problem_params);
     solver.solve(total_it);
 
     return 0;

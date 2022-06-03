@@ -4,7 +4,8 @@
 #include "scopi/solvers/OptimScs.hpp"
 #endif
 
-namespace scopi {
+namespace scopi
+{
     OptimParamsUzawaBase::OptimParamsUzawaBase()
     : m_tol(1e-9)
     , m_max_iter(40000)

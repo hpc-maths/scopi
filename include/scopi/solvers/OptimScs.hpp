@@ -28,7 +28,7 @@ namespace scopi
         using base_type = OptimBase<OptimScs<problem_t>, DryWithoutFriction>;
 
         template <std::size_t dim>
-        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& params);
+        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params, ProblemParams<problem_t>& problem_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -127,14 +127,14 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& params)
-    : base_type(nparts, dt, 2*3*nparts, 0)
+    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params, ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, problem_params)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
     , m_P_p(6*nparts+1)
     , m_A_p(6*nparts+1)
     , m_sol_x(6*nparts)
-    , m_params(params)
+    , m_params(optim_params)
     {
         auto active_offset = particles.nb_inactive();
         std::size_t index = 0;

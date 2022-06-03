@@ -63,10 +63,11 @@ namespace scopi
     }
 
 
-    DryWithFriction::DryWithFriction(std::size_t nparticles, double dt)
+    DryWithFriction::DryWithFriction(std::size_t nparticles, double dt, ProblemParams<DryWithFriction>& problem_params)
     : ProblemBase(nparticles, dt) 
     , DryBase()
     , WithFrictionBase()
+    , m_params(problem_params)
     {}
 
 }

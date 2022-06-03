@@ -28,7 +28,7 @@ namespace scopi
         using base_type = OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>;
 
         template <std::size_t dim>
-        OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& params);
+        OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& optim_params, ProblemParams<problem_t>& problem_params);
         ~OptimUzawaMkl();
 
         template <std::size_t dim>
@@ -142,8 +142,8 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& params)
-    : base_type(nparts, dt, params)
+    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& optim_params, ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, optim_params, problem_params)
     {
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;

@@ -26,7 +26,7 @@ namespace scopi{
         using base_type = OptimBase<OptimMosek, problem_t>;
 
         template <std::size_t dim>
-        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& params);
+        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& optim_params, ProblemParams<problem_t>& problem_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -120,10 +120,10 @@ namespace scopi{
 
     template<class problem_t>
     template <std::size_t dim>
-    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& params)
-    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
+    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& optim_params, ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, problem_params)
     , ConstraintMosek<problem_t>(nparts)
-    , m_params(params)
+    , m_params(optim_params)
     {
         using namespace mosek::fusion;
         using namespace monty;

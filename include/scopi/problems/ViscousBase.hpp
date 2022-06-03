@@ -35,12 +35,10 @@ namespace scopi
         std::vector<double> m_gamma;
         std::vector<double> m_gamma_old;
         std::size_t m_nb_gamma_neg;
-        double m_tol;
     };
 
     template<std::size_t dim>
     ViscousBase<dim>::ViscousBase()
-    : m_tol(1e-6)
     {}
 
     template<std::size_t dim>

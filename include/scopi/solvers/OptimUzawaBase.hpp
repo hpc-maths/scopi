@@ -20,7 +20,7 @@ namespace scopi{
     public:
         using base_type = OptimBase<Derived, problem_t>;
         template <template <class> class solver_t>
-        OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& params);
+        OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& optim_params, ProblemParams<problem_t>& problem_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -60,11 +60,11 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template <template <class> class solver_t>
-    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& params)
-    : base_type(nparts, dt, 2*3*nparts, 0)
+    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& optim_params, ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, problem_params)
     , m_dmin(0.)
     , m_U(xt::zeros<double>({6*nparts}))
-    , m_params(params)
+    , m_params(optim_params)
     {}
 
     template<class Derived, class problem_t>

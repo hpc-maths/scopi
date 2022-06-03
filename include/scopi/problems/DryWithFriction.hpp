@@ -11,6 +11,7 @@
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
+#include "../params/ProblemParams.hpp"
 
 #include "ProblemBase.hpp"
 #include "DryBase.hpp"
@@ -21,13 +22,25 @@ namespace scopi
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0);
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0);
 
+    class DryWithFriction;
+
+    template<>
+    class ProblemParams<DryWithFriction>
+    {
+    public:
+        ProblemParams();
+        ProblemParams(ProblemParams<DryWithFriction>& params);
+
+        double m_mu;
+    };
+
     class DryWithFriction : public ProblemBase
                           , public DryBase
                           , public WithFrictionBase
     {
 
     protected:
-        DryWithFriction(std::size_t nparticles, double dt);
+        DryWithFriction(std::size_t nparticles, double dt, ProblemParams<DryWithFriction>& problem_params);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
@@ -37,6 +50,9 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+
+    private:
+        ProblemParams<DryWithFriction> m_params;
     };
 
     template<std::size_t dim>
@@ -70,10 +86,10 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
-                        this->m_A_values[index] = -this->m_dt*this->m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        this->m_A_values[index] = -this->m_dt*m_params.m_mu*c.nij[ind_row]*c.nij[ind_col];
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[index] += this->m_dt*this->m_mu;
+                            this->m_A_values[index] += this->m_dt*m_params.m_mu;
                         }
                         index++;
                     }
@@ -95,10 +111,10 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
-                        this->m_A_values[index] = this->m_dt*this->m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        this->m_A_values[index] = this->m_dt*m_params.m_mu*c.nij[ind_row]*c.nij[ind_col];
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[index] -= this->m_dt*this->m_mu;
+                            this->m_A_values[index] -= this->m_dt*m_params.m_mu;
                         }
                         index++;
                     }
@@ -127,7 +143,7 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        this->m_A_values[index] = -this->m_mu*this->m_dt*dot(ind_row, ind_col) + this->m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        this->m_A_values[index] = -m_params.m_mu*this->m_dt*dot(ind_row, ind_col) + m_params.m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                         index++;
                     }
                 }
@@ -150,7 +166,7 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        this->m_A_values[index] = this->m_mu*this->m_dt*dot(ind_row, ind_col) - this->m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        this->m_A_values[index] = m_params.m_mu*this->m_dt*dot(ind_row, ind_col) - m_params.m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                         index++;
                     }
                 }

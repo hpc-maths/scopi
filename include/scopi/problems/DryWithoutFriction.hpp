@@ -9,6 +9,7 @@
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
+#include "../params/ProblemParams.hpp"
 
 #include "ProblemBase.hpp"
 #include "DryBase.hpp"
@@ -16,13 +17,19 @@
 
 namespace scopi
 {
+    class DryWithoutFriction;
+
+    template<>
+    class ProblemParams<DryWithoutFriction>
+    {};
+
     class DryWithoutFriction : public ProblemBase
                              , public DryBase
                              , public WithoutFrictionBase
     {
 
     protected:
-        DryWithoutFriction(std::size_t nparts, double dt);
+        DryWithoutFriction(std::size_t nparts, double dt, ProblemParams<DryWithoutFriction>& problem_params);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
@@ -53,6 +60,8 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
+    private:
+        ProblemParams<DryWithoutFriction> m_params;
     };
 
     template<std::size_t dim>
