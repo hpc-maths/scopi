@@ -13,7 +13,6 @@
 
 #include "ProblemBase.hpp"
 #include "DryBase.hpp"
-#include "WithoutFrictionBase.hpp"
 
 namespace scopi
 {
@@ -25,7 +24,6 @@ namespace scopi
 
     class DryWithoutFriction : public ProblemBase
                              , public DryBase
-                             , public WithoutFrictionBase
     {
 
     protected:
@@ -39,12 +37,6 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
-
-        template<std::size_t dim>
-        void matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
-                                    xt::xtensor<double, 1>& U,
-                                    std::size_t active_offset,
-                                    std::size_t row);
 
         template<std::size_t dim>
         void matrix_free_gemv_A(const neighbor<dim>& c,
@@ -153,19 +145,6 @@ namespace scopi
         {
             this->m_distances[i] = contacts[i].dij;
         }
-    }
-
-    template<std::size_t dim>
-    void DryWithoutFriction::matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
-                                                   xt::xtensor<double, 1>& U,
-                                                   std::size_t active_offset,
-                                                   std::size_t row)
-    {
-        for (std::size_t d = 0; d < dim; ++d)
-        {
-            U(3*row + d) /= (-1.*particles.m()(active_offset + row)); 
-        }
-        matrix_free_gemv_inv_P_moment(particles, U, active_offset, row);
     }
 
     template<std::size_t dim>

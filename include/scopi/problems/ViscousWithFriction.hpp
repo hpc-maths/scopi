@@ -13,7 +13,6 @@
 
 #include "ProblemBase.hpp"
 #include "ViscousBase.hpp"
-#include "WithFrictionBase.hpp"
 
 namespace scopi
 {
@@ -35,7 +34,6 @@ namespace scopi
     template<std::size_t dim>
     class ViscousWithFriction: public ProblemBase
                              , public ViscousBase<dim>
-                             , public WithFrictionBase
     {
     public:
         ViscousWithFriction(std::size_t nparts, double dt, ProblemParams<ViscousWithFriction<dim>>& problem_params);
@@ -296,7 +294,6 @@ namespace scopi
     ViscousWithFriction<dim>::ViscousWithFriction(std::size_t nparticles, double dt, ProblemParams<ViscousWithFriction<dim>>& problem_params)
     : ProblemBase(nparticles, dt)
     , ViscousBase<dim>()
-    , WithFrictionBase()
     , m_params(problem_params)
     {}
 

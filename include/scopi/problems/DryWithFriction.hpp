@@ -15,7 +15,6 @@
 
 #include "ProblemBase.hpp"
 #include "DryBase.hpp"
-#include "WithFrictionBase.hpp"
 
 namespace scopi
 {
@@ -36,7 +35,6 @@ namespace scopi
 
     class DryWithFriction : public ProblemBase
                           , public DryBase
-                          , public WithFrictionBase
     {
 
     protected:
