@@ -29,12 +29,10 @@ namespace scopi
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts,
-                             std::size_t nb_gamma_neg,
-                             std::size_t nb_gamma_min);
+                             DryWithoutFriction& problem);
         void update_dual(std::size_t nb_row_matrix,
                         std::size_t nb_contacts,
-                        std::size_t nb_gamma_neg,
-                        std::size_t nb_gamma_min);
+                        DryWithoutFriction& problem);
 
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
@@ -49,8 +47,7 @@ namespace scopi
                                                              mosek::fusion::Variable::t X,
                                                              mosek::fusion::Model::t model,
                                                              const std::vector<neighbor<dim>>&,
-                                                             std::size_t,
-                                                             std::size_t)
+                                                             DryWithoutFriction&)
     {
         using namespace mosek::fusion;
         m_qc1 =  model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
@@ -74,12 +71,10 @@ namespace scopi
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts,
-                             std::size_t nb_gamma_neg,
-                             std::size_t nb_gamma_min);
+                             DryWithFriction& problem);
         void update_dual(std::size_t nb_row_matrix,
                          std::size_t nb_contacts,
-                         std::size_t nb_gamma_neg,
-                         std::size_t nb_gamma_min);
+                         DryWithFriction& problem);
 
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
@@ -94,8 +89,7 @@ namespace scopi
                                                                      mosek::fusion::Variable::t X,
                                                                      mosek::fusion::Model::t model,
                                                                      const std::vector<neighbor<dim>>& contacts,
-                                                                     std::size_t,
-                                                                     std::size_t)
+                                                                     DryWithFriction&)
     {
         using namespace mosek::fusion;
         m_qc1 = model->constraint("qc1"
@@ -121,12 +115,10 @@ namespace scopi
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts,
-                             std::size_t nb_gamma_neg,
-                             std::size_t nb_gamma_min);
+                             ViscousWithoutFriction<dim>& problem);
         void update_dual(std::size_t nb_row_matrix,
                          std::size_t nb_contacts,
-                         std::size_t nb_gamma_neg,
-                         std::size_t nb_gamma_min);
+                         ViscousWithoutFriction<dim>& problem);
 
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
@@ -141,8 +133,8 @@ namespace scopi
                                                                        mosek::fusion::Variable::t X,
                                                                        mosek::fusion::Model::t model,
                                                                        const std::vector<neighbor<dim>>&,
-                                                                       std::size_t,
-                                                                       std::size_t)
+                                                                       ViscousWithoutFriction<dim>&)
+
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -169,9 +161,8 @@ namespace scopi
 
     template <std::size_t dim>
     void ConstraintMosek<ViscousWithoutFriction<dim>>::update_dual(std::size_t,
-                                                                       std::size_t,
-                                                                       std::size_t,
-                                                                       std::size_t)
+                                                                   std::size_t,
+                                                                   ViscousWithoutFriction<dim>&)
     {
         m_dual = m_qc1->dual();
     }
@@ -194,12 +185,10 @@ namespace scopi
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts,
-                             std::size_t nb_gamma_neg,
-                             std::size_t nb_gamma_min);
+                             ViscousWithFriction<dim>& problem);
         void update_dual(std::size_t nb_row_matrix,
                          std::size_t nb_contacts,
-                         std::size_t nb_gamma_neg,
-                         std::size_t nb_gamma_min);
+                         ViscousWithFriction<dim>& problem);
 
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
@@ -215,20 +204,19 @@ namespace scopi
                                                                            mosek::fusion::Variable::t X,
                                                                            mosek::fusion::Model::t model,
                                                                            const std::vector<neighbor<dim>>& contacts,
-                                                                           std::size_t nb_gamma_neg,
-                                                                           std::size_t nb_gamma_min)
+                                                                           ViscousWithFriction<dim>& problem)
     {
         using namespace mosek::fusion;
         using namespace monty;
 
-        auto D_restricted_1 = std::make_shared<ndarray<double, 1>>(D->raw(), shape_t<1>({contacts.size() - nb_gamma_min + nb_gamma_neg}));
-        m_qc1 = model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))->slice(0, contacts.size() - nb_gamma_min + nb_gamma_neg), Domain::lessThan(D_restricted_1));
+        auto D_restricted_1 = std::make_shared<ndarray<double, 1>>(D->raw(), shape_t<1>({contacts.size() - problem.get_nb_gamma_min() + problem.get_nb_gamma_neg()}));
+        m_qc1 = model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))->slice(0, contacts.size() - problem.get_nb_gamma_min() + problem.get_nb_gamma_neg()), Domain::lessThan(D_restricted_1));
 
-        auto D_restricted_4 = std::make_shared<ndarray<double, 1>>(D->raw()+(contacts.size() - nb_gamma_min + nb_gamma_neg), shape_t<1>(4*nb_gamma_min));
+        auto D_restricted_4 = std::make_shared<ndarray<double, 1>>(D->raw()+(contacts.size() - problem.get_nb_gamma_min() + problem.get_nb_gamma_neg()), shape_t<1>(4*problem.get_nb_gamma_min()));
         m_qc4 = model->constraint("qc4", 
                 Expr::reshape(
-                    Expr::sub(D_restricted_4, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - nb_gamma_min + nb_gamma_neg, contacts.size() - nb_gamma_min + nb_gamma_neg + 4*nb_gamma_min) ),
-                    nb_gamma_min, 4),
+                    Expr::sub(D_restricted_4, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - problem.get_nb_gamma_min() + problem.get_nb_gamma_neg(), contacts.size() - problem.get_nb_gamma_min() + problem.get_nb_gamma_neg() + 4*problem.get_nb_gamma_min()) ),
+                    problem.get_nb_gamma_min(), 4),
                 Domain::inQCone());
     }
 
@@ -251,16 +239,15 @@ namespace scopi
 
     template <std::size_t dim>
     void ConstraintMosek<ViscousWithFriction<dim>>::update_dual(std::size_t nb_row_matrix,
-                                                                       std::size_t nb_contacts,
-                                                                       std::size_t nb_gamma_neg,
-                                                                       std::size_t nb_gamma_min)
+                                                                std::size_t nb_contacts,
+                                                                ViscousWithFriction<dim>& problem)
     {
         using namespace mosek::fusion;
         using namespace monty;
         m_dual = std::make_shared<monty::ndarray<double, 1>>(m_qc1->dual()->raw(), shape_t<1>(nb_row_matrix));
-        for (std::size_t i = 0; i < 4*nb_gamma_min; ++i)
+        for (std::size_t i = 0; i < 4*problem.get_nb_gamma_min(); ++i)
         {
-            m_dual->raw()[nb_contacts - nb_gamma_min + nb_gamma_neg + i] = -m_qc4->dual()->raw()[i];
+            m_dual->raw()[nb_contacts - problem.get_nb_gamma_min() + problem.get_nb_gamma_neg() + i] = -m_qc4->dual()->raw()[i];
         }
     }
 

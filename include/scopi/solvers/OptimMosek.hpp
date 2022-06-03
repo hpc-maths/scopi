@@ -86,7 +86,7 @@ namespace scopi{
                              std::make_shared<ndarray<int, 1>>(problem.m_A_cols.data(), shape_t<1>({problem.m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(problem.m_A_values.data(), shape_t<1>({problem.m_A_values.size()})));
 
-        this->add_constraints(D_mosek, m_A, X, model, contacts, problem.get_nb_gamma_neg(), problem.get_nb_gamma_min());
+        this->add_constraints(D_mosek, m_A, X, model, contacts, problem);
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
 
@@ -103,7 +103,7 @@ namespace scopi{
         model->solve();
 
         m_Xlvl = X->level();
-        this->update_dual(problem.number_row_matrix(contacts), contacts.size(), problem.get_nb_gamma_neg(), problem.get_nb_gamma_min());
+        this->update_dual(problem.number_row_matrix(contacts), contacts.size(), problem);
         for (auto& x : *this->m_dual)
         {
             x *= -1.;
