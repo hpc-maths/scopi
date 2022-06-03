@@ -51,8 +51,14 @@ namespace scopi
         TypePair<ScopiSolver<dim, DryWithFriction, OptimMosek, contact, vap>, OptimParams<OptimMosek>>
 
     // TODO add Uzawa and ViscsousWithFriction with mu = 0
+#ifdef SCOPI_USE_MKL
+    #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
+        TypePair<ScopiSolver<dim, ViscousWithoutFriction<dim>, OptimMosek, contact, vap>, OptimParams<OptimMosek>>, \
+        TypePair<ScopiSolver<dim, ViscousWithoutFriction<dim>, OptimUzawaMkl, contact, vap>, OptimParams<OptimUzawaMkl>>
+#else
     #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
         TypePair<ScopiSolver<dim, ViscousWithoutFriction<dim>, OptimMosek, contact, vap>, OptimParams<OptimMosek>>
+#endif
 
     #define SOLVER_VISCOUS_WITH_FRICTION(dim, contact, vap) \
         TypePair<ScopiSolver<dim, ViscousWithFriction<dim>, OptimMosek, contact, vap>, OptimParams<OptimMosek>>
