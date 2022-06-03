@@ -432,6 +432,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -445,8 +446,9 @@ namespace scopi
         particles.push_back(s1, p);
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/two_ellipsoids_symmetrical.json", tolerance));
@@ -456,6 +458,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -469,8 +472,9 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0049.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance));
@@ -480,6 +484,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -493,8 +498,9 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_asymmetrical.json", tolerance));
@@ -504,6 +510,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -517,8 +524,9 @@ namespace scopi
         particles.push_back(s1, p);
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
@@ -528,6 +536,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .01;
@@ -570,8 +579,9 @@ namespace scopi
             }
         }
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));

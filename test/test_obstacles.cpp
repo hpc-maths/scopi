@@ -36,6 +36,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
 
@@ -50,11 +51,13 @@ namespace scopi
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
 
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+
         SUBCASE("fixed")
         {
             particles.push_back(s, prop);
-            OptimParamsType params;
-            SolverType solver(particles, dt, params);
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_plan(particles);
         }
@@ -62,8 +65,7 @@ namespace scopi
         SUBCASE("velocity")
         {
             particles.push_back(s, prop.desired_velocity({{0., -1.}}));
-            OptimParamsType params;
-            SolverType solver(particles, dt, params);
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_plan(particles);
         }
@@ -73,6 +75,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
 
@@ -88,8 +91,9 @@ namespace scopi
         particles.push_back(p, property<dim>().deactivate());
 
         particles.push_back(s, prop.force({{0., -1.}}));
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         check_result_sphere_plan(particles);
     }
@@ -117,6 +121,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -133,8 +138,9 @@ namespace scopi
         SUBCASE("fixed")
         {
             particles.push_back(sphere, prop);
-            OptimParamsType params;
-            SolverType solver(particles, dt, params);
+            OptimParamsType optim_params;
+            ProblemParamsType problem_params;
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_sphere(particles);
         }
@@ -142,8 +148,9 @@ namespace scopi
         SUBCASE("velocity")
         {
             particles.push_back(sphere, prop.desired_velocity({{0., -1.}}));
-            OptimParamsType params;
-            SolverType solver(particles, dt, params);
+            OptimParamsType optim_params;
+            ProblemParamsType problem_params;
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_sphere(particles);
         }
@@ -153,6 +160,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -167,8 +175,9 @@ namespace scopi
         particles.push_back(obstacle, property<dim>().deactivate());
 
         particles.push_back(sphere, prop.force({{0., -1.}}));
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         check_result_sphere_sphere(particles);
     }
@@ -177,6 +186,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -191,8 +201,9 @@ namespace scopi
         particles.push_back(obstacle, property<dim>().deactivate());
         particles.push_back(sphere, prop.force({{0., -10.}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
@@ -202,6 +213,7 @@ namespace scopi
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         std::tuple<double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double>>
@@ -227,8 +239,9 @@ namespace scopi
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0., -g}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         auto pos = particles.pos();

@@ -17,6 +17,7 @@ namespace scopi {
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         constexpr std::size_t dim = 2;
         double PI = xt::numeric_constants<double>::PI;
@@ -35,8 +36,9 @@ namespace scopi {
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, prop.force({{g, -g}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);
@@ -48,6 +50,7 @@ namespace scopi {
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         constexpr std::size_t dim = 2;
         double PI = xt::numeric_constants<double>::PI;
@@ -66,9 +69,10 @@ namespace scopi {
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, prop.force({{0, -g}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
-        solver.set_coeff_friction(0.1);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = 0.1;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);
@@ -80,6 +84,7 @@ namespace scopi {
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         constexpr std::size_t dim = 2;
         double PI = xt::numeric_constants<double>::PI;
@@ -98,9 +103,10 @@ namespace scopi {
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, prop.force({{g, -g}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
-        solver.set_coeff_friction(0.1);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = 0.1;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);

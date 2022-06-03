@@ -17,6 +17,7 @@ namespace scopi {
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .005;
@@ -31,9 +32,10 @@ namespace scopi {
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
-        solver.set_coeff_friction(mu);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = mu;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
@@ -43,6 +45,7 @@ namespace scopi {
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         static constexpr std::size_t dim = 2;
         double dt = .01;
@@ -78,9 +81,10 @@ namespace scopi {
             }
         }
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
-        solver.set_coeff_friction(mu);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = mu;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
@@ -90,6 +94,7 @@ namespace scopi {
     {
         using SolverType = typename SolverAndParams::SolverType;
         using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
 
         std::tuple<double, double, double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double, double, double>>
@@ -122,9 +127,10 @@ namespace scopi {
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0., -g}}));
 
-        OptimParamsType params;
-        SolverType solver(particles, dt, params);
-        solver.set_coeff_friction(mu);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = mu;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         auto pos = particles.pos();
