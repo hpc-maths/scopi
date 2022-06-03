@@ -13,8 +13,12 @@
 
 namespace scopi {
 
-    TEST_CASE_TEMPLATE("two spheres asymetrical friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two spheres asymetrical friction", SolverAndParams, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -28,15 +32,21 @@ namespace scopi {
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        SolverType solver(particles, dt);
-        solver.set_coeff_friction(mu);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = mu;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d spheres friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("critical 2d spheres friction", SolverAndParams, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .01;
         std::size_t total_it = 100;
@@ -71,15 +81,21 @@ namespace scopi {
             }
         }
 
-        SolverType solver(particles, dt);
-        solver.set_coeff_friction(mu);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = mu;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere inclined plan friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere inclined plan friction", SolverAndParams, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         std::tuple<double, double, double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double, double, double>>
             data_container({std::make_tuple(0.1, PI/6., 0.00101117, 0.00409424, 0.00100648, 0.000971288),
@@ -111,8 +127,10 @@ namespace scopi {
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0., -g}}));
 
-        SolverType solver(particles, dt);
-        solver.set_coeff_friction(mu);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = mu;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         auto pos = particles.pos();

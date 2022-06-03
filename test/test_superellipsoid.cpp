@@ -428,8 +428,12 @@ namespace scopi
         REQUIRE(rotation_matrix(2, 2) == doctest::Approx(1.));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two ellispsoids symetrical", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 200;
@@ -442,14 +446,20 @@ namespace scopi
         particles.push_back(s1, p);
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/two_ellipsoids_symmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids spheres symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two ellispsoids spheres symetrical", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 50;
@@ -462,14 +472,20 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0049.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids asymetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two ellispsoids asymetrical", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -482,14 +498,20 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_asymmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids spheres asymetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two ellispsoids spheres asymetrical", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -502,14 +524,20 @@ namespace scopi
         particles.push_back(s1, p);
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d superellipsoids", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("critical 2d superellipsoids", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .01;
         std::size_t total_it = 20;
@@ -551,7 +579,9 @@ namespace scopi
             }
         }
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));

@@ -32,8 +32,12 @@ namespace scopi
         REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    TEST_CASE_TEMPLATE("sphere plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("sphere plan", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
 
         double dt = .005;
@@ -47,10 +51,13 @@ namespace scopi
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
 
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+
         SUBCASE("fixed")
         {
             particles.push_back(s, prop);
-            SolverType solver(particles, dt);
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_plan(particles);
         }
@@ -58,14 +65,18 @@ namespace scopi
         SUBCASE("velocity")
         {
             particles.push_back(s, prop.desired_velocity({{0., -1.}}));
-            SolverType solver(particles, dt);
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_plan(particles);
         }
     }
 
-    TEST_CASE_TEMPLATE("sphere plan force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere plan force", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
 
         double dt = .005;
@@ -80,7 +91,9 @@ namespace scopi
         particles.push_back(p, property<dim>().deactivate());
 
         particles.push_back(s, prop.force({{0., -1.}}));
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         check_result_sphere_plan(particles);
     }
@@ -104,8 +117,12 @@ namespace scopi
         REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere fixed", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("sphere sphere fixed", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 100;
@@ -121,7 +138,9 @@ namespace scopi
         SUBCASE("fixed")
         {
             particles.push_back(sphere, prop);
-            SolverType solver(particles, dt);
+            OptimParamsType optim_params;
+            ProblemParamsType problem_params;
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_sphere(particles);
         }
@@ -129,14 +148,20 @@ namespace scopi
         SUBCASE("velocity")
         {
             particles.push_back(sphere, prop.desired_velocity({{0., -1.}}));
-            SolverType solver(particles, dt);
+            OptimParamsType optim_params;
+            ProblemParamsType problem_params;
+            SolverType solver(particles, dt, optim_params, problem_params);
             solver.solve(total_it);
             check_result_sphere_sphere(particles);
         }
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere fixed force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere sphere fixed force", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 100;
@@ -150,13 +175,19 @@ namespace scopi
         particles.push_back(obstacle, property<dim>().deactivate());
 
         particles.push_back(sphere, prop.force({{0., -1.}}));
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         check_result_sphere_sphere(particles);
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere moving", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere sphere moving", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 100;
@@ -170,14 +201,20 @@ namespace scopi
         particles.push_back(obstacle, property<dim>().deactivate());
         particles.push_back(sphere, prop.force({{0., -10.}}));
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere inclined plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere inclined plan", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         std::tuple<double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double>>
             data_container({std::make_tuple(PI/6., 0.000998789, 0., 0.0010002),
@@ -202,7 +239,9 @@ namespace scopi
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0., -g}}));
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
 
         auto pos = particles.pos();

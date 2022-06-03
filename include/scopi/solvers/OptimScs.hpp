@@ -7,6 +7,20 @@
 
 namespace scopi
 {
+    template<class problem_t>
+    class OptimScs;
+
+    template<>
+    class OptimParams<OptimScs>
+    {
+    public:
+        OptimParams();
+        OptimParams(OptimParams<OptimScs>& params);
+
+        double m_tol;
+        double m_tol_infeas;
+    };
+
     template <class problem_t = DryWithoutFriction>
     class OptimScs: public OptimBase<OptimScs<problem_t>, DryWithoutFriction>
     {
@@ -14,7 +28,7 @@ namespace scopi
         using base_type = OptimBase<OptimScs<problem_t>, DryWithoutFriction>;
 
         template <std::size_t dim>
-        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol = 1e-7);
+        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params, ProblemParams<problem_t>& problem_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -53,6 +67,8 @@ namespace scopi
         ScsSettings m_stgs;
         OptimScs(const OptimScs &);
         OptimScs & operator=(const OptimScs &);
+
+        OptimParams<OptimScs> m_params;
     };
 
     template <class problem_t>
@@ -111,13 +127,14 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, double tol)
-    : base_type(nparts, dt, 2*3*nparts, 0)
+    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params, ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, problem_params)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
     , m_P_p(6*nparts+1)
     , m_A_p(6*nparts+1)
     , m_sol_x(6*nparts)
+    , m_params(optim_params)
     {
         auto active_offset = particles.nb_inactive();
         std::size_t index = 0;
@@ -148,9 +165,9 @@ namespace scopi
         m_P.n = 6*nparts;
 
         scs_set_default_settings(&m_stgs);
-        m_stgs.eps_abs = tol;
-        m_stgs.eps_rel = tol;
-        m_stgs.eps_infeas = tol*1e-3;
+        m_stgs.eps_abs = m_params.m_tol;
+        m_stgs.eps_rel = m_params.m_tol;
+        m_stgs.eps_infeas = m_params.m_tol_infeas;
         m_stgs.verbose = 0;
     }
 

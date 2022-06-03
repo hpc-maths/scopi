@@ -13,8 +13,24 @@
 
 namespace scopi {
 
-    TEST_CASE_TEMPLATE("sphere plan viscosity", SolverType, SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    template <class OptimParamsType>
+    void set_params_test(OptimParamsType&)
+    {}
+
+#ifdef SCOPI_USE_MKL
+    template <>
+    void set_params_test<OptimParams<OptimUzawaMkl>>(OptimParams<OptimUzawaMkl>& params)
     {
+        params.m_rho = 200.;
+    }
+#endif
+
+    TEST_CASE_TEMPLATE("sphere plan viscosity", SolverAndParams, SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         constexpr std::size_t dim = 2;
         double PI = xt::numeric_constants<double>::PI;
 
@@ -32,7 +48,9 @@ namespace scopi {
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, prop.force({{g, -g}}));
 
-        SolverType solver(particles, dt);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);
@@ -40,8 +58,12 @@ namespace scopi {
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere plan viscosity friction vertical", SolverType, SOLVER_VISCOUS_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITH_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere plan viscosity friction vertical", SolverAndParams, SOLVER_VISCOUS_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         constexpr std::size_t dim = 2;
         double PI = xt::numeric_constants<double>::PI;
 
@@ -59,8 +81,10 @@ namespace scopi {
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, prop.force({{0, -g}}));
 
-        SolverType solver(particles, dt);
-        solver.set_coeff_friction(0.1);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = 0.1;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);
@@ -68,8 +92,12 @@ namespace scopi {
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction_vertical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere plan viscosity friction", SolverType, SOLVER_VISCOUS_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITH_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere plan viscosity friction", SolverAndParams, SOLVER_VISCOUS_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
+        using SolverType = typename SolverAndParams::SolverType;
+        using OptimParamsType = typename SolverAndParams::OptimParamsType;
+        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
+
         constexpr std::size_t dim = 2;
         double PI = xt::numeric_constants<double>::PI;
 
@@ -87,8 +115,10 @@ namespace scopi {
         particles.push_back(p, scopi::property<dim>().deactivate());
         particles.push_back(s, prop.force({{g, -g}}));
 
-        SolverType solver(particles, dt);
-        solver.set_coeff_friction(0.1);
+        OptimParamsType optim_params;
+        ProblemParamsType problem_params;
+        problem_params.m_mu = 0.1;
+        SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
         solver.solve(2*total_it, total_it);
