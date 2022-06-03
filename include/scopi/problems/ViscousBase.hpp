@@ -19,18 +19,11 @@ namespace scopi
     protected:
         ViscousBase();
 
-        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts,
-                                          std::size_t firstCol);
         void set_gamma_base(const std::vector<neighbor<dim>>& contacts_new);
-        void update_gamma(const std::vector<neighbor<dim>>& contacts,
-                          xt::xtensor<double, 1> lambda);
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
-
+    public:
         std::size_t get_nb_gamma_neg() const;
-        std::size_t get_nb_gamma_min();
 
+    protected:
         std::vector<neighbor<dim>> m_contacts_old;
         std::vector<double> m_gamma;
         std::vector<double> m_gamma_old;

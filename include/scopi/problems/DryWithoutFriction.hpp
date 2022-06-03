@@ -26,7 +26,7 @@ namespace scopi
                              , public DryBase
     {
 
-    protected:
+    public:
         DryWithoutFriction(std::size_t nparts, double dt, ProblemParams<DryWithoutFriction>& problem_params);
 
         template <std::size_t dim>
@@ -52,6 +52,7 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
+    protected:
         ProblemParams<DryWithoutFriction> m_params;
     };
 

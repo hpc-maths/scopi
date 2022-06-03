@@ -15,15 +15,18 @@ namespace scopi
     protected:
         ProblemBase(std::size_t nparts, double dt);
 
+    public:
         template<std::size_t dim>
         void matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
                                     xt::xtensor<double, 1>& U,
                                     std::size_t active_offset,
                                     std::size_t row);
 
+    protected:
         std::size_t m_nparticles;
         double m_dt;
 
+    public:
         std::vector<int> m_A_rows;
         std::vector<int> m_A_cols;
         std::vector<double> m_A_values;

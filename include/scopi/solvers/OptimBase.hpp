@@ -9,19 +9,17 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 
-#include "../problems/DryWithoutFriction.hpp"
-
 namespace scopi{
-    template <class Derived, class problem_t = DryWithoutFriction>
-    class OptimBase : public problem_t
+    template <class Derived>
+    class OptimBase
     {
     public:
-        template<std::size_t dim>
-        void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t nite);
+        template<std::size_t dim, class problem_t>
+        void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t nite);
         auto get_uadapt();
         auto get_wadapt();
-        template<std::size_t dim>
-        auto get_lagrange_multiplier(std::vector<neighbor<dim>> contacts);
+        template<std::size_t dim, class problem_t>
+        auto get_lagrange_multiplier(std::vector<neighbor<dim>> contacts, problem_t& problem);
         void set_coeff_friction(double mu);
         template<std::size_t dim>
         void set_gamma(std::vector<neighbor<dim>> contacts);
@@ -29,7 +27,7 @@ namespace scopi{
         void update_gamma(std::vector<neighbor<dim>> contacts);
 
     protected:
-        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, ProblemParams<problem_t>& problem_params);
+        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
 
         std::size_t m_nparts;
         double m_dt;
@@ -40,41 +38,41 @@ namespace scopi{
         template<std::size_t dim>
         void create_vector_c(const scopi_container<dim>& particles);
 
-        template<std::size_t dim>
+        template<std::size_t dim, class problem_t>
         int solve_optimization_problem(const scopi_container<dim>& particles,
-                                       const std::vector<neighbor<dim>>& contacts);
+                                       const std::vector<neighbor<dim>>& contacts,
+                                       problem_t& problem);
 
         int get_nb_active_contacts() const;
     };
 
-    template<class Derived, class problem_t>
-    template<std::size_t dim>
-    void OptimBase<Derived, problem_t>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, const std::size_t)
+    template<class Derived>
+    template<std::size_t dim, class problem_t>
+    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t)
     {
         tic();
         create_vector_c(particles);
-        this->create_vector_distances(contacts);
+        problem.create_vector_distances(contacts);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
-        auto nbIter = solve_optimization_problem(particles, contacts);
+        auto nbIter = solve_optimization_problem(particles, contacts, problem);
         PLOG_INFO << "iterations : " << nbIter;
         PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
     }
 
 
-    template<class Derived, class problem_t>
-    OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, ProblemParams<problem_t>& problem_params)
-    : problem_t(nparts, dt, problem_params)
-    , m_nparts(nparts)
+    template<class Derived>
+    OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
+    : m_nparts(nparts)
     , m_dt(dt)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)
     {}
 
-    template<class Derived, class problem_t>
+    template<class Derived>
     template<std::size_t dim>
-    void OptimBase<Derived, problem_t>::create_vector_c(const scopi_container<dim>& particles)
+    void OptimBase<Derived>::create_vector_c(const scopi_container<dim>& particles)
     {
         std::size_t mass_dec = m_c_dec;
         std::size_t moment_dec = mass_dec + 3*particles.nb_active();
@@ -98,61 +96,41 @@ namespace scopi{
         }
     }
 
-    template<class Derived, class problem_t>
-    template<std::size_t dim>
-    int OptimBase<Derived, problem_t>::solve_optimization_problem(const scopi_container<dim>& particles,
-                                                 const std::vector<neighbor<dim>>& contacts)
+    template<class Derived>
+    template<std::size_t dim, class problem_t>
+    int OptimBase<Derived>::solve_optimization_problem(const scopi_container<dim>& particles,
+                                                       const std::vector<neighbor<dim>>& contacts,
+                                                       problem_t& problem)
     {
-        return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts);
+        return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts, problem);
     }
 
-    template<class Derived, class problem_t>
-    auto OptimBase<Derived, problem_t>::get_uadapt()
+    template<class Derived>
+    auto OptimBase<Derived>::get_uadapt()
     {
         auto data = static_cast<Derived&>(*this).uadapt_data();
         return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
     }
 
-    template<class Derived, class problem_t>
-    auto OptimBase<Derived, problem_t>::get_wadapt()
+    template<class Derived>
+    auto OptimBase<Derived>::get_wadapt()
     {
         auto data = static_cast<Derived&>(*this).wadapt_data();
         return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
     }
 
-    template<class Derived, class problem_t>
-    template<std::size_t dim>
-    auto OptimBase<Derived, problem_t>::get_lagrange_multiplier(std::vector<neighbor<dim>> contacts)
+    template<class Derived>
+    template<std::size_t dim, class problem_t>
+    auto OptimBase<Derived>::get_lagrange_multiplier(std::vector<neighbor<dim>> contacts, problem_t& problem)
     {
         auto data = static_cast<Derived&>(*this).lagrange_multiplier_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {this->number_row_matrix(contacts), 1UL});
+        return xt::adapt(reinterpret_cast<double*>(data), {problem.number_row_matrix(contacts), 1UL});
     }
 
-    template<class Derived, class problem_t>
-    int OptimBase<Derived, problem_t>::get_nb_active_contacts() const
+    template<class Derived>
+    int OptimBase<Derived>::get_nb_active_contacts() const
     {
         return static_cast<const Derived&>(*this).get_nb_active_contacts_impl();
     }
-
-    template<class Derived, class problem_t>
-    void OptimBase<Derived, problem_t>::set_coeff_friction(double mu)
-    {
-        problem_t::set_coeff_friction(mu);
-    }
-
-    template<class Derived, class problem_t>
-    template<std::size_t dim>
-    void OptimBase<Derived, problem_t>::set_gamma(std::vector<neighbor<dim>> contacts)
-    {
-        problem_t::set_gamma(contacts);
-    }
-
-    template<class Derived, class problem_t>
-    template<std::size_t dim>
-    void OptimBase<Derived, problem_t>::update_gamma(std::vector<neighbor<dim>> contacts)
-    {
-        problem_t::update_gamma(contacts, get_lagrange_multiplier(contacts));
-    }
-
 }
 

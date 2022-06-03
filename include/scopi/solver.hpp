@@ -60,6 +60,7 @@ namespace scopi
         scopi_container<dim>& m_particles;
         double m_dt;
         optim_solver_t<problem_t> m_solver;
+        problem_t m_problem;
         vap_t m_vap;
     };
 
@@ -93,7 +94,8 @@ namespace scopi
     ScopiSolverBase<dim, problem_t, optim_solver_t, contact_t, vap_t>::ScopiSolverBase(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params)
     : m_particles(particles)
     , m_dt(dt)
-    , m_solver(m_particles.nb_active(), m_dt, particles, optim_params, problem_params)
+    , m_solver(m_particles.nb_active(), m_dt, particles, optim_params)
+    , m_problem(m_particles.nb_active(), m_dt, problem_params)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
@@ -124,7 +126,7 @@ namespace scopi
             auto contacts = compute_contacts();
 
             tic();
-            m_solver.set_gamma(contacts);
+            m_problem.set_gamma(contacts);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : set gamma = " << duration;
 
@@ -138,7 +140,7 @@ namespace scopi
             duration = toc();
             PLOG_INFO << "----> CPUTIME : set vap = " << duration;
 
-            m_solver.run(m_particles, contacts, nite);
+            m_solver.run(m_particles, contacts, m_problem, nite);
 
             tic();
             move_active_particles();
@@ -146,7 +148,7 @@ namespace scopi
             PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
 
             tic();
-            m_solver.update_gamma(contacts);
+            m_problem.update_gamma(contacts, m_solver.get_lagrange_multiplier(contacts, m_problem));
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
@@ -173,7 +175,7 @@ namespace scopi
             auto contacts = this->compute_contacts();
 
             tic();
-            this->m_solver.set_gamma(contacts);
+            this->m_problem.set_gamma(contacts);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : set gamma = " << duration;
 
@@ -187,21 +189,21 @@ namespace scopi
             duration = toc();
             PLOG_INFO << "----> CPUTIME : set vap = " << duration;
 
-            this->m_solver.setup_first_resolution();
-            this->m_solver.run(this->m_particles, contacts, nite);
+            this->m_problem.setup_first_resolution();
+            this->m_solver.run(this->m_particles, contacts, this->m_problem, nite);
 
             tic();
-            this->m_solver.correct_lambda(contacts, this->m_solver.get_lagrange_multiplier(contacts), this->m_particles, this->m_solver.get_uadapt());
+            this->m_problem.correct_lambda(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_problem), this->m_particles, this->m_solver.get_uadapt());
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
             m_vap_projection.set_u_w(this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
             m_vap_projection.set_a_priori_velocity(this->m_particles);
-            this->m_solver.setup_projection();
-            this->m_solver.run(this->m_particles, contacts, nite);
+            this->m_problem.setup_projection();
+            this->m_solver.run(this->m_particles, contacts, this->m_problem,  nite);
 
             tic();
-            this->m_solver.update_gamma(contacts);
+            this->m_problem.update_gamma(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_problem));
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 

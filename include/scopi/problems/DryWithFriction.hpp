@@ -37,7 +37,7 @@ namespace scopi
                           , public DryBase
     {
 
-    protected:
+    public:
         DryWithFriction(std::size_t nparticles, double dt, ProblemParams<DryWithFriction>& problem_params);
 
         template <std::size_t dim>

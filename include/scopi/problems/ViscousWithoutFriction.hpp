@@ -45,7 +45,6 @@ namespace scopi
 
         std::size_t get_nb_gamma_min();
 
-    protected:
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
 
         void matrix_free_gemv_A(const neighbor<dim>& c,

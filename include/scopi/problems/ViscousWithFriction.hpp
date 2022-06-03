@@ -55,15 +55,14 @@ namespace scopi
 
         std::size_t get_nb_gamma_min();
 
-    protected:
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
 
+    private:
         std::size_t m_nb_gamma_min;
 
         std::vector<double> m_lambda;
         bool m_projection;
 
-    private:
         ProblemParams<ViscousWithFriction<dim>> m_params;
     };
 

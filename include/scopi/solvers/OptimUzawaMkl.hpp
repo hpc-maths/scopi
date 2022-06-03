@@ -28,7 +28,7 @@ namespace scopi
         using base_type = OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>;
 
         template <std::size_t dim>
-        OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& optim_params, ProblemParams<problem_t>& problem_params);
+        OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& optim_params);
         ~OptimUzawaMkl();
 
         template <std::size_t dim>
@@ -37,15 +37,17 @@ namespace scopi
         void finalize_uzawa_impl();
 
         template <std::size_t dim>
-        void gemv_inv_P_impl(const scopi_container<dim>& particles);
+        void gemv_inv_P_impl(const scopi_container<dim>& particles, problem_t& problem);
 
         template <std::size_t dim>
         void gemv_A_impl(const scopi_container<dim>& particles,
-                         const std::vector<neighbor<dim>>& contacts);
+                         const std::vector<neighbor<dim>>& contacts,
+                         problem_t& problem);
 
         template <std::size_t dim>
         void gemv_transpose_A_impl(const scopi_container<dim>& particles,
-                                   const std::vector<neighbor<dim>>& contacts);
+                                   const std::vector<neighbor<dim>>& contacts,
+                                   problem_t& problem);
 
     private:
         void print_csr_matrix(const sparse_matrix_t);
@@ -116,7 +118,7 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    void OptimUzawaMkl<problem_t>::gemv_inv_P_impl(const scopi_container<dim>&)
+    void OptimUzawaMkl<problem_t>::gemv_inv_P_impl(const scopi_container<dim>&, problem_t&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_U.data(), 0., this->m_U.data()); // U = - P^-1 * U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status;
@@ -125,7 +127,8 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::gemv_A_impl(const scopi_container<dim>&,
-                                         const std::vector<neighbor<dim>>&)
+                                               const std::vector<neighbor<dim>>&,
+                                               problem_t&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_A, m_descrA, this->m_U.data(), 1., this->m_R.data()); // R = - A * U + R
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for R = - A * U + R: " << m_status;
@@ -134,7 +137,8 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::gemv_transpose_A_impl(const scopi_container<dim>&,
-                                                   const std::vector<neighbor<dim>>&)
+                                                         const std::vector<neighbor<dim>>&,
+                                                         problem_t&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, this->m_L.data(), 1., this->m_U.data()); // U = A^T * L + U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status;
@@ -142,8 +146,8 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& optim_params, ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, dt, optim_params, problem_params)
+    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMkl>& optim_params)
+    : base_type(nparts, dt, optim_params)
     {
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;
