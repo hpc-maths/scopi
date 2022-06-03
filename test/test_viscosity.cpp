@@ -17,13 +17,29 @@ namespace scopi {
     void set_params_test(OptimParamsType&)
     {}
 
+    template <class OptimParamsType>
+    void set_params_test_uzawa(OptimParamsType& params)
+    {
+        params.m_rho = 200.;
+    }
+
 #ifdef SCOPI_USE_MKL
     template <>
     void set_params_test<OptimParams<OptimUzawaMkl>>(OptimParams<OptimUzawaMkl>& params)
     {
-        params.m_rho = 200.;
+        set_params_test_uzawa(params);
     }
 #endif
+    template <>
+    void set_params_test<OptimParams<OptimUzawaMatrixFreeTbb>>(OptimParams<OptimUzawaMatrixFreeTbb>& params)
+    {
+        set_params_test_uzawa(params);
+    }
+    template <>
+    void set_params_test<OptimParams<OptimUzawaMatrixFreeOmp>>(OptimParams<OptimUzawaMatrixFreeOmp>& params)
+    {
+        set_params_test_uzawa(params);
+    }
 
     TEST_CASE_TEMPLATE("sphere plan viscosity", SolverAndParams, SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
@@ -49,7 +65,9 @@ namespace scopi {
         particles.push_back(s, prop.force({{g, -g}}));
 
         OptimParamsType optim_params;
+        set_params_test(optim_params);
         ProblemParamsType problem_params;
+
         SolverType solver(particles, dt, optim_params, problem_params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;

@@ -55,14 +55,17 @@ namespace scopi
 #define SOLVER_DRY_WITH_FRICTION(dim, contact, vap) \
     SET_SOLVER_AND_PARAMS(OptimMosek, DryWithFriction, dim, contact, vap)
 
-    // TODO add Uzawa matrix-free
 #ifdef SCOPI_USE_MKL
 #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
     SET_SOLVER_AND_PARAMS(OptimMosek, ViscousWithoutFriction<dim>, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMkl, ViscousWithoutFriction<dim>, dim, contact, vap)
+    SET_SOLVER_AND_PARAMS(OptimUzawaMkl, ViscousWithoutFriction<dim>, dim, contact, vap), \
+    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<dim>, dim, contact, vap), \
+    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<dim>, dim, contact, vap)
 #else
 #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
-    SET_SOLVER_AND_PARAMS(OptimMosek, ViscousWithoutFriction<dim>, dim, contact, vap)
+    SET_SOLVER_AND_PARAMS(OptimMosek, ViscousWithoutFriction<dim>, dim, contact, vap), \
+    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<dim>, dim, contact, vap), \
+    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<dim>, dim, contact, vap)
 #endif
 
 #define SOLVER_VISCOUS_WITH_FRICTION(dim, contact, vap) \
@@ -111,6 +114,28 @@ TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, 
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
+
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimMosek, scopi::contact_brute_force, scopi::vap_fpd>);
+
+#ifdef SCOPI_USE_MKL 
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_kdtree, scopi::vap_fpd>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMkl, scopi::contact_brute_force, scopi::vap_fpd>);
+#endif
+
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_kdtree, scopi::vap_fpd>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_brute_force, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeTbb, scopi::contact_brute_force, scopi::vap_fpd>);
+
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_kdtree, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_kdtree, scopi::vap_fpd>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_brute_force, scopi::vap_fixed>);
+TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithoutFriction<2>, scopi::OptimUzawaMatrixFreeOmp, scopi::contact_brute_force, scopi::vap_fpd>);
 
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fixed>);
 TYPE_TO_STRING(scopi::ScopiSolver<2, scopi::ViscousWithFriction<2>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd>);
