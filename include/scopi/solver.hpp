@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -197,7 +198,6 @@ namespace scopi
             m_vap_projection.set_u_w(this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
             m_vap_projection.set_a_priori_velocity(this->m_particles);
             this->m_solver.setup_projection();
-
             this->m_solver.run(this->m_particles, contacts, nite);
 
             tic();
