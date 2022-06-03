@@ -48,6 +48,19 @@ namespace scopi
     protected:
         void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
 
+        void matrix_free_gemv_A(const neighbor<dim>& c,
+                                const scopi_container<dim>& particles,
+                                const xt::xtensor<double, 1>& U,
+                                xt::xtensor<double, 1>& R,
+                                std::size_t active_offset,
+                                std::size_t row);
+        void matrix_free_gemv_transpose_A(const neighbor<dim>& c,
+                                          const scopi_container<dim>& particles,
+                                          const xt::xtensor<double, 1>& L,
+                                          xt::xtensor<double, 1>& U,
+                                          std::size_t active_offset,
+                                          std::size_t row);
+
     private:
         ProblemParams<ViscousWithoutFriction<dim>> m_params;
     };
@@ -228,6 +241,146 @@ namespace scopi
     std::size_t ViscousWithoutFriction<dim>::get_nb_gamma_min()
     {
         return 0;
+    }
+
+    template<std::size_t dim>
+    void ViscousWithoutFriction<dim>::matrix_free_gemv_A(const neighbor<dim>& c,
+                                                         const scopi_container<dim>& particles,
+                                                         const xt::xtensor<double, 1>& U,
+                                                         xt::xtensor<double, 1>& R,
+                                                         std::size_t active_offset,
+                                                         std::size_t row)
+    {
+        if (c.i >= active_offset)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                R(row) -= (-this->m_dt*c.nij[d]) * U((c.i - active_offset)*3 + d);
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+                    R(this->m_gamma.size() + row) -= (this->m_dt*c.nij[d]) * U((c.i - active_offset)*3 + d);
+                }
+            }
+        }
+
+        if (c.j >= active_offset)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                R(row) -= (this->m_dt*c.nij[d]) * U((c.j - active_offset)*3 + d);
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+                    R(this->m_gamma.size() + row) -= (-this->m_dt*c.nij[d]) * U((c.j - active_offset)*3 + d);
+                }
+            }
+        }
+
+        auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
+        auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
+        auto Ri = rotation_matrix<3>(particles.q()(c.i));
+        auto Rj = rotation_matrix<3>(particles.q()(c.j));
+
+        if (c.i >= active_offset)
+        {
+            std::size_t ind_part = c.i - active_offset;
+            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            for (std::size_t ip = 0; ip < 3; ++ip)
+            {
+                R(row) -= (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+                    R(this->m_gamma.size() + row) -= (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
+                }
+            }
+        }
+
+        if (c.j >= active_offset)
+        {
+            std::size_t ind_part = c.j - active_offset;
+            auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+            for (std::size_t ip = 0; ip < 3; ++ip)
+            {
+                R(row) -= (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+                    R(this->m_gamma.size() + row) -= (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
+                }
+            }
+        }
+    }
+
+    template<std::size_t dim>
+    void ViscousWithoutFriction<dim>::matrix_free_gemv_transpose_A(const neighbor<dim>& c,
+                                                                   const scopi_container<dim>& particles,
+                                                                   const xt::xtensor<double, 1>& L,
+                                                                   xt::xtensor<double, 1>& U,
+                                                                   std::size_t active_offset,
+                                                                   std::size_t row)
+    {
+        if (c.i >= active_offset)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+#pragma omp atomic
+                U((c.i - active_offset)*3 + d) += L(row) * (-this->m_dt*c.nij[d]);
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+#pragma omp atomic
+                    U((c.i - active_offset)*3 + d) += L(this->m_gamma.size() + row) * (this->m_dt*c.nij[d]);
+                }
+            }
+        }
+
+        if (c.j >= active_offset)
+        {
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+#pragma omp atomic
+                U((c.j - active_offset)*3 + d) += L(row) * (this->m_dt*c.nij[d]);
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+#pragma omp atomic
+                    U((c.j - active_offset)*3 + d) += L(this->m_gamma.size() + row) * (-this->m_dt*c.nij[d]);
+                }
+            }
+        }
+
+        auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
+        auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
+        auto Ri = rotation_matrix<3>(particles.q()(c.i));
+        auto Rj = rotation_matrix<3>(particles.q()(c.j));
+
+        if (c.i >= active_offset)
+        {
+            std::size_t ind_part = c.i - active_offset;
+            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            for (std::size_t ip = 0; ip < 3; ++ip)
+            {
+#pragma omp atomic
+                U(3*this->m_nparticles + 3*ind_part + ip) += L(row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+#pragma omp atomic
+                    U(3*this->m_nparticles + 3*ind_part + ip) += L(this->m_gamma.size() + row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                }
+            }
+        }
+
+        if (c.j >= active_offset)
+        {
+            std::size_t ind_part = c.j - active_offset;
+            auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+            for (std::size_t ip = 0; ip < 3; ++ip)
+            {
+#pragma omp atomic
+                U(3*this->m_nparticles + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                if (this->m_gamma[row] < -m_params.m_tol)
+                {
+#pragma omp atomic
+                    U(3*this->m_nparticles + 3*ind_part + ip) += L(this->m_gamma.size() + row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                }
+            }
+        }
     }
 
 
