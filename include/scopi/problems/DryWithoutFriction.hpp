@@ -10,9 +10,7 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 #include "../params/ProblemParams.hpp"
-
 #include "ProblemBase.hpp"
-#include "DryBase.hpp"
 
 namespace scopi
 {
@@ -23,7 +21,6 @@ namespace scopi
     {};
 
     class DryWithoutFriction : public ProblemBase
-                             , public DryBase
     {
 
     public:

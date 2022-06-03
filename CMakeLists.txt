@@ -105,7 +105,6 @@ set(SCOPI_SRC
     src/problems/DryWithoutFriction.cpp
     src/problems/DryWithFriction.cpp
     src/problems/ProblemBase.cpp
-    src/problems/DryBase.cpp
     src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
@@ -203,7 +202,6 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/params/ProblemParams.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/params/OptimParams.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/ProblemBase.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithoutFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithFriction.hpp
