@@ -13,6 +13,16 @@
 
 namespace scopi {
 
+    template <class OptimParamsType>
+    void set_params_test(OptimParamsType&)
+    {}
+
+    template <>
+    void set_params_test<OptimParams<OptimUzawaMkl>>(OptimParams<OptimUzawaMkl>& params)
+    {
+        params.m_rho = 200.;
+    }
+
     TEST_CASE_TEMPLATE("sphere plan viscosity", SolverAndParams, SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
         using SolverType = typename SolverAndParams::SolverType;
@@ -36,6 +46,7 @@ namespace scopi {
         particles.push_back(s, prop.force({{g, -g}}));
 
         OptimParamsType params;
+        set_params_test(params);
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
