@@ -25,8 +25,7 @@ int main()
     std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001});
     std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000});
     std::vector<double> mu_vec({0., 0.1, 0.5, 1.});
-    std::vector<double> alpha_vec({PI/3.});
-    // std::vector<double> alpha_vec({PI/6., PI/4., PI/3.});
+    std::vector<double> alpha_vec({PI/6., PI/4., PI/3.});
 
     for(auto mu : mu_vec)
     {
@@ -40,8 +39,10 @@ int main()
                 particles.push_back(p, scopi::property<dim>().deactivate());
                 particles.push_back(s, prop.force({{0., -g}}));
 
-                scopi::ScopiSolver<dim, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i]);
-                solver.set_coeff_friction(mu);
+                scopi::OptimParams<scopi::OptimMosek> optim_params;
+                scopi::ProblemParams<ViscousWithFriction<dim>> problem_params;
+                problem_params.m_mu = mu;
+                scopi::ScopiSolver<dim, scopi::DryWithFriction, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i], optim_params, problem_params);
                 solver.solve(total_it[i]);
 
                 auto pos = particles.pos();
