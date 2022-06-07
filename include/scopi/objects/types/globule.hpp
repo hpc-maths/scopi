@@ -3,6 +3,9 @@
 #include <array>
 #include <vector>
 
+#include "base.hpp"
+#include "../../quaternion.hpp"
+
 namespace scopi
 {
     ////////////////////////
