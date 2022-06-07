@@ -128,7 +128,7 @@ namespace scopi
             json_globule["position"] = g.pos(i);
             json_globule["radius"] = g.radius();
             json_globule["quaternion"] = g.q(i);
-            object["obj"].push_back(json_globule);
+            object["globule"].push_back(json_globule);
         }
         return object;
         // std::cout << "write_objects : GLOBULE" << std::endl;

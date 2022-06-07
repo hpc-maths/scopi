@@ -31,10 +31,10 @@ init();
 animate();
 
 const sphereObject = function () {
-    const position = new THREE.Vector3();
-    const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3();
     return function (obj, matrix, rot) {
+        const position = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion();
+        const scale = new THREE.Vector3();
         const center = new THREE.Vector3();
         const vec = new THREE.Vector3();
 
@@ -123,22 +123,39 @@ function drawObjects() {
 
             var geometry = new THREE.SphereGeometry(1, 16, 16);
             const material = new THREE.MeshBasicMaterial({ color: 'red' });
-            var mesh = new THREE.InstancedMesh(geometry, material, objects.length);
+
+            var nbSpheres = 0;
+            objects.forEach((obj, index) => {
+                if (obj.type === "globule") {
+                    nbSpheres += 6;
+                }
+                else if (obj.type === "sphere" || obj.type === "superellipsoid") {
+                    nbSpheres += 1;
+                }
+            });
+            var mesh = new THREE.InstancedMesh(geometry, material, nbSpheres);
             scene.add(mesh);
             const plan = [];
-            const rot = []
+            const rot = [];
 
             const matrix = new THREE.Matrix4();
+            nbSpheres = 0;
 
             objects.forEach((obj, index) => {
                 if (obj.type === "plan") {
                     planObject(obj, plan);
                 }
                 else if (obj.type === "globule") {
+                    obj.globule.forEach((sphere, indexSphere) => {
+                        sphereObject(sphere, matrix, rot);
+                        mesh.setMatrixAt(nbSpheres+indexSphere, matrix);
+                    });
+                    nbSpheres += 6;
                 }
                 else {
                     sphereObject(obj, matrix, rot);
-                    mesh.setMatrixAt(index, matrix);
+                    mesh.setMatrixAt(nbSpheres, matrix);
+                    nbSpheres += 1;
                 }
 
             });

@@ -12,8 +12,15 @@ int main()
     std::size_t total_it = 1;
     scopi::scopi_container<dim> particles;
 
+    scopi::sphere<dim> s2({{ -0.5,  0.}}, 0.1);
+    particles.push_back(s2);
+
     scopi::globule<dim> g1({{0., 0.}}, 0.1);
     particles.push_back(g1);
+    for (std::size_t i = 0; i < g1.size(); ++i)
+    {
+        particles[1]->pos(i)(0) = 2.*i*g1.radius();
+    }
 
     scopi::OptimParams<scopi::OptimUzawaMatrixFreeOmp> optim_params;
     scopi::ProblemParams<scopi::DryWithoutFriction> problem_params;
