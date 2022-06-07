@@ -32,9 +32,12 @@ animate();
 
 const sphereObject = function () {
     const position = new THREE.Vector3();
-    const rotation = new THREE.Euler();
+    const quaternion = new THREE.Quaternion();
     const scale = new THREE.Vector3();
-    return function (obj, matrix, quaternion) {
+    return function (obj, matrix, rot) {
+        const center = new THREE.Vector3();
+        const vec = new THREE.Vector3();
+
         position.x = obj.position[0];
         position.y = obj.position[1];
 
@@ -62,6 +65,24 @@ const sphereObject = function () {
         quaternion.normalize();
 
         matrix.compose(position, quaternion, scale);
+
+        center.x = obj.position[0];
+        center.y = obj.position[1];
+        center.z = 0.;
+        rot.push(center);
+        if (typeof obj.radius === "number") {
+            vec.x = obj.radius;
+            vec.y = 0.;
+            vec.z = 0.;
+        }
+        else {
+            vec.x = obj.radius[0];
+            vec.y = 0.;
+            vec.z = 0.;
+        }
+        vec.applyQuaternion(quaternion);
+        vec.add(center);
+        rot.push(vec);
     };
 }();
 
@@ -108,29 +129,16 @@ function drawObjects() {
             const rot = []
 
             const matrix = new THREE.Matrix4();
-            const quaternion = new THREE.Quaternion();
-            let center = new THREE.Vector3();
-            let vec = new THREE.Vector3();
 
             objects.forEach((obj, index) => {
                 if (obj.type === "plan") {
                     planObject(obj, plan);
                 }
+                else if (obj.type === "globule") {
+                }
                 else {
-                    sphereObject(obj, matrix, quaternion);
+                    sphereObject(obj, matrix, rot);
                     mesh.setMatrixAt(index, matrix);
-
-                    center = new THREE.Vector3(obj.position[0], obj.position[1], 0.);
-                    rot.push(center);
-                    if (typeof obj.radius === "number") {
-                        vec = new THREE.Vector3(obj.radius, 0., 0.);
-                    }
-                    else {
-                        vec = new THREE.Vector3(obj.radius[0], 0., 0.);
-                    }
-                    vec.applyQuaternion(quaternion);
-                    vec.add(center);
-                    rot.push(vec);
                 }
 
             });
