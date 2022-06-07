@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <regex>
@@ -116,13 +117,24 @@ namespace scopi
 
     // GLOBULE
     template<std::size_t dim>
-    nl::json write_objects(const globule<dim, false>)
+    nl::json write_objects(const globule<dim, false> g)
     {
-      return {};
-      // std::cout << "write_objects : GLOBULE" << std::endl;
-      // std::stringstream ss;
-      // ss << "redcell; ";
-      // return ss.str();
+        nl::json object;
+        object["type"] = "globule";
+        for (std::size_t i = 0; i < g.size(); ++i)
+        {
+            nl::json json_globule;
+            json_globule["type"] = "sphere";
+            json_globule["position"] = g.pos(i);
+            json_globule["radius"] = g.radius();
+            json_globule["quaternion"] = g.q(i);
+            object["obj"].push_back(json_globule);
+        }
+        return object;
+        // std::cout << "write_objects : GLOBULE" << std::endl;
+        // std::stringstream ss;
+        // ss << "redcell; ";
+        // return ss.str();
     }
 
     template <std::size_t dim>

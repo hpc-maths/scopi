@@ -38,6 +38,8 @@ namespace scopi
         virtual void print() const override;
         virtual std::size_t hash() const override;
 
+        double radius() const;
+
     private:
 
         void create_hash();
@@ -90,4 +92,11 @@ namespace scopi
         ss << "globule<" << dim << ">(" << m_radius << ")";
         m_hash = std::hash<std::string>{}(ss.str());
     }
+
+    template<std::size_t dim, bool owner>
+    double globule<dim, owner>::radius() const
+    {
+        return m_radius;
+    }
+
 }
