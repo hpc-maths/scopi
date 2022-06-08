@@ -12,7 +12,6 @@
 
 namespace scopi
 {
-
     TEST_CASE("Sphere 2D")
     {
         static constexpr std::size_t dim = 2;
