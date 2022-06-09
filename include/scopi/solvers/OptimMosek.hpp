@@ -227,7 +227,7 @@ namespace scopi{
             {
                 Az_rows.push_back(3*nparts + 3*i + d);
                 Az_cols.push_back(1 + 3*nparts + 3*i + d);
-                Az_values.push_back(std::sqrt(particles.j()(active_offset + i)(d)));
+                Az_values.push_back(std::sqrt(particles.j()(active_offset + i)[d]));
 
                 Az_rows.push_back(3*nparts + 3*i + d);
                 Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + d);

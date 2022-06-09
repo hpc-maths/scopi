@@ -289,8 +289,9 @@ namespace scopi
                 normw = 1;
             }
             type::quaternion_t expw;
-            expw(0) = std::cos(0.5*normw*m_dt);
-            xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
+            auto expw_adapt = xt::adapt(expw);
+            expw_adapt(0) = std::cos(0.5*normw*m_dt);
+            xt::view(expw_adapt, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
 
             for (std::size_t d = 0; d < dim; ++d)
             {
@@ -361,8 +362,9 @@ namespace scopi
                 normw = 1;
             }
             type::quaternion_t expw;
-            expw(0) = std::cos(0.5*normw*m_dt);
-            xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
+            auto expw_adapt = xt::adapt(expw);
+            expw_adapt(0) = std::cos(0.5*normw*m_dt);
+            xt::view(expw_adapt, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
             for (std::size_t d = 0; d < dim; ++d)
             {
                 m_particles.pos()(i + active_offset)(d) += m_dt*uadapt(i, d);

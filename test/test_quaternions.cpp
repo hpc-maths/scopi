@@ -1,6 +1,8 @@
 #include "doctest/doctest.h"
 #include "utils.hpp"
 
+#include <xtensor/xadapt.hpp>
+
 #include <scopi/quaternion.hpp>
 
 namespace scopi
@@ -61,7 +63,7 @@ namespace scopi
 
     TEST_CASE("rotation_matrix")
     {
-        auto q = quaternion(PI/3);
+        auto q = xt::adapt(quaternion(PI/3));
         SUBCASE("2D")
         {
             auto m = rotation_matrix<2>(q);

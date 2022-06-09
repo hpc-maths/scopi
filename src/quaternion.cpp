@@ -45,6 +45,7 @@ namespace scopi
 
     namespace detail
     {
+        /*
         type::matrix_rotation_t<2> rotation_matrix_impl(const type::quaternion_t& q, std::integral_constant<std::size_t, 2>)
         {
             auto x = q[0];
@@ -85,6 +86,7 @@ namespace scopi
             //          {   2*y*z+2*x*w, 1-2*y*y-2*w*w,   2*z*w-2*x*y },
             //          {   2*y*w-2*x*z,   2*z*w+2*x*y, 1-2*y*y-2*z*z } };
         }
+        */
     }
 
     type::quaternion_t mult_quaternion(const type::quaternion_t& q1, const type::quaternion_t& q2)

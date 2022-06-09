@@ -25,7 +25,7 @@ namespace scopi
         auto nparticles = particles.nb_active();
         for (std::size_t d = 0; d < 3; ++d)
         {
-            U(3*nparticles + 3*row + d) /= (-1.*particles.j()(active_offset + row)(d));
+            U(3*nparticles + 3*row + d) /= (-1.*particles.j()(active_offset + row)[d]);
         }
     }
 }
