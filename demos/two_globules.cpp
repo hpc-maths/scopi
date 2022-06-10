@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <xtensor/xmath.hpp>
 #include <scopi/objects/types/globule.hpp>
 #include <scopi/solver.hpp>
@@ -12,21 +13,20 @@ int main()
     std::size_t total_it = 1;
     scopi::scopi_container<dim> particles;
 
-    scopi::sphere<dim> s2({{ -0.5,  0.}}, 0.1);
-    particles.push_back(s2);
-
-    scopi::globule<dim> g1({{0., 0.}}, 0.1);
+    scopi::globule<dim> g1({{0., 0.}, {1., 0.}, {2., 0.}, {3., 0.}, {4., 0.}, {5., 0.}}, 0.5);
     particles.push_back(g1);
-    for (std::size_t i = 0; i < g1.size(); ++i)
-    {
-        particles[1]->pos(i)(0) = 2.*i*g1.radius();
-    }
 
     scopi::OptimParams<scopi::OptimUzawaMatrixFreeOmp> optim_params;
     scopi::ProblemParams<scopi::DryWithoutFriction> problem_params;
-
     scopi::ScopiSolver<dim> solver(particles, dt, optim_params, problem_params);
     solver.solve(total_it);
+
+    for (std::size_t i = 0; i < particles.nb_active(); ++i)
+    {
+        particles.pos()(i)(0) *= -1.;
+    }
+
+    solver.solve(2*total_it, total_it);
 
     return 0;
 }
