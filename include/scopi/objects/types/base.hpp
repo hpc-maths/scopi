@@ -51,7 +51,7 @@ namespace scopi
         template<std::size_t dim>
         auto get_value_impl(const type::position_t<dim>* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, dim});
+            return xt::view((xt::adapt(reinterpret_cast<const double*>(t->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
         }
 
         template<std::size_t dim>
@@ -63,7 +63,7 @@ namespace scopi
         template<std::size_t dim>
         auto get_value_impl(type::position_t<dim>* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
+            return xt::view((xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
         }
 
         // quaternion type
@@ -76,7 +76,7 @@ namespace scopi
         template <class object_t = type::quaternion_t>
         auto get_value_impl(const object_t* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL});
+            return xt::view((xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL+2})), xt::all(), xt::range(0, 4UL));
         }
 
         template <class object_t = type::quaternion_t>
@@ -88,7 +88,7 @@ namespace scopi
         template <class object_t = type::quaternion_t>
         auto get_value_impl(object_t* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL});
+            return xt::view((xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL+2})), xt::all(), xt::range(0, 4UL));
         }
 
         template <class T>

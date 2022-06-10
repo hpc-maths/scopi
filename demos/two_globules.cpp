@@ -12,9 +12,10 @@ int main()
     double dt = .005;
     std::size_t total_it = 1;
     scopi::scopi_container<dim> particles;
+    auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
     scopi::globule<dim> g1({{0., 0.}, {1., 0.}, {2., 0.}, {3., 0.}, {4., 0.}, {5., 0.}}, 0.5);
-    particles.push_back(g1);
+    particles.push_back(g1, prop);
 
     scopi::OptimParams<scopi::OptimUzawaMatrixFreeOmp> optim_params;
     scopi::ProblemParams<scopi::DryWithoutFriction> problem_params;
