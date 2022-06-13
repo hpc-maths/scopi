@@ -38,7 +38,8 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       scopi_container<dim>& particles);
         template <std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
+                                     scopi_container<dim>& particles);
 
         template <std::size_t dim>
         void matrix_free_gemv_A(const neighbor<dim>& c,
@@ -54,6 +55,9 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
+    private:
+        template <std::size_t dim>
+        std::size_t number_extra_contacts(scopi_container<dim>& particles);
     };
 
     template<std::size_t dim>
@@ -171,28 +175,29 @@ namespace scopi
     std::size_t ViscousGlobule::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                                   scopi_container<dim>& particles)
     {
-        std::size_t nb_globules = 0;
-        for (std::size_t i = 0; i < particles.size(); ++i)
-        {
-            std::cout << i << "   " << number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]) << std::endl;
-            // nb_globules += nb_extra_row_per_object(*particles[i]);
-        }
-        return contacts.size() + nb_globules;
+        return contacts.size() + number_extra_contacts(particles);
     }
 
     template<std::size_t dim>
-    void ViscousGlobule::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void ViscousGlobule::create_vector_distances(const std::vector<neighbor<dim>>& contacts,
+                                                 scopi_container<dim>& particles)
     {
-        this->m_distances = xt::zeros<double>({contacts.size() /*+ this->m_nb_gamma_neg*/});
+        this->m_distances = xt::zeros<double>({contacts.size() + number_extra_contacts(particles)});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             this->m_distances[i] = contacts[i].dij;
-            /*
-            if(this->m_gamma[i] < -m_params.m_tol)
+        }
+
+        std::size_t nb_previous_constraints = contacts.size();
+        for (std::size_t i = 0; i < particles.size(); ++i)
+        {
+            auto dist_loc = distances_per_particle_dispatcher<dim>::dispatch(*particles[i]);
+            // TODO use xtensor's function instead of a loop
+            for (std::size_t j = 0; j < dist_loc.size(); ++j)
             {
-                this->m_distances[contacts.size() + i] = -contacts[i].dij;
+                this->m_distances[nb_previous_constraints + j ] = dist_loc(j);
             }
-            */
+            nb_previous_constraints += number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);;
         }
     }
 
@@ -350,6 +355,17 @@ namespace scopi
                 */
             }
         }
+    }
+
+    template <std::size_t dim>
+    std::size_t ViscousGlobule::number_extra_contacts(scopi_container<dim>& particles)
+    {
+        std::size_t nb_extra_contacts = 0;
+        for (std::size_t i = 0; i < particles.size(); ++i)
+        {
+            nb_extra_contacts += number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);
+        }
+        return nb_extra_contacts;
     }
 }
 

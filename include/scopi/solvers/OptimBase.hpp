@@ -52,7 +52,7 @@ namespace scopi{
     {
         tic();
         create_vector_c(particles);
-        problem.create_vector_distances(contacts);
+        problem.create_vector_distances(contacts, particles);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
