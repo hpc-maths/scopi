@@ -29,7 +29,7 @@ namespace scopi{
         OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& optim_params);
 
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
+        int solve_optimization_problem_impl(scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
                                             problem_t& problem);
 
@@ -60,7 +60,7 @@ namespace scopi{
 
     template<class problem_t>
     template<std::size_t dim>
-    int OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+    int OptimMosek<problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
                                                                const std::vector<neighbor<dim>>& contacts,
                                                                problem_t& problem)
     {
@@ -81,7 +81,7 @@ namespace scopi{
 
         // matrix
         problem.create_matrix_constraint_coo(particles, contacts, this->index_first_col_matrix());
-        m_A = Matrix::sparse(problem.number_row_matrix(contacts), this->number_col_matrix(),
+        m_A = Matrix::sparse(problem.number_row_matrix(contacts, particles), this->number_col_matrix(),
                              std::make_shared<ndarray<int, 1>>(problem.m_A_rows.data(), shape_t<1>({problem.m_A_rows.size()})),
                              std::make_shared<ndarray<int, 1>>(problem.m_A_cols.data(), shape_t<1>({problem.m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(problem.m_A_values.data(), shape_t<1>({problem.m_A_values.size()})));
@@ -103,7 +103,7 @@ namespace scopi{
         model->solve();
 
         m_Xlvl = X->level();
-        this->update_dual(problem.number_row_matrix(contacts), contacts.size(), problem);
+        this->update_dual(problem.number_row_matrix(contacts, particles), contacts.size(), problem);
         for (auto& x : *this->m_dual)
         {
             x *= -1.;

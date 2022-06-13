@@ -47,7 +47,8 @@ namespace scopi
                                     xt::xtensor<double, 1> lambda,
                                     const scopi_container<dim>& particles,
                                     const xt::xtensor<double, 2>& u);
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
+                                      const scopi_container<dim>& particles);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
         void setup_first_resolution();
@@ -72,7 +73,7 @@ namespace scopi
                                                                 std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t size = 6 * this->number_row_matrix(contacts);
+        std::size_t size = 6 * this->number_row_matrix(contacts, particles);
         this->m_A_rows.resize(size);
         this->m_A_cols.resize(size);
         this->m_A_values.resize(size);
@@ -371,7 +372,8 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t ViscousWithFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    std::size_t ViscousWithFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts, 
+                                                            const scopi_container<dim>&)
     {
         return contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min;
     }

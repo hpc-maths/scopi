@@ -15,7 +15,7 @@ namespace scopi{
     {
     public:
         template<std::size_t dim, class problem_t>
-        void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t nite);
+        void run(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t nite);
         auto get_uadapt();
         auto get_wadapt();
         template<std::size_t dim, class problem_t>
@@ -39,7 +39,7 @@ namespace scopi{
         void create_vector_c(const scopi_container<dim>& particles);
 
         template<std::size_t dim, class problem_t>
-        int solve_optimization_problem(const scopi_container<dim>& particles,
+        int solve_optimization_problem(scopi_container<dim>& particles,
                                        const std::vector<neighbor<dim>>& contacts,
                                        problem_t& problem);
 
@@ -48,7 +48,7 @@ namespace scopi{
 
     template<class Derived>
     template<std::size_t dim, class problem_t>
-    void OptimBase<Derived>::run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t)
+    void OptimBase<Derived>::run(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t)
     {
         tic();
         create_vector_c(particles);
@@ -98,7 +98,7 @@ namespace scopi{
 
     template<class Derived>
     template<std::size_t dim, class problem_t>
-    int OptimBase<Derived>::solve_optimization_problem(const scopi_container<dim>& particles,
+    int OptimBase<Derived>::solve_optimization_problem(scopi_container<dim>& particles,
                                                        const std::vector<neighbor<dim>>& contacts,
                                                        problem_t& problem)
     {

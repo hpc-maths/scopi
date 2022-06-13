@@ -42,7 +42,8 @@ namespace scopi
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
         template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contact,
+                                      const scopi_container<dim>& particles);
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
@@ -175,7 +176,8 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
+                                                   const scopi_container<dim>&)
     {
         return 4*contacts.size();
     }

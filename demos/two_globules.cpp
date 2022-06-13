@@ -1,9 +1,10 @@
 #include <cstddef>
 #include <xtensor/xmath.hpp>
 #include <scopi/objects/types/globule.hpp>
-// #include <scopi/solver.hpp>
+#include <scopi/solver.hpp>
 #include <scopi/property.hpp>
-#include <xtensor/xadapt.hpp>
+#include <scopi/solvers/OptimMosek.hpp>
+#include <scopi/problems/ViscousGlobule.hpp>
 
 int main()
 {
@@ -15,20 +16,15 @@ int main()
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
-    scopi::globule<dim> g1({{0., 0.}, {1., 0.}, {2., 0.}, {3., 0.}, {4., 0.}, {5., 0.}}, 0.5);
+    scopi::globule<dim> g1({{3., 0.}, {5., 0.}, {7., 0.}, {9., 0.}, {11., 0.}, {13., 0.}}, 1.);
+    scopi::globule<dim> g2({{-3., 0.}, {-5., 0.}, {-7., 0.}, {-9., 0.}, {-11., 0.}, {-13., 0.}}, 1.);
     particles.push_back(g1, prop);
+    particles.push_back(g2, prop);
 
-    scopi::OptimParams<scopi::OptimUzawaMatrixFreeOmp> optim_params;
-    scopi::ProblemParams<scopi::DryWithoutFriction> problem_params;
-    scopi::ScopiSolver<dim> solver(particles, dt, optim_params, problem_params);
+    scopi::OptimParams<scopi::OptimMosek> optim_params;
+    scopi::ProblemParams<scopi::ViscousGlobule> problem_params;
+    scopi::ScopiSolver<dim, scopi::ViscousGlobule, scopi::OptimMosek> solver(particles, dt, optim_params, problem_params);
     solver.solve(total_it);
-
-    for (std::size_t i = 0; i < particles.nb_active(); ++i)
-    {
-        particles.pos()(i)(0) *= -1.;
-    }
-
-    solver.solve(2*total_it, total_it);
 
     return 0;
 }

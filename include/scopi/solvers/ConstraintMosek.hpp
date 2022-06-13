@@ -7,6 +7,7 @@
 #include "../problems/DryWithFriction.hpp"
 #include "../problems/ViscousWithoutFriction.hpp"
 #include "../problems/ViscousWithFriction.hpp"
+#include "../problems/ViscousGlobule.hpp"
 
 namespace scopi
 {
@@ -15,6 +16,7 @@ namespace scopi
     {
     };
 
+    // DryWithoutFriction
     template<>
     class ConstraintMosek<DryWithoutFriction>
     {
@@ -58,6 +60,7 @@ namespace scopi
 
 
 
+    // DryWithFriction
     template<>
     class ConstraintMosek<DryWithFriction>
     {
@@ -102,6 +105,7 @@ namespace scopi
 
 
 
+    // ViscousWithoutFriction
     template<std::size_t dim>
     class ConstraintMosek<ViscousWithoutFriction<dim>>
     {
@@ -172,6 +176,7 @@ namespace scopi
 
 
 
+    // ViscousWithFriction
     template<std::size_t dim>
     class ConstraintMosek<ViscousWithFriction<dim>>
     {
@@ -249,6 +254,51 @@ namespace scopi
         {
             m_dual->raw()[nb_contacts - problem.get_nb_gamma_min() + problem.get_nb_gamma_neg() + i] = -m_qc4->dual()->raw()[i];
         }
+    }
+
+
+
+
+    // ViscousGlobule
+    template<>
+    class ConstraintMosek<ViscousGlobule>
+    {
+    protected:
+        ConstraintMosek(std::size_t nparts);
+        std::size_t number_col_matrix() const;
+        std::size_t index_first_col_matrix() const;
+
+        template <std::size_t dim>
+        void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+                             mosek::fusion::Matrix::t A,
+                             mosek::fusion::Variable::t X,
+                             mosek::fusion::Model::t model,
+                             const std::vector<neighbor<dim>>& contacts,
+                             ViscousGlobule& problem);
+        void update_dual(std::size_t nb_row_matrix,
+                        std::size_t nb_contacts,
+                        ViscousGlobule& problem);
+
+        std::shared_ptr<monty::ndarray<double,1>> m_dual;
+
+    private:
+        std::size_t m_nparticles;
+        mosek::fusion::Constraint::t m_qc1;
+    };
+
+    template <std::size_t dim>
+    void ConstraintMosek<ViscousGlobule>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+                                                          mosek::fusion::Matrix::t A,
+                                                          mosek::fusion::Variable::t X,
+                                                          mosek::fusion::Model::t model,
+                                                          const std::vector<neighbor<dim>>&,
+                                                          ViscousGlobule&)
+
+    {
+        using namespace mosek::fusion;
+        using namespace monty;
+
+        m_qc1 = model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
     }
 
 }
