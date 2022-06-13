@@ -1651,4 +1651,27 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
+
+    // distance globule - globule
+    TEST_CASE("closest_points, globule_globule_2d_dispatch")
+    {
+        constexpr std::size_t dim = 2;
+        globule<dim> g1({{3., 0.}, {5., 0.}, {7., 0.}, {9., 0.}, {11., 0.}, {13., 0.}}, 1.);
+        globule<dim> g2({{-3., 0.}, {-5., 0.}, {-7., 0.}, {-9., 0.}, {-11., 0.}, {-13., 0.}}, 1.);
+
+        scopi_container<dim> particles;
+        particles.push_back(g1);
+        particles.push_back(g2);
+
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
+
+        REQUIRE(out.pi(0) == doctest::Approx(2.));
+        REQUIRE(out.pi(1) == doctest::Approx(0.));
+        REQUIRE(out.pj(0) == doctest::Approx(-2.));
+        REQUIRE(out.pj(1) == doctest::Approx(0.));
+        REQUIRE(out.nij(0) == doctest::Approx(1.));
+        REQUIRE(out.nij(1) == doctest::Approx(0.));
+        REQUIRE(out.dij == doctest::Approx(4.));
+    }
+
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xarray.hpp>
@@ -681,14 +682,48 @@ namespace scopi
 
     // GLOBULE - GLOBULE
     template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner>, const globule<dim, owner>)
+    auto closest_points(const globule<dim, owner> gi, const globule<dim, owner> gj)
     {
-        return neighbor<dim>();
+        neighbor<dim> neigh;
+        neigh.dij = std::numeric_limits<double>::max();
+        for (std::size_t i = 0; i < gi.size(); ++i)
+        {
+            for (std::size_t j = 0; j < gj.size(); ++j)
+            {
+                // auto si_pos = xt::view(gi.pos(i), 0);
+                // auto sj_pos = xt::view(gj.pos(j), 0);
+                auto si_pos = gi.pos(i);
+                auto sj_pos = gj.pos(j);
+                auto si_to_sj = (sj_pos - si_pos)/xt::linalg::norm(sj_pos - si_pos);
+
+                auto pi = si_pos + gi.radius()*si_to_sj;
+                auto pj = sj_pos - gj.radius()*si_to_sj;
+                auto nij = (pj - sj_pos)/xt::linalg::norm(pj - sj_pos);
+                auto dij = xt::linalg::dot(pi - pj, nij)[0];
+        
+                if (dij < neigh.dij)
+                {
+                    neigh.pi = pi;
+                    neigh.pj = pj;
+                    neigh.nij = nij;
+                    neigh.dij = dij;
+                }
+
+            }
+        }
+        return neigh;
     }
 
     // SPHERE - GLOBULE
     template<std::size_t dim, bool owner>
     auto closest_points(const sphere<dim, owner>, const globule<dim, owner>)
+    {
+        return neighbor<dim>();
+    }
+
+    // GLOBULE - SPHERE
+    template<std::size_t dim, bool owner>
+    auto closest_points(const globule<dim, owner>, const sphere<dim, owner>)
     {
         return neighbor<dim>();
     }
@@ -1685,6 +1720,13 @@ namespace scopi
         return neighbor<dim>();
     }
 
+    // PLAN - GLOBULE
+    template<std::size_t dim, bool owner>
+    auto closest_points(const plan<dim, owner>, const globule<dim, owner>)
+    {
+        return neighbor<dim>();
+    }
+
     template <std::size_t dim>
     struct closest_points_functor
     {
@@ -1707,7 +1749,7 @@ namespace scopi
         const object<dim, owner>,
         mpl::vector<const sphere<dim, owner>,
                     const superellipsoid<dim, owner>,
-                    // const globule<dim, owner>,
+                    const globule<dim, owner>,
                     const plan<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
         antisymmetric_dispatch
