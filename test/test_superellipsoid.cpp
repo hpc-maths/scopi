@@ -16,58 +16,51 @@ namespace scopi
         static constexpr std::size_t dim = 2;
         superellipsoid<dim> s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, 1.5);
         property<dim> p(property<dim>().desired_velocity({{0.25, 0}}));
+        scopi_container<dim> particles;
+        particles.push_back(s, p);
 
         SUBCASE("pos")
         {
-            REQUIRE(s.pos()(0) == doctest::Approx(-0.2));
-            REQUIRE(s.pos()(1) == doctest::Approx(0.3));
+            REQUIRE(s.pos()(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos()(0)(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("pos index")
         {
-            REQUIRE(s.pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(s.pos(1)() == doctest::Approx(0.3));
+            REQUIRE(s.pos(0)(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos(0)(0)(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("pos container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
             REQUIRE(particles[0]->pos()(0) == doctest::Approx(-0.2));
             REQUIRE(particles[0]->pos()(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("pos index container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
-            REQUIRE(particles[0]->pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(particles[0]->pos(1)() == doctest::Approx(0.3));
+            REQUIRE(particles[0]->pos(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(particles[0]->pos(0)(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("q")
         {
-            REQUIRE(s.q()(0) == doctest::Approx(1.));
-            REQUIRE(s.q()(1) == doctest::Approx(0.));
-            REQUIRE(s.q()(2) == doctest::Approx(0.));
-            REQUIRE(s.q()(3) == doctest::Approx(0.));
+            REQUIRE(s.q()(0)(0) == doctest::Approx(1.));
+            REQUIRE(s.q()(0)(1) == doctest::Approx(0.));
+            REQUIRE(s.q()(0)(2) == doctest::Approx(0.));
+            REQUIRE(s.q()(0)(3) == doctest::Approx(0.));
         }
 
         SUBCASE("q index")
         {
-            REQUIRE(s.q(0)() == doctest::Approx(1.));
-            REQUIRE(s.q(1)() == doctest::Approx(0.));
-            REQUIRE(s.q(2)() == doctest::Approx(0.));
-            REQUIRE(s.q(3)() == doctest::Approx(0.));
+            REQUIRE(s.q(0)(0)(0) == doctest::Approx(1.));
+            REQUIRE(s.q(0)(0)(1) == doctest::Approx(0.));
+            REQUIRE(s.q(0)(0)(2) == doctest::Approx(0.));
+            REQUIRE(s.q(0)(0)(3) == doctest::Approx(0.));
         }
 
         SUBCASE("q container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
             REQUIRE(particles[0]->q()(0) == doctest::Approx(1.));
             REQUIRE(particles[0]->q()(1) == doctest::Approx(0.));
             REQUIRE(particles[0]->q()(2) == doctest::Approx(0.));
@@ -76,13 +69,10 @@ namespace scopi
 
         SUBCASE("q index container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
-            REQUIRE(particles[0]->q(0)() == doctest::Approx(1.));
-            REQUIRE(particles[0]->q(1)() == doctest::Approx(0.));
-            REQUIRE(particles[0]->q(2)() == doctest::Approx(0.));
-            REQUIRE(particles[0]->q(3)() == doctest::Approx(0.));
+            REQUIRE(particles[0]->q(0)(0) == doctest::Approx(1.));
+            REQUIRE(particles[0]->q(0)(1) == doctest::Approx(0.));
+            REQUIRE(particles[0]->q(0)(2) == doctest::Approx(0.));
+            REQUIRE(particles[0]->q(0)(3) == doctest::Approx(0.));
         }
 
         SUBCASE("radius")
@@ -98,6 +88,7 @@ namespace scopi
             REQUIRE(squareness(0) == doctest::Approx(1.5));
         }
 
+        /*
         SUBCASE("point x")
         {
             auto point = s.point(0.);
@@ -139,6 +130,7 @@ namespace scopi
             REQUIRE(tangent(0) == doctest::Approx(-1.));
             REQUIRE(tangent(1) == doctest::Approx(0.));
         }
+        */
     }
 
     TEST_CASE("Superellipsoid 2D const")
@@ -146,58 +138,51 @@ namespace scopi
         static constexpr std::size_t dim = 2;
         const superellipsoid<dim> s({{-0.2, 0.3}}, {quaternion(0)}, {{0.1, 0.2}}, 1.5);
         const property<dim> p(property<dim>().desired_velocity({{0.25, 0}}));
+        scopi_container<dim> particles;
+        particles.push_back(s, p);
 
         SUBCASE("pos")
         {
-            REQUIRE(s.pos()(0) == doctest::Approx(-0.2));
-            REQUIRE(s.pos()(1) == doctest::Approx(0.3));
+            REQUIRE(s.pos()(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos()(0)(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("pos index")
         {
-            REQUIRE(s.pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(s.pos(1)() == doctest::Approx(0.3));
+            REQUIRE(s.pos(0)(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos(0)(0)(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("pos container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
             REQUIRE(particles[0]->pos()(0) == doctest::Approx(-0.2));
             REQUIRE(particles[0]->pos()(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("pos index container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
-            REQUIRE(particles[0]->pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(particles[0]->pos(1)() == doctest::Approx(0.3));
+            REQUIRE(particles[0]->pos(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(particles[0]->pos(0)(1) == doctest::Approx(0.3));
         }
 
         SUBCASE("q")
         {
-            REQUIRE(s.q()(0) == doctest::Approx(1.));
-            REQUIRE(s.q()(1) == doctest::Approx(0.));
-            REQUIRE(s.q()(2) == doctest::Approx(0.));
-            REQUIRE(s.q()(3) == doctest::Approx(0.));
+            REQUIRE(s.q()(0)(0) == doctest::Approx(1.));
+            REQUIRE(s.q()(0)(1) == doctest::Approx(0.));
+            REQUIRE(s.q()(0)(2) == doctest::Approx(0.));
+            REQUIRE(s.q()(0)(3) == doctest::Approx(0.));
         }
 
         SUBCASE("q index")
         {
-            REQUIRE(s.q(0)() == doctest::Approx(1.));
-            REQUIRE(s.q(1)() == doctest::Approx(0.));
-            REQUIRE(s.q(2)() == doctest::Approx(0.));
-            REQUIRE(s.q(3)() == doctest::Approx(0.));
+            REQUIRE(s.q(0)(0)(0) == doctest::Approx(1.));
+            REQUIRE(s.q(0)(0)(1) == doctest::Approx(0.));
+            REQUIRE(s.q(0)(0)(2) == doctest::Approx(0.));
+            REQUIRE(s.q(0)(0)(3) == doctest::Approx(0.));
         }
 
         SUBCASE("q container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
             REQUIRE(particles[0]->q()(0) == doctest::Approx(1.));
             REQUIRE(particles[0]->q()(1) == doctest::Approx(0.));
             REQUIRE(particles[0]->q()(2) == doctest::Approx(0.));
@@ -206,16 +191,14 @@ namespace scopi
 
         SUBCASE("q index container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
-            REQUIRE(particles[0]->q(0)() == doctest::Approx(1.));
-            REQUIRE(particles[0]->q(1)() == doctest::Approx(0.));
-            REQUIRE(particles[0]->q(2)() == doctest::Approx(0.));
-            REQUIRE(particles[0]->q(3)() == doctest::Approx(0.));
+            REQUIRE(particles[0]->q(0)(0) == doctest::Approx(1.));
+            REQUIRE(particles[0]->q(0)(1) == doctest::Approx(0.));
+            REQUIRE(particles[0]->q(0)(2) == doctest::Approx(0.));
+            REQUIRE(particles[0]->q(0)(3) == doctest::Approx(0.));
         }
     }
 
+    /*
     TEST_CASE("Superellipsoid 2D rotation")
     {
         static constexpr std::size_t dim = 2;
@@ -228,32 +211,32 @@ namespace scopi
         REQUIRE(rotation_matrix(1, 0) == doctest::Approx(std::sqrt(3.)/2.));
         REQUIRE(rotation_matrix(1, 1) == doctest::Approx(1./2.));
     }
+    */
 
     TEST_CASE("Superellipsoid 3D")
     {
         static constexpr std::size_t dim = 3;
         superellipsoid<dim> s({{-0.2, 0.3, 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}});
         property<dim> p(property<dim>().desired_velocity({{0.25, 0, 0}}));
+        scopi_container<dim> particles;
+        particles.push_back(s, p);
 
         SUBCASE("pos")
         {
-            REQUIRE(s.pos()(0) == doctest::Approx(-0.2));
-            REQUIRE(s.pos()(1) == doctest::Approx(0.3));
-            REQUIRE(s.pos()(2) == doctest::Approx(0.1));
+            REQUIRE(s.pos()(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos()(0)(1) == doctest::Approx(0.3));
+            REQUIRE(s.pos()(0)(2) == doctest::Approx(0.1));
         }
 
         SUBCASE("pos index")
         {
-            REQUIRE(s.pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(s.pos(1)() == doctest::Approx(0.3));
-            REQUIRE(s.pos(2)() == doctest::Approx(0.1));
+            REQUIRE(s.pos(0)(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos(0)(0)(1) == doctest::Approx(0.3));
+            REQUIRE(s.pos(0)(0)(2) == doctest::Approx(0.1));
         }
 
         SUBCASE("pos container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
             REQUIRE(particles[0]->pos()(0) == doctest::Approx(-0.2));
             REQUIRE(particles[0]->pos()(1) == doctest::Approx(0.3));
             REQUIRE(particles[0]->pos()(2) == doctest::Approx(0.1));
@@ -261,12 +244,9 @@ namespace scopi
 
         SUBCASE("pos index container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
-            REQUIRE(particles[0]->pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(particles[0]->pos(1)() == doctest::Approx(0.3));
-            REQUIRE(particles[0]->pos(2)() == doctest::Approx(0.1));
+            REQUIRE(particles[0]->pos(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(particles[0]->pos(0)(1) == doctest::Approx(0.3));
+            REQUIRE(particles[0]->pos(0)(2) == doctest::Approx(0.1));
         }
 
         SUBCASE("radius")
@@ -284,6 +264,7 @@ namespace scopi
             REQUIRE(squareness(1) == doctest::Approx(1.5));
         }
 
+        /*
         SUBCASE("point x")
         {
             auto point = s.point(0., 0.);
@@ -367,6 +348,7 @@ namespace scopi
             REQUIRE(tangent.second(1) == doctest::Approx(0.));
             REQUIRE(tangent.second(2) == doctest::Approx(0.));
         }
+        */
     }
 
     TEST_CASE("Superellipsoid 3D const")
@@ -374,26 +356,26 @@ namespace scopi
         static constexpr std::size_t dim = 3;
         const superellipsoid<dim> s({{-0.2, 0.3, 0.1}}, {quaternion(0)}, {{0.1, 0.2, 0.3}}, {{0.5, 1.5}});
         const property<dim> p(property<dim>().desired_velocity({{0.25, 0, 0}}));
+        scopi_container<dim> particles;
+        particles.push_back(s, p);
+
 
         SUBCASE("pos")
         {
-            REQUIRE(s.pos()(0) == doctest::Approx(-0.2));
-            REQUIRE(s.pos()(1) == doctest::Approx(0.3));
-            REQUIRE(s.pos()(2) == doctest::Approx(0.1));
+            REQUIRE(s.pos()(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos()(0)(1) == doctest::Approx(0.3));
+            REQUIRE(s.pos()(0)(2) == doctest::Approx(0.1));
         }
 
         SUBCASE("pos index")
         {
-            REQUIRE(s.pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(s.pos(1)() == doctest::Approx(0.3));
-            REQUIRE(s.pos(2)() == doctest::Approx(0.1));
+            REQUIRE(s.pos(0)(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(s.pos(0)(0)(1) == doctest::Approx(0.3));
+            REQUIRE(s.pos(0)(0)(2) == doctest::Approx(0.1));
         }
 
         SUBCASE("pos container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
             REQUIRE(particles[0]->pos()(0) == doctest::Approx(-0.2));
             REQUIRE(particles[0]->pos()(1) == doctest::Approx(0.3));
             REQUIRE(particles[0]->pos()(2) == doctest::Approx(0.1));
@@ -401,15 +383,13 @@ namespace scopi
 
         SUBCASE("pos index container")
         {
-            scopi_container<dim> particles;
-            particles.push_back(s, p);
-
-            REQUIRE(particles[0]->pos(0)() == doctest::Approx(-0.2));
-            REQUIRE(particles[0]->pos(1)() == doctest::Approx(0.3));
-            REQUIRE(particles[0]->pos(2)() == doctest::Approx(0.1));
+            REQUIRE(particles[0]->pos(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(particles[0]->pos(0)(1) == doctest::Approx(0.3));
+            REQUIRE(particles[0]->pos(0)(2) == doctest::Approx(0.1));
         }
     }
 
+    /*
     TEST_CASE("Superellipsoid 3D rotation")
     {
         static constexpr std::size_t dim = 3;
@@ -427,6 +407,7 @@ namespace scopi
         REQUIRE(rotation_matrix(2, 1) == doctest::Approx(0.));
         REQUIRE(rotation_matrix(2, 2) == doctest::Approx(1.));
     }
+    */
 
     TEST_CASE_TEMPLATE("two ellispsoids symetrical", SolverAndParams, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
