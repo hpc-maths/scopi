@@ -43,52 +43,52 @@ namespace scopi
     {
         // position type
         template<std::size_t dim>
-        auto get_value_impl(const std::vector<type::position_t<dim>>& t, std::size_t size)
+        auto get_value_impl(const std::vector<type::position_t<dim>>& t, std::size_t)
         {
-            return xt::view((xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
+            return xt::adapt(t);
         }
 
         template<std::size_t dim>
         auto get_value_impl(const type::position_t<dim>* t, std::size_t size)
         {
-            return xt::view((xt::adapt(reinterpret_cast<const double*>(t->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
+            return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, dim});
         }
 
         template<std::size_t dim>
-        auto get_value_impl(std::vector<type::position_t<dim>>& t, std::size_t size)
+        auto get_value_impl(std::vector<type::position_t<dim>>& t, std::size_t)
         {
-            return xt::view((xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
+            return xt::adapt(t);
         }
 
         template<std::size_t dim>
         auto get_value_impl(type::position_t<dim>* t, std::size_t size)
         {
-            return xt::view((xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
+            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
         }
 
         // quaternion type
         template <class object_t = type::quaternion_t>
-        auto get_value_impl(const std::vector<object_t>& t, std::size_t size)
+        auto get_value_impl(const std::vector<object_t>& t, std::size_t)
         {
-            return xt::view((xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, 4UL+2})), xt::all(), xt::range(0, 4UL));
+            return xt::adapt(t);
         }
 
         template <class object_t = type::quaternion_t>
         auto get_value_impl(const object_t* t, std::size_t size)
         {
-            return xt::view((xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL+2})), xt::all(), xt::range(0, 4UL));
+            return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL});
         }
 
         template <class object_t = type::quaternion_t>
-        auto get_value_impl(std::vector<object_t>& t, std::size_t size)
+        auto get_value_impl(std::vector<object_t>& t, std::size_t)
         {
-            return xt::view((xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, 4UL+2})), xt::all(), xt::range(0, 4UL));
+            return xt::adapt(t);
         }
 
         template <class object_t = type::quaternion_t>
         auto get_value_impl(object_t* t, std::size_t size)
         {
-            return xt::view((xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL+2})), xt::all(), xt::range(0, 4UL));
+            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL});
         }
 
         template <class T>

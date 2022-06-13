@@ -9,6 +9,7 @@
 namespace scopi
 {
     // distance sphere - sphere
+    /*
     TEST_CASE("closest_points, sphere_sphere_2d")
     {
         constexpr std::size_t dim = 2;
@@ -45,6 +46,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(sinRot));
         REQUIRE(out.dij == doctest::Approx(0.4));
     }
+    */
 
     TEST_CASE("closest_points, sphere_sphere_2d_dispatch")
     {
@@ -91,6 +93,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.4));
     }
 
+    /*
     TEST_CASE("closest_points, sphere_sphere_3d")
     {
         constexpr std::size_t dim = 3;
@@ -133,6 +136,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.4));
     }
+    */
 
     TEST_CASE("closest_points, sphere_sphere_3d_dispatch")
     {
@@ -186,6 +190,7 @@ namespace scopi
     }
 
     // distance sphere - plan
+    /*
     TEST_CASE("closest_points, sphere_plan_2d")
     {
         constexpr std::size_t dim = 2;
@@ -239,6 +244,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(1.));
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
+    */
 
     TEST_CASE("closest_points, sphere_plan_2d_dispatch")
     {
@@ -306,6 +312,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
+    /*
     TEST_CASE("closest_points, sphere_plan_3d")
     {
         constexpr std::size_t dim = 3;
@@ -368,6 +375,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
+    */
 
     TEST_CASE("closest_points, sphere_plan_3d_dispatch")
     {
@@ -445,6 +453,7 @@ namespace scopi
     }
 
     // distance plan - sphere
+    /*
     TEST_CASE("closest_points, plan_sphere_2d")
     {
         constexpr std::size_t dim = 2;
@@ -498,6 +507,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(-1.));
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
+    */
 
     TEST_CASE("closest_points, plan_sphere_2d_dispatch")
     {
@@ -565,6 +575,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
+    /*
     TEST_CASE("closest_points, plan_sphere_3d")
     {
         constexpr std::size_t dim = 3;
@@ -627,6 +638,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
+    */
 
     TEST_CASE("closest_points, plan_sphere_3d_dispatch")
     {
@@ -704,6 +716,7 @@ namespace scopi
     }
 
     // distance sphere - superellipsoid
+    /*
     TEST_CASE("closest_points, sphere_superellipsoid_2d")
     {
         // FIXME
@@ -742,6 +755,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
         REQUIRE(out.dij == doctest::Approx(0.6));
     }
+    */
 
     TEST_CASE("closest_points, sphere_superellipsoid_2d_dispatch")
     {
@@ -790,6 +804,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
+    /*
     TEST_CASE("closest_points, sphere_superellipsoid_3d")
     {
         // FIXME
@@ -834,6 +849,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.6));
     }
+    */
 
     TEST_CASE("closest_points, sphere_superellipsoid_3d_dispatch")
     {
@@ -889,6 +905,7 @@ namespace scopi
     }
 
     // distance superellipsoid - sphere
+    /*
     TEST_CASE("closest_points, superellipsoid_sphere_2d")
     {
         // FIXME
@@ -927,6 +944,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(sinRot));
         REQUIRE(out.dij == doctest::Approx(0.6));
     }
+    */
 
     TEST_CASE("closest_points, superellipsoid_sphere_2d_dispatch")
     {
@@ -975,6 +993,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.6));
     }
 
+    /*
     TEST_CASE("closest_points, superellipsoid_sphere_3d")
     {
         // FIXME
@@ -1019,6 +1038,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.6));
     }
+    */
 
     TEST_CASE("closest_points, superellipsoid_sphere_3d_dispatch")
     {
@@ -1074,6 +1094,7 @@ namespace scopi
     }
 
     // distance superellipsoid - superellipsoid
+    /*
     TEST_CASE("closest_points, superellipsoid_superellipsoid_2d")
     {
         constexpr std::size_t dim = 2;
@@ -1110,6 +1131,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(sinRot));
         REQUIRE(out.dij == doctest::Approx(0.5));
     }
+    */
 
     TEST_CASE("closest_points, superellipsoid_superellipsoid_2d_dispatch")
     {
@@ -1156,6 +1178,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.5));
     }
 
+    /*
     TEST_CASE("closest_points, superellipsoid_superellipsoid_3d")
     {
         constexpr std::size_t dim = 3;
@@ -1198,6 +1221,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.5));
     }
+    */
 
     TEST_CASE("closest_points, superellipsoid_superellipsoid_3d_dispatch")
     {
@@ -1251,6 +1275,7 @@ namespace scopi
     }
 
     // distance superellipsoid - plan
+    /*
     TEST_CASE("closest_points, superellipsoid_plan_2d")
     {
         // FIXME Newton does not converge
@@ -1289,6 +1314,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
+    */
 
     TEST_CASE("closest_points, superellipsoid_plan_2d_dispatch")
     {
@@ -1337,6 +1363,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
+/*
     TEST_CASE("closest_points, superellipsoid_plan_3d")
     {
         // FIXME Newton does not converge
@@ -1381,6 +1408,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
+    */
 
     TEST_CASE("closest_points, superellipsoid_plan_3d_dispatch")
     {
@@ -1436,6 +1464,7 @@ namespace scopi
     }
 
     // distance plan - superellipsoid
+    /*
     TEST_CASE("closest_points, plan_superellipsoid_2d")
     {
         // FIXME Newton does not converge
@@ -1474,6 +1503,7 @@ namespace scopi
         REQUIRE(out.nij(1) == doctest::Approx(-sinRot));
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
+    */
 
     TEST_CASE("closest_points, plan_superellipsoid_2d_dispatch")
     {
@@ -1522,6 +1552,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
+    /*
     TEST_CASE("closest_points, plan_superellipsoid_3d")
     {
         // FIXME Newton does not converge
@@ -1566,6 +1597,7 @@ namespace scopi
         REQUIRE(out.nij(2) == doctest::Approx(0.));
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
+    */
 
     TEST_CASE("closest_points, plan_superellipsoid_3d_dispatch")
     {
