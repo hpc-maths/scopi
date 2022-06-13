@@ -50,8 +50,6 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
-    protected:
-        ProblemParams<DryWithoutFriction> m_params;
     };
 
     template<std::size_t dim>

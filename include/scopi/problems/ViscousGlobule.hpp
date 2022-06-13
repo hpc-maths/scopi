@@ -12,6 +12,7 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 #include "../objects/types/globule.hpp"
+#include "../objects/methods/number_contacts.hpp"
 
 #include "../params/ProblemParams.hpp"
 #include "ProblemBase.hpp"
@@ -53,16 +54,6 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
-
-    private:
-        // template <std::size_t dim>
-        // std::size_t nb_extra_row_per_object(object<dim, false>& obj);
-
-        template <class T>
-        std::size_t nb_extra_row_per_object(std::unique_ptr<T> obj);
-        // template <std::size_t dim> 
-        std::size_t nb_extra_row_per_object(std::unique_ptr<globule<2, false>> obj);
-        ProblemParams<ViscousGlobule> m_params;
     };
 
     template<std::size_t dim>
@@ -183,7 +174,7 @@ namespace scopi
         std::size_t nb_globules = 0;
         for (std::size_t i = 0; i < particles.size(); ++i)
         {
-            std::cout << i << "   " << nb_extra_row_per_object(particles[i]) << std::endl;
+            std::cout << i << "   " << number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]) << std::endl;
             // nb_globules += nb_extra_row_per_object(*particles[i]);
         }
         return contacts.size() + nb_globules;
@@ -360,20 +351,5 @@ namespace scopi
             }
         }
     }
-
-    // template <std::size_t dim>
-    // std::size_t ViscousGlobule::nb_extra_row_per_object(object<dim, false>&)
-
-    template <class T>
-    std::size_t ViscousGlobule::nb_extra_row_per_object(std::unique_ptr<T>)
-    {
-        return 0;
-    }
-
-    // template <std::size_t dim> 
-    // std::size_t ViscousGlobule::nb_extra_row_per_object(std::unique_ptr<globule<2, false>>)
-    // {
-    //     return 5;
-    // }
 }
 

@@ -3,9 +3,8 @@
 
 namespace scopi
 {
-    ViscousGlobule::ViscousGlobule(std::size_t nparticles, double dt, ProblemParams<ViscousGlobule>& problem_params)
+    ViscousGlobule::ViscousGlobule(std::size_t nparticles, double dt, ProblemParams<ViscousGlobule>&)
     : ProblemBase(nparticles, dt)
-    , m_params(problem_params)
     {}
 
 }
