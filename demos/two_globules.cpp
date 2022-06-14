@@ -16,10 +16,10 @@ int main()
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
-    scopi::globule<dim> g1({{3., 0.}, {5., 0.}, {7., 0.}, {9., 0.}, {11., 0.}, {13., 0.}}, 1.);
-    scopi::globule<dim> g2({{-3., 0.}, {-5., 0.}, {-7., 0.}, {-9., 0.}, {-11., 0.}, {-13., 0.}}, 1.);
-    particles.push_back(g1, prop);
-    particles.push_back(g2, prop);
+    scopi::globule<dim> g1({{1., 1.}, {3., 1.}, {5., 1.}, {7., 1.}, {9., 1.}, {11., 1.}}, 1.);
+    scopi::globule<dim> g2({{-1., -1.}, {-3., -1.}, {-5., -1.}, {-7., -1.}, {-9., -1.}, {-11., -1.}}, 1.);
+    particles.push_back(g1, prop.desired_velocity({-1., 0.}));
+    particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
     scopi::OptimParams<scopi::OptimMosek> optim_params;
     scopi::ProblemParams<scopi::ViscousGlobule> problem_params;

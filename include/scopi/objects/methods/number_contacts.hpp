@@ -44,9 +44,9 @@ namespace scopi
 
     // GLOBULE
     template<std::size_t dim>
-    std::size_t number_contact_per_particle(const globule<dim, false>&)
+    std::size_t number_contact_per_particle(const globule<dim, false>& g)
     {
-        return 5;
+        return g.size()-1;
     }
 
     template <std::size_t dim>
@@ -106,7 +106,15 @@ namespace scopi
     template<std::size_t dim>
     xt::xtensor<double, 1> distances_per_particle(const globule<dim, false>& g)
     {
-        return -2.*g.radius() * xt::ones<double>({g.size()-1});
+        xt::xtensor<double, 1>::shape_type shape = {2*(g.size()-1)};
+        xt::xtensor<double, 1> distances(shape);
+        // TODO use xtensor's functions instead of a loop
+        for (std::size_t i = 0; i < g.size()-1; ++i)
+        {
+            distances(2*i  ) =  2.*g.radius();
+            distances(2*i+1) = -2.*g.radius();
+        }
+        return distances;
     }
 
     template <std::size_t dim>
@@ -166,7 +174,8 @@ namespace scopi
     template<std::size_t dim>
     xt::xtensor<double, 2> matrix_per_particle(const globule<dim, false>& g)
     {
-        xt::xtensor<double, 2> mat = xt::zeros<double>({12*(g.size()-1), 3});
+        xt::xtensor<double, 2>::shape_type shape = {2*12*(g.size()-1), 3};
+        xt::xtensor<double, 2> mat(shape);
         std::size_t index = 0;
         for (std::size_t i = 0; i < g.size()-1; ++i)
         {
@@ -179,14 +188,22 @@ namespace scopi
 
             for (std::size_t d = 0; d < 3; ++d)
             {
-                mat(index, 0) = i;
+                mat(index, 0) = 2*i;
+                mat(index, 1) = i*3 + d;
+                mat(index, 2) = - nij[d];
+                index++;
+                mat(index, 0) = 2*i+1;
                 mat(index, 1) = i*3 + d;
                 mat(index, 2) = nij[d];
                 index++;
             }
             for (std::size_t d = 0; d < 3; ++d)
             {
-                mat(index, 0) = i;
+                mat(index, 0) = 2*i;
+                mat(index, 1) = (i+1)*3 + d;
+                mat(index, 2) = nij[d];
+                index++;
+                mat(index, 0) = 2*i+1;
                 mat(index, 1) = (i+1)*3 + d;
                 mat(index, 2) = - nij[d];
                 index++;
@@ -200,7 +217,11 @@ namespace scopi
             auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                mat(index, 0) = i;
+                mat(index, 0) = 2*i;
+                mat(index, 1) = 3*i + ip;
+                mat(index, 2) = (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
+                index++;
+                mat(index, 0) = 2*i+1;
                 mat(index, 1) = 3*i + ip;
                 mat(index, 2) = -(nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
                 index++;
@@ -209,7 +230,11 @@ namespace scopi
             dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                mat(index, 0) = i;
+                mat(index, 0) = 2*i;
+                mat(index, 1) = 3*(i+1) + ip;
+                mat(index, 2) = - (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
+                index++;
+                mat(index, 0) = 2*i+1;
                 mat(index, 1) = 3*(i+1) + ip;
                 mat(index, 2) = (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
                 index++;
@@ -238,7 +263,7 @@ namespace scopi
     template <std::size_t dim>
     using matrix_per_particle_dispatcher = unit_static_dispatcher
     <
-        distances_per_particle_functor<dim>,
+        matrix_per_particle_functor<dim>,
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
                     const superellipsoid<dim, false>,

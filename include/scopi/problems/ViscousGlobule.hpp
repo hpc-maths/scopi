@@ -66,11 +66,15 @@ namespace scopi
                                                       std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t u_size = 3*contacts.size()*2;
-        std::size_t w_size = 3*contacts.size()*2;
-        this->m_A_rows.resize(2*(u_size + w_size) + number_extra_contacts(particles));
-        this->m_A_cols.resize(2*(u_size + w_size) + number_extra_contacts(particles));
-        this->m_A_values.resize(2*(u_size + w_size) + number_extra_contacts(particles));
+        std::size_t nb_row = contacts.size() + number_extra_contacts(particles);
+        this->m_A_rows.resize(12*nb_row);
+        this->m_A_cols.resize(12*nb_row);
+        this->m_A_values.resize(12*nb_row);
+        // std::size_t u_size = 3*contacts.size()*2;
+        // std::size_t w_size = 3*contacts.size()*2;
+        // this->m_A_rows.resize(2*(u_size + w_size) + 12*number_extra_contacts(particles));
+        // this->m_A_cols.resize(2*(u_size + w_size) + 12*number_extra_contacts(particles));
+        // this->m_A_values.resize(2*(u_size + w_size) + 12*number_extra_contacts(particles));
 
         std::size_t ic = 0;
         std::size_t index = 0;
@@ -146,16 +150,16 @@ namespace scopi
             }
             for (std::size_t j = mat_loc.shape(0)/2; j < mat_loc.shape(0); ++j)
             {
-                this->m_A_rows[index] = nb_previous_constraints + 3*this->m_nparticles + mat_loc(j, 0);
-                this->m_A_cols[index] = firstCol + mat_loc(j, 1);
+                this->m_A_rows[index] = nb_previous_constraints + mat_loc(j, 0);
+                this->m_A_cols[index] = firstCol + 3*this->m_nparticles + mat_loc(j, 1);
                 this->m_A_values[index] = this->m_dt * mat_loc(j, 2);
                 index++;
             }
-            nb_previous_constraints += number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);;
+            nb_previous_constraints += 2*number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);
         }
-        this->m_A_rows.resize(index);
-        this->m_A_cols.resize(index);
-        this->m_A_values.resize(index);
+        // this->m_A_rows.resize(index);
+        // this->m_A_cols.resize(index);
+        // this->m_A_values.resize(index);
     }
 
     template<std::size_t dim>
@@ -184,7 +188,7 @@ namespace scopi
             {
                 this->m_distances[nb_previous_constraints + j ] = dist_loc(j);
             }
-            nb_previous_constraints += number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);;
+            nb_previous_constraints += dist_loc.size();
         }
     }
 
@@ -350,7 +354,7 @@ namespace scopi
         std::size_t nb_extra_contacts = 0;
         for (std::size_t i = 0; i < particles.size(); ++i)
         {
-            nb_extra_contacts += number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);
+            nb_extra_contacts += 2*number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);
         }
         return nb_extra_contacts;
     }
