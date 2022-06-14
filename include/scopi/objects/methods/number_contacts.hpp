@@ -111,8 +111,15 @@ namespace scopi
         // TODO use xtensor's functions instead of a loop
         for (std::size_t i = 0; i < g.size()-1; ++i)
         {
-            distances(2*i  ) =  2.*g.radius();
-            distances(2*i+1) = -2.*g.radius();
+            auto si_pos = g.pos(i);
+            auto sj_pos = g.pos(i+1);
+            auto si_to_sj = (sj_pos - si_pos)/xt::linalg::norm(sj_pos - si_pos);
+            auto pi = si_pos + g.radius()*si_to_sj;
+            auto pj = sj_pos - g.radius()*si_to_sj;
+            auto nij = (pj - sj_pos)/xt::linalg::norm(pj - sj_pos);
+            auto dij = xt::linalg::dot(pi - pj, nij)[0];
+            distances(2*i  ) =  dij;
+            distances(2*i+1) = -dij;
         }
         return distances;
     }
