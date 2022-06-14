@@ -39,7 +39,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, double kdtree_radius=10)
+        contact_kdtree(double dmax, double kdtree_radius=100)
         : contact_base(dmax)
         , m_kd_tree_radius(kdtree_radius)
         , m_nMatches(0)
@@ -116,13 +116,19 @@ namespace scopi
                     if (i < j)  { //&& (j>=active_ptr)
                       auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
                       m_nMatches++;
-                      if (neigh.dij < m_dmax) {
-                          neigh.i = i;
-                          neigh.j = j;
-                          #pragma omp critical
-                          contacts.emplace_back(std::move(neigh));
-                          // contacts.back().i = i;
-                          // contacts.back().j = j;
+                      for (std::size_t gi = 0; gi < 6; ++gi)
+                      {
+                          for (std::size_t gj = 0; gj < 6; ++gj)
+                          {
+                              if (neigh[6*gi+gj].dij < m_dmax) {
+                                  neigh[6*gi+gj].i = i*6 + gi;
+                                  neigh[6*gi+gj].j = j*6 + gj;
+                                  #pragma omp critical
+                                  contacts.emplace_back(std::move(neigh[6*gi+gj]));
+                                  // contacts.back().i = i;
+                                  // contacts.back().j = j;
+                              }
+                          }
                       }
                     }
 
@@ -130,6 +136,7 @@ namespace scopi
 
             }
 
+            /*
             // obstacles
             for (std::size_t i = 0; i < active_ptr; ++i)
             {
@@ -144,6 +151,7 @@ namespace scopi
                     }
                 }
             }
+            */
 
             duration = toc();
             PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << " compute " << m_nMatches << " distances" << std::endl;

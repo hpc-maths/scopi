@@ -684,8 +684,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     auto closest_points(const globule<dim, owner> gi, const globule<dim, owner> gj)
     {
-        neighbor<dim> neigh;
-        neigh.dij = std::numeric_limits<double>::max();
+        std::vector<neighbor<dim>> neigh(gi.size()*gj.size());
         for (std::size_t i = 0; i < gi.size(); ++i)
         {
             for (std::size_t j = 0; j < gj.size(); ++j)
@@ -696,19 +695,10 @@ namespace scopi
                 auto sj_pos = gj.pos(j);
                 auto si_to_sj = (sj_pos - si_pos)/xt::linalg::norm(sj_pos - si_pos);
 
-                auto pi = si_pos + gi.radius()*si_to_sj;
-                auto pj = sj_pos - gj.radius()*si_to_sj;
-                auto nij = (pj - sj_pos)/xt::linalg::norm(pj - sj_pos);
-                auto dij = xt::linalg::dot(pi - pj, nij)[0];
-        
-                if (dij < neigh.dij)
-                {
-                    neigh.pi = pi;
-                    neigh.pj = pj;
-                    neigh.nij = nij;
-                    neigh.dij = dij;
-                }
-
+                neigh[gj.size()*i + j].pi = si_pos + gi.radius()*si_to_sj;
+                neigh[gj.size()*i + j].pj = sj_pos - gj.radius()*si_to_sj;
+                neigh[gj.size()*i + j].nij = (neigh[gj.size()*i + j].pj - sj_pos)/xt::linalg::norm(neigh[gj.size()*i + j].pj - sj_pos);
+                neigh[gj.size()*i + j].dij = xt::linalg::dot(neigh[gj.size()*i + j].pi - neigh[gj.size()*i + j].pj, neigh[gj.size()*i + j].nij)[0];
             }
         }
         return neigh;
@@ -1730,7 +1720,8 @@ namespace scopi
     template <std::size_t dim>
     struct closest_points_functor
     {
-        using return_type = neighbor<dim>;
+        using return_type = std::vector<neighbor<dim>>;
+        // using return_type = neighbor<dim>;
          template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2) const
         {
@@ -1742,15 +1733,24 @@ namespace scopi
         }
     };
 
+    // template <std::size_t dim, bool owner=false>
+    // using closest_points_dispatcher = double_static_dispatcher
+    // <
+    //     closest_points_functor<dim>,
+    //     const object<dim, owner>,
+    //     mpl::vector<const sphere<dim, owner>,
+    //                 const superellipsoid<dim, owner>,
+    //                 const globule<dim, owner>,
+    //                 const plan<dim, owner>>,
+    //     typename closest_points_functor<dim>::return_type,
+    //     antisymmetric_dispatch
+    // >;
     template <std::size_t dim, bool owner=false>
     using closest_points_dispatcher = double_static_dispatcher
     <
         closest_points_functor<dim>,
         const object<dim, owner>,
-        mpl::vector<const sphere<dim, owner>,
-                    const superellipsoid<dim, owner>,
-                    const globule<dim, owner>,
-                    const plan<dim, owner>>,
+        mpl::vector<const globule<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
         antisymmetric_dispatch
     >;
