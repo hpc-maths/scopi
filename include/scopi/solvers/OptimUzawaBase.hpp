@@ -24,7 +24,7 @@ namespace scopi{
         OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& optim_params);
 
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
+        int solve_optimization_problem_impl(scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
                                             problem_t& problem);
 
@@ -49,7 +49,7 @@ namespace scopi{
                               problem_t& problem);
 
         template <std::size_t dim>
-        void init_uzawa(const scopi_container<dim>& particles,
+        void init_uzawa(scopi_container<dim>& particles,
                         const std::vector<neighbor<dim>>& contacts, 
                         problem_t& problem);
         void finalize_uzawa();
@@ -74,15 +74,15 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template <std::size_t dim>
-    int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+    int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
                                                                             const std::vector<neighbor<dim>>& contacts,
                                                                             problem_t& problem)
     {
         tic();
         init_uzawa(particles, contacts, problem);
         auto duration = toc();
-        m_L = xt::zeros<double>({problem.number_row_matrix(contacts)});
-        m_R = xt::zeros<double>({problem.number_row_matrix(contacts)});
+        m_L = xt::zeros<double>({problem.number_row_matrix(contacts, particles)});
+        m_R = xt::zeros<double>({problem.number_row_matrix(contacts, particles)});
         PLOG_INFO << "----> CPUTIME : Uzawa matrix = " << duration;
 
         double time_assign_u = 0.;
@@ -141,7 +141,9 @@ namespace scopi{
             time_solve += duration;
             cc += 1;
 
-            PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
+            // std::cout << m_U << std::endl;
+
+            PLOG_VERBOSE << std::setw(24) << std::scientific << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
         }
 
         PLOG_ERROR_IF(cc >= m_params.m_max_iter) << "Uzawa does not converge";
@@ -211,7 +213,7 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived, problem_t>::init_uzawa(const scopi_container<dim>& particles,
+    void OptimUzawaBase<Derived, problem_t>::init_uzawa(scopi_container<dim>& particles,
                                                         const std::vector<neighbor<dim>>& contacts,
                                                         problem_t& problem)
     {
