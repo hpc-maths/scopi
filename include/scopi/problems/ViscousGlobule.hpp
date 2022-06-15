@@ -70,11 +70,6 @@ namespace scopi
         this->m_A_rows.resize(12*nb_row);
         this->m_A_cols.resize(12*nb_row);
         this->m_A_values.resize(12*nb_row);
-        // std::size_t u_size = 3*contacts.size()*2;
-        // std::size_t w_size = 3*contacts.size()*2;
-        // this->m_A_rows.resize(2*(u_size + w_size) + 12*number_extra_contacts(particles));
-        // this->m_A_cols.resize(2*(u_size + w_size) + 12*number_extra_contacts(particles));
-        // this->m_A_values.resize(2*(u_size + w_size) + 12*number_extra_contacts(particles));
 
         std::size_t ic = 0;
         std::size_t index = 0;
@@ -137,29 +132,49 @@ namespace scopi
 
         // TODO obstacles
         std::size_t nb_previous_constraints = contacts.size();
+        const std::size_t size = 6;
         for (std::size_t i = 0; i < particles.size(); ++i)
         {
             auto mat_loc = matrix_per_particle_dispatcher<dim>::dispatch(*particles[i]);
-            // TODO use xtensor's function instead of a loop
-            for (std::size_t j = 0; j < mat_loc.shape(0)/2; ++j)
+            for (std::size_t c = 0; c < size-1; ++c)
             {
-                this->m_A_rows[index] = nb_previous_constraints + mat_loc(j, 0);
-                this->m_A_cols[index] = firstCol + mat_loc(j, 1);
-                this->m_A_values[index] = this->m_dt * mat_loc(j, 2);
-                index++;
+                // TODO use xtensor's function instead of a loop
+                // TODO particles with different sizes
+                // D >= 0, cols u
+                for (std::size_t j = c*24; j < c*24+6; ++j)
+                {
+                    this->m_A_rows[index] = nb_previous_constraints + 0;
+                    this->m_A_cols[index] = firstCol + 3*i*size + mat_loc(j, 1);
+                    this->m_A_values[index] = this->m_dt * mat_loc(j, 2);
+                    index++;
+                }
+                // D >= 0, cols w
+                for (std::size_t j = c*24+6; j < c*24+2*6; ++j)
+                {
+                    this->m_A_rows[index] = nb_previous_constraints + 0;
+                    this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*i*size + mat_loc(j, 1);
+                    this->m_A_values[index] = this->m_dt * mat_loc(j, 2);
+                    index++;
+                }
+                // D <= 0, cols u
+                for (std::size_t j = c*24+2*6; j < c*24+3*6; ++j)
+                {
+                    this->m_A_rows[index] = nb_previous_constraints + 1;
+                    this->m_A_cols[index] = firstCol + 3*i*size + mat_loc(j, 1);
+                    this->m_A_values[index] = this->m_dt * mat_loc(j, 2);
+                    index++;
+                }
+                // D <= 0, cols w
+                for (std::size_t j = c*24+3*6; j < c*24+4*6; ++j)
+                {
+                    this->m_A_rows[index] = nb_previous_constraints + 1;
+                    this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*i*size + mat_loc(j, 1);
+                    this->m_A_values[index] = this->m_dt * mat_loc(j, 2);
+                    index++;
+                }
+                nb_previous_constraints += 2;
             }
-            for (std::size_t j = mat_loc.shape(0)/2; j < mat_loc.shape(0); ++j)
-            {
-                this->m_A_rows[index] = nb_previous_constraints + mat_loc(j, 0);
-                this->m_A_cols[index] = firstCol + 3*this->m_nparticles + mat_loc(j, 1);
-                this->m_A_values[index] = this->m_dt * mat_loc(j, 2);
-                index++;
-            }
-            nb_previous_constraints += 2*number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);
         }
-        // this->m_A_rows.resize(index);
-        // this->m_A_cols.resize(index);
-        // this->m_A_values.resize(index);
     }
 
     template<std::size_t dim>

@@ -34,7 +34,7 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const scopi_container<dim>& particles);
         template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, scopi_container<dim>& particles);
 
         template<std::size_t dim>
         void matrix_free_gemv_A(const neighbor<dim>& c,
@@ -136,7 +136,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void DryWithoutFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void DryWithoutFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts, scopi_container<dim>&)
     {
         this->m_distances = xt::zeros<double>({contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)

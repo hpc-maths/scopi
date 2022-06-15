@@ -2,6 +2,7 @@
 
 #include "base.hpp"
 
+#include <cstddef>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
@@ -39,7 +40,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, double kdtree_radius=100)
+        contact_kdtree(double dmax, double kdtree_radius=10)
         : contact_base(dmax)
         , m_kd_tree_radius(kdtree_radius)
         , m_nMatches(0)
@@ -116,15 +117,16 @@ namespace scopi
                     if (i < j)  { //&& (j>=active_ptr)
                       auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
                       m_nMatches++;
-                      for (std::size_t gi = 0; gi < 6; ++gi)
+                      std::size_t size = 6;
+                      for (std::size_t gi = 0; gi < size; ++gi)
                       {
-                          for (std::size_t gj = 0; gj < 6; ++gj)
+                          for (std::size_t gj = 0; gj < size; ++gj)
                           {
-                              if (neigh[6*gi+gj].dij < m_dmax) {
-                                  neigh[6*gi+gj].i = i*6 + gi;
-                                  neigh[6*gi+gj].j = j*6 + gj;
+                              if (neigh[size*gi+gj].dij < m_dmax) {
+                                  neigh[size*gi+gj].i = i*size + gi;
+                                  neigh[size*gi+gj].j = j*size + gj;
                                   #pragma omp critical
-                                  contacts.emplace_back(std::move(neigh[6*gi+gj]));
+                                  contacts.emplace_back(std::move(neigh[size*gi+gj]));
                                   // contacts.back().i = i;
                                   // contacts.back().j = j;
                               }

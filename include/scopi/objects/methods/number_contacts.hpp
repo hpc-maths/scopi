@@ -193,15 +193,12 @@ namespace scopi
             auto pj = sj_pos - g.radius()*si_to_sj;
             auto nij = (pj - sj_pos)/xt::linalg::norm(pj - sj_pos);
 
+            // D >= 0, cols u
             for (std::size_t d = 0; d < 3; ++d)
             {
                 mat(index, 0) = 2*i;
                 mat(index, 1) = i*3 + d;
                 mat(index, 2) = - nij[d];
-                index++;
-                mat(index, 0) = 2*i+1;
-                mat(index, 1) = i*3 + d;
-                mat(index, 2) = nij[d];
                 index++;
             }
             for (std::size_t d = 0; d < 3; ++d)
@@ -209,10 +206,6 @@ namespace scopi
                 mat(index, 0) = 2*i;
                 mat(index, 1) = (i+1)*3 + d;
                 mat(index, 2) = nij[d];
-                index++;
-                mat(index, 0) = 2*i+1;
-                mat(index, 1) = (i+1)*3 + d;
-                mat(index, 2) = - nij[d];
                 index++;
             }
 
@@ -221,6 +214,7 @@ namespace scopi
             auto Ri = rotation_matrix<3>(g.q(i));
             auto Rj = rotation_matrix<3>(g.q(i+1));
 
+            // D >= 0, cols w
             auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
@@ -228,6 +222,37 @@ namespace scopi
                 mat(index, 1) = 3*i + ip;
                 mat(index, 2) = (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
                 index++;
+            }
+
+            dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+            for (std::size_t ip = 0; ip < 3; ++ip)
+            {
+                mat(index, 0) = 2*i;
+                mat(index, 1) = 3*(i+1) + ip;
+                mat(index, 2) = - (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
+                index++;
+            }
+
+            // D <= 0, cols u
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                mat(index, 0) = 2*i+1;
+                mat(index, 1) = i*3 + d;
+                mat(index, 2) = nij[d];
+                index++;
+            }
+            for (std::size_t d = 0; d < 3; ++d)
+            {
+                mat(index, 0) = 2*i+1;
+                mat(index, 1) = (i+1)*3 + d;
+                mat(index, 2) = - nij[d];
+                index++;
+            }
+
+            // D <= 0, cols w
+            dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            for (std::size_t ip = 0; ip < 3; ++ip)
+            {
                 mat(index, 0) = 2*i+1;
                 mat(index, 1) = 3*i + ip;
                 mat(index, 2) = -(nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
@@ -241,10 +266,10 @@ namespace scopi
                 mat(index, 1) = 3*(i+1) + ip;
                 mat(index, 2) = - (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
                 index++;
-                mat(index, 0) = 2*i+1;
-                mat(index, 1) = 3*(i+1) + ip;
-                mat(index, 2) = (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
-                index++;
+                // mat(index, 0) = 2*i+1;
+                // mat(index, 1) = 3*(i+1) + ip;
+                // mat(index, 2) = (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
+                // index++;
             }
         }
         return mat;
