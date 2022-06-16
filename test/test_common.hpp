@@ -52,6 +52,16 @@ namespace scopi
     SET_SOLVER_AND_PARAMS(OptimMosek, DryWithFriction, dim, contact, vap) // friction with mu = 0
 #endif
 
+#ifdef SCOPI_USE_MKL
+#define SOLVER_VISCOUS_GLOBULE(dim, contact, vap) \
+    SET_SOLVER_AND_PARAMS(OptimMosek, ViscousGlobule, dim, contact, vap), \
+    SET_SOLVER_AND_PARAMS(OptimUzawaMkl, ViscousGlobule, dim, contact, vap)
+#else
+#define SOLVER_VISCOUS_GLOBULE(dim, contact, vap) \
+    SET_SOLVER_AND_PARAMS(OptimMosek, ViscousGlobule, dim, contact, vap)
+#endif
+
+
 #define SOLVER_DRY_WITH_FRICTION(dim, contact, vap) \
     SET_SOLVER_AND_PARAMS(OptimMosek, DryWithFriction, dim, contact, vap)
 
