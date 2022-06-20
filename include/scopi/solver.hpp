@@ -13,6 +13,7 @@
 #include <nlohmann/json.hpp>
 
 #include <plog/Log.h>
+#include "objects/methods/number_contacts.hpp"
 #include "plog/Initializers/RollingFileInitializer.h"
 
 #include "container.hpp"
@@ -204,7 +205,7 @@ namespace scopi
             PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
 
             tic();
-            this->m_problem.update_gamma(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_problem));
+            this->m_problem.update_gamma(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_particles, this->m_problem));
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
@@ -250,7 +251,7 @@ namespace scopi
             this->m_solver.run(this->m_particles, contacts, this->m_problem, nite);
 
             tic();
-            this->m_problem.correct_lambda(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_problem), this->m_particles, this->m_solver.get_uadapt());
+            this->m_problem.correct_lambda(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_particles, this->m_problem), this->m_particles, this->m_solver.get_uadapt());
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 
@@ -260,7 +261,7 @@ namespace scopi
             this->m_solver.run(this->m_particles, contacts, this->m_problem,  nite);
 
             tic();
-            this->m_problem.update_gamma(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_problem));
+            this->m_problem.update_gamma(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_particles, this->m_problem));
             duration = toc();
             PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
 

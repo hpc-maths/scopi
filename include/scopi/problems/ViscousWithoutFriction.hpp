@@ -42,7 +42,8 @@ namespace scopi
                           xt::xtensor<double, 1> lambda);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const scopi_container<dim>& particles);
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
+                                     const scopi_container<dim>& particles);
 
         std::size_t get_nb_gamma_min();
 
@@ -225,7 +226,8 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void ViscousWithoutFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts,
+                                                              const scopi_container<dim>&)
     {
         this->m_distances = xt::zeros<double>({contacts.size() + this->m_nb_gamma_neg});
         for (std::size_t i = 0; i < contacts.size(); ++i)
