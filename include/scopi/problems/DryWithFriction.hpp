@@ -45,7 +45,7 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contact,
                                       const scopi_container<dim>& particles);
         template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, scopi_container<dim>& particles);
 
     private:
         ProblemParams<DryWithFriction> m_params;
@@ -183,7 +183,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts, scopi_container<dim>&)
     {
         this->m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
