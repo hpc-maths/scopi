@@ -434,10 +434,10 @@ namespace scopi
         scopi_container<dim> particles;
         auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
-        globule<dim> g1({{0.5, 0.7}, {2.5, 0.7}, {4.5, 0.7}, {6.5, 0.7}, {8.5, 0.7}, {10.5, 0.7}},
+        globule<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
-        globule<dim> g2({{-0.5, -0.7}, {-2.5, -0.7}, {-4.5, -0.7}, {-6.5, -0.7}, {-8.5, -0.7}, {-10.5, -0.7}},
+        globule<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
         particles.push_back(g1, prop.desired_velocity({-1., 0.}));

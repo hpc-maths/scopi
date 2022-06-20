@@ -117,3 +117,8 @@ TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<2>, 
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<2>, 2)
 
 TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, ViscousWithFriction<2>, 2)
+
+TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, ViscousGlobule, 2)
+#ifdef SCOPI_USE_MKL
+TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMkl, ViscousGlobule, 2)
+#endif
