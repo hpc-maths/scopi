@@ -108,52 +108,26 @@ namespace scopi
                 auto nMatches_loc = index.radiusSearch(query_pt, m_kd_tree_radius, ret_matches,
                     nanoflann::SearchParams());
 
-                //std::cout << i << " nMatches = " << nMatches << std::endl;
-
                 for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
-
                     std::size_t j = ret_matches[ic].first;
-                    //double dist = ret_matches[ic].second;
-                    if (i < j)  { //&& (j>=active_ptr)
-                      auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                      m_nMatches++;
-                      std::size_t size = 6;
-                      for (std::size_t gi = 0; gi < size; ++gi)
-                      {
-                          for (std::size_t gj = 0; gj < size; ++gj)
-                          {
-                              if (neigh[size*gi+gj].dij < m_dmax) {
-                                  neigh[size*gi+gj].i = i*size + gi;
-                                  neigh[size*gi+gj].j = j*size + gj;
-                                  #pragma omp critical
-                                  contacts.emplace_back(std::move(neigh[size*gi+gj]));
-                                  // contacts.back().i = i;
-                                  // contacts.back().j = j;
-                              }
-                          }
-                      }
+                    if (i < j)
+                    { 
+                        compute_exact_distance(particles, i, j, contacts, m_dmax);
+                        m_nMatches++;
                     }
 
                 }
 
             }
 
-            /*
             // obstacles
             for (std::size_t i = 0; i < active_ptr; ++i)
             {
                 for (std::size_t j = active_ptr; j < particles.size(); ++j)
                 {
-                    auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                    if (neigh.dij < m_dmax)
-                    {
-                        neigh.i = i;
-                        neigh.j = j;
-                        contacts.emplace_back(std::move(neigh));
-                    }
+                    compute_exact_distance(particles, i, j, contacts, m_dmax);
                 }
             }
-            */
 
             duration = toc();
             PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << " compute " << m_nMatches << " distances" << std::endl;
@@ -161,18 +135,7 @@ namespace scopi
 
 
             tic();
-            std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
-            {
-                if (a.i < b.i) {
-                  return true;
-                }
-                else {
-                  if (a.i == b.i) {
-                    return a.j < b.j;
-                  }
-                }
-                return false;
-            });
+            sort_contacts(contacts);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 

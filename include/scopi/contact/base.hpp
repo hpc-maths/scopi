@@ -3,6 +3,7 @@
 #include "../container.hpp"
 #include "../objects/methods/closest_points.hpp"
 #include "../objects/neighbor.hpp"
+#include <cstddef>
 #include <nanoflann.hpp>
 
 namespace scopi
@@ -19,7 +20,6 @@ namespace scopi
       double m_dmax;
     };
 
-
     template <class D>
     template <std::size_t dim>
     std::vector<neighbor<dim>> contact_base<D>::run(scopi_container<dim>& particles, std::size_t active_ptr)
@@ -27,4 +27,47 @@ namespace scopi
         return this->derived_cast().run_impl(particles, active_ptr);
     }
 
+    template <std::size_t dim>
+    void compute_exact_distance(scopi_container<dim>& particles, std::size_t i, std::size_t j, std::vector<neighbor<dim>>& contacts, double dmax)
+    {
+        auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+        for (std::size_t ind_i = 0; ind_i < particles[i]->size(); ++ind_i)
+        {
+            for (std::size_t ind_j = 0; ind_j < particles[j]->size(); ++ind_j)
+            {
+                if (neigh[particles[j]->size()*ind_i + ind_j].dij < dmax) {
+                    std::size_t nb_prev_part = 0;
+                    for (std::size_t k = 0; k < i; ++k)
+                    {
+                        nb_prev_part += particles[k]->size();
+                    }
+                    neigh[particles[j]->size()*ind_i + ind_j].i = nb_prev_part + ind_i;
+                    for (std::size_t k = i; k < j; ++k)
+                    {
+                        nb_prev_part += particles[k]->size();
+                    }
+                    neigh[particles[j]->size()*ind_i + ind_j].j = nb_prev_part + ind_j;
+                    #pragma omp critical
+                    contacts.emplace_back(std::move(neigh[particles[j]->size()*ind_i + ind_j]));
+                }
+            }
+        }
+    }
+
+    template <std::size_t dim>
+    void sort_contacts(std::vector<neighbor<dim>>& contacts)
+    {
+        std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
+        {
+          if (a.i < b.i) {
+            return true;
+          }
+          else {
+            if (a.i == b.i) {
+              return a.j < b.j;
+            }
+          }
+          return false;
+        });
+    }
 }
