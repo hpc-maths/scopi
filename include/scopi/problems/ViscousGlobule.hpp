@@ -12,7 +12,7 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 #include "../objects/types/globule.hpp"
-#include "../objects/methods/number_contacts.hpp"
+#include "../objects/methods/matrix_particles.hpp"
 
 #include "../params/ProblemParams.hpp"
 #include "ProblemBase.hpp"
@@ -369,7 +369,7 @@ namespace scopi
         std::size_t nb_extra_contacts = 0;
         for (std::size_t i = 0; i < particles.size(); ++i)
         {
-            nb_extra_contacts += 2*number_contact_per_particle_dispatcher<dim>::dispatch(*particles[i]);
+            nb_extra_contacts += 2*(particles[i]->size()-1);
         }
         return nb_extra_contacts;
     }

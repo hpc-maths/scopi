@@ -13,7 +13,6 @@
 #include <nlohmann/json.hpp>
 
 #include <plog/Log.h>
-#include "objects/methods/number_contacts.hpp"
 #include "plog/Initializers/RollingFileInitializer.h"
 
 #include "container.hpp"

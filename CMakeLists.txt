@@ -193,7 +193,7 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/write_objects.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/closest_points.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/distance.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/number_contacts.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/matrix_particles.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimMosek.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeOmp.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimScs.hpp
