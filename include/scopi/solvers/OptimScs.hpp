@@ -10,12 +10,12 @@ namespace scopi
     template<class problem_t>
     class OptimScs;
 
-    template<>
-    class OptimParams<OptimScs>
+    template<class problem_t>
+    class OptimParams<OptimScs<problem_t>>
     {
     public:
         OptimParams();
-        OptimParams(OptimParams<OptimScs>& params);
+        OptimParams(OptimParams<OptimScs<problem_t>>& params);
 
         double m_tol;
         double m_tol_infeas;
@@ -26,6 +26,7 @@ namespace scopi
     {
     public:
         using base_type = OptimBase<OptimScs<problem_t>>;
+        using problem_type = problem_t; 
 
         template <std::size_t dim>
         OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params);
@@ -289,5 +290,17 @@ namespace scopi
             }
         }
     }
+
+    template<class problem_t>
+    OptimParams<OptimScs<problem_t>>::OptimParams()
+    : m_tol(1e-7)
+    , m_tol_infeas(1e-10)
+    {}
+
+    template<class problem_t>
+    OptimParams<OptimScs<problem_t>>::OptimParams(OptimParams<OptimScs<problem_t>>& params)
+    : m_tol(params.m_tol)
+    , m_tol_infeas(params.m_tol_infeas)
+    {}
 }
 #endif

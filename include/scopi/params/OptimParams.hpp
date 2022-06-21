@@ -7,7 +7,7 @@
 
 namespace scopi
 {
-    template<template <class> class solver_t>
+    template<class solver_t>
     class OptimParams
     {
     private:
@@ -18,7 +18,7 @@ namespace scopi
     {
     public:
         OptimParamsUzawaBase();
-        template<template <class> class solver_t>
+        template<class solver_t>
         OptimParamsUzawaBase(OptimParams<solver_t>& params);
 
         double m_tol;
@@ -26,7 +26,7 @@ namespace scopi
         double m_rho;
     };
 
-    template<template <class> class solver_t>
+    template<class solver_t>
     OptimParamsUzawaBase::OptimParamsUzawaBase(OptimParams<solver_t>& params)
     : m_tol(params.m_tol)
     , m_max_iter(params.m_max_iter)

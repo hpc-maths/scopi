@@ -14,8 +14,8 @@ namespace scopi{
     template<class problem_t>
     class OptimMosek;
 
-    template<>
-    class OptimParams<OptimMosek>
+    template<class problem_t>
+    class OptimParams<OptimMosek<problem_t>>
     {};
 
     template<class problem_t = DryWithoutFriction>
@@ -24,6 +24,7 @@ namespace scopi{
     {
     public:
         using base_type = OptimBase<OptimMosek<problem_t>>;
+        using problem_type = problem_t; 
 
         template <std::size_t dim>
         OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& optim_params);

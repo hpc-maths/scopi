@@ -18,8 +18,8 @@ namespace scopi
     template<class problem_t>
     class OptimUzawaMatrixFreeTbb;
 
-    template<>
-    class OptimParams<OptimUzawaMatrixFreeTbb> : public OptimParamsUzawaBase
+    template<class problem_t>
+    class OptimParams<OptimUzawaMatrixFreeTbb<problem_t>> : public OptimParamsUzawaBase
     {};
 
     template<class problem_t = DryWithoutFriction>
@@ -27,6 +27,7 @@ namespace scopi
     {
     public:
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeTbb<problem_t>, problem_t>;
+        using problem_type = problem_t; 
         template <std::size_t dim>
         OptimUzawaMatrixFreeTbb(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimUzawaMatrixFreeTbb>& optim_params);
 
