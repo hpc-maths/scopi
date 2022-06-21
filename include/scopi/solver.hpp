@@ -39,7 +39,6 @@ using namespace xt::placeholders;
 namespace scopi
 {
     template <std::size_t dim,
-              class problem_t, 
               class optim_solver_t>
     struct isSpecialType
     {
@@ -47,14 +46,14 @@ namespace scopi
     };
 
     template <std::size_t dim,
-              class optim_solver_t>
-    struct isSpecialType<dim, ViscousWithoutFriction<dim>, optim_solver_t>
+              template<class> class optim_solver_t>
+    struct isSpecialType<dim, optim_solver_t<ViscousWithoutFriction<dim>>>
     {
         static constexpr std::size_t value { 1 };
     };
 
     template <std::size_t dim>
-    struct isSpecialType<dim, ViscousWithFriction<dim>, OptimMosek<ViscousWithFriction<dim>>>
+    struct isSpecialType<dim, OptimMosek<ViscousWithFriction<dim>>>
     {
         static constexpr std::size_t value { 2 };
     };
@@ -87,7 +86,7 @@ namespace scopi
              class optim_solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed, 
-             std::size_t = isSpecialType<dim, typename optim_solver_t::problem_type, optim_solver_t>::value
+             std::size_t = isSpecialType<dim, optim_solver_t>::value
              >
     class ScopiSolver;
 
