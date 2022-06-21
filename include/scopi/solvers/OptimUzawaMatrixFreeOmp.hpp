@@ -18,7 +18,7 @@ namespace scopi{
     class OptimUzawaMatrixFreeOmp;
 
     template<class problem_t>
-    class OptimParams<OptimUzawaMatrixFreeOmp<problem_t>> : public OptimParamsUzawaBase
+    class OptimParams<OptimUzawaMatrixFreeOmp<problem_t>> : public OptimParamsUzawaBase<problem_t>
     {};
 
     template<class problem_t = DryWithoutFriction>

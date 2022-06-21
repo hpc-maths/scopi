@@ -15,11 +15,25 @@
 #include "../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
+    template<class problem_t>
+    class OptimParamsUzawaBase
+    {
+    public:
+        OptimParamsUzawaBase();
+        OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
+
+        ProblemParams<problem_t> m_problem_params;
+        double m_tol;
+        std::size_t m_max_iter;
+        double m_rho;
+    };
+
     template<class Derived, class problem_t = DryWithoutFriction>
     class OptimUzawaBase: public OptimBase<Derived>
     {
     public:
         using base_type = OptimBase<Derived>;
+        using problem_type = problem_t; 
         template <class solver_t>
         OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<solver_t>& optim_params);
 
@@ -59,7 +73,7 @@ namespace scopi{
         xt::xtensor<double, 1> m_L;
         xt::xtensor<double, 1> m_R;
 
-        OptimParamsUzawaBase m_params;
+        OptimParamsUzawaBase<problem_t> m_params;
 
     };
 
@@ -223,4 +237,21 @@ namespace scopi{
     {
         static_cast<Derived&>(*this).finalize_uzawa_impl();
     }
+
+    template<class problem_t>
+    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase(const OptimParamsUzawaBase& params)
+    : m_problem_params(params.m_problem_params)
+    , m_tol(params.m_tol)
+    , m_max_iter(params.m_max_iter)
+    , m_rho(params.m_rho)
+    {}
+
+    template<class problem_t>
+    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase()
+    : m_problem_params()
+    , m_tol(1e-9)
+    , m_max_iter(40000)
+    , m_rho(2000.)
+    {}
+
 }

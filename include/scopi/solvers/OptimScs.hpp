@@ -17,6 +17,7 @@ namespace scopi
         OptimParams();
         OptimParams(OptimParams<OptimScs<problem_t>>& params);
 
+        ProblemParams<problem_t> m_problem_params;
         double m_tol;
         double m_tol_infeas;
     };
@@ -293,13 +294,15 @@ namespace scopi
 
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams()
-    : m_tol(1e-7)
+    : m_problem_params()
+    , m_tol(1e-7)
     , m_tol_infeas(1e-10)
     {}
 
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams(OptimParams<OptimScs<problem_t>>& params)
-    : m_tol(params.m_tol)
+    : m_problem_params(params.m_problem_params)
+    , m_tol(params.m_tol)
     , m_tol_infeas(params.m_tol_infeas)
     {}
 }

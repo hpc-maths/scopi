@@ -18,7 +18,7 @@ namespace scopi
     class OptimUzawaMkl;
 
     template<class problem_t>
-    class OptimParams<OptimUzawaMkl<problem_t>> : public OptimParamsUzawaBase
+    class OptimParams<OptimUzawaMkl<problem_t>> : public OptimParamsUzawaBase<problem_t>
     {};
 
     template <class problem_t = DryWithoutFriction>
