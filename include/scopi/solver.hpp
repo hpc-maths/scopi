@@ -99,6 +99,7 @@ namespace scopi
     {
     public:
         using problem_t = typename optim_solver_t::problem_type;
+        using solver_type = optim_solver_t;
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
                     const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>());
@@ -114,6 +115,7 @@ namespace scopi
     {
     public:
         using problem_t = typename optim_solver_t::problem_type;
+        using solver_type = optim_solver_t;
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
                     const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>());
@@ -129,6 +131,7 @@ namespace scopi
     {
     public:
         using problem_t = typename optim_solver_t::problem_type;
+        using solver_type = optim_solver_t;
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
                     const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>());

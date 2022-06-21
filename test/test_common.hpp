@@ -24,52 +24,41 @@
 
 namespace scopi
 {
-    template <class first, class second, class third>
-    struct SolverWithParams
-    {
-        using SolverType = first;
-        using OptimParamsType = second;
-        using ProblemParamsType = third;
-    };
-
-#define SET_SOLVER_AND_PARAMS(solver, problem, dim, contact, vap) \
-    SolverWithParams<ScopiSolver<dim, problem, solver, contact, vap>, OptimParams<solver>, ProblemParams<problem>>
-
 #ifdef SCOPI_USE_MKL
 #define SOLVER_DRY_WITHOUT_FRICTION(dim, contact, vap) \
-    SET_SOLVER_AND_PARAMS(OptimMosek, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimScs, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMkl, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeTbb, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeOmp, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimMosek, DryWithFriction, dim, contact, vap) // friction with mu = 0
+    ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimScs<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMkl<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeTbb<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeOmp<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap> // friction with mu = 0
 #else
 #define SOLVER_DRY_WITHOUT_FRICTION(dim, contact, vap) \
-    SET_SOLVER_AND_PARAMS(OptimMosek, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimScs, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeTbb, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeOmp, DryWithoutFriction, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimMosek, DryWithFriction, dim, contact, vap) // friction with mu = 0
+    ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimScs<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeTbb<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeOmp<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap> // friction with mu = 0
 #endif
 
 #define SOLVER_DRY_WITH_FRICTION(dim, contact, vap) \
-    SET_SOLVER_AND_PARAMS(OptimMosek, DryWithFriction, dim, contact, vap)
+    ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap> \
 
 #ifdef SCOPI_USE_MKL
 #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
-    SET_SOLVER_AND_PARAMS(OptimMosek, ViscousWithoutFriction<dim>, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMkl, ViscousWithoutFriction<dim>, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<dim>, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<dim>, dim, contact, vap)
+    ScopiSolver<dim, OptimMosek<ViscousWithoutFriction<dim>>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMkl<ViscousWithoutFriction<dim>>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<dim>>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<dim>>, contact, vap>
 #else
 #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
-    SET_SOLVER_AND_PARAMS(OptimMosek, ViscousWithoutFriction<dim>, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<dim>, dim, contact, vap), \
-    SET_SOLVER_AND_PARAMS(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<dim>, dim, contact, vap)
+    ScopiSolver<dim, OptimMosek<ViscousWithoutFriction<dim>>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<dim>>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<dim>>, contact, vap>
 #endif
 
 #define SOLVER_VISCOUS_WITH_FRICTION(dim, contact, vap) \
-    SET_SOLVER_AND_PARAMS(OptimMosek, ViscousWithFriction<dim>, dim, contact, vap)
+    ScopiSolver<dim, OptimMosek<ViscousWithFriction<dim>>, contact, vap>
 
 #define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \
     static size_t _doctest_subcase_idx = 0; \
@@ -82,7 +71,7 @@ namespace scopi
 }
 
 #define TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact, vap) \
-    TYPE_TO_STRING(scopi::SolverWithParams<scopi::ScopiSolver<dim, scopi::problem, scopi::solver, scopi::contact, scopi::vap>, scopi::OptimParams<scopi::solver>, scopi::ProblemParams<scopi::problem>>)
+    TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::solver<scopi::problem>, scopi::contact, scopi::vap>)
 #define TYPE_TO_STRING_CONTACTS_VAP(solver, problem, dim)\
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fixed); \
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fpd); \

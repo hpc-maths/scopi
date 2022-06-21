@@ -13,12 +13,9 @@
 
 namespace scopi {
 
-    TEST_CASE_TEMPLATE("two spheres asymetrical friction", SolverAndParams, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two spheres asymetrical friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
     {
-        using SolverType = typename SolverAndParams::SolverType;
-        using OptimParamsType = typename SolverAndParams::OptimParamsType;
-        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
-
+        using solver_t = typename SolverType::solver_type;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -32,21 +29,17 @@ namespace scopi {
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        OptimParamsType optim_params;
-        ProblemParamsType problem_params;
-        problem_params.m_mu = mu;
-        SolverType solver(particles, dt, optim_params, problem_params);
+        OptimParams<solver_t> params;
+        params.m_problem_params.m_mu = mu;
+        SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d spheres friction", SolverAndParams, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("critical 2d spheres friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
     {
-        using SolverType = typename SolverAndParams::SolverType;
-        using OptimParamsType = typename SolverAndParams::OptimParamsType;
-        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
-
+        using solver_t = typename SolverType::solver_type;
         static constexpr std::size_t dim = 2;
         double dt = .01;
         std::size_t total_it = 100;
@@ -81,32 +74,28 @@ namespace scopi {
             }
         }
 
-        OptimParamsType optim_params;
-        ProblemParamsType problem_params;
-        problem_params.m_mu = mu;
-        SolverType solver(particles, dt, optim_params, problem_params);
+        OptimParams<solver_t> params;
+        params.m_problem_params.m_mu = mu;
+        SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere inclined plan friction", SolverAndParams, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE("sphere inclined plan friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
-        using SolverType = typename SolverAndParams::SolverType;
-        using OptimParamsType = typename SolverAndParams::OptimParamsType;
-        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
-
+        using solver_t = typename SolverType::solver_type;
         std::tuple<double, double, double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double, double, double>>
             data_container({std::make_tuple(0.1, PI/6., 0.00101117, 0.00409424, 0.00100648, 0.000971288),
-                            std::make_tuple(0.1, PI/4., 0.00102263, 0.00304414, 0.00100977, 0.000929086),
-                            std::make_tuple(0.1, PI/3., 0.00102867, 0.00178655, 0.00101159, 0.000856009),
-                            std::make_tuple(0.5, PI/6., 0.00105583, 0.00715824, 0.86414, 0.000999002),
-                            std::make_tuple(0.5, PI/4., 0.00104746, 0.0102814, 0.859236, 0.000999008),
-                            std::make_tuple(0.5, PI/3., 0.0010907, 0.0096141, 0.00105025, 0.000883162),
-                            std::make_tuple(1., PI/6., 0.00107652, 0.00680805, 0.86414, 0.000999002),
-                            std::make_tuple(1., PI/4., 0.00112413, 0.00844355, 0.859236, 0.000999003), 
-                            std::make_tuple(1., PI/3., 0.0011583, 0.00915214, 0.848851, 0.000999013)});
+                    std::make_tuple(0.1, PI/4., 0.00102263, 0.00304414, 0.00100977, 0.000929086),
+                    std::make_tuple(0.1, PI/3., 0.00102867, 0.00178655, 0.00101159, 0.000856009),
+                    std::make_tuple(0.5, PI/6., 0.00105583, 0.00715824, 0.86414, 0.000999002),
+                    std::make_tuple(0.5, PI/4., 0.00104746, 0.0102814, 0.859236, 0.000999008),
+                    std::make_tuple(0.5, PI/3., 0.0010907, 0.0096141, 0.00105025, 0.000883162),
+                    std::make_tuple(1., PI/6., 0.00107652, 0.00680805, 0.86414, 0.000999002),
+                    std::make_tuple(1., PI/4., 0.00112413, 0.00844355, 0.859236, 0.000999003), 
+                    std::make_tuple(1., PI/3., 0.0011583, 0.00915214, 0.848851, 0.000999013)});
 
         DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
 
@@ -127,10 +116,9 @@ namespace scopi {
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0., -g}}));
 
-        OptimParamsType optim_params;
-        ProblemParamsType problem_params;
-        problem_params.m_mu = mu;
-        SolverType solver(particles, dt, optim_params, problem_params);
+        OptimParams<solver_t> params;
+        params.m_problem_params.m_mu = mu;
+        SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
         auto pos = particles.pos();

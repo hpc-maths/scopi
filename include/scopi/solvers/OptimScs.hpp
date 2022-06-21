@@ -15,7 +15,7 @@ namespace scopi
     {
     public:
         OptimParams();
-        OptimParams(OptimParams<OptimScs<problem_t>>& params);
+        OptimParams(const OptimParams<OptimScs<problem_t>>& params);
 
         ProblemParams<problem_t> m_problem_params;
         double m_tol;
@@ -297,7 +297,7 @@ namespace scopi
     {}
 
     template<class problem_t>
-    OptimParams<OptimScs<problem_t>>::OptimParams(OptimParams<OptimScs<problem_t>>& params)
+    OptimParams<OptimScs<problem_t>>::OptimParams(const OptimParams<OptimScs<problem_t>>& params)
     : m_problem_params(params.m_problem_params)
     , m_tol(params.m_tol)
     , m_tol_infeas(params.m_tol_infeas)
