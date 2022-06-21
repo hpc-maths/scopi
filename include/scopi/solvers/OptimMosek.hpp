@@ -14,9 +14,15 @@ namespace scopi{
     template<class problem_t>
     class OptimMosek;
 
-    template<>
-    class OptimParams<OptimMosek>
-    {};
+    template<class problem_t>
+    class OptimParams<OptimMosek<problem_t>>
+    {
+    public:
+        OptimParams();
+        OptimParams(const OptimParams<OptimMosek<problem_t>>& params);
+
+        ProblemParams<problem_t> m_problem_params;
+    };
 
     template<class problem_t = DryWithoutFriction>
     class OptimMosek: public OptimBase<OptimMosek<problem_t>>
@@ -24,9 +30,10 @@ namespace scopi{
     {
     public:
         using base_type = OptimBase<OptimMosek<problem_t>>;
+        using problem_type = problem_t; 
 
         template <std::size_t dim>
-        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& optim_params);
+        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimMosek<problem_t>>& optim_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(scopi_container<dim>& particles,
@@ -54,8 +61,6 @@ namespace scopi{
         mosek::fusion::Matrix::t m_Az;
         mosek::fusion::Matrix::t m_A;
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
-
-        OptimParams<OptimMosek> m_params;
     };
 
     template<class problem_t>
@@ -122,10 +127,9 @@ namespace scopi{
 
     template<class problem_t>
     template <std::size_t dim>
-    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimMosek>& optim_params)
-    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
+    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimMosek<problem_t>>& optim_params)
+    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, optim_params)
     , ConstraintMosek<problem_t>(nparts)
-    , m_params(optim_params)
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -235,5 +239,15 @@ namespace scopi{
             }
         }
     }
+
+    template<class problem_t>
+    OptimParams<OptimMosek<problem_t>>::OptimParams(const OptimParams<OptimMosek<problem_t>>& params)
+    : m_problem_params(params.m_problem_params)
+    {}
+
+    template<class problem_t>
+    OptimParams<OptimMosek<problem_t>>::OptimParams()
+    : m_problem_params()
+    {}
 }
 #endif

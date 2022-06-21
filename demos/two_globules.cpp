@@ -25,9 +25,7 @@ int main()
     particles.push_back(g1, prop.desired_velocity({-1., 0.}));
     particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
-    scopi::OptimParams<scopi::OptimMosek> optim_params;
-    scopi::ProblemParams<scopi::ViscousGlobule> problem_params;
-    scopi::ScopiSolver<dim, scopi::ViscousGlobule, scopi::OptimMosek> solver(particles, dt, optim_params, problem_params);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousGlobule>> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;

@@ -47,9 +47,7 @@ int main()
     }
 
 
-    scopi::OptimParams<scopi::OptimMosek> optim_params;
-    scopi::ProblemParams<scopi::ViscousGlobule> problem_params;
-    scopi::ScopiSolver<dim, scopi::ViscousGlobule, scopi::OptimMosek> solver(particles, dt, optim_params, problem_params);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousGlobule>> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;

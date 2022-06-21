@@ -28,7 +28,7 @@ namespace scopi
     class ViscousGlobule: public ProblemBase
     {
     public:
-        ViscousGlobule(std::size_t nparts, double dt, ProblemParams<ViscousGlobule>& problem_params);
+        ViscousGlobule(std::size_t nparts, double dt, const ProblemParams<ViscousGlobule>& problem_params);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(scopi_container<dim>& particles,

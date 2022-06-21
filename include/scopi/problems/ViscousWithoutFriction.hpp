@@ -23,7 +23,7 @@ namespace scopi
     {
     public:
         ProblemParams();
-        ProblemParams(ProblemParams<ViscousWithoutFriction<dim>>& params);
+        ProblemParams(const ProblemParams<ViscousWithoutFriction<dim>>& params);
 
         double m_tol;
     };
@@ -33,7 +33,7 @@ namespace scopi
                                 , public ViscousBase<dim>
     {
     public:
-        ViscousWithoutFriction(std::size_t nparts, double dt, ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
+        ViscousWithoutFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
@@ -170,7 +170,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt, ProblemParams<ViscousWithoutFriction<dim>>& problem_params)
+    ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params)
     : ProblemBase(nparticles, dt)
     , ViscousBase<dim>()
     , m_params(problem_params)
@@ -393,7 +393,7 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    ProblemParams<ViscousWithoutFriction<dim>>::ProblemParams(ProblemParams<ViscousWithoutFriction<dim>>& params)
+    ProblemParams<ViscousWithoutFriction<dim>>::ProblemParams(const ProblemParams<ViscousWithoutFriction<dim>>& params)
     : m_tol(params.m_tol)
     {}
 

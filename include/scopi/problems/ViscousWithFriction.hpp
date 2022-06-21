@@ -24,7 +24,7 @@ namespace scopi
     {
     public:
         ProblemParams();
-        ProblemParams(ProblemParams<ViscousWithFriction<dim>>& params);
+        ProblemParams(const ProblemParams<ViscousWithFriction<dim>>& params);
 
         double m_mu;
         double m_gamma_min;
@@ -36,7 +36,7 @@ namespace scopi
                              , public ViscousBase<dim>
     {
     public:
-        ViscousWithFriction(std::size_t nparts, double dt, ProblemParams<ViscousWithFriction<dim>>& problem_params);
+        ViscousWithFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithFriction<dim>>& problem_params);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
@@ -292,7 +292,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    ViscousWithFriction<dim>::ViscousWithFriction(std::size_t nparticles, double dt, ProblemParams<ViscousWithFriction<dim>>& problem_params)
+    ViscousWithFriction<dim>::ViscousWithFriction(std::size_t nparticles, double dt, const ProblemParams<ViscousWithFriction<dim>>& problem_params)
     : ProblemBase(nparticles, dt)
     , ViscousBase<dim>()
     , m_params(problem_params)
@@ -420,7 +420,7 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    ProblemParams<ViscousWithFriction<dim>>::ProblemParams(ProblemParams<ViscousWithFriction<dim>>& params)
+    ProblemParams<ViscousWithFriction<dim>>::ProblemParams(const ProblemParams<ViscousWithFriction<dim>>& params)
     : m_mu(params.m_mu)
     , m_gamma_min(params.m_gamma_min)
     , m_tol(params.m_tol)

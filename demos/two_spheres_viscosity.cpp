@@ -21,9 +21,7 @@ int main()
     particles.push_back(s1, prop.velocity({0.3, 0.75}));
     particles.push_back(s2, prop.velocity({0., 0.}));
 
-    scopi::OptimParams<scopi::OptimMosek> optim_params;
-    scopi::ProblemParams<ViscousWithFriction<dim>> problem_params;
-    scopi::ScopiSolver<dim, scopi::ViscousWithFriction<dim>, scopi::OptimMosek, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, optim_params, problem_params);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousWithFriction<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;

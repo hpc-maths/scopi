@@ -422,12 +422,8 @@ namespace scopi
         }
     }
 
-    TEST_CASE_TEMPLATE("two globules", SolverAndParams, SOLVER_VISCOUS_GLOBULE(2, contact_kdtree, vap_fixed)/*, SOLVER_VISCOUS_GLOBULE(2, contact_brute_force, vap_fixed)*/)
+    TEST_CASE_TEMPLATE("two globules", SolverType, SOLVER_VISCOUS_GLOBULE(2, contact_kdtree, vap_fixed), SOLVER_VISCOUS_GLOBULE(2, contact_brute_force, vap_fixed))
     {
-        using SolverType = typename SolverAndParams::SolverType;
-        using OptimParamsType = typename SolverAndParams::OptimParamsType;
-        using ProblemParamsType = typename SolverAndParams::ProblemParamsType;
-
         constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -443,9 +439,7 @@ namespace scopi
         particles.push_back(g1, prop.desired_velocity({-1., 0.}));
         particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
-        OptimParamsType optim_params;
-        ProblemParamsType problem_params;
-        SolverType solver(particles, dt, optim_params, problem_params);
+        SolverType solver(particles, dt);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_globules.json", tolerance));

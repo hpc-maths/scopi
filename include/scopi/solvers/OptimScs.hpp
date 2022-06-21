@@ -10,13 +10,14 @@ namespace scopi
     template<class problem_t>
     class OptimScs;
 
-    template<>
-    class OptimParams<OptimScs>
+    template<class problem_t>
+    class OptimParams<OptimScs<problem_t>>
     {
     public:
         OptimParams();
-        OptimParams(OptimParams<OptimScs>& params);
+        OptimParams(const OptimParams<OptimScs<problem_t>>& params);
 
+        ProblemParams<problem_t> m_problem_params;
         double m_tol;
         double m_tol_infeas;
     };
@@ -26,9 +27,10 @@ namespace scopi
     {
     public:
         using base_type = OptimBase<OptimScs<problem_t>>;
+        using problem_type = problem_t; 
 
         template <std::size_t dim>
-        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params);
+        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -68,8 +70,6 @@ namespace scopi
         ScsSettings m_stgs;
         OptimScs(const OptimScs &);
         OptimScs & operator=(const OptimScs &);
-
-        OptimParams<OptimScs> m_params;
     };
 
     template <class problem_t>
@@ -129,14 +129,13 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params)
-    : base_type(nparts, dt, 2*3*nparts, 0)
+    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
     , m_P_p(6*nparts+1)
     , m_A_p(6*nparts+1)
     , m_sol_x(6*nparts)
-    , m_params(optim_params)
     {
         auto active_offset = particles.nb_inactive();
         std::size_t index = 0;
@@ -167,9 +166,9 @@ namespace scopi
         m_P.n = 6*nparts;
 
         scs_set_default_settings(&m_stgs);
-        m_stgs.eps_abs = m_params.m_tol;
-        m_stgs.eps_rel = m_params.m_tol;
-        m_stgs.eps_infeas = m_params.m_tol_infeas;
+        m_stgs.eps_abs = this->m_params.m_tol;
+        m_stgs.eps_rel = this->m_params.m_tol;
+        m_stgs.eps_infeas = this->m_params.m_tol_infeas;
         m_stgs.verbose = 0;
     }
 
@@ -289,5 +288,19 @@ namespace scopi
             }
         }
     }
+
+    template<class problem_t>
+    OptimParams<OptimScs<problem_t>>::OptimParams()
+    : m_problem_params()
+    , m_tol(1e-7)
+    , m_tol_infeas(1e-10)
+    {}
+
+    template<class problem_t>
+    OptimParams<OptimScs<problem_t>>::OptimParams(const OptimParams<OptimScs<problem_t>>& params)
+    : m_problem_params(params.m_problem_params)
+    , m_tol(params.m_tol)
+    , m_tol_infeas(params.m_tol_infeas)
+    {}
 }
 #endif

@@ -3,6 +3,14 @@
 
 namespace scopi
 {
+    ProblemParams<DryWithFriction>::ProblemParams()
+    : m_mu(0.)
+    {}
+
+    ProblemParams<DryWithFriction>::ProblemParams(const ProblemParams<DryWithFriction>& params)
+    : m_mu(params.m_mu)
+    {}
+
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0)
     {
         double x_normal, theta;
@@ -69,7 +77,7 @@ namespace scopi
     }
 
 
-    DryWithFriction::DryWithFriction(std::size_t nparticles, double dt, ProblemParams<DryWithFriction>& problem_params)
+    DryWithFriction::DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params)
     : ProblemBase(nparticles, dt) 
     , m_params(problem_params)
     {}

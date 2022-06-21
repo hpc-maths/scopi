@@ -24,7 +24,7 @@ namespace scopi
     {
 
     public:
-        DryWithoutFriction(std::size_t nparts, double dt, ProblemParams<DryWithoutFriction>& problem_params);
+        DryWithoutFriction(std::size_t nparts, double dt, const ProblemParams<DryWithoutFriction>& problem_params);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,

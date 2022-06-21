@@ -26,7 +26,7 @@ namespace scopi
     {
     public:
         ProblemParams();
-        ProblemParams(ProblemParams<DryWithFriction>& params);
+        ProblemParams(const ProblemParams<DryWithFriction>& params);
 
         double m_mu;
     };
@@ -35,7 +35,7 @@ namespace scopi
     {
 
     public:
-        DryWithFriction(std::size_t nparticles, double dt, ProblemParams<DryWithFriction>& problem_params);
+        DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,

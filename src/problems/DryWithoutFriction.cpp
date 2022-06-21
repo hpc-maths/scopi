@@ -3,7 +3,7 @@
 
 namespace scopi
 {
-    DryWithoutFriction::DryWithoutFriction(std::size_t nparticles, double dt, ProblemParams<DryWithoutFriction>&)
+    DryWithoutFriction::DryWithoutFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithoutFriction>&)
     : ProblemBase(nparticles, dt)
     {}
 

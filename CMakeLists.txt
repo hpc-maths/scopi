@@ -100,8 +100,6 @@ endif()
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
-    src/params/ProblemParams.cpp
-    src/params/OptimParams.cpp
     src/problems/DryWithoutFriction.cpp
     src/problems/DryWithFriction.cpp
     src/problems/ViscousGlobule.cpp

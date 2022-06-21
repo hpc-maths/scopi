@@ -15,13 +15,26 @@
 #include "../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
+    template<class problem_t>
+    class OptimParamsUzawaBase
+    {
+    public:
+        OptimParamsUzawaBase();
+        OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
+
+        ProblemParams<problem_t> m_problem_params;
+        double m_tol;
+        std::size_t m_max_iter;
+        double m_rho;
+    };
+
     template<class Derived, class problem_t = DryWithoutFriction>
     class OptimUzawaBase: public OptimBase<Derived>
     {
     public:
         using base_type = OptimBase<Derived>;
-        template <template <class> class solver_t>
-        OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& optim_params);
+        using problem_type = problem_t; 
+        OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(scopi_container<dim>& particles,
@@ -58,18 +71,13 @@ namespace scopi{
         xt::xtensor<double, 1> m_U;
         xt::xtensor<double, 1> m_L;
         xt::xtensor<double, 1> m_R;
-
-        OptimParamsUzawaBase m_params;
-
     };
 
     template<class Derived, class problem_t>
-    template <template <class> class solver_t>
-    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, OptimParams<solver_t>& optim_params)
-    : base_type(nparts, dt, 2*3*nparts, 0)
+    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
     , m_dmin(0.)
     , m_U(xt::zeros<double>({6*nparts}))
-    , m_params(optim_params)
     {}
 
     template<class Derived, class problem_t>
@@ -96,7 +104,7 @@ namespace scopi{
 
         std::size_t cc = 0;
         double cmax = -1000.0;
-        while ( (cmax<=-m_params.m_tol) && (cc <= m_params.m_max_iter) )
+        while ( (cmax<=-this->m_params.m_tol) && (cc <= this->m_params.m_max_iter) )
         {
             tic();
             xt::noalias(m_U) = this->m_c;
@@ -129,7 +137,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            xt::noalias(m_L) = xt::maximum( m_L-m_params.m_rho*m_R, 0);
+            xt::noalias(m_L) = xt::maximum( m_L-this->m_params.m_rho*m_R, 0);
             duration = toc();
             time_assign_l += duration;
             time_solve += duration;
@@ -146,7 +154,7 @@ namespace scopi{
             PLOG_VERBOSE << std::setw(24) << std::scientific << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
         }
 
-        PLOG_ERROR_IF(cc >= m_params.m_max_iter) << "Uzawa does not converge";
+        PLOG_ERROR_IF(cc >= this->m_params.m_max_iter) << "Uzawa does not converge";
 
         PLOG_INFO << "----> CPUTIME : solve (total) = " << time_solve;
         PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
@@ -225,4 +233,21 @@ namespace scopi{
     {
         static_cast<Derived&>(*this).finalize_uzawa_impl();
     }
+
+    template<class problem_t>
+    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase(const OptimParamsUzawaBase& params)
+    : m_problem_params(params.m_problem_params)
+    , m_tol(params.m_tol)
+    , m_max_iter(params.m_max_iter)
+    , m_rho(params.m_rho)
+    {}
+
+    template<class problem_t>
+    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase()
+    : m_problem_params()
+    , m_tol(1e-9)
+    , m_max_iter(40000)
+    , m_rho(2000.)
+    {}
+
 }
