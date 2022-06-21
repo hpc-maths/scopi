@@ -40,20 +40,20 @@ namespace scopi
 {
     template <std::size_t dim,
               class optim_solver_t>
-    struct isSpecialType
+    struct SolverType
     {
         static constexpr std::size_t value { 0 };
     };
 
     template <std::size_t dim,
               template<class> class optim_solver_t>
-    struct isSpecialType<dim, optim_solver_t<ViscousWithoutFriction<dim>>>
+    struct SolverType<dim, optim_solver_t<ViscousWithoutFriction<dim>>>
     {
         static constexpr std::size_t value { 1 };
     };
 
     template <std::size_t dim>
-    struct isSpecialType<dim, OptimMosek<ViscousWithFriction<dim>>>
+    struct SolverType<dim, OptimMosek<ViscousWithFriction<dim>>>
     {
         static constexpr std::size_t value { 2 };
     };
@@ -67,7 +67,7 @@ namespace scopi
     {
     protected:
         using problem_t = typename optim_solver_t::problem_type;
-        ScopiSolverBase(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params);
+        ScopiSolverBase(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params, const ProblemParams<problem_t>& problem_params);
 
     protected:
         void displacement_obstacles();
@@ -86,7 +86,7 @@ namespace scopi
              class optim_solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed, 
-             std::size_t = isSpecialType<dim, optim_solver_t>::value
+             std::size_t = SolverType<dim, optim_solver_t>::value
              >
     class ScopiSolver;
 
@@ -99,7 +99,10 @@ namespace scopi
     {
     public:
         using problem_t = typename optim_solver_t::problem_type;
-        ScopiSolver(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params);
+        ScopiSolver(scopi_container<dim>& particles,
+                    double dt,
+                    const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>(),
+                    const ProblemParams<problem_t>& problem_params = ProblemParams<problem_t>());
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
     };
 
@@ -112,7 +115,10 @@ namespace scopi
     {
     public:
         using problem_t = typename optim_solver_t::problem_type;
-        ScopiSolver(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params);
+        ScopiSolver(scopi_container<dim>& particles,
+                    double dt,
+                    const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>(),
+                    const ProblemParams<problem_t>& problem_params = ProblemParams<problem_t>());
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
     };
 
@@ -125,14 +131,17 @@ namespace scopi
     {
     public:
         using problem_t = typename optim_solver_t::problem_type;
-        ScopiSolver(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params);
+        ScopiSolver(scopi_container<dim>& particles,
+                    double dt,
+                    const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>(),
+                    const ProblemParams<problem_t>& problem_params = ProblemParams<problem_t>());
         void solve(std::size_t total_it, std::size_t initial_iter = 0);
     private:
         vap_projection m_vap_projection;
     };
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>::ScopiSolverBase(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params)
+    ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>::ScopiSolverBase(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params, const ProblemParams<problem_t>& problem_params)
     : m_particles(particles)
     , m_dt(dt)
     , m_solver(m_particles.nb_active(), m_dt, particles, optim_params)
@@ -141,17 +150,17 @@ namespace scopi
     {}
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 0>::ScopiSolver(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params)
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 0>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params, const ProblemParams<problem_t>& problem_params)
     : ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>(particles, dt, optim_params, problem_params)
     {}
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 1>::ScopiSolver(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params)
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 1>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params, const ProblemParams<problem_t>& problem_params)
     : ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>(particles, dt, optim_params, problem_params)
     {}
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 2>::ScopiSolver(scopi_container<dim>& particles, double dt, OptimParams<optim_solver_t>& optim_params, ProblemParams<problem_t>& problem_params)
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 2>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params, const ProblemParams<problem_t>& problem_params)
     : ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>(particles, dt, optim_params, problem_params)
     , m_vap_projection(this->m_particles.nb_active(), this->m_particles.nb_inactive(), this->m_dt)
     {}

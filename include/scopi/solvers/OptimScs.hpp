@@ -29,7 +29,7 @@ namespace scopi
         using problem_type = problem_t; 
 
         template <std::size_t dim>
-        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params);
+        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -130,7 +130,7 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, OptimParams<OptimScs>& optim_params)
+    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params)
     : base_type(nparts, dt, 2*3*nparts, 0)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)

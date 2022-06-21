@@ -8,7 +8,7 @@ namespace scopi
     : m_mu(0.)
     {}
 
-    ProblemParams<DryWithFriction>::ProblemParams(ProblemParams<DryWithFriction>& params)
+    ProblemParams<DryWithFriction>::ProblemParams(const ProblemParams<DryWithFriction>& params)
     : m_mu(params.m_mu)
     {}
 }

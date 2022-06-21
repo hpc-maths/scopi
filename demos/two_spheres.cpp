@@ -19,9 +19,8 @@ int main()
 
     scopi::OptimParams<scopi::OptimUzawaMatrixFreeOmp<scopi::DryWithoutFriction>> optim_params;
     optim_params.m_max_iter = 1000;
-    scopi::ProblemParams<scopi::DryWithoutFriction> problem_params;
 
-    scopi::ScopiSolver<dim> solver(particles, dt, optim_params, problem_params);
+    scopi::ScopiSolver<dim> solver(particles, dt, optim_params);
     solver.solve(total_it);
 
     return 0;
