@@ -19,7 +19,7 @@ namespace scopi{
     {
     public:
         OptimParams();
-        OptimParams(OptimParams<OptimMosek<problem_t>>& params);
+        OptimParams(const OptimParams<OptimMosek<problem_t>>& params);
 
         ProblemParams<problem_t> m_problem_params;
     };
@@ -241,7 +241,7 @@ namespace scopi{
     }
 
     template<class problem_t>
-    OptimParams<OptimMosek<problem_t>>::OptimParams(OptimParams<OptimMosek<problem_t>>& params)
+    OptimParams<OptimMosek<problem_t>>::OptimParams(const OptimParams<OptimMosek<problem_t>>& params)
     : m_problem_params(params.m_problem_params)
     {}
 

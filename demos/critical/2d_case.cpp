@@ -104,9 +104,7 @@ int main()
     //
     // }
 
-    scopi::OptimParams<scopi::OptimMosek> optim_params;
-    scopi::ProblemParams<ViscousWithFriction<dim>> problem_params;
-    scopi::ScopiSolver<dim> solver(particles, dt, optim_params, problem_params);
+    scopi::ScopiSolver<dim> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;
