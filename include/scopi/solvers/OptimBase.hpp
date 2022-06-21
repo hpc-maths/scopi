@@ -8,6 +8,7 @@
 #include "../crtp.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
+#include "../params/OptimParams.hpp"
 
 namespace scopi{
     template <class Derived>
@@ -27,8 +28,9 @@ namespace scopi{
         void update_gamma(std::vector<neighbor<dim>> contacts);
 
     protected:
-        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
+        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& params);
 
+        OptimParams<Derived> m_params;
         std::size_t m_nparts;
         double m_dt;
         xt::xtensor<double, 1> m_c;
@@ -63,8 +65,9 @@ namespace scopi{
 
 
     template<class Derived>
-    OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
-    : m_nparts(nparts)
+    OptimBase<Derived>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& params)
+    : m_params(params)
+    , m_nparts(nparts)
     , m_dt(dt)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)

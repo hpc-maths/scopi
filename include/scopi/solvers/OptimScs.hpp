@@ -70,8 +70,6 @@ namespace scopi
         ScsSettings m_stgs;
         OptimScs(const OptimScs &);
         OptimScs & operator=(const OptimScs &);
-
-        OptimParams<OptimScs> m_params;
     };
 
     template <class problem_t>
@@ -132,13 +130,12 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params)
-    : base_type(nparts, dt, 2*3*nparts, 0)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
     , m_P_p(6*nparts+1)
     , m_A_p(6*nparts+1)
     , m_sol_x(6*nparts)
-    , m_params(optim_params)
     {
         auto active_offset = particles.nb_inactive();
         std::size_t index = 0;
@@ -169,9 +166,9 @@ namespace scopi
         m_P.n = 6*nparts;
 
         scs_set_default_settings(&m_stgs);
-        m_stgs.eps_abs = m_params.m_tol;
-        m_stgs.eps_rel = m_params.m_tol;
-        m_stgs.eps_infeas = m_params.m_tol_infeas;
+        m_stgs.eps_abs = this->m_params.m_tol;
+        m_stgs.eps_rel = this->m_params.m_tol;
+        m_stgs.eps_infeas = this->m_params.m_tol_infeas;
         m_stgs.verbose = 0;
     }
 

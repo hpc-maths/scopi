@@ -34,8 +34,7 @@ namespace scopi{
     public:
         using base_type = OptimBase<Derived>;
         using problem_type = problem_t; 
-        template <class solver_t>
-        OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<solver_t>& optim_params);
+        OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params);
 
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
@@ -72,18 +71,13 @@ namespace scopi{
         xt::xtensor<double, 1> m_U;
         xt::xtensor<double, 1> m_L;
         xt::xtensor<double, 1> m_R;
-
-        OptimParamsUzawaBase<problem_t> m_params;
-
     };
 
     template<class Derived, class problem_t>
-    template <class solver_t>
-    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<solver_t>& optim_params)
-    : base_type(nparts, dt, 2*3*nparts, 0)
+    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
     , m_dmin(0.)
     , m_U(xt::zeros<double>({6*nparts}))
-    , m_params(optim_params)
     {}
 
     template<class Derived, class problem_t>
@@ -110,7 +104,7 @@ namespace scopi{
 
         std::size_t cc = 0;
         double cmax = -1000.0;
-        while ( (cmax<=-m_params.m_tol) && (cc <= m_params.m_max_iter) )
+        while ( (cmax<=-this->m_params.m_tol) && (cc <= this->m_params.m_max_iter) )
         {
             tic();
             xt::noalias(m_U) = this->m_c;
@@ -143,7 +137,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            xt::noalias(m_L) = xt::maximum( m_L-m_params.m_rho*m_R, 0);
+            xt::noalias(m_L) = xt::maximum( m_L-this->m_params.m_rho*m_R, 0);
             duration = toc();
             time_assign_l += duration;
             time_solve += duration;
@@ -158,7 +152,7 @@ namespace scopi{
             PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
         }
 
-        PLOG_ERROR_IF(cc >= m_params.m_max_iter) << "Uzawa does not converge";
+        PLOG_ERROR_IF(cc >= this->m_params.m_max_iter) << "Uzawa does not converge";
 
         PLOG_INFO << "----> CPUTIME : solve (total) = " << time_solve;
         PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
