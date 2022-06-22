@@ -2,6 +2,7 @@
 
 #include "../container.hpp"
 #include "../objects/methods/closest_points.hpp"
+#include "../objects/methods/select.hpp"
 #include "../objects/neighbor.hpp"
 #include <cstddef>
 #include <nanoflann.hpp>
@@ -30,7 +31,13 @@ namespace scopi
     template <std::size_t dim>
     void compute_exact_distance(scopi_container<dim>& particles, std::size_t i, std::size_t j, std::vector<neighbor<dim>>& contacts, double dmax)
     {
-        auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
+        std::size_t o1 = particles.object_index(i);
+        std::size_t o2 = particles.object_index(j);
+        std::cout << i << " " << j << " " << o1 << " " << o2 << std::endl;
+        auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*particles[o1], index(i-particles.offset(o1))),
+                                                              *select_object_dispatcher<dim>::dispatch(*particles[o2], index(j-particles.offset(o2))));
+        std::cout << neigh[0] << std::endl;
+        /*
         for (std::size_t ind_i = 0; ind_i < particles[i]->size(); ++ind_i)
         {
             for (std::size_t ind_j = 0; ind_j < particles[j]->size(); ++ind_j)
@@ -52,6 +59,7 @@ namespace scopi
                 }
             }
         }
+        */
     }
 
     template <std::size_t dim>
@@ -70,4 +78,5 @@ namespace scopi
           return false;
         });
     }
+
 }

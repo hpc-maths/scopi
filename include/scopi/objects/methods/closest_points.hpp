@@ -34,6 +34,7 @@ namespace scopi
         neigh.pj = sj_pos - sj.radius()*si_to_sj;
         neigh.nij = (neigh.pj - sj_pos)/xt::linalg::norm(neigh.pj - sj_pos);
         neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+        std::cout << si_pos << "  " << sj_pos << std::endl;
         return std::vector<neighbor<dim>>({neigh});
     }
 
@@ -683,8 +684,11 @@ namespace scopi
 
     // GLOBULE - GLOBULE
     template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner> gi, const globule<dim, owner> gj)
+    auto closest_points(const globule<dim, owner> gi, const globule<dim, owner> gj, std::size_t i1, std::size_t i2)
     {
+        return closest_points(*(gi.get_sphere(i1)), *(gj.get_sphere(i2)));
+        /*
+        gi.get_sphere(0)->print();
         std::vector<neighbor<dim>> neigh(gi.size()*gj.size());
         for (std::size_t i = 0; i < gi.size(); ++i)
         {
@@ -703,6 +707,7 @@ namespace scopi
             }
         }
         return neigh;
+        */
     }
 
     // SPHERE - GLOBULE
@@ -1728,6 +1733,11 @@ namespace scopi
         {
             return closest_points(obj1, obj2);
         }
+         template <class T1, class T2>
+        return_type run(const T1& obj1, const T2& obj2, std::size_t i1, std::size_t i2) const
+        {
+            return closest_points(obj1, obj2, i1, i2);
+        }
          return_type on_error(const object<dim, false>&, const object<dim, false>&) const
         {
             return {};
@@ -1741,7 +1751,7 @@ namespace scopi
         const object<dim, owner>,
         mpl::vector<const sphere<dim, owner>,
                     const superellipsoid<dim, owner>,
-                    const globule<dim, owner>,
+                    // const globule<dim, owner>,
                     const plan<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
         antisymmetric_dispatch

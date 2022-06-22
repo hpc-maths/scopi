@@ -17,7 +17,7 @@ namespace scopi
         inline std::size_t kdtree_get_point_count() const
         {
           //std::cout << "KDTREE m_p.size() = "<< m_p.size() <<std::endl;
-          return m_p.size();
+          return m_p.pos().size() - m_actptr;
         }
         inline double kdtree_get_pt(std::size_t idx, const std::size_t d) const
         {
@@ -75,9 +75,9 @@ namespace scopi
             tic();
 
             m_nMatches = 0;
-            #pragma omp parallel for reduction(+:m_nMatches) //num_threads(8)
+            #pragma omp parallel for reduction(+:m_nMatches) num_threads(1)
 
-            for (std::size_t i = active_ptr; i < particles.size() - 1; ++i)
+            for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
             {
                 // for (std::size_t j = i + 1; j < particles.size(); ++j)
                 // {
@@ -96,7 +96,7 @@ namespace scopi
                     query_pt[d] = particles.pos()(i)(d);
                     // query_pt[d] = particles.pos()(i)(d);
                 }
-                //std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+                std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
                 std::vector<std::pair<size_t, double>> indices_dists;
 
@@ -110,6 +110,7 @@ namespace scopi
 
                 for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
                     std::size_t j = ret_matches[ic].first;
+                    std::cout << "i = " << i << "  j = " << j << std::endl;
                     if (i < j)
                     { 
                         compute_exact_distance(particles, i, j, contacts, m_dmax);

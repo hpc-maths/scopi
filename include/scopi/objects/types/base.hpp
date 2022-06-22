@@ -134,12 +134,16 @@ namespace scopi
 
         auto pos() const;
         auto pos();
+        auto internal_pos() const;
+        auto internal_pos();
 
         auto pos(std::size_t i) const;
         auto pos(std::size_t i);
 
         auto q() const;
         auto q();
+        auto internal_q() const;
+        auto internal_q();
 
         auto q(std::size_t i) const;
         auto q(std::size_t i);
@@ -180,6 +184,18 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_pos() const
+    {
+        return m_pos;
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_pos()
+    {
+        return m_pos;
+    }
+
+    template<std::size_t dim, bool owner>
     inline auto object_container<dim, owner>::pos(std::size_t i) const
     {
         return xt::view(detail::get_value(m_pos, m_size), i);
@@ -201,6 +217,18 @@ namespace scopi
     inline auto object_container<dim, owner>::q()
     {
         return detail::get_value(m_q, m_size);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_q() const
+    {
+        return m_q;
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_q()
+    {
+        return m_q;
     }
 
     template<std::size_t dim, bool owner>

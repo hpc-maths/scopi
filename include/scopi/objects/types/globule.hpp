@@ -1,10 +1,12 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <vector>
 
 #include "base.hpp"
 #include "../../quaternion.hpp"
+#include "sphere.hpp"
 
 namespace scopi
 {
@@ -39,6 +41,7 @@ namespace scopi
         virtual std::size_t hash() const override;
 
         double radius() const;
+        std::unique_ptr<object<dim, false>> get_sphere(std::size_t i) const;
 
     private:
 
@@ -97,6 +100,13 @@ namespace scopi
     double globule<dim, owner>::radius() const
     {
         return m_radius;
+    }
+
+    template<std::size_t dim, bool owner>
+    std::unique_ptr<object<dim, false>> globule<dim, owner>::get_sphere(std::size_t i) const
+    {
+        auto object = make_object_constructor<sphere<dim, false>>(m_radius);
+        return (*object)(&this->internal_pos()[i], &this->internal_q()[i]);
     }
 
 }
