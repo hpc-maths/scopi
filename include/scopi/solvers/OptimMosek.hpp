@@ -36,9 +36,9 @@ namespace scopi{
         OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimMosek<problem_t>>& optim_params);
 
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts,
-                                            problem_t& problem);
+        std::size_t solve_optimization_problem_impl(const scopi_container<dim>& particles,
+                                                    const std::vector<neighbor<dim>>& contacts,
+                                                    problem_t& problem);
 
         double* uadapt_data();
         double* wadapt_data();
@@ -65,9 +65,9 @@ namespace scopi{
 
     template<class problem_t>
     template<std::size_t dim>
-    int OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                               const std::vector<neighbor<dim>>& contacts,
-                                                               problem_t& problem)
+    std::size_t OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+                                                                       const std::vector<neighbor<dim>>& contacts,
+                                                                       problem_t& problem)
     {
         using namespace mosek::fusion;
         using namespace monty;

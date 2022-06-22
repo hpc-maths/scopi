@@ -37,9 +37,9 @@ namespace scopi{
         OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params);
 
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts,
-                                            problem_t& problem);
+        std::size_t solve_optimization_problem_impl(const scopi_container<dim>& particles,
+                                                    const std::vector<neighbor<dim>>& contacts,
+                                                    problem_t& problem);
 
         auto uadapt_data();
         auto wadapt_data();
@@ -82,9 +82,9 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template <std::size_t dim>
-    int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                                            const std::vector<neighbor<dim>>& contacts,
-                                                                            problem_t& problem)
+    std::size_t OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+                                                                                    const std::vector<neighbor<dim>>& contacts,
+                                                                                    problem_t& problem)
     {
         tic();
         init_uzawa(particles, contacts, problem);
