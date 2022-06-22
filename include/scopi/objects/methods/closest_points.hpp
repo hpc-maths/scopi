@@ -682,48 +682,6 @@ namespace scopi
         return std::vector<neighbor<dim>>({neighbor<dim>()});
     }
 
-    // GLOBULE - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner> gi, const globule<dim, owner> gj, std::size_t i1, std::size_t i2)
-    {
-        return closest_points(*(gi.get_sphere(i1)), *(gj.get_sphere(i2)));
-        /*
-        gi.get_sphere(0)->print();
-        std::vector<neighbor<dim>> neigh(gi.size()*gj.size());
-        for (std::size_t i = 0; i < gi.size(); ++i)
-        {
-            for (std::size_t j = 0; j < gj.size(); ++j)
-            {
-                // auto si_pos = xt::view(gi.pos(i), 0);
-                // auto sj_pos = xt::view(gj.pos(j), 0);
-                auto si_pos = gi.pos(i);
-                auto sj_pos = gj.pos(j);
-                auto si_to_sj = (sj_pos - si_pos)/xt::linalg::norm(sj_pos - si_pos);
-
-                neigh[gj.size()*i + j].pi = si_pos + gi.radius()*si_to_sj;
-                neigh[gj.size()*i + j].pj = sj_pos - gj.radius()*si_to_sj;
-                neigh[gj.size()*i + j].nij = (neigh[gj.size()*i + j].pj - sj_pos)/xt::linalg::norm(neigh[gj.size()*i + j].pj - sj_pos);
-                neigh[gj.size()*i + j].dij = xt::linalg::dot(neigh[gj.size()*i + j].pi - neigh[gj.size()*i + j].pj, neigh[gj.size()*i + j].nij)[0];
-            }
-        }
-        return neigh;
-        */
-    }
-
-    // SPHERE - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const sphere<dim, owner>, const globule<dim, owner>)
-    {
-        return std::vector<neighbor<dim>>({neighbor<dim>()});
-    }
-
-    // GLOBULE - SPHERE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner>, const sphere<dim, owner>)
-    {
-        return std::vector<neighbor<dim>>({neighbor<dim>()});
-    }
-
     // SPHERE - PLAN
     template<std::size_t dim, bool owner>
     auto closest_points(const sphere<dim, owner>& s, const plan<dim, owner>& p)
@@ -1691,44 +1649,12 @@ namespace scopi
         return std::vector<neighbor<2>>({neigh});
     }
 
-    // SUPERELLIPSOID - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const superellipsoid<dim, owner>, const globule<dim, owner>)
-    {
-        std::cout << "closest_points : SUPERELLIPSOID - GLOBULE" << std::endl;
-        return std::vector<neighbor<dim>>({neighbor<dim>()});
-    }
-
-    // GLOBULE  - SUPERELLIPSOID
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner> g, const superellipsoid<dim, owner> s)
-    {
-        auto neigh = closest_points(s, g)[0];
-        neigh.nij *= -1.;
-        std::swap(neigh.pi, neigh.pj);
-        return std::vector<neighbor<dim>>({neigh});
-    }
-
-    // GLOBULE - PLAN
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner>, const plan<dim, owner>)
-    {
-        return std::vector<neighbor<dim>>({neighbor<dim>()});
-    }
-
-    // PLAN - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner>, const globule<dim, owner>)
-    {
-        return std::vector<neighbor<dim>>({neighbor<dim>()});
-    }
-
     template <std::size_t dim>
     struct closest_points_functor
     {
         using return_type = std::vector<neighbor<dim>>;
         // using return_type = neighbor<dim>;
-         template <class T1, class T2>
+        template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2) const
         {
             return closest_points(obj1, obj2);
@@ -1751,7 +1677,6 @@ namespace scopi
         const object<dim, owner>,
         mpl::vector<const sphere<dim, owner>,
                     const superellipsoid<dim, owner>,
-                    // const globule<dim, owner>,
                     const plan<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
         antisymmetric_dispatch
