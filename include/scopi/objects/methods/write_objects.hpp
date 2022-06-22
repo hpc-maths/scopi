@@ -124,7 +124,6 @@ namespace scopi
         for (std::size_t i = 0; i < g.size(); ++i)
         {
             nl::json json_globule;
-            json_globule["type"] = "sphere";
             json_globule["position"] = g.pos(i);
             json_globule["radius"] = g.radius();
             json_globule["quaternion"] = g.q(i);

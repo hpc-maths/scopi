@@ -148,9 +148,9 @@ function drawObjects() {
                 else if (obj.type === "globule") {
                     obj.globule.forEach((sphere, indexSphere) => {
                         sphereObject(sphere, matrix, rot);
-                        mesh.setMatrixAt(nbSpheres+indexSphere, matrix);
+                        mesh.setMatrixAt(nbSpheres, matrix);
+                        nbSpheres += 1;
                     });
-                    nbSpheres += 6;
                 }
                 else {
                     sphereObject(obj, matrix, rot);
