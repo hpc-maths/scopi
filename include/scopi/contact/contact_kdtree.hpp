@@ -75,7 +75,7 @@ namespace scopi
             tic();
 
             m_nMatches = 0;
-            #pragma omp parallel for reduction(+:m_nMatches) num_threads(1)
+            #pragma omp parallel for reduction(+:m_nMatches) //num_threads(8)
 
             for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
             {
@@ -96,7 +96,7 @@ namespace scopi
                     query_pt[d] = particles.pos()(i)(d);
                     // query_pt[d] = particles.pos()(i)(d);
                 }
-                std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+                // std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
                 std::vector<std::pair<size_t, double>> indices_dists;
 
@@ -110,15 +110,12 @@ namespace scopi
 
                 for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
                     std::size_t j = ret_matches[ic].first;
-                    std::cout << "i = " << i << "  j = " << j << std::endl;
                     if (i < j)
                     { 
                         compute_exact_distance(particles, i, j, contacts, m_dmax);
                         m_nMatches++;
                     }
-
                 }
-
             }
 
             // obstacles

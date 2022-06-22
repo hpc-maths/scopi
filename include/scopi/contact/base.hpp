@@ -33,33 +33,14 @@ namespace scopi
     {
         std::size_t o1 = particles.object_index(i);
         std::size_t o2 = particles.object_index(j);
-        std::cout << i << " " << j << " " << o1 << " " << o2 << std::endl;
         auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*particles[o1], index(i-particles.offset(o1))),
                                                               *select_object_dispatcher<dim>::dispatch(*particles[o2], index(j-particles.offset(o2))));
-        std::cout << neigh << std::endl;
-        /*
-        for (std::size_t ind_i = 0; ind_i < particles[i]->size(); ++ind_i)
-        {
-            for (std::size_t ind_j = 0; ind_j < particles[j]->size(); ++ind_j)
-            {
-                if (neigh[particles[j]->size()*ind_i + ind_j].dij < dmax) {
-                    std::size_t nb_prev_part = 0;
-                    for (std::size_t k = 0; k < i; ++k)
-                    {
-                        nb_prev_part += particles[k]->size();
-                    }
-                    neigh[particles[j]->size()*ind_i + ind_j].i = nb_prev_part + ind_i;
-                    for (std::size_t k = i; k < j; ++k)
-                    {
-                        nb_prev_part += particles[k]->size();
-                    }
-                    neigh[particles[j]->size()*ind_i + ind_j].j = nb_prev_part + ind_j;
-                    #pragma omp critical
-                    contacts.emplace_back(std::move(neigh[particles[j]->size()*ind_i + ind_j]));
-                }
-            }
+        if (neigh.dij < dmax) {
+            neigh.i = i;
+            neigh.j = j;
+            #pragma omp critical
+            contacts.emplace_back(std::move(neigh));
         }
-        */
     }
 
     template <std::size_t dim>
