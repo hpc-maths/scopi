@@ -45,7 +45,7 @@ namespace scopi
     template<std::size_t dim>
     xt::xtensor<double, 1> distances_per_particle(const globule<dim, false>& g)
     {
-        xt::xtensor<double, 1>::shape_type shape = {2*(g.size()-1)};
+        xt::xtensor<double, 1>::shape_type shape = {g.size()-1};
         xt::xtensor<double, 1> distances(shape);
         // TODO use xtensor's functions instead of a loop
         for (std::size_t i = 0; i < g.size()-1; ++i)
@@ -57,8 +57,7 @@ namespace scopi
             auto pj = sj_pos - g.radius()*si_to_sj;
             auto nij = (pj - sj_pos)/xt::linalg::norm(pj - sj_pos);
             auto dij = xt::linalg::dot(pi - pj, nij)[0];
-            distances(2*i  ) =  dij;
-            distances(2*i+1) = -dij;
+            distances(i) = -dij;
         }
         return distances;
     }
@@ -120,7 +119,7 @@ namespace scopi
     template<std::size_t dim>
     xt::xtensor<double, 2> matrix_per_particle(const globule<dim, false>& g)
     {
-        xt::xtensor<double, 2>::shape_type shape = {2*12*(g.size()-1), 3};
+        xt::xtensor<double, 2>::shape_type shape = {12*(g.size()-1), 3};
         xt::xtensor<double, 2> mat(shape);
         std::size_t index = 0;
         for (std::size_t i = 0; i < g.size()-1; ++i)
@@ -131,46 +130,6 @@ namespace scopi
             auto pi = si_pos + g.radius()*si_to_sj;
             auto pj = sj_pos - g.radius()*si_to_sj;
             auto nij = (pj - sj_pos)/xt::linalg::norm(pj - sj_pos);
-
-            // D >= 0, cols u
-            for (std::size_t d = 0; d < 3; ++d)
-            {
-                mat(index, 0) = 2*i;
-                mat(index, 1) = i*3 + d;
-                mat(index, 2) = - nij[d];
-                index++;
-            }
-            for (std::size_t d = 0; d < 3; ++d)
-            {
-                mat(index, 0) = 2*i;
-                mat(index, 1) = (i+1)*3 + d;
-                mat(index, 2) = nij[d];
-                index++;
-            }
-
-            auto ri_cross = cross_product<dim>(pi - g.pos(i));
-            auto rj_cross = cross_product<dim>(pj - g.pos(i+1));
-            auto Ri = rotation_matrix<3>(g.q(i));
-            auto Rj = rotation_matrix<3>(g.q(i+1));
-
-            // D >= 0, cols w
-            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-            for (std::size_t ip = 0; ip < 3; ++ip)
-            {
-                mat(index, 0) = 2*i;
-                mat(index, 1) = 3*i + ip;
-                mat(index, 2) = (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
-                index++;
-            }
-
-            dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-            for (std::size_t ip = 0; ip < 3; ++ip)
-            {
-                mat(index, 0) = 2*i;
-                mat(index, 1) = 3*(i+1) + ip;
-                mat(index, 2) = - (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
-                index++;
-            }
 
             // D <= 0, cols u
             for (std::size_t d = 0; d < 3; ++d)
@@ -188,8 +147,13 @@ namespace scopi
                 index++;
             }
 
+            auto ri_cross = cross_product<dim>(pi - g.pos(i));
+            auto rj_cross = cross_product<dim>(pj - g.pos(i+1));
+            auto Ri = rotation_matrix<3>(g.q(i));
+            auto Rj = rotation_matrix<3>(g.q(i+1));
+
             // D <= 0, cols w
-            dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
                 mat(index, 0) = 2*i+1;
@@ -205,10 +169,6 @@ namespace scopi
                 mat(index, 1) = 3*(i+1) + ip;
                 mat(index, 2) = - (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
                 index++;
-                // mat(index, 0) = 2*i+1;
-                // mat(index, 1) = 3*(i+1) + ip;
-                // mat(index, 2) = (nij[0]*dot(0, ip)+nij[1]*dot(1, ip)+nij[2]*dot(2, ip));
-                // index++;
             }
         }
         return mat;
