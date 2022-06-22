@@ -15,7 +15,7 @@ namespace scopi
         sphere<dim> s1({{-0.2, 0.0}}, 0.1);
         sphere<dim> s2({{ 0.2, 0.0}}, 0.1);
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -35,7 +35,7 @@ namespace scopi
         sphere<dim> s1({{-dist*cosRot,  dist*sinRot}}, 0.1);
         sphere<dim> s2({{ dist*cosRot, -dist*sinRot}}, 0.1);
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
@@ -56,7 +56,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -80,7 +80,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
@@ -97,7 +97,7 @@ namespace scopi
         sphere<dim> s1({{-0.2, 0.0, 0.0}}, 0.1);
         sphere<dim> s2({{ 0.2, 0.0, 0.0}}, 0.1);
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -120,7 +120,7 @@ namespace scopi
         sphere<dim> s1({{-dist*cosRot,  dist*sinRot, 0.}}, 0.1);
         sphere<dim> s2({{ dist*cosRot, -dist*sinRot, 0.}}, 0.1);
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
@@ -144,7 +144,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -171,7 +171,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.2*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.2*sinRot));
@@ -192,7 +192,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0}}, 0.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -212,7 +212,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -229,7 +229,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{0., -0.2}}, PI/2.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.1));
@@ -250,7 +250,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -274,7 +274,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -295,7 +295,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.1));
@@ -312,7 +312,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -335,7 +335,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -355,7 +355,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
         plan<dim> p({{0., -0.2, 0.}}, PI/2.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.1));
@@ -379,7 +379,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -406,7 +406,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -430,7 +430,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.1));
@@ -451,7 +451,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0}}, 0.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -471,7 +471,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -488,7 +488,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0}}, 0.1);
         plan<dim> p({{0., -0.2}}, PI/2.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.2));
@@ -509,7 +509,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -533,7 +533,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -554,7 +554,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.2));
@@ -571,7 +571,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0, 0.0}}, 0.1);
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -594,7 +594,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -614,7 +614,7 @@ namespace scopi
         sphere<dim> s({{0.0, 0.0, 0,}}, 0.1);
         plan<dim> p({{0., -0.2, 0.}}, PI/2.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.2));
@@ -638,7 +638,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -665,7 +665,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -689,7 +689,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.));
         REQUIRE(out.pi(1) == doctest::Approx(-0.2));
@@ -711,7 +711,7 @@ namespace scopi
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
         superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
 
-        auto out = closest_points(s, e)[0];
+        auto out = closest_points(s, e);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1).epsilon(1e-7));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -732,7 +732,7 @@ namespace scopi
         sphere<dim> s({{dist*cosRot, -dist*sinRot}}, 0.1);
         superellipsoid<dim> e({{-dist*cosRot, dist*sinRot}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2}}, 1);
 
-        auto out = closest_points(s, e)[0];
+        auto out = closest_points(s, e);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot).epsilon(1e-5));
         REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
@@ -754,7 +754,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(e);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -779,7 +779,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(e);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
@@ -797,7 +797,7 @@ namespace scopi
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
 
-        auto out = closest_points(s, e)[0];
+        auto out = closest_points(s, e);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -821,7 +821,7 @@ namespace scopi
         sphere<dim> s({{dist*cosRot, -dist*sinRot, 0.}}, 0.1);
         superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
-        auto out = closest_points(s, e)[0];
+        auto out = closest_points(s, e);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
@@ -846,7 +846,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(e);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -874,7 +874,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(e);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
@@ -896,7 +896,7 @@ namespace scopi
         sphere<dim> s({{-0.2, 0.0}}, 0.1);
         superellipsoid<dim> e({{0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
 
-        auto out = closest_points(e, s)[0];
+        auto out = closest_points(e, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -917,7 +917,7 @@ namespace scopi
         sphere<dim> s({{dist*cosRot, -dist*sinRot}}, 0.1);
         superellipsoid<dim> e({{-dist*cosRot, dist*sinRot}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2}}, 1);
 
-        auto out = closest_points(e, s)[0];
+        auto out = closest_points(e, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -939,7 +939,7 @@ namespace scopi
         particles.push_back(e);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -964,7 +964,7 @@ namespace scopi
         particles.push_back(e);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -982,7 +982,7 @@ namespace scopi
         sphere<dim> s({{0.2, 0.0, 0.0}}, 0.1);
         superellipsoid<dim> e({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
 
-        auto out = closest_points(e, s)[0];
+        auto out = closest_points(e, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1006,7 +1006,7 @@ namespace scopi
         sphere<dim> s({{dist*cosRot, -dist*sinRot, 0.}}, 0.1);
         superellipsoid<dim> e({{-dist*cosRot, dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
-        auto out = closest_points(e, s)[0];
+        auto out = closest_points(e, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
@@ -1031,7 +1031,7 @@ namespace scopi
         particles.push_back(e);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1059,7 +1059,7 @@ namespace scopi
         particles.push_back(e);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(-0.3*sinRot));
@@ -1080,7 +1080,7 @@ namespace scopi
         superellipsoid<dim> s1({{-0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
         superellipsoid<dim> s2({{ 0.2, 0.0}}, {quaternion(0.)}, {{0.1, 0.3}}, 1);
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1100,7 +1100,7 @@ namespace scopi
         superellipsoid<dim> s1({{-dist*cosRot,  dist*sinRot}}, {quaternion(-PI/6.)}, {{0.1, 0.4}}, 1);
         superellipsoid<dim> s2({{ dist*cosRot, -dist*sinRot}}, {quaternion(PI-PI/6.)}, {{0.2, 0.3}}, 1);
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -1121,7 +1121,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1145,7 +1145,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -1162,7 +1162,7 @@ namespace scopi
         superellipsoid<dim> s1({{-0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
         superellipsoid<dim> s2({{ 0.2, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}},  {1, 1});
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1185,7 +1185,7 @@ namespace scopi
         superellipsoid<dim> s1({{-dist*cosRot,  dist*sinRot, 0.}}, {quaternion(-PI/6.)}, {{0.1, 0.4, 0.5}}, {1, 1});
         superellipsoid<dim> s2({{ dist*cosRot, -dist*sinRot, 0.}}, {quaternion(PI-PI/6.)}, {{0.2, 0.3, 0.6}}, {1, 1});
 
-        auto out = closest_points(s1, s2)[0];
+        auto out = closest_points(s1, s2);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -1209,7 +1209,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1236,7 +1236,7 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(-0.3*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.3*sinRot));
@@ -1258,7 +1258,7 @@ namespace scopi
         superellipsoid<dim> s({{ 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
         plan<dim> p({{ 0.3, 0.0}}, 0.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1279,7 +1279,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1301,7 +1301,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1326,7 +1326,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1344,7 +1344,7 @@ namespace scopi
         superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1368,7 +1368,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
 
-        auto out = closest_points(s, p)[0];
+        auto out = closest_points(s, p);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1393,7 +1393,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1421,7 +1421,7 @@ namespace scopi
         particles.push_back(s);
         particles.push_back(p);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1443,7 +1443,7 @@ namespace scopi
         superellipsoid<dim> s({{ 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2}}, 1);
         plan<dim> p({{ 0.3, 0.0}}, 0.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1464,7 +1464,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot}}, PI/6.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1486,7 +1486,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1511,7 +1511,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1529,7 +1529,7 @@ namespace scopi
         superellipsoid<dim> s({{ 0.0, 0.0, 0.0}}, {quaternion(0.)}, {{0.1, 0.2, 0.3}}, {1, 1});
         plan<dim> p({{ 0.3, 0.0, 0.0}}, 0.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1553,7 +1553,7 @@ namespace scopi
         double sinRot = 1./2.;
         plan<dim> p({{dist*cosRot, dist*sinRot, 0.}}, PI/6.);
 
-        auto out = closest_points(p, s)[0];
+        auto out = closest_points(p, s);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1578,7 +1578,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1));
         REQUIRE(out.pi(1) == doctest::Approx(0.));
@@ -1606,7 +1606,7 @@ namespace scopi
         particles.push_back(p);
         particles.push_back(s);
 
-        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1])[0];
+        auto out = closest_points_dispatcher<dim>::dispatch(*particles[0], *particles[1]);
 
         REQUIRE(out.pi(0) == doctest::Approx(0.1*cosRot));
         REQUIRE(out.pi(1) == doctest::Approx(0.1*sinRot));
@@ -1632,6 +1632,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(dij));
     }
 
+    /*
     TEST_CASE("globule_globule_2d")
     {
         constexpr std::size_t dim = 2;
@@ -1737,5 +1738,6 @@ namespace scopi
         check_neigh_globule_globule(out[34], 12., -10., 22.);
         check_neigh_globule_globule(out[35], 12., -12., 24.);
     }
+*/
 
 }

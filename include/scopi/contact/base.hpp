@@ -36,7 +36,7 @@ namespace scopi
         std::cout << i << " " << j << " " << o1 << " " << o2 << std::endl;
         auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*particles[o1], index(i-particles.offset(o1))),
                                                               *select_object_dispatcher<dim>::dispatch(*particles[o2], index(j-particles.offset(o2))));
-        std::cout << neigh[0] << std::endl;
+        std::cout << neigh << std::endl;
         /*
         for (std::size_t ind_i = 0; ind_i < particles[i]->size(); ++ind_i)
         {
