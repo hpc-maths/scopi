@@ -13,10 +13,10 @@ namespace scopi{
     class projection_max
     {
     protected:
-        auto projection_cone(xt::xtensor<double, 1>& l);
+        auto projection_cone(const xt::xtensor<double, 1>& l);
     };
 
-    auto projection_max::projection_cone(xt::xtensor<double, 1>& l)
+    auto projection_max::projection_cone(const xt::xtensor<double, 1>& l)
     {
         return xt::maximum( l, 0);
     }
