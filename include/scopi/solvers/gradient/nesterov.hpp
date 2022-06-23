@@ -12,10 +12,10 @@
 
 namespace scopi{
     template<class projection_t = projection_max>
-    class projected_gradient: public projection_t
+    class nesterov: public projection_t
     {
     protected:
-        projected_gradient(std::size_t max_iter, double rho, double tol_dg, double tol_l);
+        nesterov(std::size_t max_iter, double rho, double tol_dg, double tol_l);
         std::size_t projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l);
     private:
         std::size_t m_max_iter;
@@ -31,7 +31,7 @@ namespace scopi{
     };
 
     template<class projection_t>
-    projected_gradient<projection_t>::projected_gradient(std::size_t max_iter, double rho, double tol_dg, double tol_l)
+    nesterov<projection_t>::nesterov(std::size_t max_iter, double rho, double tol_dg, double tol_l)
     : projection_t()
     , m_max_iter(max_iter)
     , m_rho(rho)
@@ -40,7 +40,7 @@ namespace scopi{
     {}
 
     template<class projection_t>
-    std::size_t projected_gradient<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
+    std::size_t nesterov<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
         std::size_t iter = 0;
         double theta_old = 1.;
@@ -54,7 +54,7 @@ namespace scopi{
             PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for dg = A*y+dg: " << m_status;
 
             xt::noalias(l) = this->projection_cone(m_y - m_rho * m_dg);
-            double theta = 0.5*(theta_old + std::sqrt(4.+theta_old*theta_old) - theta_old*theta_old);
+            double theta = 0.5*(theta_old*std::sqrt(4.+theta_old*theta_old) - theta_old*theta_old);
             double beta = theta_old*(1. - theta_old)/(theta_old*theta_old + theta);
             m_y = l + beta*(l - m_l_old);
             double norm_dg = xt::amax(xt::abs(m_dg))(0);
