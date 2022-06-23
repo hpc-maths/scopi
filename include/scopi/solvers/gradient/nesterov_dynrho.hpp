@@ -61,18 +61,18 @@ namespace scopi{
             std::size_t cc = 0;
             // lAl = l^T*A*l
             double lAl;
-            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 0., l.data(), &lAl);
+            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 0., m_tmp.data(), &lAl);
             PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for lAl = l^T*A*l: " << m_status;
             double cl = xt::linalg::dot(c, l)(0);
             // yAy = y^T*A*y
             double yAy;
-            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 0., m_y.data(), &yAy);
+            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 0., m_tmp.data(), &yAy);
             PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for yAy = y^T*A*y: " << m_status;
             double cy = xt::linalg::dot(c, m_y)(0);
             double dgly = xt::linalg::dot(m_dg, l - m_y)(0);
             double lyly = xt::linalg::dot(l - m_y, l - m_y)(0);
 
-            while (0.5*lAl + cl > 0.5*yAy + cy + dgly + lipsch/2.*lyly && cc < 10)
+            while ((0.5*lAl + cl > 0.5*yAy + cy + dgly + lipsch/2.*lyly) && (cc < 10))
             {
                 lipsch *= 2.;
                 m_rho = 1./lipsch;
@@ -80,7 +80,7 @@ namespace scopi{
 
                 cc++;
                 // lAl = l^T*A*l
-                m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 0., l.data(), &lAl);
+                m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 0., m_tmp.data(), &lAl);
                 PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for lAl = l^TA*l: " << m_status;
                 cl = xt::linalg::dot(c, l)(0);
                 dgly = xt::linalg::dot(m_dg, l - m_y)(0);
