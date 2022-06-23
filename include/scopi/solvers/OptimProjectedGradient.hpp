@@ -33,6 +33,43 @@ namespace scopi{
         double m_rho;
     };
 
+    void print_csr_matrix(const sparse_matrix_t A)
+    {
+        // TODO free memory
+        MKL_INT* csr_row_begin = NULL;
+        MKL_INT* csr_row_end = NULL;
+        MKL_INT* csr_col = NULL;
+        double* csr_val = NULL;
+        sparse_index_base_t indexing;
+        MKL_INT nbRows;
+        MKL_INT nbCols;
+        auto status = mkl_sparse_d_export_csr(A,
+                                           &indexing,
+                                           &nbRows,
+                                           &nbCols,
+                                           &csr_row_begin,
+                                           &csr_row_end,
+                                           &csr_col,
+                                           &csr_val);
+
+        PLOG_ERROR_IF(status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_export_csr: " << status;
+
+        std::cout << "\nMatrix with " << nbRows << " rows and " << nbCols << " columns\n";
+        std::cout << "RESULTANT MATRIX:\nrow# : (column, value) (column, value)\n";
+        int ii = 0;
+        for( int i = 0; i < nbRows; i++ )
+        {
+            std::cout << "row#" << i << ": ";
+            for(MKL_INT j = csr_row_begin[i]; j < csr_row_end[i]; j++ )
+            {
+                std::cout << " (" << csr_col[ii] << ", " << csr_val[ii] << ")";
+                ii++;
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "_____________________________________________________________________  \n" ;
+    }
+
     template<class problem_t = DryWithoutFriction, class gradient_t = projected_gradient<projection_max>>
     class OptimProjectedGradient: public OptimBase<OptimProjectedGradient<problem_t, gradient_t>>
                                 , public gradient_t
@@ -165,6 +202,9 @@ namespace scopi{
                                           &m_B);
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_convert_csr for matrix B: " << m_status;
 
+        m_status = mkl_sparse_destroy ( B_coo );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix B_coo: " << m_status;
+
         m_status = mkl_sparse_order(m_B);
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_order for matrix B: " << m_status;
 
@@ -174,11 +214,13 @@ namespace scopi{
         m_status = mkl_sparse_set_mv_hint(m_B, SPARSE_OPERATION_TRANSPOSE, m_descrB, 1 );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix B SPARSE_OPERATION_TRANSPOSE: " << m_status;
 
+        /*
         m_status = mkl_sparse_set_mm_hint(m_B, SPARSE_OPERATION_NON_TRANSPOSE, m_descrB, SPARSE_LAYOUT_ROW_MAJOR, 0, 1);
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mm_hint for matrix B SPARSE_OPERATION_NON_TRANSPOSE: " << m_status;
 
         m_status = mkl_sparse_set_mm_hint(m_B, SPARSE_OPERATION_TRANSPOSE, m_descrB, SPARSE_LAYOUT_ROW_MAJOR, 0, 1);
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mm_hint for matrix B SPARSE_OPERATION_TRANSPOSE: " << m_status;
+        */
 
         m_status = mkl_sparse_optimize ( m_B );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix B: " << m_status;
@@ -186,22 +228,32 @@ namespace scopi{
         // tmp = P^{-1}*B
         sparse_matrix_t tmp;
 
+        m_descr_inv_P.type = SPARSE_MATRIX_TYPE_GENERAL;
         m_status = mkl_sparse_sp2m(SPARSE_OPERATION_NON_TRANSPOSE, m_descr_inv_P, m_inv_P,
-                SPARSE_OPERATION_NON_TRANSPOSE, m_descrB, m_B,
+                SPARSE_OPERATION_TRANSPOSE, m_descrB, m_B,
                 SPARSE_STAGE_FULL_MULT, &tmp);
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_sp2m for tmp = P^{-1}*B: " << m_status;
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_sp2m for tmp = P^{-1}*B^T: " << m_status;
+        m_descr_inv_P.type = SPARSE_MATRIX_TYPE_DIAGONAL;
+        m_descr_inv_P.diag = SPARSE_DIAG_NON_UNIT;
 
         m_status = mkl_sparse_order(tmp);
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_order for matrix tmp: " << m_status;
 
         // A = B^T*tmp
-        m_status = mkl_sparse_sp2m(SPARSE_OPERATION_TRANSPOSE, m_descrB, m_B,
+        m_status = mkl_sparse_sp2m(SPARSE_OPERATION_NON_TRANSPOSE, m_descrB, m_B,
                 SPARSE_OPERATION_NON_TRANSPOSE, m_descrB, tmp,
                 SPARSE_STAGE_FULL_MULT, &m_A);
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_sp2m for A = B^T*tmp: " << m_status;
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_sp2m for A = B*tmp: " << m_status;
+        m_descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
 
         m_status = mkl_sparse_destroy ( tmp );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix tmp: " << m_status;
+
+        m_status = mkl_sparse_set_mv_hint(m_A, SPARSE_OPERATION_NON_TRANSPOSE, m_descrA, 2 );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix A: " << m_status;
+
+        m_status = mkl_sparse_optimize ( m_A );
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix A: " << m_status;
 
         // e = B*v^{a priori}+d
         xt::noalias(m_e) = problem.m_distances;
