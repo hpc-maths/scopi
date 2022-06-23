@@ -105,7 +105,6 @@ namespace scopi{
 
         xt::xtensor<double, 1> m_l;
         xt::xtensor<double, 1> m_e; // vector c in 220517_PbDual_MiniForces.pdf
-        xt::xtensor<double, 1> m_vap;
         xt::xtensor<double, 1> m_u;
         xt::xtensor<double, 1> m_bl;
 
@@ -123,7 +122,6 @@ namespace scopi{
     OptimProjectedGradient<problem_t, gradient_t>::OptimProjectedGradient(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params)
     : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
     , gradient_t(optim_params.m_max_iter, optim_params.m_rho, optim_params.m_tol_dg, optim_params.m_tol_l)
-    , m_vap(xt::zeros<double>({6*nparts}))
     , m_u(xt::zeros<double>({6*nparts}))
     , m_bl(xt::zeros<double>({6*nparts}))
     {
@@ -170,10 +168,6 @@ namespace scopi{
 
         m_status = mkl_sparse_optimize ( m_inv_P );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
-
-        // vap = P^{-1}*c
-        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., m_inv_P, m_descr_inv_P, this->m_c.data(), 0., m_vap.data());
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for vap = P^{-1}*c: " << m_status;
     }
 
     template<class problem_t, class gradient_t>
@@ -183,6 +177,10 @@ namespace scopi{
                                                                                               problem_t& problem)
     {
         xt::noalias(m_l) = xt::zeros<double>({problem.number_row_matrix(contacts)});
+
+        // u = P^{-1}*c
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., m_inv_P, m_descr_inv_P, this->m_c.data(), 0., m_u.data());
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for u = P^{-1}*c: " << m_status;
 
         // matrix B
         problem.create_matrix_constraint_coo(particles, contacts, 0);
@@ -260,15 +258,16 @@ namespace scopi{
         // e = B*v^{a priori}+d
         xt::noalias(m_e) = problem.m_distances;
 
-        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., m_B, m_descrB, m_vap.data(), 1., m_e.data());
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for e = B*vap+d: " << m_status;
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_B, m_descrB, m_u.data(), 1., m_e.data());
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for e = B*u+d: " << m_status;
 
         std::size_t nb_iter = this->projection(m_A, m_descrA, m_e, m_l);
+
         // u = vap + P^{-1}*B^T*l
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_B, m_descrB, m_l.data(), 0., m_bl.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for bl = B^T*l: " << m_status;
 
-        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, m_bl.data(), 1., m_vap.data());
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, m_bl.data(), 1., m_u.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for u = vap - P^{-1}*bl: " << m_status;
 
         m_status = mkl_sparse_destroy ( m_B );
