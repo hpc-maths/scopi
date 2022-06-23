@@ -149,7 +149,7 @@ namespace scopi{
             time_solve += duration;
             cc += 1;
 
-            PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
+            PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cmax;
         }
 
         PLOG_ERROR_IF(cc >= this->m_params.m_max_iter) << "Uzawa does not converge";
