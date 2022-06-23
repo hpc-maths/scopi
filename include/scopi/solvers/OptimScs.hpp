@@ -33,9 +33,9 @@ namespace scopi
         OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params);
 
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts, 
-                                            problem_t& problem);
+        std::size_t solve_optimization_problem_impl(const scopi_container<dim>& particles,
+                                                    const std::vector<neighbor<dim>>& contacts, 
+                                                    problem_t& problem);
         double* uadapt_data();
         double* wadapt_data();
         double* lagrange_multiplier_data();
@@ -74,9 +74,9 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    int OptimScs<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                             const std::vector<neighbor<dim>>& contacts,
-                                                             problem_t& problem)
+    std::size_t OptimScs<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+                                                                     const std::vector<neighbor<dim>>& contacts,
+                                                                     problem_t& problem)
     {
         tic();
         problem.create_matrix_constraint_coo(particles, contacts, 0);

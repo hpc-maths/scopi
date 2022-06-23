@@ -41,9 +41,9 @@ namespace scopi{
         void create_vector_c(const scopi_container<dim>& particles);
 
         template<std::size_t dim, class problem_t>
-        int solve_optimization_problem(const scopi_container<dim>& particles,
-                                       const std::vector<neighbor<dim>>& contacts,
-                                       problem_t& problem);
+        std::size_t solve_optimization_problem(const scopi_container<dim>& particles,
+                                               const std::vector<neighbor<dim>>& contacts,
+                                               problem_t& problem);
 
         int get_nb_active_contacts() const;
     };
@@ -101,9 +101,9 @@ namespace scopi{
 
     template<class Derived>
     template<std::size_t dim, class problem_t>
-    int OptimBase<Derived>::solve_optimization_problem(const scopi_container<dim>& particles,
-                                                       const std::vector<neighbor<dim>>& contacts,
-                                                       problem_t& problem)
+    std::size_t OptimBase<Derived>::solve_optimization_problem(const scopi_container<dim>& particles,
+                                                               const std::vector<neighbor<dim>>& contacts,
+                                                               problem_t& problem)
     {
         return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts, problem);
     }
