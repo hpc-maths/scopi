@@ -179,7 +179,7 @@ namespace scopi{
     {
         xt::noalias(m_l) = xt::zeros<double>({problem.number_row_matrix(contacts)});
         // u = P^{-1}*c = vap
-        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., m_inv_P, m_descr_inv_P, this->m_c.data(), 0., m_u.data());
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_c.data(), 0., m_u.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for u = P^{-1}*c: " << m_status;
 
         create_matrix_B(particles, contacts, problem);
