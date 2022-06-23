@@ -66,16 +66,16 @@ namespace scopi{
             double cl = xt::linalg::dot(c, l)(0);
             // yAy = y^T*A*y
             double yAy;
-            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 0., l.data(), &lAl);
+            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 0., m_y.data(), &yAy);
             PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for yAy = y^T*A*y: " << m_status;
-            double cy = xt::linalg::dot(c, y)(0);
+            double cy = xt::linalg::dot(c, m_y)(0);
             double dgly = xt::linalg::dot(m_dg, l - m_y)(0);
             double lyly = xt::linalg::dot(l - m_y, l - m_y)(0);
 
             while (0.5*lAl + cl > 0.5*yAy + cy + dgly + lipsch/2.*lyly && cc < 10)
             {
                 lipsch *= 2.;
-                rho = 1./lipsch;
+                m_rho = 1./lipsch;
                 xt::noalias(l) = this->projection_cone(m_y - m_rho * m_dg);
 
                 cc++;
@@ -108,6 +108,8 @@ namespace scopi{
 
             m_l_old = l;
             theta_old = theta;
+            lipsch *= 0.97; // 0.9 in the paper
+            m_rho = 1./lipsch;
             iter++;
         }
         PLOG_ERROR << "Uzawa does not converge";
