@@ -125,6 +125,7 @@ namespace scopi{
     , gradient_t(optim_params.m_max_iter, optim_params.m_rho, optim_params.m_tol_dg, optim_params.m_tol_l)
     , m_vap(xt::zeros<double>({6*nparts}))
     , m_u(xt::zeros<double>({6*nparts}))
+    , m_bl(xt::zeros<double>({6*nparts}))
     {
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;
@@ -162,8 +163,10 @@ namespace scopi{
         m_status = mkl_sparse_set_mv_hint(m_inv_P, SPARSE_OPERATION_NON_TRANSPOSE, m_descr_inv_P, 2 );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix invP: " << m_status;
 
+        /*
         m_status = mkl_sparse_set_mm_hint( m_inv_P, SPARSE_OPERATION_NON_TRANSPOSE, m_descr_inv_P, SPARSE_LAYOUT_ROW_MAJOR, 0, 1);
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mm_hint for matrix invP: " << m_status;
+        */
 
         m_status = mkl_sparse_optimize ( m_inv_P );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
@@ -180,7 +183,6 @@ namespace scopi{
                                                                                               problem_t& problem)
     {
         xt::noalias(m_l) = xt::zeros<double>({problem.number_row_matrix(contacts)});
-        m_bl.resize({problem.number_row_matrix(contacts)});
 
         // matrix B
         problem.create_matrix_constraint_coo(particles, contacts, 0);
@@ -262,13 +264,12 @@ namespace scopi{
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for e = B*vap+d: " << m_status;
 
         std::size_t nb_iter = this->projection(m_A, m_descrA, m_e, m_l);
-
         // u = vap + P^{-1}*B^T*l
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_B, m_descrB, m_l.data(), 0., m_bl.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for bl = B^T*l: " << m_status;
 
-        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., m_inv_P, m_descr_inv_P, m_bl.data(), 1., m_vap.data());
-        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for u = vap + P^{-1}*bl: " << m_status;
+        m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, m_bl.data(), 1., m_vap.data());
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for u = vap - P^{-1}*bl: " << m_status;
 
         m_status = mkl_sparse_destroy ( m_B );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix B: " << m_status;
