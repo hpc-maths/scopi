@@ -40,7 +40,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, double kdtree_radius=10)
+        contact_kdtree(double dmax, double kdtree_radius=17)
         : contact_base(dmax)
         , m_kd_tree_radius(kdtree_radius)
         , m_nMatches(0)
@@ -75,7 +75,7 @@ namespace scopi
             tic();
 
             m_nMatches = 0;
-            #pragma omp parallel for reduction(+:m_nMatches) //num_threads(8)
+            #pragma omp parallel for reduction(+:m_nMatches) //num_threads(1)
 
             for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
             {
