@@ -9,7 +9,7 @@ set(SCOPI_EXAMPLES
    sphere_plan.cpp
    viscosity.cpp
    two_spheres_viscosity.cpp
-   two_globules.cpp
+   two_worms.cpp
 )
 
 include(generator)

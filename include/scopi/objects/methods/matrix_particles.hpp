@@ -12,7 +12,7 @@
 
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
-#include "../types/globule.hpp"
+#include "../types/worm.hpp"
 #include "../types/plan.hpp"
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"
@@ -41,9 +41,9 @@ namespace scopi
         return xt::xtensor<double, 1>({});
     }
 
-    // GLOBULE
+    // WORM
     template<std::size_t dim>
-    xt::xtensor<double, 1> distances_per_particle(const globule<dim, false>& g)
+    xt::xtensor<double, 1> distances_per_particle(const worm<dim, false>& g)
     {
         xt::xtensor<double, 1>::shape_type shape = {g.size()-1};
         xt::xtensor<double, 1> distances(shape);
@@ -86,7 +86,7 @@ namespace scopi
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
                     const superellipsoid<dim, false>,
-                    const globule<dim, false>,
+                    const worm<dim, false>,
                     const plan<dim, false>>,
         typename distances_per_particle_functor<dim>::return_type
     >;
@@ -115,9 +115,9 @@ namespace scopi
         return xt::xtensor<double, 2>({});
     }
 
-    // GLOBULE
+    // WORM
     template<std::size_t dim>
-    xt::xtensor<double, 2> matrix_per_particle(const globule<dim, false>& g)
+    xt::xtensor<double, 2> matrix_per_particle(const worm<dim, false>& g)
     {
         xt::xtensor<double, 2>::shape_type shape = {12*(g.size()-1), 3};
         xt::xtensor<double, 2> mat(shape);
@@ -198,7 +198,7 @@ namespace scopi
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
                     const superellipsoid<dim, false>,
-                    const globule<dim, false>,
+                    const worm<dim, false>,
                     const plan<dim, false>>,
         typename matrix_per_particle_functor<dim>::return_type
     >;

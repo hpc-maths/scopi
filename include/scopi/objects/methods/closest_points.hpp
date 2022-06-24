@@ -13,7 +13,6 @@
 
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
-#include "../types/globule.hpp"
 #include "../types/plan.hpp"
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"

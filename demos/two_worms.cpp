@@ -1,6 +1,6 @@
 #include <cstddef>
 #include <xtensor/xmath.hpp>
-#include <scopi/objects/types/globule.hpp>
+#include <scopi/objects/types/worm.hpp>
 #include <scopi/solver.hpp>
 #include <scopi/property.hpp>
 #include <scopi/solvers/OptimMosek.hpp>
@@ -9,7 +9,7 @@
 
 int main()
 {
-    plog::init(plog::error, "two_globules.log");
+    plog::init(plog::error, "two_worms.log");
 
     constexpr std::size_t dim = 2;
     double dt = .005;
@@ -17,10 +17,10 @@ int main()
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
-    scopi::globule<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
+    scopi::worm<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
             {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
             1.);
-    scopi::globule<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
+    scopi::worm<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
             {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
             1.);
     particles.push_back(g1, prop.desired_velocity({-1., 0.}));

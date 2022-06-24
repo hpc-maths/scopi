@@ -11,7 +11,6 @@
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
-#include "../objects/types/globule.hpp"
 #include "../objects/methods/matrix_particles.hpp"
 
 #include "../params/ProblemParams.hpp"

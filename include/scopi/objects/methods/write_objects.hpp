@@ -12,7 +12,7 @@
 
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
-#include "../types/globule.hpp"
+#include "../types/worm.hpp"
 #include "../types/plan.hpp"
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"
@@ -115,22 +115,22 @@ namespace scopi
       // return ssss;
     }
 
-    // GLOBULE
+    // WORM
     template<std::size_t dim>
-    nl::json write_objects(const globule<dim, false> g)
+    nl::json write_objects(const worm<dim, false> g)
     {
         nl::json object;
-        object["type"] = "globule";
+        object["type"] = "worm";
         for (std::size_t i = 0; i < g.size(); ++i)
         {
-            nl::json json_globule;
-            json_globule["position"] = g.pos(i);
-            json_globule["radius"] = g.radius();
-            json_globule["quaternion"] = g.q(i);
-            object["globule"].push_back(json_globule);
+            nl::json json_worm;
+            json_worm["position"] = g.pos(i);
+            json_worm["radius"] = g.radius();
+            json_worm["quaternion"] = g.q(i);
+            object["worm"].push_back(json_worm);
         }
         return object;
-        // std::cout << "write_objects : GLOBULE" << std::endl;
+        // std::cout << "write_objects : WORM" << std::endl;
         // std::stringstream ss;
         // ss << "redcell; ";
         // return ss.str();
@@ -160,7 +160,7 @@ namespace scopi
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
                     const superellipsoid<dim, false>,
-                    const globule<dim, false>,
+                    const worm<dim, false>,
                     const plan<dim, false>>,
         typename write_objects_functor<dim>::return_type
     >;

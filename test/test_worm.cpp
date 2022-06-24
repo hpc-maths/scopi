@@ -4,7 +4,7 @@
 #include "test_common.hpp"
 #include "utils.hpp"
 
-#include <scopi/objects/types/globule.hpp>
+#include <scopi/objects/types/worm.hpp>
 #include <scopi/vap/vap_fpd.hpp>
 #include <scopi/container.hpp>
 #include <scopi/solver.hpp>
@@ -12,10 +12,10 @@
 
 namespace scopi
 {
-    TEST_CASE("Globule 2D")
+    TEST_CASE("Worm 2D")
     {
         static constexpr std::size_t dim = 2;
-        globule<dim> g({{2., 0.7}, {4., 0.7}, {6., 0.7}, {8., 0.7}, {10., 0.7}, {12., 0.7}},
+        worm<dim> g({{2., 0.7}, {4., 0.7}, {6., 0.7}, {8., 0.7}, {10., 0.7}, {12., 0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
         property<dim> p(property<dim>().desired_velocity({{0.25, 0}}));
@@ -142,10 +142,10 @@ namespace scopi
         }
     }
 
-    TEST_CASE("Globule 2D const")
+    TEST_CASE("Worm 2D const")
     {
         static constexpr std::size_t dim = 2;
-        const globule<dim> g({{2., 0.7}, {4., 0.7}, {6., 0.7}, {8., 0.7}, {10., 0.7}, {12., 0.7}},
+        const worm<dim> g({{2., 0.7}, {4., 0.7}, {6., 0.7}, {8., 0.7}, {10., 0.7}, {12., 0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
         const property<dim> p(property<dim>().desired_velocity({{0.25, 0}}));
@@ -272,10 +272,10 @@ namespace scopi
         }
     }
 
-    TEST_CASE("Globule 3D")
+    TEST_CASE("Worm 3D")
     {
         static constexpr std::size_t dim = 3;
-        globule<dim> g({{2., 0.7, 0.2}, {4., 0.7, 0.2}, {6., 0.7, 0.2}, {8., 0.7, 0.2}, {10., 0.7, 0.2}, {12., 0.7, 0.2}},
+        worm<dim> g({{2., 0.7, 0.2}, {4., 0.7, 0.2}, {6., 0.7, 0.2}, {8., 0.7, 0.2}, {10., 0.7, 0.2}, {12., 0.7, 0.2}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
         property<dim> p(property<dim>().desired_velocity({{0.25, 0, 0}}));
@@ -347,10 +347,10 @@ namespace scopi
         }
     }
 
-    TEST_CASE("Sphere 3D const")
+    TEST_CASE("Worm 3D const")
     {
         static constexpr std::size_t dim = 3;
-        const globule<dim> g({{2., 0.7, 0.2}, {4., 0.7, 0.2}, {6., 0.7, 0.2}, {8., 0.7, 0.2}, {10., 0.7, 0.2}, {12., 0.7, 0.2}},
+        const worm<dim> g({{2., 0.7, 0.2}, {4., 0.7, 0.2}, {6., 0.7, 0.2}, {8., 0.7, 0.2}, {10., 0.7, 0.2}, {12., 0.7, 0.2}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
         const property<dim> p(property<dim>().desired_velocity({{0.25, 0, 0}}));
@@ -422,7 +422,7 @@ namespace scopi
         }
     }
 
-    TEST_CASE_TEMPLATE("two globules", SolverType, SOLVER_VISCOUS_GLOBULE(2, contact_kdtree, vap_fixed), SOLVER_VISCOUS_GLOBULE(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two worms", SolverType, SOLVER_VISCOUS_GLOBULE(2, contact_kdtree, vap_fixed), SOLVER_VISCOUS_GLOBULE(2, contact_brute_force, vap_fixed))
     {
         using solver_t = typename SolverType::solver_type;
 
@@ -432,10 +432,10 @@ namespace scopi
         scopi_container<dim> particles;
         auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
-        globule<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
+        worm<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
-        globule<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
+        worm<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
                 1.);
         particles.push_back(g1, prop.desired_velocity({-1., 0.}));
@@ -446,6 +446,6 @@ namespace scopi
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_globules.json", tolerance));
+        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_worms.json", tolerance));
     }
 }

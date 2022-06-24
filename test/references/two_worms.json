@@ -437,7 +437,7 @@
     ],
     "objects": [
         {
-            "globule": [
+            "worm": [
                 {
                     "position": [
                         -3.885571091668796,
@@ -517,10 +517,10 @@
                     "radius": 1.0
                 }
             ],
-            "type": "globule"
+            "type": "worm"
         },
         {
-            "globule": [
+            "worm": [
                 {
                     "position": [
                         3.8855710916719732,
@@ -600,7 +600,7 @@
                     "radius": 1.0
                 }
             ],
-            "type": "globule"
+            "type": "worm"
         }
     ]
 }

@@ -13,7 +13,7 @@
 
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
-#include "../types/globule.hpp"
+#include "../types/worm.hpp"
 #include "../types/plan.hpp"
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"
@@ -55,9 +55,9 @@ namespace scopi
         return std::make_unique<plan<dim, false>>(s);
     }
 
-    // GLOBULE
+    // WORM
     template<std::size_t dim>
-    std::unique_ptr<object<dim, false>> select_object(const globule<dim, false>& s, const std::size_t i)
+    std::unique_ptr<object<dim, false>> select_object(const worm<dim, false>& s, const std::size_t i)
     {
         return s.get_sphere(i);
     }
@@ -86,7 +86,7 @@ namespace scopi
         const object<dim, false>,
         mpl::vector<const sphere<dim, false>,
                     const superellipsoid<dim, false>,
-                    const globule<dim, false>,
+                    const worm<dim, false>,
                     const plan<dim, false>>,
         typename select_object_functor<dim>::return_type,
         antisymmetric_dispatch, const index, mpl::vector<const index>

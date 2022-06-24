@@ -1,6 +1,6 @@
 #include <cstddef>
 #include <xtensor/xmath.hpp>
-#include <scopi/objects/types/globule.hpp>
+#include <scopi/objects/types/worm.hpp>
 #include <scopi/solver.hpp>
 #include <scopi/property.hpp>
 #include <scopi/solvers/OptimMosek.hpp>
@@ -8,7 +8,7 @@
 
 int main()
 {
-    plog::init(plog::error, "critical_globules.log");
+    plog::init(plog::error, "critical_worms.log");
 
     constexpr std::size_t dim = 2;
     double dt = .005;
@@ -16,7 +16,7 @@ int main()
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
-    int n = 10; // 2*n globules
+    int n = 10; // 2*n worms
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distrib_r(0.1, 0.8);
     std::uniform_real_distribution<double> distrib_move_x(-0.5, 0.5);
@@ -28,7 +28,7 @@ int main()
         double r = distrib_r(generator);
         double x0 =  2. + distrib_move_x(generator);
         double y = 2.*(i + 0.5);;
-        scopi::globule<dim> g1({{x0, y}, {x0 + 2.*r, y}, {x0 + 4.*r, y}, {x0 + 6.*r, y}, {x0 + 8.*r, y}, {x0 + 10.*r, y}},
+        scopi::worm<dim> g1({{x0, y}, {x0 + 2.*r, y}, {x0 + 4.*r, y}, {x0 + 6.*r, y}, {x0 + 8.*r, y}, {x0 + 10.*r, y}},
                 {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
                 r);
         double v_x = distrib_velocity(generator);
@@ -38,7 +38,7 @@ int main()
         r = distrib_r(generator);
         x0 = -2. + distrib_move_x(generator);
         y = 2.*i;
-        scopi::globule<dim> g2({{x0, y}, {x0 - 2.*r, y}, {x0 - 4.*r, y}, {x0 - 6.*r, y}, {x0 - 8.*r, y}, {x0 - 10.*r, y}},
+        scopi::worm<dim> g2({{x0, y}, {x0 - 2.*r, y}, {x0 - 4.*r, y}, {x0 - 6.*r, y}, {x0 - 8.*r, y}, {x0 - 10.*r, y}},
                 {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
                 r);
         v_x = distrib_velocity(generator);
