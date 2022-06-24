@@ -56,26 +56,13 @@ namespace scopi
                                                               const std::vector<neighbor<dim>>& contacts,
                                                               std::size_t firstCol)
     {
+        std::size_t index = matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, particles), 4);
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t u_size = 3*contacts.size()*2;
-        std::size_t w_size = 3*contacts.size()*2;
-        this->m_A_rows.resize(4*(u_size + w_size));
-        this->m_A_cols.resize(4*(u_size + w_size));
-        this->m_A_values.resize(4*(u_size + w_size));
-
         std::size_t ic = 0;
-        std::size_t index = 0;
         for (auto &c: contacts)
         {
             if (c.i >= active_offset)
             {
-                for (std::size_t d = 0; d < 3; ++d)
-                {
-                    this->m_A_rows[index] = 4*ic;
-                    this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
-                    this->m_A_values[index] = -this->m_dt*c.nij[d];
-                    index++;
-                }
                 for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
@@ -94,13 +81,6 @@ namespace scopi
 
             if (c.j >= active_offset)
             {
-                for (std::size_t d = 0; d < 3; ++d)
-                {
-                    this->m_A_rows[index] = 4*ic;
-                    this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
-                    this->m_A_values[index] = this->m_dt*c.nij[d];
-                    index++;
-                }
                 for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
@@ -126,13 +106,6 @@ namespace scopi
             {
                 std::size_t ind_part = c.i - active_offset;
                 auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                for (std::size_t ip = 0; ip < 3; ++ip)
-                {
-                    this->m_A_rows[index] = 4*ic;
-                    this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                    this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
-                }
                 for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
@@ -149,13 +122,6 @@ namespace scopi
             {
                 std::size_t ind_part = c.j - active_offset;
                 auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                for (std::size_t ip = 0; ip < 3; ++ip)
-                {
-                    this->m_A_rows[index] = 4*ic;
-                    this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                    this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
-                }
                 for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
@@ -170,9 +136,6 @@ namespace scopi
 
             ++ic;
         }
-        this->m_A_rows.resize(index);
-        this->m_A_cols.resize(index);
-        this->m_A_values.resize(index);
     }
 
     template <std::size_t dim>

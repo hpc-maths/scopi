@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 #include <vector>
@@ -72,25 +73,15 @@ namespace scopi
                                                                    std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t u_size = 3*contacts.size()*2;
-        std::size_t w_size = 3*contacts.size()*2;
-        this->m_A_rows.resize(2*(u_size + w_size));
-        this->m_A_cols.resize(2*(u_size + w_size));
-        this->m_A_values.resize(2*(u_size + w_size));
-
+        std::size_t index = matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, particles), 1);
         std::size_t ic = 0;
-        std::size_t index = 0;
         for (auto &c: contacts)
         {
             if (c.i >= active_offset)
             {
-                for (std::size_t d = 0; d < 3; ++d)
+                if (this->m_gamma[ic] < -m_params.m_tol)
                 {
-                    this->m_A_rows[index] = ic;
-                    this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
-                    this->m_A_values[index] = -this->m_dt*c.nij[d];
-                    index++;
-                    if (this->m_gamma[ic] < -m_params.m_tol)
+                    for (std::size_t d = 0; d < 3; ++d)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
@@ -102,13 +93,9 @@ namespace scopi
 
             if (c.j >= active_offset)
             {
-                for (std::size_t d = 0; d < 3; ++d)
+                if (this->m_gamma[ic] < -m_params.m_tol)
                 {
-                    this->m_A_rows[index] = ic;
-                    this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
-                    this->m_A_values[index] = this->m_dt*c.nij[d];
-                    index++;
-                    if (this->m_gamma[ic] < -m_params.m_tol)
+                    for (std::size_t d = 0; d < 3; ++d)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
@@ -129,10 +116,6 @@ namespace scopi
                 auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    this->m_A_rows[index] = ic;
-                    this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
-                    this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
                     if (this->m_gamma[ic] < -m_params.m_tol)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
@@ -147,13 +130,9 @@ namespace scopi
             {
                 std::size_t ind_part = c.j - active_offset;
                 auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                for (std::size_t ip = 0; ip < 3; ++ip)
+                if (this->m_gamma[ic] < -m_params.m_tol)
                 {
-                    this->m_A_rows[index] = ic;
-                    this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
-                    this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
-                    if (this->m_gamma[ic] < -m_params.m_tol)
+                    for (std::size_t ip = 0; ip < 3; ++ip)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
@@ -164,9 +143,6 @@ namespace scopi
             }
             ++ic;
         }
-        this->m_A_rows.resize(index);
-        this->m_A_cols.resize(index);
-        this->m_A_values.resize(index);
     }
 
     template<std::size_t dim>
