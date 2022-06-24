@@ -22,6 +22,7 @@ namespace scopi{
         OptimParams(const OptimParams<OptimMosek<problem_t>>& params);
 
         ProblemParams<problem_t> m_problem_params;
+        bool m_change_default_tol_mosek;
     };
 
     template<class problem_t = DryWithoutFriction>
@@ -99,8 +100,11 @@ namespace scopi{
         // model->setSolverParam("numThreads", thread_qty);
         // model->setSolverParam("intpntCoTolPfeas", 1e-11);
         // model->setSolverParam("intpntTolPfeas", 1.e-11);
-        model->setSolverParam("intpntCoTolPfeas", 1e-11);
-        model->setSolverParam("intpntCoTolRelGap", 1e-11);
+        if (this->m_params.m_change_default_tol_mosek)
+        {
+            model->setSolverParam("intpntCoTolPfeas", 1e-11);
+            model->setSolverParam("intpntCoTolRelGap", 1e-11);
+        }
 
         // model->setSolverParam("intpntCoTolDfeas", 1e-6);
         model->setLogHandler([](const std::string & msg) {PLOG_VERBOSE << msg << std::flush; } );
@@ -243,11 +247,13 @@ namespace scopi{
     template<class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams(const OptimParams<OptimMosek<problem_t>>& params)
     : m_problem_params(params.m_problem_params)
+    , m_change_default_tol_mosek(params.m_change_default_tol_mosek)
     {}
 
     template<class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams()
     : m_problem_params()
+    , m_change_default_tol_mosek(true)
     {}
 }
 #endif

@@ -424,6 +424,8 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("two globules", SolverType, SOLVER_VISCOUS_GLOBULE(2, contact_kdtree, vap_fixed), SOLVER_VISCOUS_GLOBULE(2, contact_brute_force, vap_fixed))
     {
+        using solver_t = typename SolverType::solver_type;
+
         constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -439,7 +441,9 @@ namespace scopi
         particles.push_back(g1, prop.desired_velocity({-1., 0.}));
         particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
-        SolverType solver(particles, dt);
+        OptimParams<solver_t> params;
+        params.m_change_default_tol_mosek = false;
+        SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_globules.json", tolerance));
