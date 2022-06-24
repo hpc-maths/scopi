@@ -47,6 +47,12 @@ namespace scopi
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts, scopi_container<dim>& particles);
 
+        template<std::size_t dim>
+        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        template<std::size_t dim>
+        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                     xt::xtensor<double, 1> lambda);
+
     private:
         ProblemParams<DryWithFriction> m_params;
     };
@@ -154,6 +160,15 @@ namespace scopi
             this->m_distances[4*i] = contacts[i].dij;
         }
     }
+
+    template<std::size_t dim>
+    void DryWithFriction::extra_setps_before_solve(const std::vector<neighbor<dim>>&)
+    {}
+
+    template<std::size_t dim>
+    void DryWithFriction::extra_setps_after_solve(const std::vector<neighbor<dim>>&,
+                                                  xt::xtensor<double, 1>)
+    {}
   
 }
 

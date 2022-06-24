@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "../container.hpp"
+#include "../utils.hpp"
 
 namespace scopi
 {
@@ -31,13 +32,19 @@ namespace scopi
     template <std::size_t dim>
     void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles)
     {
+        tic();
         this->derived_cast().set_a_priori_velocity_impl(particles);
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : set vap = " << duration;
     }
 
     template <class D>
     template <std::size_t dim>
     void vap_base<D>::update_velocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt)
     {
+        tic();
         this->derived_cast().update_velocity_impl(particles, uadapt, wadapt);
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : update vap = " << duration;
     }
 }

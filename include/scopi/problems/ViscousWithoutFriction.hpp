@@ -39,8 +39,8 @@ namespace scopi
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
-        void update_gamma(const std::vector<neighbor<dim>>& contacts,
-                          xt::xtensor<double, 1> lambda);
+        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                     xt::xtensor<double, 1> lambda);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const scopi_container<dim>& particles);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
@@ -48,7 +48,7 @@ namespace scopi
 
         std::size_t get_nb_gamma_min();
 
-        void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
+        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
 
         void matrix_free_gemv_A(const neighbor<dim>& c,
                                 const scopi_container<dim>& particles,
@@ -153,7 +153,7 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::set_gamma(const std::vector<neighbor<dim>>& contacts_new)
+    void ViscousWithoutFriction<dim>::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new)
     {
         this->set_gamma_base(contacts_new);
         this->m_nb_gamma_neg = 0;
@@ -165,8 +165,8 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts,
-                                                   xt::xtensor<double, 1> lambda)
+    void ViscousWithoutFriction<dim>::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                                              xt::xtensor<double, 1> lambda)
     {
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());

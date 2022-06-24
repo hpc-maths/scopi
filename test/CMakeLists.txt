@@ -16,7 +16,7 @@ set(SCOPI_TESTS
     test_friction.cpp
     test_viscosity.cpp
     test_quaternions.cpp
-    test_worm.cpp
+    # test_worm.cpp
 )
 
 foreach(filename IN LISTS SCOPI_TESTS)

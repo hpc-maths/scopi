@@ -49,6 +49,12 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
+
+        template<std::size_t dim>
+        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        template<std::size_t dim>
+        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                     xt::xtensor<double, 1> lambda);
     };
 
     template<std::size_t dim>
@@ -179,5 +185,15 @@ namespace scopi
             }
         }
     }
+
+    template<std::size_t dim>
+    void DryWithoutFriction::extra_setps_before_solve(const std::vector<neighbor<dim>>&)
+    {}
+
+    template<std::size_t dim>
+    void DryWithoutFriction::extra_setps_after_solve(const std::vector<neighbor<dim>>&,
+                                                     xt::xtensor<double, 1>)
+    {}
+
 }
 

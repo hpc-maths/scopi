@@ -41,7 +41,7 @@ namespace scopi
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           std::size_t firstCol);
-        void update_gamma(const std::vector<neighbor<dim>>& contacts,
+        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
                           xt::xtensor<double, 1> lambda);
         void correct_lambda(const std::vector<neighbor<dim>>& contacts,
                                     xt::xtensor<double, 1> lambda,
@@ -57,7 +57,7 @@ namespace scopi
 
         std::size_t get_nb_gamma_min();
 
-        void set_gamma(const std::vector<neighbor<dim>>& contacts_new);
+        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
 
     private:
         std::size_t m_nb_gamma_min;
@@ -299,7 +299,7 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    void ViscousWithFriction<dim>::set_gamma(const std::vector<neighbor<dim>>& contacts_new)
+    void ViscousWithFriction<dim>::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new)
     {
         this->set_gamma_base(contacts_new);
         this->m_nb_gamma_neg = 0;
@@ -355,7 +355,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void ViscousWithFriction<dim>::update_gamma(const std::vector<neighbor<dim>>& contacts,
+    void ViscousWithFriction<dim>::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                                 xt::xtensor<double, 1>)
     {
         this->m_contacts_old = contacts;
