@@ -17,7 +17,7 @@ namespace scopi
     {}
 
     template <>
-    void set_params_test<OptimMosek<DryWithoutFriction>>(OptimParams<OptimMosek<DryWithoutFriction>>>&)
+    void set_params_test<OptimMosek<DryWithoutFriction>>(OptimParams<OptimMosek<DryWithoutFriction>>& params)
     {
         params.m_change_default_tol_mosek = false;
     }
