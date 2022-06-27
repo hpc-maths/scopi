@@ -11,15 +11,14 @@ namespace scopi
     class OptimScs;
 
     template<class problem_t>
-    class OptimParams<OptimScs<problem_t>>
+    struct OptimParams<OptimScs<problem_t>>
     {
-    public:
         OptimParams();
         OptimParams(const OptimParams<OptimScs<problem_t>>& params);
 
         ProblemParams<problem_t> m_problem_params;
-        double m_tol;
-        double m_tol_infeas;
+        double tol;
+        double tol_infeas;
     };
 
     template <class problem_t = DryWithoutFriction>
@@ -169,9 +168,9 @@ namespace scopi
         m_P.n = 6*nparts;
 
         scs_set_default_settings(&m_stgs);
-        m_stgs.eps_abs = this->m_params.m_tol;
-        m_stgs.eps_rel = this->m_params.m_tol;
-        m_stgs.eps_infeas = this->m_params.m_tol_infeas;
+        m_stgs.eps_abs = this->m_params.tol;
+        m_stgs.eps_rel = this->m_params.tol;
+        m_stgs.eps_infeas = this->m_params.tol_infeas;
         m_stgs.verbose = 0;
     }
 
@@ -295,15 +294,15 @@ namespace scopi
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams()
     : m_problem_params()
-    , m_tol(1e-7)
-    , m_tol_infeas(1e-10)
+    , tol(1e-7)
+    , tol_infeas(1e-10)
     {}
 
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams(const OptimParams<OptimScs<problem_t>>& params)
     : m_problem_params(params.m_problem_params)
-    , m_tol(params.m_tol)
-    , m_tol_infeas(params.m_tol_infeas)
+    , tol(params.tol)
+    , tol_infeas(params.tol_infeas)
     {}
 }
 #endif

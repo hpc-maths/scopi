@@ -19,7 +19,7 @@ namespace scopi {
 
     void set_params_test_uzawa(OptimParamsUzawaBase<ViscousWithoutFriction<2>>& params)
     {
-        params.m_rho = 200.;
+        params.rho = 200.;
     }
 
 #ifdef SCOPI_USE_MKL
@@ -90,7 +90,7 @@ namespace scopi {
         particles.push_back(s, prop.force({{0, -g}}));
 
         OptimParams<solver_t> params;
-        params.m_problem_params.m_mu = 0.1;
+        params.m_problem_params.mu = 0.1;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;
@@ -119,7 +119,7 @@ namespace scopi {
         particles.push_back(s, prop.force({{g, -g}}));
 
         OptimParams<solver_t> params;
-        params.m_problem_params.m_mu = 0.1;
+        params.m_problem_params.mu = 0.1;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
         particles.f()(1)(1) *= -1.;

@@ -16,16 +16,15 @@
 
 namespace scopi{
     template<class problem_t>
-    class OptimParamsUzawaBase
+    struct OptimParamsUzawaBase
     {
-    public:
         OptimParamsUzawaBase();
         OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
 
         ProblemParams<problem_t> m_problem_params;
-        double m_tol;
-        std::size_t m_max_iter;
-        double m_rho;
+        double tol;
+        std::size_t max_iter;
+        double rho;
     };
 
     template<class Derived, class problem_t = DryWithoutFriction>
@@ -107,7 +106,7 @@ namespace scopi{
 
         std::size_t cc = 0;
         double cmax = -1000.0;
-        while ( (cmax<=-this->m_params.m_tol) && (cc <= this->m_params.m_max_iter) )
+        while ( (cmax<=-this->m_params.tol) && (cc <= this->m_params.max_iter) )
         {
             tic();
             xt::noalias(m_U) = this->m_c;
@@ -140,7 +139,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            xt::noalias(m_L) = xt::maximum( m_L-this->m_params.m_rho*m_R, 0);
+            xt::noalias(m_L) = xt::maximum( m_L-this->m_params.rho*m_R, 0);
             duration = toc();
             time_assign_l += duration;
             time_solve += duration;
@@ -157,7 +156,7 @@ namespace scopi{
             PLOG_VERBOSE << std::setw(24) << std::scientific << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
         }
 
-        PLOG_ERROR_IF(cc >= this->m_params.m_max_iter) << "Uzawa does not converge";
+        PLOG_ERROR_IF(cc >= this->m_params.max_iter) << "Uzawa does not converge";
 
         PLOG_INFO << "----> CPUTIME : solve (total) = " << time_solve;
         PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
@@ -238,17 +237,17 @@ namespace scopi{
     template<class problem_t>
     OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase(const OptimParamsUzawaBase& params)
     : m_problem_params(params.m_problem_params)
-    , m_tol(params.m_tol)
-    , m_max_iter(params.m_max_iter)
-    , m_rho(params.m_rho)
+    , tol(params.tol)
+    , max_iter(params.max_iter)
+    , rho(params.rho)
     {}
 
     template<class problem_t>
     OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase()
     : m_problem_params()
-    , m_tol(1e-9)
-    , m_max_iter(40000)
-    , m_rho(2000.)
+    , tol(1e-9)
+    , max_iter(40000)
+    , rho(2000.)
     {}
 
 }

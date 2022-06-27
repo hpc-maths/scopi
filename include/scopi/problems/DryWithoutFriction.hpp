@@ -18,7 +18,7 @@ namespace scopi
     class DryWithoutFriction;
 
     template<>
-    class ProblemParams<DryWithoutFriction>
+    struct ProblemParams<DryWithoutFriction>
     {};
 
     class DryWithoutFriction : protected ProblemBase

@@ -22,13 +22,12 @@ namespace scopi
     class DryWithFriction;
 
     template<>
-    class ProblemParams<DryWithFriction>
+    struct ProblemParams<DryWithFriction>
     {
-    public:
         ProblemParams();
         ProblemParams(const ProblemParams<DryWithFriction>& params);
 
-        double m_mu;
+        double mu;
     };
 
     class DryWithFriction : protected ProblemBase
@@ -76,10 +75,10 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
-                        this->m_A_values[index] = -this->m_dt*m_params.m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        this->m_A_values[index] = -this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col];
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[index] += this->m_dt*m_params.m_mu;
+                            this->m_A_values[index] += this->m_dt*m_params.mu;
                         }
                         index++;
                     }
@@ -94,10 +93,10 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
-                        this->m_A_values[index] = this->m_dt*m_params.m_mu*c.nij[ind_row]*c.nij[ind_col];
+                        this->m_A_values[index] = this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col];
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[index] -= this->m_dt*m_params.m_mu;
+                            this->m_A_values[index] -= this->m_dt*m_params.mu;
                         }
                         index++;
                     }
@@ -119,7 +118,7 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        this->m_A_values[index] = -m_params.m_mu*this->m_dt*dot(ind_row, ind_col) + m_params.m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        this->m_A_values[index] = -m_params.mu*this->m_dt*dot(ind_row, ind_col) + m_params.mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                         index++;
                     }
                 }
@@ -135,7 +134,7 @@ namespace scopi
                     {
                         this->m_A_rows[index] = 4*ic + 1 + ind_row;
                         this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ind_col;
-                        this->m_A_values[index] = m_params.m_mu*this->m_dt*dot(ind_row, ind_col) - m_params.m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                        this->m_A_values[index] = m_params.mu*this->m_dt*dot(ind_row, ind_col) - m_params.mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                         index++;
                     }
                 }

@@ -8,7 +8,7 @@
 namespace scopi
 {
     template<class problem_t>
-    class ProblemParams
+    struct ProblemParams
     {
     private:
         ProblemParams();

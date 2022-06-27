@@ -9,7 +9,7 @@
 namespace scopi
 {
     template<class solver_t>
-    class OptimParams
+    struct OptimParams
     {
     private:
         OptimParams();

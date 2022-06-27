@@ -4,11 +4,11 @@
 namespace scopi
 {
     ProblemParams<DryWithFriction>::ProblemParams()
-    : m_mu(0.)
+    : mu(0.)
     {}
 
     ProblemParams<DryWithFriction>::ProblemParams(const ProblemParams<DryWithFriction>& params)
-    : m_mu(params.m_mu)
+    : mu(params.mu)
     {}
 
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0)

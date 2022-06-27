@@ -20,13 +20,12 @@ namespace scopi
     class ViscousWithoutFriction;
 
     template<std::size_t dim>
-    class ProblemParams<ViscousWithoutFriction<dim>>
+    struct ProblemParams<ViscousWithoutFriction<dim>>
     {
-    public:
         ProblemParams();
         ProblemParams(const ProblemParams<ViscousWithoutFriction<dim>>& params);
 
-        double m_tol;
+        double tol;
     };
 
     template<std::size_t dim>
@@ -81,7 +80,7 @@ namespace scopi
         {
             if (c.i >= active_offset)
             {
-                if (this->m_gamma[ic] < -m_params.m_tol)
+                if (this->m_gamma[ic] < -m_params.tol)
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
@@ -95,7 +94,7 @@ namespace scopi
 
             if (c.j >= active_offset)
             {
-                if (this->m_gamma[ic] < -m_params.m_tol)
+                if (this->m_gamma[ic] < -m_params.tol)
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
@@ -118,7 +117,7 @@ namespace scopi
                 auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    if (this->m_gamma[ic] < -m_params.m_tol)
+                    if (this->m_gamma[ic] < -m_params.tol)
                     {
                         this->m_A_rows[index] = contacts.size() + ic;
                         this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
@@ -132,7 +131,7 @@ namespace scopi
             {
                 std::size_t ind_part = c.j - active_offset;
                 auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                if (this->m_gamma[ic] < -m_params.m_tol)
+                if (this->m_gamma[ic] < -m_params.tol)
                 {
                     for (std::size_t ip = 0; ip < 3; ++ip)
                     {
@@ -161,7 +160,7 @@ namespace scopi
         this->m_nb_gamma_neg = 0;
         for (auto& g : this->m_gamma)
         {
-            if (g < -m_params.m_tol)
+            if (g < -m_params.tol)
                 this->m_nb_gamma_neg++;
         }
     }
@@ -176,7 +175,7 @@ namespace scopi
         for (std::size_t i = 0; i < this->m_gamma_old.size(); ++i)
         {
             double f_contact;
-            if (this->m_gamma[i] < -m_params.m_tol)
+            if (this->m_gamma[i] < -m_params.tol)
             {
                 f_contact = lambda(i) - lambda(this->m_gamma.size() + ind_gamma_neg);
                 ind_gamma_neg++;
@@ -186,9 +185,9 @@ namespace scopi
                 f_contact = lambda(i);
             }
             this->m_gamma_old[i] = std::min(0., this->m_gamma[i] - this->m_dt * f_contact);
-            if (this->m_gamma_old[i] > -m_params.m_tol)
+            if (this->m_gamma_old[i] > -m_params.tol)
                 this->m_gamma_old[i] = 0.;
-            // if (this->m_gamma_old[i] > -m_params.m_tol)
+            // if (this->m_gamma_old[i] > -m_params.tol)
             //     this->m_gamma_old[i] = 0.;
 
             PLOG_WARNING << this->m_gamma[i];
@@ -211,7 +210,7 @@ namespace scopi
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             this->m_distances[i] = contacts[i].dij;
-            if(this->m_gamma[i] < -m_params.m_tol)
+            if(this->m_gamma[i] < -m_params.tol)
             {
                 this->m_distances[contacts.size() + i] = -contacts[i].dij;
             }
@@ -237,7 +236,7 @@ namespace scopi
             for (std::size_t d = 0; d < 3; ++d)
             {
                 R(row) -= (-this->m_dt*c.nij[d]) * U((c.i - active_offset)*3 + d);
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (this->m_dt*c.nij[d]) * U((c.i - active_offset)*3 + d);
                 }
@@ -249,7 +248,7 @@ namespace scopi
             for (std::size_t d = 0; d < 3; ++d)
             {
                 R(row) -= (this->m_dt*c.nij[d]) * U((c.j - active_offset)*3 + d);
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (-this->m_dt*c.nij[d]) * U((c.j - active_offset)*3 + d);
                 }
@@ -268,7 +267,7 @@ namespace scopi
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
                 R(row) -= (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
                 }
@@ -282,7 +281,7 @@ namespace scopi
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
                 R(row) -= (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
                 }
@@ -304,7 +303,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U((c.i - active_offset)*3 + d) += L(row) * (-this->m_dt*c.nij[d]);
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
 #pragma omp atomic
                     U((c.i - active_offset)*3 + d) += L(this->m_gamma.size() + row) * (this->m_dt*c.nij[d]);
@@ -318,7 +317,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U((c.j - active_offset)*3 + d) += L(row) * (this->m_dt*c.nij[d]);
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
 #pragma omp atomic
                     U((c.j - active_offset)*3 + d) += L(this->m_gamma.size() + row) * (-this->m_dt*c.nij[d]);
@@ -339,7 +338,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U(3*this->m_nparticles + 3*ind_part + ip) += L(row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
 #pragma omp atomic
                     U(3*this->m_nparticles + 3*ind_part + ip) += L(this->m_gamma.size() + row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
@@ -355,7 +354,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U(3*this->m_nparticles + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                if (this->m_gamma[row] < -m_params.m_tol)
+                if (this->m_gamma[row] < -m_params.tol)
                 {
 #pragma omp atomic
                     U(3*this->m_nparticles + 3*ind_part + ip) += L(this->m_gamma.size() + row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
@@ -367,12 +366,12 @@ namespace scopi
 
     template<std::size_t dim>
     ProblemParams<ViscousWithoutFriction<dim>>::ProblemParams()
-    : m_tol(1e-6)
+    : tol(1e-6)
     {}
 
     template<std::size_t dim>
     ProblemParams<ViscousWithoutFriction<dim>>::ProblemParams(const ProblemParams<ViscousWithoutFriction<dim>>& params)
-    : m_tol(params.m_tol)
+    : tol(params.tol)
     {}
 
 }

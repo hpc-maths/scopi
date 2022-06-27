@@ -20,15 +20,14 @@ namespace scopi
     class ViscousWithFriction;
 
     template<std::size_t dim>
-    class ProblemParams<ViscousWithFriction<dim>>
+    struct ProblemParams<ViscousWithFriction<dim>>
     {
-    public:
         ProblemParams();
         ProblemParams(const ProblemParams<ViscousWithFriction<dim>>& params);
 
-        double m_mu;
-        double m_gamma_min;
-        double m_tol;
+        double mu;
+        double gamma_min;
+        double tol;
     };
 
     template<std::size_t dim>
@@ -84,7 +83,7 @@ namespace scopi
         std::size_t index = 0;
         for (auto &c: contacts)
         {
-            if (this->m_gamma[ic] != m_params.m_gamma_min || m_projection)
+            if (this->m_gamma[ic] != m_params.gamma_min || m_projection)
             {
                 if (c.i >= active_offset)
                 {
@@ -94,7 +93,7 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
                         this->m_A_values[index] = -this->m_dt*c.nij[d];
                         index++;
-                        if (this->m_gamma[ic] < -m_params.m_tol)
+                        if (this->m_gamma[ic] < -m_params.tol)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
                             this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
@@ -112,7 +111,7 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
                         this->m_A_values[index] = this->m_dt*c.nij[d];
                         index++;
-                        if (this->m_gamma[ic] < -m_params.m_tol)
+                        if (this->m_gamma[ic] < -m_params.tol)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
                             this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
@@ -137,7 +136,7 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
-                        if (this->m_gamma[ic] < -m_params.m_tol)
+                        if (this->m_gamma[ic] < -m_params.tol)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
                             this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
@@ -157,7 +156,7 @@ namespace scopi
                         this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
                         this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
                         index++;
-                        if (this->m_gamma[ic] < -m_params.m_tol)
+                        if (this->m_gamma[ic] < -m_params.tol)
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + ic;
                             this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
@@ -185,10 +184,10 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + ind_col;
-                            this->m_A_values[index] = -this->m_dt*m_params.m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            this->m_A_values[index] = -this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
                             {
-                                this->m_A_values[index] += this->m_dt*m_params.m_mu;
+                                this->m_A_values[index] += this->m_dt*m_params.mu;
                             }
                             index++;
                         }
@@ -210,10 +209,10 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + ind_col;
-                            this->m_A_values[index] = this->m_dt*m_params.m_mu*c.nij[ind_row]*c.nij[ind_col];
+                            this->m_A_values[index] = this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col];
                             if(ind_row == ind_col)
                             {
-                                this->m_A_values[index] -= this->m_dt*m_params.m_mu;
+                                this->m_A_values[index] -= this->m_dt*m_params.mu;
                             }
                             index++;
                         }
@@ -242,7 +241,7 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
-                            this->m_A_values[index] = -m_params.m_mu*this->m_dt*dot(ind_row, ind_col) + m_params.m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            this->m_A_values[index] = -m_params.mu*this->m_dt*dot(ind_row, ind_col) + m_params.mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
                         }
                     }
@@ -265,7 +264,7 @@ namespace scopi
                         {
                             this->m_A_rows[index] = contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ic + 1 + ind_row;
                             this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ind_col;
-                            this->m_A_values[index] = m_params.m_mu*this->m_dt*dot(ind_row, ind_col) - m_params.m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
+                            this->m_A_values[index] = m_params.mu*this->m_dt*dot(ind_row, ind_col) - m_params.mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col));
                             index++;
                         }
                     }
@@ -314,11 +313,11 @@ namespace scopi
         m_nb_gamma_min = 0;
         for (auto& g : this->m_gamma)
         {
-            if (g < -m_params.m_tol && g > m_params.m_gamma_min)
+            if (g < -m_params.tol && g > m_params.gamma_min)
             {
                 this->m_nb_gamma_neg++;
             }
-            else if (g == m_params.m_gamma_min)
+            else if (g == m_params.gamma_min)
             {
                 m_nb_gamma_min++;
             }
@@ -338,9 +337,9 @@ namespace scopi
 
         for (std::size_t ic = 0; ic < contacts.size(); ++ic)
         {
-            if (this->m_gamma[ic] != m_params.m_gamma_min)
+            if (this->m_gamma[ic] != m_params.gamma_min)
             {
-                if (this->m_gamma[ic] < - m_params.m_tol)
+                if (this->m_gamma[ic] < - m_params.tol)
                 {
                     m_lambda[ic] = lambda(ic) - lambda(this->m_gamma.size() - m_nb_gamma_min + ind_gamma_neg);
                     ind_gamma_neg++;
@@ -353,7 +352,7 @@ namespace scopi
             else
             {
                 m_lambda[ic] = lambda(this->m_gamma.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*ind_gamma_min);
-                if (m_lambda[ic] < m_params.m_tol)
+                if (m_lambda[ic] < m_params.tol)
                 {
                     m_lambda[ic] = + xt::linalg::dot(xt::view(u, contacts[ic].j, xt::range(_, dim)) - particles.v()(contacts[ic].j), contacts[ic].nij)(0)/this->m_dt;
                 }
@@ -370,11 +369,11 @@ namespace scopi
         this->m_gamma_old.resize(this->m_gamma.size());
         for (std::size_t ic = 0; ic < this->m_gamma.size(); ++ic)
         {
-            this->m_gamma_old[ic] = std::max(m_params.m_gamma_min, std::min(0., this->m_gamma[ic] - this->m_dt * m_lambda[ic]));
+            this->m_gamma_old[ic] = std::max(m_params.gamma_min, std::min(0., this->m_gamma[ic] - this->m_dt * m_lambda[ic]));
             // for Mosek
-            if (this->m_gamma_old[ic] - m_params.m_gamma_min < m_params.m_tol)
-                this->m_gamma_old[ic] = m_params.m_gamma_min;
-            if (this->m_gamma_old[ic] > -m_params.m_tol)
+            if (this->m_gamma_old[ic] - m_params.gamma_min < m_params.tol)
+                this->m_gamma_old[ic] = m_params.gamma_min;
+            if (this->m_gamma_old[ic] > -m_params.tol)
                 this->m_gamma_old[ic] = 0.;
             PLOG_WARNING << this->m_gamma[ic];
         }
@@ -396,10 +395,10 @@ namespace scopi
         std::size_t index_friciton = 0;
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            if (this->m_gamma[i] != m_params.m_gamma_min || m_projection)
+            if (this->m_gamma[i] != m_params.gamma_min || m_projection)
             {
                 this->m_distances[index_dry] = contacts[i].dij;
-                if(this->m_gamma[i] < -m_params.m_tol)
+                if(this->m_gamma[i] < -m_params.tol)
                 {
                     this->m_distances[contacts.size() - m_nb_gamma_min + index_dry] = -contacts[i].dij;
                 }
@@ -422,16 +421,16 @@ namespace scopi
 
     template<std::size_t dim>
     ProblemParams<ViscousWithFriction<dim>>::ProblemParams()
-    : m_mu(0.)
-    , m_gamma_min(-3.)
-    , m_tol(1e-6)
+    : mu(0.)
+    , gamma_min(-3.)
+    , tol(1e-6)
     {}
 
     template<std::size_t dim>
     ProblemParams<ViscousWithFriction<dim>>::ProblemParams(const ProblemParams<ViscousWithFriction<dim>>& params)
-    : m_mu(params.m_mu)
-    , m_gamma_min(params.m_gamma_min)
-    , m_tol(params.m_tol)
+    : mu(params.mu)
+    , gamma_min(params.gamma_min)
+    , tol(params.tol)
     {}
 
 }
