@@ -39,6 +39,7 @@ namespace scopi{
         template <std::size_t dim>
         int solve_optimization_problem_impl(scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
+                                            const std::vector<neighbor<dim>>& contacts_worms,
                                             problem_t& problem);
 
         auto uadapt_data();
@@ -64,6 +65,7 @@ namespace scopi{
         template <std::size_t dim>
         void init_uzawa(scopi_container<dim>& particles,
                         const std::vector<neighbor<dim>>& contacts, 
+                        const std::vector<neighbor<dim>>& contacts_worms, 
                         problem_t& problem);
         void finalize_uzawa();
 
@@ -84,13 +86,14 @@ namespace scopi{
     template <std::size_t dim>
     int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
                                                                             const std::vector<neighbor<dim>>& contacts,
+                                                                            const std::vector<neighbor<dim>>& contacts_worms,
                                                                             problem_t& problem)
     {
         tic();
-        init_uzawa(particles, contacts, problem);
+        init_uzawa(particles, contacts, contacts_worms, problem);
         auto duration = toc();
-        m_L = xt::zeros<double>({problem.number_row_matrix(contacts, particles)});
-        m_R = xt::zeros<double>({problem.number_row_matrix(contacts, particles)});
+        m_L = xt::zeros<double>({problem.number_row_matrix(contacts, contacts_worms)});
+        m_R = xt::zeros<double>({problem.number_row_matrix(contacts, contacts_worms)});
         PLOG_INFO << "----> CPUTIME : Uzawa matrix = " << duration;
 
         double time_assign_u = 0.;
@@ -223,9 +226,10 @@ namespace scopi{
     template <std::size_t dim>
     void OptimUzawaBase<Derived, problem_t>::init_uzawa(scopi_container<dim>& particles,
                                                         const std::vector<neighbor<dim>>& contacts,
+                                                        const std::vector<neighbor<dim>>& contacts_worms,
                                                         problem_t& problem)
     {
-        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts, problem);
+        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts, contacts_worms, problem);
     }
 
     template<class Derived, class problem_t>

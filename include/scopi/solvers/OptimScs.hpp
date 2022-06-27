@@ -35,6 +35,7 @@ namespace scopi
         template <std::size_t dim>
         int solve_optimization_problem_impl(scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts, 
+                                            const std::vector<neighbor<dim>>& contacts_worms, 
                                             problem_t& problem);
         double* uadapt_data();
         double* wadapt_data();
@@ -76,10 +77,11 @@ namespace scopi
     template<std::size_t dim>
     int OptimScs<problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
                                                              const std::vector<neighbor<dim>>& contacts,
+                                                             const std::vector<neighbor<dim>>& contacts_worms,
                                                              problem_t& problem)
     {
         tic();
-        problem.create_matrix_constraint_coo(particles, contacts, 0);
+        problem.create_matrix_constraint_coo(particles, contacts, contacts_worms, 0);
         // COO storage to CSR storage is easy to write
         // The CSC storage of A is the CSR storage of A^T
         // reverse the role of row and column pointers to have the transpose

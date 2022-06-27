@@ -47,6 +47,7 @@ namespace scopi
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts,
+                             const std::vector<neighbor<dim>>& contacts_worms,
                              problem_t& problem);
         void finalize_uzawa_impl();
 
@@ -55,6 +56,7 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     void OptimUzawaMatrixFreeTbb<problem_t>::init_uzawa_impl(const scopi_container<dim>&,
+                                                             const std::vector<neighbor<dim>>&,
                                                              const std::vector<neighbor<dim>>&,
                                                              problem_t&)
     {}

@@ -39,6 +39,7 @@ namespace scopi{
         template <std::size_t dim>
         int solve_optimization_problem_impl(scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
+                                            const std::vector<neighbor<dim>>& contacts_worms,
                                             problem_t& problem);
 
         double* uadapt_data();
@@ -68,6 +69,7 @@ namespace scopi{
     template<std::size_t dim>
     int OptimMosek<problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
                                                                const std::vector<neighbor<dim>>& contacts,
+                                                               const std::vector<neighbor<dim>>& contacts_worms,
                                                                problem_t& problem)
     {
         using namespace mosek::fusion;
@@ -86,8 +88,8 @@ namespace scopi{
         auto D_mosek = std::make_shared<monty::ndarray<double, 1>>(problem.m_distances.data(), monty::shape_t<1>(problem.m_distances.shape(0)));
 
         // matrix
-        problem.create_matrix_constraint_coo(particles, contacts, this->index_first_col_matrix());
-        m_A = Matrix::sparse(problem.number_row_matrix(contacts, particles), this->number_col_matrix(),
+        problem.create_matrix_constraint_coo(particles, contacts, contacts_worms, this->index_first_col_matrix());
+        m_A = Matrix::sparse(problem.number_row_matrix(contacts, contacts_worms), this->number_col_matrix(),
                              std::make_shared<ndarray<int, 1>>(problem.m_A_rows.data(), shape_t<1>({problem.m_A_rows.size()})),
                              std::make_shared<ndarray<int, 1>>(problem.m_A_cols.data(), shape_t<1>({problem.m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(problem.m_A_values.data(), shape_t<1>({problem.m_A_values.size()})));
@@ -112,7 +114,7 @@ namespace scopi{
         model->solve();
 
         m_Xlvl = X->level();
-        this->update_dual(problem.number_row_matrix(contacts, particles), contacts.size(), problem);
+        this->update_dual(problem.number_row_matrix(contacts, contacts_worms), contacts.size(), problem);
         for (auto& x : *this->m_dual)
         {
             x *= -1.;

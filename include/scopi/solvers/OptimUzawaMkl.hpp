@@ -35,6 +35,7 @@ namespace scopi
         template <std::size_t dim>
         void init_uzawa_impl(scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts,
+                             const std::vector<neighbor<dim>>& contacts_worms,
                              problem_t& problem);
         void finalize_uzawa_impl();
 
@@ -80,14 +81,15 @@ namespace scopi
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::init_uzawa_impl(scopi_container<dim>& particles,
                                                   const std::vector<scopi::neighbor<dim>>& contacts,
+                                                  const std::vector<scopi::neighbor<dim>>& contacts_worms,
                                                   problem_t& problem)
     {
-        problem.create_matrix_constraint_coo(particles, contacts, 0);
+        problem.create_matrix_constraint_coo(particles, contacts, contacts_worms, 0);
 
         sparse_matrix_t A_coo;
         m_status =  mkl_sparse_d_create_coo(&A_coo,
                                            SPARSE_INDEX_BASE_ZERO,
-                                           problem.number_row_matrix(contacts, particles), // number of rows
+                                           problem.number_row_matrix(contacts, contacts_worms), // number of rows
                                            6*this->m_nparts, // number of cols
                                            problem.m_A_values.size(), // number of non-zero elements
                                            problem.m_A_rows.data(),

@@ -59,6 +59,7 @@ namespace scopi
         void displacement_obstacles();
 
         std::vector<neighbor<dim>> compute_contacts();
+        std::vector<neighbor<dim>> compute_contacts_worms();
         void write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite);
         void move_active_particles();
         scopi_container<dim>& m_particles;
@@ -115,11 +116,12 @@ namespace scopi
 
             displacement_obstacles();
             auto contacts = compute_contacts();
+            auto contacts_worms = compute_contacts_worms();
             write_output_files(contacts, nite);
             m_vap.set_a_priori_velocity(m_particles);
             m_problem.extra_setps_before_solve(contacts);
-            m_solver.run(m_particles, contacts, m_problem, nite);
-            m_problem.extra_setps_after_solve(contacts, m_solver.get_lagrange_multiplier(contacts, m_particles, m_problem));
+            m_solver.run(m_particles, contacts, contacts_worms, m_problem, nite);
+            m_problem.extra_setps_after_solve(contacts, m_solver.get_lagrange_multiplier(contacts, contacts_worms, m_problem));
             move_active_particles();
             m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
         }
@@ -207,6 +209,26 @@ namespace scopi
         contact_t cont(2.);
         auto contacts = cont.run(m_particles, m_particles.nb_inactive());
         PLOG_INFO << "contacts.size() = " << contacts.size() << std::endl;
+        return contacts;
+    }
+
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts_worms()
+    {
+        std::vector<neighbor<dim>> contacts;
+        #pragma omp parallel for
+        for (std::size_t i = 0; i < m_particles.size(); ++i)
+        {
+            for (std::size_t j = 0; j < m_particles[i]->size()-1; ++j)
+            {
+                auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*m_particles[i], index(j  )),
+                                                                      *select_object_dispatcher<dim>::dispatch(*m_particles[i], index(j+1)));
+                neigh.i = m_particles.offset(i) + j;
+                neigh.j = m_particles.offset(i) + j + 1;
+                #pragma omp critical
+                contacts.emplace_back(std::move(neigh));
+            }
+        }
         return contacts;
     }
 

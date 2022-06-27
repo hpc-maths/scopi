@@ -16,11 +16,15 @@ namespace scopi{
     {
     public:
         template<std::size_t dim, class problem_t>
-        void run(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t nite);
+        void run(scopi_container<dim>& particles,
+                 const std::vector<neighbor<dim>>& contacts,
+                 const std::vector<neighbor<dim>>& contacts_worms,
+                 problem_t& problem,
+                 const std::size_t nite);
         auto get_uadapt();
         auto get_wadapt();
         template<std::size_t dim, class problem_t>
-        auto get_lagrange_multiplier(std::vector<neighbor<dim>> contacts, scopi_container<dim>& particles, problem_t& problem);
+        auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms, problem_t& problem);
         void set_coeff_friction(double mu);
         template<std::size_t dim>
         void set_gamma(std::vector<neighbor<dim>> contacts);
@@ -43,6 +47,7 @@ namespace scopi{
         template<std::size_t dim, class problem_t>
         int solve_optimization_problem(scopi_container<dim>& particles,
                                        const std::vector<neighbor<dim>>& contacts,
+                                       const std::vector<neighbor<dim>>& contacts_worms,
                                        problem_t& problem);
 
         int get_nb_active_contacts() const;
@@ -50,15 +55,19 @@ namespace scopi{
 
     template<class Derived>
     template<std::size_t dim, class problem_t>
-    void OptimBase<Derived>::run(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, problem_t& problem, const std::size_t)
+    void OptimBase<Derived>::run(scopi_container<dim>& particles,
+                                 const std::vector<neighbor<dim>>& contacts,
+                                 const std::vector<neighbor<dim>>& contacts_worms,
+                                 problem_t& problem,
+                                 const std::size_t)
     {
         tic();
         create_vector_c(particles);
-        problem.create_vector_distances(contacts, particles);
+        problem.create_vector_distances(contacts, contacts_worms);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
-        auto nbIter = solve_optimization_problem(particles, contacts, problem);
+        auto nbIter = solve_optimization_problem(particles, contacts, contacts_worms, problem);
         PLOG_INFO << "iterations : " << nbIter;
         PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
     }
@@ -103,9 +112,10 @@ namespace scopi{
     template<std::size_t dim, class problem_t>
     int OptimBase<Derived>::solve_optimization_problem(scopi_container<dim>& particles,
                                                        const std::vector<neighbor<dim>>& contacts,
+                                                       const std::vector<neighbor<dim>>& contacts_worms,
                                                        problem_t& problem)
     {
-        return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts, problem);
+        return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts, contacts_worms, problem);
     }
 
     template<class Derived>
@@ -124,10 +134,10 @@ namespace scopi{
 
     template<class Derived>
     template<std::size_t dim, class problem_t>
-    auto OptimBase<Derived>::get_lagrange_multiplier(std::vector<neighbor<dim>> contacts, scopi_container<dim>& particles, problem_t& problem)
+    auto OptimBase<Derived>::get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms, problem_t& problem)
     {
         auto data = static_cast<Derived&>(*this).lagrange_multiplier_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {problem.number_row_matrix(contacts, particles), 1UL});
+        return xt::adapt(reinterpret_cast<double*>(data), {problem.number_row_matrix(contacts, contacts_worms), 1UL});
     }
 
     template<class Derived>
