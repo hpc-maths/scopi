@@ -16,17 +16,13 @@ namespace scopi
     protected:
         ProblemBase(std::size_t nparts, double dt);
 
-    public:
         template<std::size_t dim>
         void matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
                                     xt::xtensor<double, 1>& U,
                                     std::size_t active_offset,
                                     std::size_t row);
 
-    protected:
-        std::size_t m_nparticles;
-        double m_dt;
-
+    private:
         template<std::size_t dim>
         std::size_t matrix_positive_distance(const scopi_container<dim>& particles,
                                              const std::vector<neighbor<dim>>& contacts,
@@ -34,12 +30,7 @@ namespace scopi
                                              std::size_t nb_row,
                                              std::size_t nb_row_per_contact);
 
-    public:
-        std::vector<int> m_A_rows;
-        std::vector<int> m_A_cols;
-        std::vector<double> m_A_values;
-        xt::xtensor<double, 1> m_distances;
-    private:
+
         void matrix_free_gemv_inv_P_moment(const scopi_container<2>& particles,
                                            xt::xtensor<double, 1>& U,
                                            std::size_t active_offset,
@@ -48,6 +39,14 @@ namespace scopi
                                            xt::xtensor<double, 1>& U,
                                            std::size_t active_offset,
                                            std::size_t row);
+
+    protected:
+        std::size_t m_nparticles;
+        double m_dt;
+        std::vector<int> m_A_rows;
+        std::vector<int> m_A_cols;
+        std::vector<double> m_A_values;
+        xt::xtensor<double, 1> m_distances;
     };
 
     template<std::size_t dim>

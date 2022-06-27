@@ -31,10 +31,9 @@ namespace scopi
         double m_mu;
     };
 
-    class DryWithFriction : public ProblemBase
+    class DryWithFriction : protected ProblemBase
     {
-
-    public:
+    protected:
         DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
 
         template <std::size_t dim>

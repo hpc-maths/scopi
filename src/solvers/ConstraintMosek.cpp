@@ -20,8 +20,7 @@ namespace scopi
     }
 
     void ConstraintMosek<DryWithoutFriction>::update_dual(std::size_t,
-                                                          std::size_t,
-                                                          DryWithoutFriction&)
+                                                          std::size_t)
     {
         m_dual = m_qc1->dual();
     }
@@ -45,8 +44,7 @@ namespace scopi
     }
 
     void ConstraintMosek<DryWithFriction>::update_dual(std::size_t,
-                                                       std::size_t,
-                                                       DryWithFriction&)
+                                                       std::size_t)
     {
         m_dual = m_qc1->dual();
     }

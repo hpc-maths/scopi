@@ -21,12 +21,12 @@ namespace scopi
     class ProblemParams<DryWithoutFriction>
     {};
 
-    class DryWithoutFriction : public ProblemBase
+    class DryWithoutFriction : protected ProblemBase
     {
-
-    public:
+    protected:
         DryWithoutFriction(std::size_t nparts, double dt, const ProblemParams<DryWithoutFriction>& problem_params);
 
+    protected:
         template <std::size_t dim>
         void create_matrix_constraint_coo(scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,

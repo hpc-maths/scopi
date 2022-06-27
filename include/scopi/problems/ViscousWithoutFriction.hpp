@@ -30,26 +30,20 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    class ViscousWithoutFriction: public ProblemBase
-                                , public ViscousBase<dim>
+    class ViscousWithoutFriction: protected ProblemBase
+                                , protected ViscousBase<dim>
     {
-    public:
+    protected:
         ViscousWithoutFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
-        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     xt::xtensor<double, 1> lambda);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
                                      const std::vector<neighbor<dim>>& contacts_worms);
-
-        std::size_t get_nb_gamma_min();
-
-        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
 
         void matrix_free_gemv_A(const neighbor<dim>& c,
                                 const scopi_container<dim>& particles,
@@ -64,7 +58,13 @@ namespace scopi
                                           std::size_t active_offset,
                                           std::size_t row);
 
+        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
+        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                     xt::xtensor<double, 1> lambda);
+
     private:
+        std::size_t get_nb_gamma_min();
+
         ProblemParams<ViscousWithoutFriction<dim>> m_params;
     };
 

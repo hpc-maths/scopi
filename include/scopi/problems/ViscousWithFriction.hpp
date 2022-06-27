@@ -32,37 +32,36 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    class ViscousWithFriction: public ProblemBase
-                             , public ViscousBase<dim>
+    class ViscousWithFriction: protected ProblemBase
+                             , protected ViscousBase<dim>
     {
-    public:
+    protected:
         ViscousWithFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithFriction<dim>>& problem_params);
+        ViscousWithFriction(std::size_t nparts);
 
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
-        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                          xt::xtensor<double, 1> lambda);
-        void correct_lambda(const std::vector<neighbor<dim>>& contacts,
-                                    xt::xtensor<double, 1> lambda,
-                                    const scopi_container<dim>& particles,
-                                    const xt::xtensor<double, 2>& u);
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
+        std::size_t get_nb_gamma_min();
+        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
+        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                     xt::xtensor<double, 1> lambda);
+
+    private:
+        void correct_lambda(const std::vector<neighbor<dim>>& contacts,
+                                    xt::xtensor<double, 1> lambda,
+                                    const scopi_container<dim>& particles,
+                                    const xt::xtensor<double, 2>& u);
         void setup_first_resolution();
         void setup_projection();
 
-        std::size_t get_nb_gamma_min();
-
-        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
-
-    private:
         std::size_t m_nb_gamma_min;
-
         std::vector<double> m_lambda;
         bool m_projection;
 
@@ -298,6 +297,13 @@ namespace scopi
     : ProblemBase(nparticles, dt)
     , ViscousBase<dim>()
     , m_params(problem_params)
+    {}
+
+    template<std::size_t dim>
+    ViscousWithFriction<dim>::ViscousWithFriction(std::size_t nparticles)
+    : ProblemBase(nparticles, 0.)
+    , ViscousBase<dim>()
+    , m_params()
     {}
 
     template<std::size_t dim>

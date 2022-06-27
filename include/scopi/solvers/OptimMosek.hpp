@@ -26,29 +26,29 @@ namespace scopi{
     };
 
     template<class problem_t = DryWithoutFriction>
-    class OptimMosek: public OptimBase<OptimMosek<problem_t>>
-                    , public ConstraintMosek<problem_t>
+    class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
+                    // , public ConstraintMosek<problem_t>
     {
-    public:
-        using base_type = OptimBase<OptimMosek<problem_t>>;
+    protected:
         using problem_type = problem_t; 
+    private:
+        using base_type = OptimBase<OptimMosek<problem_t>, problem_t>;
 
+    protected:
         template <std::size_t dim>
         OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimMosek<problem_t>>& optim_params);
 
+    public:
         template <std::size_t dim>
         int solve_optimization_problem_impl(scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
-                                            const std::vector<neighbor<dim>>& contacts_worms,
-                                            problem_t& problem);
-
+                                            const std::vector<neighbor<dim>>& contacts_worms);
         double* uadapt_data();
         double* wadapt_data();
         double* lagrange_multiplier_data();
         int get_nb_active_contacts_impl() const;
 
     private:
-
         void set_moment_mass_matrix(std::size_t nparts,
                                     std::vector<int>& Az_rows,
                                     std::vector<int>& Az_cols,
@@ -63,14 +63,14 @@ namespace scopi{
         mosek::fusion::Matrix::t m_Az;
         mosek::fusion::Matrix::t m_A;
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
+        ConstraintMosek<problem_t> m_constraint;
     };
 
     template<class problem_t>
     template<std::size_t dim>
     int OptimMosek<problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
                                                                const std::vector<neighbor<dim>>& contacts,
-                                                               const std::vector<neighbor<dim>>& contacts_worms,
-                                                               problem_t& problem)
+                                                               const std::vector<neighbor<dim>>& contacts_worms)
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -85,16 +85,16 @@ namespace scopi{
         model->objective("minvar", ObjectiveSense::Minimize, Expr::dot(c_mosek, X));
 
         // constraints
-        auto D_mosek = std::make_shared<monty::ndarray<double, 1>>(problem.m_distances.data(), monty::shape_t<1>(problem.m_distances.shape(0)));
+        auto D_mosek = std::make_shared<monty::ndarray<double, 1>>(this->m_distances.data(), monty::shape_t<1>(this->m_distances.shape(0)));
 
         // matrix
-        problem.create_matrix_constraint_coo(particles, contacts, contacts_worms, this->index_first_col_matrix());
-        m_A = Matrix::sparse(problem.number_row_matrix(contacts, contacts_worms), this->number_col_matrix(),
-                             std::make_shared<ndarray<int, 1>>(problem.m_A_rows.data(), shape_t<1>({problem.m_A_rows.size()})),
-                             std::make_shared<ndarray<int, 1>>(problem.m_A_cols.data(), shape_t<1>({problem.m_A_cols.size()})),
-                             std::make_shared<ndarray<double, 1>>(problem.m_A_values.data(), shape_t<1>({problem.m_A_values.size()})));
+        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, m_constraint.index_first_col_matrix());
+        m_A = Matrix::sparse(this->number_row_matrix(contacts, contacts_worms), m_constraint.number_col_matrix(),
+                             std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
+                             std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
+                             std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
 
-        this->add_constraints(D_mosek, m_A, X, model, contacts, problem);
+        m_constraint.add_constraints(D_mosek, m_A, X, model, contacts);
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
 
@@ -114,8 +114,8 @@ namespace scopi{
         model->solve();
 
         m_Xlvl = X->level();
-        this->update_dual(problem.number_row_matrix(contacts, contacts_worms), contacts.size(), problem);
-        for (auto& x : *this->m_dual)
+        m_constraint.update_dual(this->number_row_matrix(contacts, contacts_worms), contacts.size());
+        for (auto& x : *(m_constraint.m_dual))
         {
             x *= -1.;
         }
@@ -135,7 +135,7 @@ namespace scopi{
     template <std::size_t dim>
     OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimMosek<problem_t>>& optim_params)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, optim_params)
-    , ConstraintMosek<problem_t>(nparts)
+    , m_constraint(nparts)
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -182,7 +182,7 @@ namespace scopi{
     template<class problem_t>
     double* OptimMosek<problem_t>::lagrange_multiplier_data()
     {
-        return this->m_dual->raw();
+        return m_constraint.m_dual->raw();
     }
 
     template<class problem_t>
@@ -195,7 +195,7 @@ namespace scopi{
     int OptimMosek<problem_t>::get_nb_active_contacts_impl() const
     {
         int nb_active_contacts = 0;
-        for (auto x : *(this->m_dual))
+        for (auto x : *(m_constraint.m_dual))
         {
             if(std::abs(x) > 1e-3)
                 nb_active_contacts++;

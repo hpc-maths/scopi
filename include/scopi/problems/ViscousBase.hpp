@@ -20,10 +20,8 @@ namespace scopi
         ViscousBase();
 
         void set_gamma_base(const std::vector<neighbor<dim>>& contacts_new);
-    public:
         std::size_t get_nb_gamma_neg() const;
 
-    protected:
         std::vector<neighbor<dim>> m_contacts_old;
         std::vector<double> m_gamma;
         std::vector<double> m_gamma_old;

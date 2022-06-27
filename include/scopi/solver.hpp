@@ -25,7 +25,6 @@
 #include "solvers/OptimUzawaMatrixFreeOmp.hpp"
 #include "solvers/OptimMosek.hpp"
 #include "problems/DryWithoutFriction.hpp"
-#include "problems/ViscousWithFriction.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
 #include "vap/vap_projection.hpp"
@@ -64,7 +63,6 @@ namespace scopi
         void move_active_particles();
         scopi_container<dim>& m_particles;
         double m_dt;
-        problem_t m_problem;
         vap_t m_vap;
     };
 
@@ -93,7 +91,6 @@ namespace scopi
     : optim_solver_t(particles.nb_active(), dt, particles, optim_params)
     , m_particles(particles)
     , m_dt(dt)
-    , m_problem(m_particles.nb_active(), m_dt, optim_params.m_problem_params)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
@@ -118,9 +115,9 @@ namespace scopi
             auto contacts_worms = compute_contacts_worms();
             write_output_files(contacts, nite);
             m_vap.set_a_priori_velocity(m_particles);
-            m_problem.extra_setps_before_solve(contacts);
-            this->run(m_particles, contacts, contacts_worms, m_problem, nite);
-            m_problem.extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms, m_problem));
+            this->extra_setps_before_solve(contacts);
+            this->run(m_particles, contacts, contacts_worms, nite);
+            this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms));
             move_active_particles();
             m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
         }

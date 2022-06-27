@@ -24,33 +24,34 @@ namespace scopi
     template <class problem_t = DryWithoutFriction>
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>
     {
-    public:
-        using base_type = OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>;
+    protected:
         using problem_type = problem_t; 
+    private:
+        using base_type = OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>;
 
+    protected:
         template <std::size_t dim>
         OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimUzawaMkl>& optim_params);
+    private:
         ~OptimUzawaMkl();
 
+    public:
         template <std::size_t dim>
         void init_uzawa_impl(scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts,
-                             const std::vector<neighbor<dim>>& contacts_worms,
-                             problem_t& problem);
+                             const std::vector<neighbor<dim>>& contacts_worms);
         void finalize_uzawa_impl();
 
         template <std::size_t dim>
-        void gemv_inv_P_impl(const scopi_container<dim>& particles, problem_t& problem);
+        void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
         template <std::size_t dim>
         void gemv_A_impl(const scopi_container<dim>& particles,
-                         const std::vector<neighbor<dim>>& contacts,
-                         problem_t& problem);
+                         const std::vector<neighbor<dim>>& contacts);
 
         template <std::size_t dim>
         void gemv_transpose_A_impl(const scopi_container<dim>& particles,
-                                   const std::vector<neighbor<dim>>& contacts,
-                                   problem_t& problem);
+                                   const std::vector<neighbor<dim>>& contacts);
 
     private:
         void print_csr_matrix(const sparse_matrix_t);
@@ -81,20 +82,19 @@ namespace scopi
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::init_uzawa_impl(scopi_container<dim>& particles,
                                                   const std::vector<scopi::neighbor<dim>>& contacts,
-                                                  const std::vector<scopi::neighbor<dim>>& contacts_worms,
-                                                  problem_t& problem)
+                                                  const std::vector<scopi::neighbor<dim>>& contacts_worms)
     {
-        problem.create_matrix_constraint_coo(particles, contacts, contacts_worms, 0);
+        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, 0);
 
         sparse_matrix_t A_coo;
         m_status =  mkl_sparse_d_create_coo(&A_coo,
                                            SPARSE_INDEX_BASE_ZERO,
-                                           problem.number_row_matrix(contacts, contacts_worms), // number of rows
+                                           this->number_row_matrix(contacts, contacts_worms), // number of rows
                                            6*this->m_nparts, // number of cols
-                                           problem.m_A_values.size(), // number of non-zero elements
-                                           problem.m_A_rows.data(),
-                                           problem.m_A_cols.data(),
-                                           problem.m_A_values.data());
+                                           this->m_A_values.size(), // number of non-zero elements
+                                           this->m_A_rows.data(),
+                                           this->m_A_cols.data(),
+                                           this->m_A_values.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_create_coo for matrix A: " << m_status;
 
         m_status = mkl_sparse_convert_csr(A_coo,
@@ -123,7 +123,7 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    void OptimUzawaMkl<problem_t>::gemv_inv_P_impl(const scopi_container<dim>&, problem_t&)
+    void OptimUzawaMkl<problem_t>::gemv_inv_P_impl(const scopi_container<dim>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_U.data(), 0., this->m_U.data()); // U = - P^-1 * U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = - P^-1 * U: " << m_status;
@@ -132,8 +132,7 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::gemv_A_impl(const scopi_container<dim>&,
-                                               const std::vector<neighbor<dim>>&,
-                                               problem_t&)
+                                               const std::vector<neighbor<dim>>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_A, m_descrA, this->m_U.data(), 1., this->m_R.data()); // R = - A * U + R
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for R = - A * U + R: " << m_status;
@@ -142,8 +141,7 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::gemv_transpose_A_impl(const scopi_container<dim>&,
-                                                         const std::vector<neighbor<dim>>&,
-                                                         problem_t&)
+                                                         const std::vector<neighbor<dim>>&)
     {
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_A, m_descrA, this->m_L.data(), 1., this->m_U.data()); // U = A^T * L + U
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << " Error in mkl_sparse_d_mv for U = A^T * L + U: " << m_status;
