@@ -79,8 +79,8 @@ namespace scopi{
     template<class Derived, class problem_t>
     OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params)
     : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
-    , m_dmin(0.)
     , m_U(xt::zeros<double>({6*nparts}))
+    , m_dmin(0.)
     {}
 
     template<class Derived, class problem_t>

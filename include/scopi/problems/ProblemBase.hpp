@@ -8,6 +8,7 @@
 #include "../container.hpp"
 #include "../utils.hpp"
 #include "../objects/neighbor.hpp"
+#include "../quaternion.hpp"
 
 namespace scopi
 {
