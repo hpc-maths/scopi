@@ -43,7 +43,7 @@ namespace scopi
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed
              >
-    class ScopiSolver
+    class ScopiSolver : public optim_solver_t
     {
     public:
         using solver_type = optim_solver_t;
@@ -64,7 +64,6 @@ namespace scopi
         void move_active_particles();
         scopi_container<dim>& m_particles;
         double m_dt;
-        optim_solver_t m_solver;
         problem_t m_problem;
         vap_t m_vap;
     };
@@ -91,9 +90,9 @@ namespace scopi
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params)
-    : m_particles(particles)
+    : optim_solver_t(particles.nb_active(), dt, particles, optim_params)
+    , m_particles(particles)
     , m_dt(dt)
-    , m_solver(m_particles.nb_active(), m_dt, particles, optim_params)
     , m_problem(m_particles.nb_active(), m_dt, optim_params.m_problem_params)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
@@ -120,10 +119,10 @@ namespace scopi
             write_output_files(contacts, nite);
             m_vap.set_a_priori_velocity(m_particles);
             m_problem.extra_setps_before_solve(contacts);
-            m_solver.run(m_particles, contacts, contacts_worms, m_problem, nite);
-            m_problem.extra_setps_after_solve(contacts, m_solver.get_lagrange_multiplier(contacts, contacts_worms, m_problem));
+            this->run(m_particles, contacts, contacts_worms, m_problem, nite);
+            m_problem.extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms, m_problem));
             move_active_particles();
-            m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
+            m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
         }
     }
 
@@ -273,8 +272,8 @@ namespace scopi
     {
         tic();
         std::size_t active_offset = m_particles.nb_inactive();
-        auto uadapt = m_solver.get_uadapt();
-        auto wadapt = m_solver.get_wadapt();
+        auto uadapt = this->get_uadapt();
+        auto wadapt = this->get_wadapt();
 
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
