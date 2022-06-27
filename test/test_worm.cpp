@@ -16,7 +16,6 @@ namespace scopi
     void set_params_test(OptimParams<solver_t>&)
     {}
 
-    template <class solver_t>
     template <>
     void set_params_test<OptimMosek<DryWithoutFriction>>(OptimParams<OptimMosek<DryWithoutFriction>>>&)
     {
