@@ -23,7 +23,6 @@ namespace scopi
                                     std::size_t active_offset,
                                     std::size_t row);
 
-    private:
         template<std::size_t dim>
         std::size_t matrix_positive_distance(const scopi_container<dim>& particles,
                                              const std::vector<neighbor<dim>>& contacts,
@@ -31,7 +30,7 @@ namespace scopi
                                              std::size_t nb_row,
                                              std::size_t nb_row_per_contact);
 
-
+    private:
         void matrix_free_gemv_inv_P_moment(const scopi_container<2>& particles,
                                            xt::xtensor<double, 1>& U,
                                            std::size_t active_offset,
