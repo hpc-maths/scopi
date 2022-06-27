@@ -102,7 +102,6 @@ set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 set(SCOPI_SRC
     src/problems/DryWithoutFriction.cpp
     src/problems/DryWithFriction.cpp
-    src/problems/ViscousGlobule.cpp
     src/problems/ProblemBase.cpp
     src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
@@ -183,7 +182,7 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/objects/dispatch.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/neighbor.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/sphere.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/globule.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/worm.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/superellipsoid.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/constructor.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/base.hpp
@@ -207,7 +206,6 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWitouthFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWithFriction.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousGlobule.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/quaternion.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/minpack.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/property.hpp

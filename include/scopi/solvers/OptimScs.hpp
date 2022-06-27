@@ -33,7 +33,7 @@ namespace scopi
         OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params);
 
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
+        int solve_optimization_problem_impl(scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts, 
                                             problem_t& problem);
         double* uadapt_data();
@@ -74,7 +74,7 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    int OptimScs<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
+    int OptimScs<problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
                                                              const std::vector<neighbor<dim>>& contacts,
                                                              problem_t& problem)
     {

@@ -42,12 +42,12 @@ namespace scopi
 #endif
 
 #ifdef SCOPI_USE_MKL
-#define SOLVER_VISCOUS_GLOBULE(dim, contact, vap) \
-    ScopiSolver<dim, OptimMosek<ViscousGlobule>, contact, vap>, \
-    ScopiSolver<dim, OptimUzawaMkl<ViscousGlobule>, contact, vap>
+#define SOLVER_WORMS(dim, contact, vap) \
+    ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimUzawaMkl<DryWithoutFriction>, contact, vap>
 #else
-#define SOLVER_VISCOUS_GLOBULE(dim, contact, vap) \
-    ScopiSolver<dim, OptimMosek<ViscousGlobule>, contact, vap>
+#define SOLVER_WORMS(dim, contact, vap) \
+    ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>
 #endif
 
 #define SOLVER_DRY_WITH_FRICTION(dim, contact, vap) \
@@ -105,8 +105,3 @@ TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<2>, 
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<2>, 2)
 
 TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, ViscousWithFriction<2>, 2)
-
-TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, ViscousGlobule, 2)
-#ifdef SCOPI_USE_MKL
-TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMkl, ViscousGlobule, 2)
-#endif

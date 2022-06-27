@@ -422,7 +422,7 @@ namespace scopi
         }
     }
 
-    TEST_CASE_TEMPLATE("two worms", SolverType, SOLVER_VISCOUS_GLOBULE(2, contact_kdtree, vap_fixed), SOLVER_VISCOUS_GLOBULE(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE("two worms", SolverType, SOLVER_WORMS(2, contact_kdtree, vap_fixed), SOLVER_WORMS(2, contact_brute_force, vap_fixed))
     {
         using solver_t = typename SolverType::solver_type;
 
