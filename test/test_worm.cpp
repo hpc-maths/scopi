@@ -12,6 +12,17 @@
 
 namespace scopi
 {
+    template <class solver_t>
+    void set_params_test(OptimParams<solver_t>&)
+    {}
+
+    template <class solver_t>
+    template <>
+    void set_params_test<OptimMosek<DryWithoutFriction>>(OptimParams<OptimMosek<DryWithoutFriction>>>&)
+    {
+        params.m_change_default_tol_mosek = false;
+    }
+
     TEST_CASE("Worm 2D")
     {
         static constexpr std::size_t dim = 2;
@@ -442,7 +453,6 @@ namespace scopi
         particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
         OptimParams<solver_t> params;
-        params.m_change_default_tol_mosek = false;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
