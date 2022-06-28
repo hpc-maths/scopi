@@ -31,11 +31,11 @@ namespace scopi{
         double tol_l;
         std::size_t max_iter;
         double rho;
+        bool verbose;
     };
 
     void print_csr_matrix(const sparse_matrix_t A)
     {
-        // TODO free memory
         MKL_INT* csr_row_begin = NULL;
         MKL_INT* csr_row_end = NULL;
         MKL_INT* csr_col = NULL;
@@ -128,7 +128,7 @@ namespace scopi{
     template<std::size_t dim>
     OptimProjectedGradient<problem_t, gradient_t>::OptimProjectedGradient(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params)
     : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
-    , gradient_t(optim_params.max_iter, optim_params.rho, optim_params.tol_dg, optim_params.tol_l)
+    , gradient_t(optim_params.max_iter, optim_params.rho, optim_params.tol_dg, optim_params.tol_l, optim_params.verbose)
     , m_u(xt::zeros<double>({6*nparts}))
     , m_bl(xt::zeros<double>({6*nparts}))
     {
@@ -167,8 +167,6 @@ namespace scopi{
 
         m_status = mkl_sparse_set_mv_hint(m_inv_P, SPARSE_OPERATION_NON_TRANSPOSE, m_descr_inv_P, 2 );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix invP: " << m_status;
-        // m_status = mkl_sparse_set_mm_hint( m_inv_P, SPARSE_OPERATION_NON_TRANSPOSE, m_descr_inv_P, SPARSE_LAYOUT_ROW_MAJOR, 0, 1);
-        // PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mm_hint for matrix invP: " << m_status;
         m_status = mkl_sparse_optimize ( m_inv_P );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
     }
@@ -261,10 +259,6 @@ namespace scopi{
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix B SPARSE_OPERATION_NON_TRANSPOSE: " << m_status;
         m_status = mkl_sparse_set_mv_hint(m_B, SPARSE_OPERATION_TRANSPOSE, m_descrB, 1 );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix B SPARSE_OPERATION_TRANSPOSE: " << m_status;
-        // m_status = mkl_sparse_set_mm_hint(m_B, SPARSE_OPERATION_NON_TRANSPOSE, m_descrB, SPARSE_LAYOUT_ROW_MAJOR, 0, 1);
-        // PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mm_hint for matrix B SPARSE_OPERATION_NON_TRANSPOSE: " << m_status;
-        // m_status = mkl_sparse_set_mm_hint(m_B, SPARSE_OPERATION_TRANSPOSE, m_descrB, SPARSE_LAYOUT_ROW_MAJOR, 0, 1);
-        // PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mm_hint for matrix B SPARSE_OPERATION_TRANSPOSE: " << m_status;
         m_status = mkl_sparse_optimize ( m_B );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix B: " << m_status;
     }
@@ -345,6 +339,7 @@ namespace scopi{
     , tol_l(params.tol_l)
     , max_iter(params.max_iter)
     , rho(params.rho)
+    , verbose(params.verbose)
     {}
 
     template<class problem_t, class gradient_t>
@@ -354,6 +349,7 @@ namespace scopi{
     , tol_l(1e-9)
     , max_iter(40000)
     , rho(2000.)
+    , verbose(false)
     {}
 
 }

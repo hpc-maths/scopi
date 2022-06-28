@@ -33,6 +33,7 @@ int main()
     particles.push_back(s, prop.force({{0., -g}}));
 
     params.rho = 2.;
+    params.verbose = true;
     scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
     solver.solve(total_it);
 
