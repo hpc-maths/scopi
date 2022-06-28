@@ -64,6 +64,7 @@ namespace scopi
         scopi_container<dim>& m_particles;
         double m_dt;
         vap_t m_vap;
+        double m_mu;
     };
 
     /*
@@ -92,6 +93,7 @@ namespace scopi
     , m_particles(particles)
     , m_dt(dt)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
+    , m_mu(optim_params.problem_params.mu)
     {}
 
     /*
@@ -116,7 +118,18 @@ namespace scopi
             write_output_files(contacts, nite);
             m_vap.set_a_priori_velocity(m_particles);
             this->extra_setps_before_solve(contacts);
-            this->run(m_particles, contacts, contacts_worms, nite);
+
+            double s = 1.;
+            double s_old = 2.;
+            std::size_t nb_iter = 0;
+            while (std::abs(s_old - s)/(std::abs(s)+1.) > 1e-3 && nb_iter < 10)
+            {
+                this->run(m_particles, contacts, contacts_worms, nite, m_mu*m_dt*s);
+                s_old = s;
+                s = xt::linalg::norm(this->get_vector_solution(), 2);
+                // std::cout << "s = " << s << "  critère d'arret = " << (std::abs(s_old - s)/(std::abs(s)+1.) ) << std::endl;
+                nb_iter++;
+            }
             this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms));
             move_active_particles();
             m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());

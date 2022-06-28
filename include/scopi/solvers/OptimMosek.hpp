@@ -43,6 +43,7 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts_worms);
         double* uadapt_data();
         double* wadapt_data();
+        double* vector_solution_data();
         double* lagrange_multiplier_data();
         int get_nb_active_contacts_impl() const;
 
@@ -178,15 +179,21 @@ namespace scopi{
     }
 
     template<class problem_t>
+    double* OptimMosek<problem_t>::wadapt_data()
+    {
+        return m_Xlvl->raw() + 1 + 3*this->m_nparts;
+    }
+
+    template<class problem_t>
     double* OptimMosek<problem_t>::lagrange_multiplier_data()
     {
         return m_constraint.m_dual->raw();
     }
 
     template<class problem_t>
-    double* OptimMosek<problem_t>::wadapt_data()
+    double* OptimMosek<problem_t>::vector_solution_data()
     {
-        return m_Xlvl->raw() + 1 + 3*this->m_nparts;
+        return m_Xlvl->raw() + 1;
     }
 
     template<class problem_t>
