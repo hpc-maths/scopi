@@ -16,7 +16,7 @@ namespace scopi
         OptimParams();
         OptimParams(const OptimParams<OptimScs<problem_t>>& params);
 
-        ProblemParams<problem_t> m_problem_params;
+        ProblemParams<problem_t> problem_params;
         double tol;
         double tol_infeas;
     };
@@ -35,7 +35,7 @@ namespace scopi
 
     public:
         template <std::size_t dim>
-        int solve_optimization_problem_impl(scopi_container<dim>& particles,
+        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts, 
                                             const std::vector<neighbor<dim>>& contacts_worms);
         double* uadapt_data();
@@ -76,7 +76,7 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    int OptimScs<problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
+    int OptimScs<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                              const std::vector<neighbor<dim>>& contacts,
                                                              const std::vector<neighbor<dim>>& contacts_worms)
     {
@@ -293,14 +293,14 @@ namespace scopi
 
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams()
-    : m_problem_params()
+    : problem_params()
     , tol(1e-7)
     , tol_infeas(1e-10)
     {}
 
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams(const OptimParams<OptimScs<problem_t>>& params)
-    : m_problem_params(params.m_problem_params)
+    : problem_params(params.problem_params)
     , tol(params.tol)
     , tol_infeas(params.tol_infeas)
     {}

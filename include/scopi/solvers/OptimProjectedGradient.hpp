@@ -176,8 +176,8 @@ namespace scopi{
     template<class problem_t, class gradient_t>
     template <std::size_t dim>
     std::size_t OptimProjectedGradient<problem_t, gradient_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                                                              const std::vector<neighbor<dim>>& contacts,
-                                                                                              const std::vector<neighbor<dim>>& contacts_worms)
+                                                                                               const std::vector<neighbor<dim>>& contacts,
+                                                                                               const std::vector<neighbor<dim>>& contacts_worms)
     {
         xt::noalias(m_l) = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
         // u = P^{-1}*c = vap

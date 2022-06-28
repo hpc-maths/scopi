@@ -20,7 +20,7 @@ namespace scopi{
         OptimParams();
         OptimParams(const OptimParams<OptimMosek<problem_t>>& params);
 
-        ProblemParams<problem_t> m_problem_params;
+        ProblemParams<problem_t> problem_params;
         bool change_default_tol_mosek;
     };
 
@@ -38,7 +38,7 @@ namespace scopi{
 
     public:
         template <std::size_t dim>
-        int solve_optimization_problem_impl(scopi_container<dim>& particles,
+        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         double* uadapt_data();
@@ -66,7 +66,7 @@ namespace scopi{
 
     template<class problem_t>
     template<std::size_t dim>
-    int OptimMosek<problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
+    int OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                                const std::vector<neighbor<dim>>& contacts,
                                                                const std::vector<neighbor<dim>>& contacts_worms)
     {
@@ -246,13 +246,13 @@ namespace scopi{
 
     template<class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams(const OptimParams<OptimMosek<problem_t>>& params)
-    : m_problem_params(params.m_problem_params)
+    : problem_params(params.problem_params)
     , change_default_tol_mosek(params.change_default_tol_mosek)
     {}
 
     template<class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams()
-    : m_problem_params()
+    : problem_params()
     , change_default_tol_mosek(true)
     {}
 }

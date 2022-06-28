@@ -21,7 +21,7 @@ namespace scopi{
         OptimParamsUzawaBase();
         OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
 
-        ProblemParams<problem_t> m_problem_params;
+        ProblemParams<problem_t> problem_params;
         double tol;
         std::size_t max_iter;
         double rho;
@@ -39,7 +39,7 @@ namespace scopi{
 
     public:
         template <std::size_t dim>
-        int solve_optimization_problem_impl(scopi_container<dim>& particles,
+        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         auto uadapt_data();
@@ -61,7 +61,7 @@ namespace scopi{
                               const std::vector<neighbor<dim>>& contacts);
 
         template <std::size_t dim>
-        void init_uzawa(scopi_container<dim>& particles,
+        void init_uzawa(const scopi_container<dim>& particles,
                         const std::vector<neighbor<dim>>& contacts, 
                         const std::vector<neighbor<dim>>& contacts_worms);
         void finalize_uzawa();
@@ -84,7 +84,7 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template <std::size_t dim>
-    int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
+    int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                                             const std::vector<neighbor<dim>>& contacts,
                                                                             const std::vector<neighbor<dim>>& contacts_worms)
     {
@@ -219,7 +219,7 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived, problem_t>::init_uzawa(scopi_container<dim>& particles,
+    void OptimUzawaBase<Derived, problem_t>::init_uzawa(const scopi_container<dim>& particles,
                                                         const std::vector<neighbor<dim>>& contacts,
                                                         const std::vector<neighbor<dim>>& contacts_worms)
     {
@@ -234,7 +234,7 @@ namespace scopi{
 
     template<class problem_t>
     OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase(const OptimParamsUzawaBase& params)
-    : m_problem_params(params.m_problem_params)
+    : problem_params(params.problem_params)
     , tol(params.tol)
     , max_iter(params.max_iter)
     , rho(params.rho)
@@ -242,7 +242,7 @@ namespace scopi{
 
     template<class problem_t>
     OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase()
-    : m_problem_params()
+    : problem_params()
     , tol(1e-9)
     , max_iter(40000)
     , rho(2000.)
