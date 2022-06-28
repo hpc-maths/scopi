@@ -11,6 +11,7 @@ set(SCOPI_EXAMPLES
    two_spheres_viscosity.cpp
    two_worms.cpp
    convergence_scheme.cpp
+   worm_spline.cpp
 )
 
 include(generator)
