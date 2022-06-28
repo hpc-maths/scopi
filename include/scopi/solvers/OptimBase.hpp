@@ -66,7 +66,7 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& params)
-    : problem_t(nparts, dt, params.m_problem_params)
+    : problem_t(nparts, dt, params.problem_params)
     , m_params(params)
     , m_nparts(nparts)
     , m_c(xt::zeros<double>({cSize}))

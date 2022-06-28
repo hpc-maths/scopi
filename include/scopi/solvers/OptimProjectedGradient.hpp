@@ -177,7 +177,7 @@ namespace scopi{
     template <std::size_t dim>
     std::size_t OptimProjectedGradient<problem_t, gradient_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                                                               const std::vector<neighbor<dim>>& contacts,
-                                                                                              const std::vector<neighbor<dim>>& contacts_worms);
+                                                                                              const std::vector<neighbor<dim>>& contacts_worms)
     {
         xt::noalias(m_l) = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
         // u = P^{-1}*c = vap
@@ -188,7 +188,7 @@ namespace scopi{
         create_matrix_A();
 
         // e = -B*u+distances
-        xt::noalias(m_e) = problem.m_distances;
+        xt::noalias(m_e) = this->m_distances;
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_B, m_descrB, m_u.data(), 1., m_e.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for e = B*u+d: " << m_status;
 
@@ -241,7 +241,7 @@ namespace scopi{
         m_descrB.type = SPARSE_MATRIX_TYPE_GENERAL;
         sparse_matrix_t B_coo;
 
-        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, 0);
+        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, 0UL);
         m_status =  mkl_sparse_d_create_coo(&B_coo,
                                            SPARSE_INDEX_BASE_ZERO,
                                            this->number_row_matrix(contacts, contacts_worms), // number of rows
