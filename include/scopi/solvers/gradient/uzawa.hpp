@@ -12,10 +12,10 @@
 
 namespace scopi{
     template<class projection_t = projection_max>
-    class projected_gradient: public projection_t
+    class uzawa: public projection_t
     {
     protected:
-        projected_gradient(std::size_t max_iter, double rho, double tol_dg, double tol_l);
+        uzawa(std::size_t max_iter, double rho, double tol_dg, double tol_l);
         std::size_t projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l);
     private:
         std::size_t m_max_iter;
@@ -29,7 +29,7 @@ namespace scopi{
     };
 
     template<class projection_t>
-    projected_gradient<projection_t>::projected_gradient(std::size_t max_iter, double rho, double tol_dg, double tol_l)
+    uzawa<projection_t>::uzawa(std::size_t max_iter, double rho, double tol_dg, double tol_l)
     : projection_t()
     , m_max_iter(max_iter)
     , m_rho(rho)
@@ -38,7 +38,7 @@ namespace scopi{
     {}
 
     template<class projection_t>
-    std::size_t projected_gradient<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
+    std::size_t uzawa<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
         std::size_t iter = 0;
         while (iter < m_max_iter)

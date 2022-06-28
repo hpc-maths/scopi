@@ -26,7 +26,6 @@ namespace scopi{
 
     template<class problem_t = DryWithoutFriction>
     class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
-                    // , public ConstraintMosek<problem_t>
     {
     protected:
         using problem_type = problem_t; 
