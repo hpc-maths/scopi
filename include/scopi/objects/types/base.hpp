@@ -2,6 +2,7 @@
 
 #include <array>
 #include <algorithm>
+#include <cstddef>
 #include <vector>
 #include <cmath>
 
@@ -45,49 +46,54 @@ namespace scopi
         template<std::size_t dim>
         auto get_value_impl(const std::vector<type::position_t<dim>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, dim});
+            return xt::view((xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
         }
 
         template<std::size_t dim>
         auto get_value_impl(const type::position_t<dim>* t, std::size_t size)
         {
+            std::cout << "get_value_impl position 2" << std::endl;
             return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, dim});
         }
 
         template<std::size_t dim>
         auto get_value_impl(std::vector<type::position_t<dim>>& t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim});
+            return xt::view((xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
         }
 
         template<std::size_t dim>
         auto get_value_impl(type::position_t<dim>* t, std::size_t size)
         {
-            return xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim});
+            return xt::view((xt::adapt(reinterpret_cast<double*>(t->data()), {size, dim+2})), xt::all(), xt::range(0, dim));
         }
 
         // quaternion type
         template <class object_t = type::quaternion_t>
-        auto get_value_impl(const std::vector<object_t>& t, std::size_t size)
+        auto get_value_impl(const std::vector<object_t>& t, std::size_t)
         {
-            return xt::adapt(reinterpret_cast<const double*>(t.data()->data()), {size, 4UL});
+            std::cout << "get_value_impl quaternion 1" << std::endl;
+            return xt::adapt(t);
         }
 
         template <class object_t = type::quaternion_t>
         auto get_value_impl(const object_t* t, std::size_t size)
         {
+            std::cout << "get_value_impl quaternion 2" << std::endl;
             return xt::adapt(reinterpret_cast<const double*>(t->data()), {size, 4UL});
         }
 
         template <class object_t = type::quaternion_t>
-        auto get_value_impl(std::vector<object_t>& t, std::size_t size)
+        auto get_value_impl(std::vector<object_t>& t, std::size_t)
         {
-            return xt::adapt(reinterpret_cast<double*>(t.data()->data()), {size, 4UL});
+            std::cout << "get_value_impl quaternion 3" << std::endl;
+            return xt::adapt(t);
         }
 
         template <class object_t = type::quaternion_t>
         auto get_value_impl(object_t* t, std::size_t size)
         {
+            std::cout << "get_value_impl quaternion 4" << std::endl;
             return xt::adapt(reinterpret_cast<double*>(t->data()), {size, 4UL});
         }
 
@@ -128,12 +134,16 @@ namespace scopi
 
         auto pos() const;
         auto pos();
+        auto internal_pos() const;
+        auto internal_pos();
 
         auto pos(std::size_t i) const;
         auto pos(std::size_t i);
 
         auto q() const;
         auto q();
+        auto internal_q() const;
+        auto internal_q();
 
         auto q(std::size_t i) const;
         auto q(std::size_t i);
@@ -174,6 +184,18 @@ namespace scopi
     }
 
     template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_pos() const
+    {
+        return m_pos;
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_pos()
+    {
+        return m_pos;
+    }
+
+    template<std::size_t dim, bool owner>
     inline auto object_container<dim, owner>::pos(std::size_t i) const
     {
         return xt::view(detail::get_value(m_pos, m_size), i);
@@ -195,6 +217,18 @@ namespace scopi
     inline auto object_container<dim, owner>::q()
     {
         return detail::get_value(m_q, m_size);
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_q() const
+    {
+        return m_q;
+    }
+
+    template<std::size_t dim, bool owner>
+    inline auto object_container<dim, owner>::internal_q()
+    {
+        return m_q;
     }
 
     template<std::size_t dim, bool owner>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+#include <vector>
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xarray.hpp>
@@ -11,7 +13,6 @@
 
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
-#include "../types/globule.hpp"
 #include "../types/plan.hpp"
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"
@@ -675,20 +676,6 @@ namespace scopi
     // PLAN - PLAN
     template<std::size_t dim, bool owner>
     auto closest_points(const plan<dim, owner>, const plan<dim, owner>)
-    {
-        return neighbor<dim>();
-    }
-
-    // GLOBULE - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner>, const globule<dim, owner>)
-    {
-        return neighbor<dim>();
-    }
-
-    // SPHERE - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const sphere<dim, owner>, const globule<dim, owner>)
     {
         return neighbor<dim>();
     }
@@ -1660,39 +1647,19 @@ namespace scopi
         return neigh;
     }
 
-    // SUPERELLIPSOID - GLOBULE
-    template<std::size_t dim, bool owner>
-    auto closest_points(const superellipsoid<dim, owner>, const globule<dim, owner>)
-    {
-        std::cout << "closest_points : SUPERELLIPSOID - GLOBULE" << std::endl;
-        return neighbor<dim>();
-    }
-
-    // GLOBULE  - SUPERELLIPSOID
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner> g, const superellipsoid<dim, owner> s)
-    {
-        auto neigh = closest_points(s, g);
-        neigh.nij *= -1.;
-        std::swap(neigh.pi, neigh.pj);
-        return neigh;
-    }
-
-    // GLOBULE - PLAN
-    template<std::size_t dim, bool owner>
-    auto closest_points(const globule<dim, owner>, const plan<dim, owner>)
-    {
-        return neighbor<dim>();
-    }
-
     template <std::size_t dim>
     struct closest_points_functor
     {
         using return_type = neighbor<dim>;
-         template <class T1, class T2>
+        template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2) const
         {
             return closest_points(obj1, obj2);
+        }
+         template <class T1, class T2>
+        return_type run(const T1& obj1, const T2& obj2, std::size_t i1, std::size_t i2) const
+        {
+            return closest_points(obj1, obj2, i1, i2);
         }
          return_type on_error(const object<dim, false>&, const object<dim, false>&) const
         {
@@ -1707,7 +1674,6 @@ namespace scopi
         const object<dim, owner>,
         mpl::vector<const sphere<dim, owner>,
                     const superellipsoid<dim, owner>,
-                    // const globule<dim, owner>,
                     const plan<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
         antisymmetric_dispatch

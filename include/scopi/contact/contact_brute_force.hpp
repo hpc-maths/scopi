@@ -2,6 +2,7 @@
 
 #include "base.hpp"
 
+#include <locale>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
@@ -25,39 +26,22 @@ namespace scopi
 
             tic();
 
-            #pragma omp parallel for num_threads(8)
+            #pragma omp parallel for num_threads(1)
 
-            for (std::size_t i = active_ptr; i < particles.size() - 1; ++i)
+            for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
             {
-              for (std::size_t j = i + 1; j < particles.size(); ++j)
+              for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
               {
-                if (i < j) {
-                  auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                  if (neigh.dij < m_dmax) {
-                      neigh.i = i;
-                      neigh.j = j;
-                      #pragma omp critical
-                      contacts.emplace_back(std::move(neigh));
-                      // contacts.back().i = i;
-                      // contacts.back().j = j;
-                  }
-                }
-
+                  compute_exact_distance(particles, i, j, contacts, m_dmax);
               }
             }
 
             // obstacles
             for (std::size_t i = 0; i < active_ptr; ++i)
             {
-                for (std::size_t j = active_ptr; j < particles.size(); ++j)
+                for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
                 {
-                    auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                    if (neigh.dij < m_dmax)
-                    {
-                        neigh.i = i;
-                        neigh.j = j;
-                        contacts.emplace_back(std::move(neigh));
-                    }
+                    compute_exact_distance(particles, i, j, contacts, m_dmax);
                 }
             }
 
@@ -65,18 +49,7 @@ namespace scopi
             PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration;
 
             tic();
-            std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
-            {
-              if (a.i < b.i) {
-                return true;
-              }
-              else {
-                if (a.i == b.i) {
-                  return a.j < b.j;
-                }
-              }
-              return false;
-            });
+            sort_contacts(contacts);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
 

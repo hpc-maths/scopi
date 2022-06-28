@@ -1,241 +1,261 @@
-#include <gtest/gtest.h>
+#include "doctest/doctest.h"
 #include "utils.hpp"
 
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
 
+#include <scopi/vap/vap_fpd.hpp>
+
 namespace scopi
 {
-    class Container2dTest  : public ::testing::Test {
+    TEST_CASE("Container 2d")
+    {
         static constexpr std::size_t dim = 2;
-        protected:
-            Container2dTest()
-            {
-                superellipsoid<dim> s1({{-0.2, 0.1}}, {quaternion(PI/3)}, {{.2, .05}}, 1);
-                sphere<dim> s2({{ 0.2,  0.05}}, {quaternion(PI/2)}, 0.1);
-                auto p = property<dim>().omega(PI/3)
-                                        .desired_omega(PI/12);
-                m_particles.push_back(s1, p.velocity({{0.1, 0.2}})
-                                           .desired_velocity({{0.01, 0.02}})
-                                           .force({{1., 2.}})
-                                           .mass(1.)
-                                           .moment_inertia(0.1));
-                m_particles.push_back(s2, p.velocity({{0.4, 0.5}})
-                                           .desired_velocity({{0.04, 0.05}})
-                                           .force({{4., 5.}})
-                                           .mass(2.)
-                                           .moment_inertia(0.3));
-            }
-            scopi_container<dim> m_particles;
-    };
+        superellipsoid<dim> s1({{-0.2, 0.1}}, {quaternion(PI/3)}, {{.2, .05}}, 1);
+        sphere<dim> s2({{ 0.2,  0.05}}, {quaternion(PI/2)}, 0.1);
+        auto p = property<dim>().omega(PI/3)
+                                .desired_omega(PI/12);
+        scopi_container<dim> particles;
+        particles.push_back(s1, p.velocity({{0.1, 0.2}})
+                                   .desired_velocity({{0.01, 0.02}})
+                                   .force({{1., 2.}})
+                                   .mass(1.)
+                                   .moment_inertia(0.1));
+        particles.push_back(s2, p.velocity({{0.4, 0.5}})
+                                   .desired_velocity({{0.04, 0.05}})
+                                   .force({{4., 5.}})
+                                   .mass(2.)
+                                   .moment_inertia(0.3));
 
-    class Container3dTest  : public ::testing::Test {
+        SUBCASE("size")
+        {
+            CHECK(particles.size() == 2);
+        }
+
+        SUBCASE("pos")
+        {
+            auto pos = particles.pos();
+            REQUIRE(pos(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(pos(0)(1) == doctest::Approx(0.1));
+            REQUIRE(pos(1)(0) == doctest::Approx(0.2));
+            REQUIRE(pos(1)(1) == doctest::Approx(0.05));
+        }
+
+        SUBCASE("q")
+        {
+            auto q = particles.q();
+            REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(3.)/2.));
+            REQUIRE(q(0)(1) == doctest::Approx(0.));
+            REQUIRE(q(0)(2) == doctest::Approx(0.));
+            REQUIRE(q(0)(3) == doctest::Approx(1./2.));
+            REQUIRE(q(1)(0) == doctest::Approx(std::sqrt(2.)/2.));
+            REQUIRE(q(1)(1) == doctest::Approx(0.));
+            REQUIRE(q(1)(2) == doctest::Approx(0.));
+            REQUIRE(q(1)(3) == doctest::Approx(std::sqrt(2.)/2.));
+        }
+
+        SUBCASE("f")
+        {
+            auto f = particles.f();
+            REQUIRE(f(0)(0) == doctest::Approx(1.));
+            REQUIRE(f(0)(1) == doctest::Approx(2.));
+            REQUIRE(f(1)(0) == doctest::Approx(4.));
+            REQUIRE(f(1)(1) == doctest::Approx(5.));
+        }
+
+        SUBCASE("m")
+        {
+            auto m = particles.m();
+            REQUIRE(m(0) == doctest::Approx(1.));
+            REQUIRE(m(1) == doctest::Approx(2.));
+        }
+
+        SUBCASE("j")
+        {
+            auto j = particles.j();
+            REQUIRE(j(0) == doctest::Approx(0.1));
+        }
+
+        SUBCASE("v")
+        {
+            auto v = particles.v();
+            REQUIRE(v(0)(0) == doctest::Approx(0.1));
+            REQUIRE(v(0)(1) == doctest::Approx(0.2));
+            REQUIRE(v(1)(0) == doctest::Approx(0.4));
+            REQUIRE(v(1)(1) == doctest::Approx(0.5));
+        }
+
+        SUBCASE("omega")
+        {
+            auto omega = particles.omega();
+            REQUIRE(omega(0) == doctest::Approx(PI/3.));
+            REQUIRE(omega(1) == doctest::Approx(PI/3.));
+        }
+
+        SUBCASE("desired_omega")
+        {
+            auto desired_omega = particles.desired_omega();
+            REQUIRE(desired_omega(0) == doctest::Approx(PI/12.));
+            REQUIRE(desired_omega(1) == doctest::Approx(PI/12.));
+        }
+
+        SUBCASE("vd")
+        {
+            auto vd = particles.vd();
+            REQUIRE(vd(0)(0) == doctest::Approx(0.01));
+            REQUIRE(vd(0)(1) == doctest::Approx(0.02));
+            REQUIRE(vd(1)(0) == doctest::Approx(0.04));
+            REQUIRE(vd(1)(1) == doctest::Approx(0.05));
+        }
+
+        SUBCASE("moments fpd sphere")
+        {
+            REQUIRE(cross_product_vap_fpd(particles, 1) == doctest::Approx(0.));
+        }
+
+        SUBCASE("moments fpd superellipsoid")
+        {
+            REQUIRE(cross_product_vap_fpd(particles, 0) == doctest::Approx(0.));
+        }
+    }
+
+    TEST_CASE("Container 3d")
+    {
         static constexpr std::size_t dim = 3;
-        protected:
-            Container3dTest()
-            {
-                superellipsoid<dim> s1({{-0.2, 0.1, 0.}}, {quaternion(PI/3)}, {{.2, .05, 0.01}}, {{1, 1}});
-                sphere<dim> s2({{ 0.2,  0.05, 0.}}, {quaternion(PI/2)}, 0.1);
-                auto p = property<dim>().omega({{PI/3, PI/3}})
-                                        .desired_omega({{PI/12, PI/12}});
-                m_particles.push_back(s1, p.velocity({{0.1, 0.2, 0.3}})
-                                           .desired_velocity({{0.01, 0.02, 0.03}})
-                                           .force({{1., 2., 3,}})
-                                           .mass(1.)
-                                           .moment_inertia({{0.1, 0.2, 0.3}}));
+        superellipsoid<dim> s1({{-0.2, 0.1, 0.}}, {quaternion(PI/3)}, {{.2, .05, 0.01}}, {{1, 1}});
+        sphere<dim> s2({{ 0.2,  0.05, 0.}}, {quaternion(PI/2)}, 0.1);
+        auto p = property<dim>().omega({{PI/3, PI/4, PI/5}})
+                                .desired_omega({{PI/12, PI/15, PI/18}});
+        scopi_container<dim> particles;
+        particles.push_back(s1, p.velocity({{0.1, 0.2, 0.3}})
+                                   .desired_velocity({{0.01, 0.02, 0.03}})
+                                   .force({{1., 2., 3,}})
+                                   .mass(1.)
+                                   .moment_inertia({{0.1, 0.2, 0.3}}));
 
-                m_particles.push_back(s2, p.velocity({{0.4, 0.5, 0.6}})
-                                           .desired_velocity({{0.04, 0.05, 0.06}})
-                                           .force({{4., 5., 6,}})
-                                           .mass(2.)
-                                           .moment_inertia({{0.4, 0.5, 0.6}}));
-            }
-            scopi_container<dim> m_particles;
-    };
+        particles.push_back(s2, p.velocity({{0.4, 0.5, 0.6}})
+                                   .desired_velocity({{0.04, 0.05, 0.06}})
+                                   .force({{4., 5., 6,}})
+                                   .mass(2.)
+                                   .moment_inertia({0.1, 0.1, 0.1}));
 
-    //size
-    TEST_F(Container2dTest, size_2d)
-    {
-        EXPECT_EQ(m_particles.size(), 2);
+        SUBCASE("size")
+        {
+            CHECK(particles.size() == 2);
+        }
+
+        SUBCASE("pos")
+        {
+            auto pos = particles.pos();
+            REQUIRE(pos(0)(0) == doctest::Approx(-0.2));
+            REQUIRE(pos(0)(1) == doctest::Approx(0.1));
+            REQUIRE(pos(0)(2) == doctest::Approx(0.));
+            REQUIRE(pos(1)(0) == doctest::Approx(0.2));
+            REQUIRE(pos(1)(1) == doctest::Approx(0.05));
+            REQUIRE(pos(1)(2) == doctest::Approx(0.));
+        }
+
+        SUBCASE("q")
+        {
+            auto q = particles.q();
+            REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(3.)/2.));
+            REQUIRE(q(0)(1) == doctest::Approx(0.));
+            REQUIRE(q(0)(2) == doctest::Approx(0.));
+            REQUIRE(q(0)(3) == doctest::Approx(1./2.));
+            REQUIRE(q(1)(0) == doctest::Approx(std::sqrt(2.)/2.));
+            REQUIRE(q(1)(1) == doctest::Approx(0.));
+            REQUIRE(q(1)(2) == doctest::Approx(0.));
+            REQUIRE(q(1)(3) == doctest::Approx(std::sqrt(2.)/2.));
+        }
+
+        SUBCASE("f")
+        {
+            auto f = particles.f();
+            REQUIRE(f(0)(0) == doctest::Approx(1.));
+            REQUIRE(f(0)(1) == doctest::Approx(2.));
+            REQUIRE(f(0)(2) == doctest::Approx(3.));
+            REQUIRE(f(1)(0) == doctest::Approx(4.));
+            REQUIRE(f(1)(1) == doctest::Approx(5.));
+            REQUIRE(f(1)(2) == doctest::Approx(6.));
+        }
+
+        SUBCASE("m")
+        {
+            auto m = particles.m();
+            REQUIRE(m(0) == doctest::Approx(1.));
+            REQUIRE(m(1) == doctest::Approx(2.));
+        }
+
+        SUBCASE("j")
+        {
+            auto j = particles.j();
+            REQUIRE(j(0)(0) == doctest::Approx(0.1));
+            REQUIRE(j(0)(1) == doctest::Approx(0.2));
+            REQUIRE(j(0)(2) == doctest::Approx(0.3));
+            REQUIRE(j(1)(0) == doctest::Approx(0.1));
+            REQUIRE(j(1)(1) == doctest::Approx(0.1));
+            REQUIRE(j(1)(2) == doctest::Approx(0.1));
+        }
+
+        SUBCASE("v")
+        {
+            auto v = particles.v();
+            REQUIRE(v(0)(0) == doctest::Approx(0.1));
+            REQUIRE(v(0)(1) == doctest::Approx(0.2));
+            REQUIRE(v(0)(2) == doctest::Approx(0.3));
+            REQUIRE(v(1)(0) == doctest::Approx(0.4));
+            REQUIRE(v(1)(1) == doctest::Approx(0.5));
+            REQUIRE(v(1)(2) == doctest::Approx(0.6));
+        }
+
+        SUBCASE("omega")
+        {
+            auto omega = particles.omega();
+            REQUIRE(omega(0)[0] == doctest::Approx(PI/3.));
+            REQUIRE(omega(0)[1] == doctest::Approx(PI/4.));
+            REQUIRE(omega(0)[2] == doctest::Approx(PI/5.));
+            REQUIRE(omega(1)[0] == doctest::Approx(PI/3.));
+            REQUIRE(omega(1)[1] == doctest::Approx(PI/4.));
+            REQUIRE(omega(1)[2] == doctest::Approx(PI/5.));
+        }
+
+        SUBCASE("desired_omega")
+        {
+            auto desired_omega = particles.desired_omega();
+            REQUIRE(desired_omega(0)[0] == doctest::Approx(PI/12.));
+            REQUIRE(desired_omega(0)[1] == doctest::Approx(PI/15.));
+            REQUIRE(desired_omega(0)[2] == doctest::Approx(PI/18.));
+            REQUIRE(desired_omega(1)[0] == doctest::Approx(PI/12.));
+            REQUIRE(desired_omega(1)[1] == doctest::Approx(PI/15.));
+            REQUIRE(desired_omega(1)[2] == doctest::Approx(PI/18.));
+        }
+
+        SUBCASE("vd")
+        {
+            auto vd = particles.vd();
+            REQUIRE(vd(0)(0) == doctest::Approx(0.01));
+            REQUIRE(vd(0)(1) == doctest::Approx(0.02));
+            REQUIRE(vd(0)(2) == doctest::Approx(0.03));
+            REQUIRE(vd(1)(0) == doctest::Approx(0.04));
+            REQUIRE(vd(1)(1) == doctest::Approx(0.05));
+            REQUIRE(vd(1)(2) == doctest::Approx(0.06));
+        }
+
+        SUBCASE("moments fpd sphere")
+        {
+            auto cross_product_sphere = cross_product_vap_fpd(particles, 1);
+            REQUIRE(cross_product_sphere(0) == doctest::Approx(0.));
+            REQUIRE(cross_product_sphere(1) == doctest::Approx(0.));
+            REQUIRE(cross_product_sphere(2) == doctest::Approx(0.));
+        }
+
+        SUBCASE("moments fpd superellipsoid")
+        {
+            auto cross_product_superellipsoid = cross_product_vap_fpd(particles, 0);
+            REQUIRE(cross_product_superellipsoid(0) == doctest::Approx(PI*PI/20.*0.1));
+            REQUIRE(cross_product_superellipsoid(1) == doctest::Approx(-PI*PI/15.*0.2));
+            REQUIRE(cross_product_superellipsoid(2) == doctest::Approx(PI*PI/12.*0.1));
+        }
     }
-
-    TEST_F(Container3dTest, size_3d)
-    {
-        EXPECT_EQ(m_particles.size(), 2);
-    }
-
-    // pos
-    TEST_F(Container2dTest, pos_2d)
-    {
-        auto pos = m_particles.pos();
-        EXPECT_DOUBLE_EQ(pos(0)(0), -0.2);
-        EXPECT_DOUBLE_EQ(pos(0)(1), 0.1);
-        EXPECT_DOUBLE_EQ(pos(1)(0), 0.2);
-        EXPECT_DOUBLE_EQ(pos(1)(1), 0.05);
-    }
-
-    TEST_F(Container3dTest, pos_3d)
-    {
-        auto pos = m_particles.pos();
-        EXPECT_DOUBLE_EQ(pos(0)(0), -0.2);
-        EXPECT_DOUBLE_EQ(pos(0)(1), 0.1);
-        EXPECT_DOUBLE_EQ(pos(0)(2), 0.);
-        EXPECT_DOUBLE_EQ(pos(1)(0), 0.2);
-        EXPECT_DOUBLE_EQ(pos(1)(1), 0.05);
-        EXPECT_DOUBLE_EQ(pos(1)(2), 0.);
-    }
-
-    // q
-    TEST_F(Container2dTest, q_2d)
-    {
-        auto q = m_particles.q();
-        EXPECT_DOUBLE_EQ(q(0)(0), std::sqrt(3.)/2.);
-        EXPECT_DOUBLE_EQ(q(0)(1), 0.);
-        EXPECT_DOUBLE_EQ(q(0)(2), 0.);
-        EXPECT_DOUBLE_EQ(q(0)(3), 1./2.);
-        EXPECT_DOUBLE_EQ(q(1)(0), std::sqrt(2.)/2.);
-        EXPECT_DOUBLE_EQ(q(1)(1), 0.);
-        EXPECT_DOUBLE_EQ(q(1)(2), 0.);
-        EXPECT_DOUBLE_EQ(q(1)(3), std::sqrt(2.)/2.);
-    }
-
-    TEST_F(Container3dTest, q_3d)
-    {
-        auto q = m_particles.q();
-        EXPECT_DOUBLE_EQ(q(0)(0), std::sqrt(3.)/2.);
-        EXPECT_DOUBLE_EQ(q(0)(1), 0.);
-        EXPECT_DOUBLE_EQ(q(0)(2), 0.);
-        EXPECT_DOUBLE_EQ(q(0)(3), 1./2.);
-        EXPECT_DOUBLE_EQ(q(1)(0), std::sqrt(2.)/2.);
-        EXPECT_DOUBLE_EQ(q(1)(1), 0.);
-        EXPECT_DOUBLE_EQ(q(1)(2), 0.);
-        EXPECT_DOUBLE_EQ(q(1)(3), std::sqrt(2.)/2.);
-    }
-
-    // f
-    TEST_F(Container2dTest, f_2d)
-    {
-        auto f = m_particles.f();
-        EXPECT_DOUBLE_EQ(f(0)(0), 1.);
-        EXPECT_DOUBLE_EQ(f(0)(1), 2.);
-        EXPECT_DOUBLE_EQ(f(1)(0), 4.);
-        EXPECT_DOUBLE_EQ(f(1)(1), 5.);
-    }
-
-    TEST_F(Container3dTest, f_3d)
-    {
-        auto f = m_particles.f();
-        EXPECT_DOUBLE_EQ(f(0)(0), 1.);
-        EXPECT_DOUBLE_EQ(f(0)(1), 2.);
-        EXPECT_DOUBLE_EQ(f(0)(2), 3.);
-        EXPECT_DOUBLE_EQ(f(1)(0), 4.);
-        EXPECT_DOUBLE_EQ(f(1)(1), 5.);
-        EXPECT_DOUBLE_EQ(f(1)(2), 6.);
-    }
-
-    // m
-    TEST_F(Container2dTest, m_2d)
-    {
-        auto m = m_particles.m();
-        EXPECT_DOUBLE_EQ(m(0), 1.);
-        EXPECT_DOUBLE_EQ(m(1), 2.);
-    }
-
-    TEST_F(Container3dTest, m_3d)
-    {
-        auto m = m_particles.m();
-        EXPECT_DOUBLE_EQ(m(0), 1.);
-        EXPECT_DOUBLE_EQ(m(1), 2.);
-    }
-
-    // j
-    TEST_F(Container2dTest, j_2d)
-    {
-        auto j = m_particles.j();
-        EXPECT_DOUBLE_EQ(j(0), 0.1);
-        EXPECT_DOUBLE_EQ(j(1), 0.3);
-    }
-
-    TEST_F(Container3dTest, j_3d)
-    {
-        auto j = m_particles.j();
-        EXPECT_DOUBLE_EQ(j(0)(0), 0.1);
-        EXPECT_DOUBLE_EQ(j(0)(1), 0.2);
-        EXPECT_DOUBLE_EQ(j(0)(2), 0.3);
-        EXPECT_DOUBLE_EQ(j(1)(0), 0.4);
-        EXPECT_DOUBLE_EQ(j(1)(1), 0.5);
-        EXPECT_DOUBLE_EQ(j(1)(2), 0.6);
-    }
-
-    // v
-    TEST_F(Container2dTest, v_2d)
-    {
-        auto v = m_particles.v();
-        EXPECT_DOUBLE_EQ(v(0)(0), 0.1);
-        EXPECT_DOUBLE_EQ(v(0)(1), 0.2);
-        EXPECT_DOUBLE_EQ(v(1)(0), 0.4);
-        EXPECT_DOUBLE_EQ(v(1)(1), 0.5);
-    }
-
-    TEST_F(Container3dTest, v_3d)
-    {
-        auto v = m_particles.v();
-        EXPECT_DOUBLE_EQ(v(0)(0), 0.1);
-        EXPECT_DOUBLE_EQ(v(0)(1), 0.2);
-        EXPECT_DOUBLE_EQ(v(0)(2), 0.3);
-        EXPECT_DOUBLE_EQ(v(1)(0), 0.4);
-        EXPECT_DOUBLE_EQ(v(1)(1), 0.5);
-        EXPECT_DOUBLE_EQ(v(1)(2), 0.6);
-    }
-
-    // omega
-    TEST_F(Container2dTest, omega_2d)
-    {
-        auto omega = m_particles.omega();
-        EXPECT_DOUBLE_EQ(omega(0), PI/3.);
-    }
-
-    TEST_F(Container3dTest, omega_3d)
-    {
-        auto omega = m_particles.omega();
-        EXPECT_DOUBLE_EQ(omega(0)[0], PI/3.);
-        EXPECT_DOUBLE_EQ(omega(0)[1], PI/3.);
-    }
-
-    // desired_omega
-    TEST_F(Container2dTest, desired_omega_2d)
-    {
-        auto desired_omega = m_particles.desired_omega();
-        EXPECT_DOUBLE_EQ(desired_omega(0), PI/12.);
-    }
-
-    TEST_F(Container3dTest, desired_omega_3d)
-    {
-        auto desired_omega = m_particles.desired_omega();
-        EXPECT_DOUBLE_EQ(desired_omega(0)[0], PI/12.);
-        EXPECT_DOUBLE_EQ(desired_omega(0)[1], PI/12.);
-    }
-
-    // vd
-    TEST_F(Container2dTest, vd_2d)
-    {
-        auto vd = m_particles.vd();
-        EXPECT_DOUBLE_EQ(vd(0)(0), 0.01);
-        EXPECT_DOUBLE_EQ(vd(0)(1), 0.02);
-        EXPECT_DOUBLE_EQ(vd(1)(0), 0.04);
-        EXPECT_DOUBLE_EQ(vd(1)(1), 0.05);
-    }
-
-    TEST_F(Container3dTest, vd_3d)
-    {
-        auto vd = m_particles.vd();
-        EXPECT_DOUBLE_EQ(vd(0)(0), 0.01);
-        EXPECT_DOUBLE_EQ(vd(0)(1), 0.02);
-        EXPECT_DOUBLE_EQ(vd(0)(2), 0.03);
-        EXPECT_DOUBLE_EQ(vd(1)(0), 0.04);
-        EXPECT_DOUBLE_EQ(vd(1)(1), 0.05);
-        EXPECT_DOUBLE_EQ(vd(1)(2), 0.06);
-    }
-
 }

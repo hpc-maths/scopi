@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -21,8 +23,13 @@
 #include "quaternion.hpp"
 
 #include "solvers/OptimUzawaMatrixFreeOmp.hpp"
+#include "solvers/OptimMosek.hpp"
+#include "problems/DryWithoutFriction.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
+#include "vap/vap_projection.hpp"
+#include "params/OptimParams.hpp"
+#include "params/ProblemParams.hpp"
 
 namespace nl = nlohmann;
 
@@ -30,81 +37,140 @@ using namespace xt::placeholders;
 
 namespace scopi
 {
-
     template<std::size_t dim,
-             class optim_solver_t = OptimUzawaMatrixFreeOmp,
+             class optim_solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
              class contact_t = contact_kdtree,
              class vap_t = vap_fixed
              >
-    class ScopiSolver
+    class ScopiSolver : public optim_solver_t
     {
     public:
-        ScopiSolver(scopi_container<dim>& particles, double dt);
-        void solve(std::size_t total_it);
-        void set_coeff_friction(double mu);
+        using solver_type = optim_solver_t;
+    private:
+        using problem_t = typename optim_solver_t::problem_type;
+    public:
+        ScopiSolver(scopi_container<dim>& particles,
+                    double dt,
+                    const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>());
+        void solve(std::size_t total_it, std::size_t initial_iter = 0);
 
     private:
         void displacement_obstacles();
 
         std::vector<neighbor<dim>> compute_contacts();
+        std::vector<neighbor<dim>> compute_contacts_worms();
         void write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite);
         void move_active_particles();
         scopi_container<dim>& m_particles;
         double m_dt;
-        optim_solver_t m_solver;
         vap_t m_vap;
     };
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
-    : m_particles(particles)
+    /*
+    template<std::size_t dim,
+             class optim_solver_t,
+             class contact_t,
+             class vap_t
+             >
+    class ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 2>: public ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>
+    {
+    public:
+        using problem_t = typename optim_solver_t::problem_type;
+        using solver_type = optim_solver_t;
+        ScopiSolver(scopi_container<dim>& particles,
+                    double dt,
+                    const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>());
+        void solve(std::size_t total_it, std::size_t initial_iter = 0);
+    private:
+        vap_projection m_vap_projection;
+    };
+    */
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params)
+    : optim_solver_t(particles.nb_active(), dt, particles, optim_params)
+    , m_particles(particles)
     , m_dt(dt)
-    , m_solver(m_particles.nb_active(), m_dt, particles)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
 
+    /*
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 2>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params)
+    : ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>(particles, dt, optim_params)
+    , m_vap_projection(this->m_particles.nb_active(), this->m_particles.nb_inactive(), this->m_dt)
+    {}
+    */
+
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it)
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
-        for (std::size_t nite = 0; nite < total_it; ++nite)
+        for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
 
-            tic();
             displacement_obstacles();
-            auto duration = toc();
-            PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
-
             auto contacts = compute_contacts();
-
-            tic();
+            auto contacts_worms = compute_contacts_worms();
             write_output_files(contacts, nite);
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : write output files = " << duration;
-
-            tic();
             m_vap.set_a_priori_velocity(m_particles);
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : set vap = " << duration;
-
-            m_solver.run(m_particles, contacts, nite);
-
-            tic();
+            this->extra_setps_before_solve(contacts);
+            this->run(m_particles, contacts, contacts_worms, nite);
+            this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms));
             move_active_particles();
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
-
-            tic();
-            m_vap.update_velocity(m_particles, m_solver.get_uadapt(), m_solver.get_wadapt());
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : update vap = " << duration;
+            m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
         }
     }
+
+    /*
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
+    {
+        // Time Loop
+        for (std::size_t nite = initial_iter; nite < total_it; ++nite)
+        {
+            PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
+
+            this->displacement_obstacles();
+            auto contacts = this->compute_contacts();
+
+            tic();
+            this->m_problem.set_gamma(contacts);
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : set gamma = " << duration;
+
+            this->write_output_files(contacts, nite);
+            this->m_vap.set_a_priori_velocity(this->m_particles);
+
+            this->m_problem.setup_first_resolution();
+            this->m_solver.run(this->m_particles, contacts, this->m_problem, nite);
+
+            tic();
+            this->m_problem.correct_lambda(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_particles, this->m_problem), this->m_particles, this->m_solver.get_uadapt());
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
+
+            m_vap_projection.set_u_w(this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
+            m_vap_projection.set_a_priori_velocity(this->m_particles);
+            this->m_problem.setup_projection();
+            this->m_solver.run(this->m_particles, contacts, this->m_problem,  nite);
+
+            tic();
+            this->m_problem.update_gamma(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_particles, this->m_problem));
+            duration = toc();
+            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
+
+            this->move_active_particles();
+            this->m_vap.update_velocity(this->m_particles, this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
+        }
+    }
+    */
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
     {
+        tic();
         for (std::size_t i = 0; i < m_particles.nb_inactive(); ++i)
         {
 
@@ -115,8 +181,9 @@ namespace scopi
                 normw = 1;
             }
             type::quaternion_t expw;
-            expw(0) = std::cos(0.5*normw*m_dt);
-            xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
+            auto expw_adapt = xt::adapt(expw);
+            expw_adapt(0) = std::cos(0.5*normw*m_dt);
+            xt::view(expw_adapt, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
 
             for (std::size_t d = 0; d < dim; ++d)
             {
@@ -126,6 +193,8 @@ namespace scopi
             normalize(m_particles.q()(i));
             // std::cout << "obstacle " << i << ": " << m_particles.pos()(0) << " " << m_particles.q()(0) << std::endl;
         }
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
     }
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
@@ -140,8 +209,29 @@ namespace scopi
     }
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts_worms()
+    {
+        std::vector<neighbor<dim>> contacts;
+        #pragma omp parallel for
+        for (std::size_t i = 0; i < m_particles.size(); ++i)
+        {
+            for (std::size_t j = 0; j < m_particles[i]->size()-1; ++j)
+            {
+                auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*m_particles[i], index(j  )),
+                                                                      *select_object_dispatcher<dim>::dispatch(*m_particles[i], index(j+1)));
+                neigh.i = m_particles.offset(i) + j;
+                neigh.j = m_particles.offset(i) + j + 1;
+                #pragma omp critical
+                contacts.emplace_back(std::move(neigh));
+            }
+        }
+        return contacts;
+    }
+
+    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
+        tic();
         nl::json json_output;
 
         std::ofstream file(fmt::format("./Results/scopi_objects_{:04d}.json", nite));
@@ -169,14 +259,18 @@ namespace scopi
 
         file << std::setw(4) << json_output;
         file.close();
+
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : write output files = " << duration;
     }
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::move_active_particles()
     {
+        tic();
         std::size_t active_offset = m_particles.nb_inactive();
-        auto uadapt = m_solver.get_uadapt();
-        auto wadapt = m_solver.get_wadapt();
+        auto uadapt = this->get_uadapt();
+        auto wadapt = this->get_wadapt();
 
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
@@ -187,8 +281,9 @@ namespace scopi
                 normw = 1;
             }
             type::quaternion_t expw;
-            expw(0) = std::cos(0.5*normw*m_dt);
-            xt::view(expw, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
+            auto expw_adapt = xt::adapt(expw);
+            expw_adapt(0) = std::cos(0.5*normw*m_dt);
+            xt::view(expw_adapt, xt::range(1, _)) = std::sin(0.5*normw*m_dt)/normw*w;
             for (std::size_t d = 0; d < dim; ++d)
             {
                 m_particles.pos()(i + active_offset)(d) += m_dt*uadapt(i, d);
@@ -197,12 +292,9 @@ namespace scopi
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
         }
-    }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::set_coeff_friction(double mu)
-    {
-        m_solver.set_coeff_friction(mu);
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
     }
 }
 

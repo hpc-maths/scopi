@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include "doctest/doctest.h"
 #include <random>
 #include<xtensor/xmath.hpp>
 
@@ -13,275 +13,214 @@
 
 namespace scopi
 {
-    // sphere - plan
-    class TestSpherePlanBase {
-        protected:
+    void check_result_sphere_plan(const scopi_container<2>& particles)
+    {
+        auto pos = particles.pos();
+        REQUIRE(pos(0)(0) == doctest::Approx(0.));
+        REQUIRE(pos(0)(1) == doctest::Approx(0.));
+        REQUIRE(pos(1)(0) == doctest::Approx(0.));
+        REQUIRE(pos(1)(1) == doctest::Approx(1.));
+
+        auto q = particles.q();
+        REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(2.)/2.));
+        REQUIRE(q(0)(1) == doctest::Approx(0.));
+        REQUIRE(q(0)(2) == doctest::Approx(0.));
+        REQUIRE(q(0)(3) == doctest::Approx(std::sqrt(2.)/2.));
+        REQUIRE(q(1)(0) == doctest::Approx(1.));
+        REQUIRE(q(1)(1) == doctest::Approx(0.));
+        REQUIRE(q(1)(2) == doctest::Approx(0.));
+        REQUIRE(q(1)(3) == doctest::Approx(0.));
+    }
+
+    TEST_CASE_TEMPLATE("sphere plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    {
         static constexpr std::size_t dim = 2;
-        TestSpherePlanBase() 
-        : m_radius(1.)
-        , m_s({{0., m_radius}}, m_radius)
-        , m_p({{ 0.,  0.}}, PI/2.)
-        , m_prop(property<dim>().mass(1.).moment_inertia(0.1))
+
+        double dt = .005;
+        std::size_t total_it = 100;
+        double radius = 1.;
+
+        sphere<dim> s({{0., radius}}, radius);
+        plan<dim> p({{ 0.,  0.}}, PI/2.);
+        auto prop = property<dim>().mass(1.).moment_inertia(0.1);
+
+        scopi_container<dim> particles;
+        particles.push_back(p, property<dim>().deactivate());
+
+        SUBCASE("fixed")
         {
-            m_particles.push_back(m_p, property<dim>().deactivate());
+            particles.push_back(s, prop);
+            SolverType solver(particles, dt);
+            solver.solve(total_it);
+            check_result_sphere_plan(particles);
         }
 
-        void check_result()
+        SUBCASE("velocity")
         {
-            auto pos = m_particles.pos();
-            EXPECT_DOUBLE_EQ(pos(0)(0), 0.);
-            EXPECT_DOUBLE_EQ(pos(0)(1), 0.);
-            EXPECT_NEAR(pos(1)(0), 0., tolerance);
-            EXPECT_NEAR(pos(1)(1), m_radius, tolerance);
-
-            auto q = m_particles.q();
-            EXPECT_DOUBLE_EQ(q(0)(0), std::sqrt(2.)/2.);
-            EXPECT_DOUBLE_EQ(q(0)(1), 0.);
-            EXPECT_DOUBLE_EQ(q(0)(2), 0.);
-            EXPECT_DOUBLE_EQ(q(0)(3), std::sqrt(2.)/2.);
-            EXPECT_DOUBLE_EQ(q(1)(0), 1.);
-            EXPECT_DOUBLE_EQ(q(1)(1), 0.);
-            EXPECT_DOUBLE_EQ(q(1)(2), 0.);
-            EXPECT_NEAR(q(1)(3), 0., tolerance);
+            particles.push_back(s, prop.desired_velocity({{0., -1.}}));
+            SolverType solver(particles, dt);
+            solver.solve(total_it);
+            check_result_sphere_plan(particles);
         }
-
-        double m_dt = .005;
-        std::size_t m_total_it = 100;
-
-        double m_radius;
-        sphere<dim> m_s;
-        plan<dim> m_p;
-        scopi_container<2> m_particles;
-        property<dim> m_prop; 
-    };
-
-    template <class S>
-    class TestSpherePlan  : public ::testing::Test 
-                          , public TestSpherePlanBase
-    {
-        protected:
-        void SetUp() override {
-            m_particles.push_back(m_s, m_prop);
-        }
-    };
-
-    TYPED_TEST_SUITE(TestSpherePlan, solver_with_contact_types<2>, );
-
-    TYPED_TEST(TestSpherePlan, sphere_plan)
-    {
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
-        this->check_result();
     }
 
-    template <class S>
-    class TestSpherePlanVelocity  : public ::testing::Test 
-                                  , public TestSpherePlanBase
+    TEST_CASE_TEMPLATE("sphere plan force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
-        protected:
-        void SetUp() override {
-            m_particles.push_back(m_s, m_prop.desired_velocity({{0., -1.}}));
-        }
-    };
-
-    TYPED_TEST_SUITE(TestSpherePlanVelocity, solver_with_contact_types<2>, );
-
-    TYPED_TEST(TestSpherePlanVelocity, sphere_plan_velocity)
-    {
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
-        this->check_result();
-    }
-
-    template <class S>
-    class TestSpherePlanForce  : public ::testing::Test 
-                               , public TestSpherePlanBase
-    {
-        protected:
-        void SetUp() override {
-            m_particles.push_back(m_s, m_prop.force({{0., -1.}}));
-        }
-    };
-
-    using solver_types_vap = solver_with_contact_types<2, vap_fpd>; // TODO does not compile without using
-    TYPED_TEST_SUITE(TestSpherePlanForce, solver_types_vap, );
-
-    TYPED_TEST(TestSpherePlanForce, sphere_plan_force)
-    {
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
-        this->check_result();
-    }
-
-    // sphere - sphere
-    class TestSphereSphereBase {
-        protected:
         static constexpr std::size_t dim = 2;
-        TestSphereSphereBase(double radius, double pos_x, double pos_y) 
-        : m_radius(radius)
-        , m_sphere({{ pos_x,  pos_y}}, m_radius)
-        , m_obstacle({{ 0.,  0.}}, m_radius)
-        , m_prop(property<dim>().mass(1.).moment_inertia(0.1))
-        {
-            m_particles.push_back(m_obstacle, property<dim>().deactivate());
-        }
 
-        void check_result_fixed()
-        {
-            auto pos = m_particles.pos();
-            EXPECT_DOUBLE_EQ(pos(0)(0), 0.);
-            EXPECT_DOUBLE_EQ(pos(0)(1), 0.);
-            EXPECT_DOUBLE_EQ(pos(1)(0), 0.);
-            EXPECT_NEAR(pos(1)(1), 2., tolerance);
+        double dt = .005;
+        std::size_t total_it = 100;
+        double radius = 1.;
 
-            auto q = m_particles.q();
-            EXPECT_DOUBLE_EQ(q(0)(0), 1.);
-            EXPECT_DOUBLE_EQ(q(0)(1), 0.);
-            EXPECT_DOUBLE_EQ(q(0)(2), 0.);
-            EXPECT_DOUBLE_EQ(q(0)(3), 0.);
-            EXPECT_DOUBLE_EQ(q(1)(0), 1.);
-            EXPECT_DOUBLE_EQ(q(1)(1), 0.);
-            EXPECT_DOUBLE_EQ(q(1)(2), 0.);
-            EXPECT_DOUBLE_EQ(q(1)(3), 0.);
-        }
+        sphere<dim> s({{0., radius}}, radius);
+        plan<dim> p({{ 0.,  0.}}, PI/2.);
+        auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
-        double m_dt = .005;
-        std::size_t m_total_it = 100;
+        scopi_container<dim> particles;
+        particles.push_back(p, property<dim>().deactivate());
 
-        double m_radius;
-        sphere<dim> m_sphere;
-        sphere<dim> m_obstacle;
-        scopi_container<2> m_particles;
-        property<dim> m_prop; 
-    };
-
-    template <class S>
-    class TestSphereSphereFixed  : public ::testing::Test 
-                                 , public TestSphereSphereBase
-    {
-        protected:
-        TestSphereSphereFixed()
-        : TestSphereSphereBase(1., 0., 2.)
-        {
-            m_particles.push_back(m_sphere, m_prop);
-        }
-    };
-
-    TYPED_TEST_SUITE(TestSphereSphereFixed, solver_with_contact_types<2>, );
-
-    TYPED_TEST(TestSphereSphereFixed, sphere_sphere_fixed)
-    {
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
-        this->check_result_fixed();
+        particles.push_back(s, prop.force({{0., -1.}}));
+        SolverType solver(particles, dt);
+        solver.solve(total_it);
+        check_result_sphere_plan(particles);
     }
 
-    template <class S>
-    class TestSphereSphereFixedVelocity  : public ::testing::Test 
-                                         , public TestSphereSphereBase
+    void check_result_sphere_sphere(const scopi_container<2>& particles)
     {
-        protected:
-        TestSphereSphereFixedVelocity()
-        : TestSphereSphereBase(1., 0., 2.)
-        {
-            m_particles.push_back(m_sphere, m_prop.desired_velocity({{0., -1.}}));
-        }
-    };
+        auto pos = particles.pos();
+        REQUIRE(pos(0)(0) == doctest::Approx(0.));
+        REQUIRE(pos(0)(1) == doctest::Approx(0.));
+        REQUIRE(pos(1)(0) == doctest::Approx(0.));
+        REQUIRE(pos(1)(1) == doctest::Approx(2.));
 
-    TYPED_TEST_SUITE(TestSphereSphereFixedVelocity, solver_with_contact_types<2>, );
-
-    TYPED_TEST(TestSphereSphereFixedVelocity, sphere_sphere_fixed_velocity)
-    {
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
-        this->check_result_fixed();
+        auto q = particles.q();
+        REQUIRE(q(0)(0) == doctest::Approx(1.));
+        REQUIRE(q(0)(1) == doctest::Approx(0.));
+        REQUIRE(q(0)(2) == doctest::Approx(0.));
+        REQUIRE(q(0)(3) == doctest::Approx(0.));
+        REQUIRE(q(1)(0) == doctest::Approx(1.));
+        REQUIRE(q(1)(1) == doctest::Approx(0.));
+        REQUIRE(q(1)(2) == doctest::Approx(0.));
+        REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    template <class S>
-    class TestSphereSphereFixedForce  : public ::testing::Test 
-                                      , public TestSphereSphereBase
+    TEST_CASE_TEMPLATE("sphere sphere fixed", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
-        protected:
-        TestSphereSphereFixedForce()
-        : TestSphereSphereBase(1., 0., 2.)
-        {
-            m_particles.push_back(m_sphere, m_prop.force({{0., -1.}}));
-        }
-    };
-
-    TYPED_TEST_SUITE(TestSphereSphereFixedForce, solver_types_vap, );
-
-    TYPED_TEST(TestSphereSphereFixedForce, sphere_sphere_fixed_force)
-    {
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
-        this->check_result_fixed();
-    }
-
-    template <class S>
-    class TestSphereSphereMoving  : public ::testing::Test 
-                                  , public TestSphereSphereBase
-    {
-        protected:
-        TestSphereSphereMoving()
-        : TestSphereSphereBase(1., 2.*1./2., 2.*std::sqrt(3.)/2.)
-        {
-            m_particles.push_back(m_sphere, m_prop.force({{0., -10.}}));
-        }
-    };
-
-    TYPED_TEST_SUITE(TestSphereSphereMoving, solver_types_vap, );
-
-    TYPED_TEST(TestSphereSphereMoving, sphere_sphere_moving)
-    {
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
-        EXPECT_PRED3(diffFile, "./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance);
-    }
-
-    template <class S>
-    class TestInclinedPlan  : public ::testing::Test 
-    {
-        protected:
         static constexpr std::size_t dim = 2;
-        TestInclinedPlan()
-        : m_r(1.)
-        , m_alpha(PI/4.)
-        , m_prop(property<dim>().mass(1.).moment_inertia(0.1))
-        {
-            plan<dim> p({{-m_r*std::cos(m_alpha), -m_r*std::sin(m_alpha)}}, m_alpha);
-            sphere<dim> s({{0., 0.}}, m_r);
+        double dt = .005;
+        std::size_t total_it = 100;
+        double radius = 1.;
 
-            m_particles.push_back(p, property<dim>().deactivate());
-            m_particles.push_back(s, m_prop.force({{0., -m_g}}));
+        sphere<dim> obstacle({{ 0.,  0.}}, radius);
+        sphere<dim> sphere({{ 0.,  2.}}, radius);
+        auto prop = property<dim>().mass(1.).moment_inertia(0.1);
+
+        scopi_container<dim> particles;
+        particles.push_back(obstacle, property<dim>().deactivate());
+
+        SUBCASE("fixed")
+        {
+            particles.push_back(sphere, prop);
+            SolverType solver(particles, dt);
+            solver.solve(total_it);
+            check_result_sphere_sphere(particles);
         }
 
-        double m_r;
-        double m_alpha;
-        double m_g = 1.;
-        scopi_container<dim> m_particles;
-        double m_dt = .001;
-        std::size_t m_total_it = 1000;
-        property<dim> m_prop; 
-    };
+        SUBCASE("velocity")
+        {
+            particles.push_back(sphere, prop.desired_velocity({{0., -1.}}));
+            SolverType solver(particles, dt);
+            solver.solve(total_it);
+            check_result_sphere_sphere(particles);
+        }
+    }
 
-    TYPED_TEST_SUITE(TestInclinedPlan, solver_types_vap, );
-
-    TYPED_TEST(TestInclinedPlan, inclined_plan)
+    TEST_CASE_TEMPLATE("sphere sphere fixed force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
-        GTEST_SKIP();
-        TypeParam solver(this->m_particles, this->m_dt);
-        solver.solve(this->m_total_it);
+        static constexpr std::size_t dim = 2;
+        double dt = .005;
+        std::size_t total_it = 100;
+        double radius = 1.;
 
-        auto pos = this->m_particles.pos();
-        double tf = this->m_dt*(this->m_total_it+1);
-        auto analytical_sol = this->m_g/2.*std::sin(this->m_alpha)*tf*tf * xt::xtensor<double, 1>({std::cos(this->m_alpha), -std::sin(this->m_alpha)});
-        PLOG_DEBUG << "pos = " << pos(1);
-        PLOG_DEBUG << "sol = " << analytical_sol;
-        double error = xt::linalg::norm(pos(1) - analytical_sol, 2) / xt::linalg::norm(analytical_sol);
-        PLOG_INFO << "error = " << error;
-        EXPECT_NEAR(error, 0., 1e-2);
-        // EXPECT_NEAR(pos(1)(0), x*std::cos(this->m_alpha), tolerance);
-        // EXPECT_NEAR(pos(1)(1), -x*std::sin(this->m_alpha), tolerance);
+        sphere<dim> obstacle({{ 0.,  0.}}, radius);
+        sphere<dim> sphere({{ 0.,  2.}}, radius);
+        auto prop = property<dim>().mass(1.).moment_inertia(0.1);
+
+        scopi_container<dim> particles;
+        particles.push_back(obstacle, property<dim>().deactivate());
+
+        particles.push_back(sphere, prop.force({{0., -1.}}));
+        SolverType solver(particles, dt);
+        solver.solve(total_it);
+        check_result_sphere_sphere(particles);
+    }
+
+    TEST_CASE_TEMPLATE("sphere sphere moving", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    {
+        static constexpr std::size_t dim = 2;
+        double dt = .005;
+        std::size_t total_it = 100;
+        double radius = 1.;
+
+        sphere<dim> obstacle({{ 0.,  0.}}, radius);
+        sphere<dim> sphere({{ 1.,  std::sqrt(3.)}}, radius);
+        auto prop = property<dim>().mass(1.).moment_inertia(0.1);
+
+        scopi_container<dim> particles;
+        particles.push_back(obstacle, property<dim>().deactivate());
+        particles.push_back(sphere, prop.force({{0., -10.}}));
+
+        SolverType solver(particles, dt);
+        solver.solve(total_it);
+
+        CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
+    }
+
+    TEST_CASE_TEMPLATE("sphere inclined plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    {
+        std::tuple<double, double, double, double> data;
+        std::vector<std::tuple<double, double, double, double>>
+            data_container({std::make_tuple(PI/6., 0.000998789, 0., 0.0010002),
+                            std::make_tuple(PI/4., 0.00100008, 0., 0.00100119),
+                            std::make_tuple(PI/3., 0.00100105, 0., 0.0010027)});
+
+        DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
+
+        static constexpr std::size_t dim = 2;
+        double radius = 1.;
+        double g = 1.;
+        double dt = 0.01;
+        std::size_t total_it = 1000;
+        double h = 2.*radius;
+        double alpha = std::get<0>(data);
+
+        auto prop = property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
+        plan<dim> p({{0., 0.}}, PI/2.-alpha);
+        sphere<dim> s({{h*std::sin(alpha), h*std::cos(alpha)}}, radius);
+
+        scopi_container<dim> particles;
+        particles.push_back(p, property<dim>().deactivate());
+        particles.push_back(s, prop.force({{0., -g}}));
+
+        SolverType solver(particles, dt);
+        solver.solve(total_it);
+
+        auto pos = particles.pos();
+        auto q = particles.q();
+        auto tmp = analytical_solution_sphere_plan(alpha, 0., dt*(total_it+1), radius, g, h);
+        auto pos_analytical = tmp.first;
+        auto q_analytical = quaternion(tmp.second);
+        double error_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
+        double error_q = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
+        auto v = particles.v();
+        auto omega = particles.omega();
+        tmp = analytical_solution_sphere_plan_velocity(alpha, 0., dt*(total_it+1), radius, g, h);
+        auto v_analytical = tmp.first;
+        double error_v = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
+
+        REQUIRE(error_pos == doctest::Approx(std::get<1>(data)));
+        REQUIRE(error_q == doctest::Approx(std::get<2>(data)));
+        REQUIRE(error_v == doctest::Approx(std::get<3>(data)));
+        REQUIRE(omega(1) == doctest::Approx(0.));
     }
 }

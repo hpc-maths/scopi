@@ -2,6 +2,7 @@
 
 #include "base.hpp"
 
+#include <cstddef>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
@@ -16,7 +17,7 @@ namespace scopi
         inline std::size_t kdtree_get_point_count() const
         {
           //std::cout << "KDTREE m_p.size() = "<< m_p.size() <<std::endl;
-          return m_p.size();
+          return m_p.pos().size() - m_actptr;
         }
         inline double kdtree_get_pt(std::size_t idx, const std::size_t d) const
         {
@@ -39,7 +40,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, double kdtree_radius=10)
+        contact_kdtree(double dmax, double kdtree_radius=17)
         : contact_base(dmax)
         , m_kd_tree_radius(kdtree_radius)
         , m_nMatches(0)
@@ -74,9 +75,9 @@ namespace scopi
             tic();
 
             m_nMatches = 0;
-            #pragma omp parallel for reduction(+:m_nMatches) //num_threads(8)
+            #pragma omp parallel for reduction(+:m_nMatches) //num_threads(1)
 
-            for (std::size_t i = active_ptr; i < particles.size() - 1; ++i)
+            for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
             {
                 // for (std::size_t j = i + 1; j < particles.size(); ++j)
                 // {
@@ -95,7 +96,7 @@ namespace scopi
                     query_pt[d] = particles.pos()(i)(d);
                     // query_pt[d] = particles.pos()(i)(d);
                 }
-                //std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+                // std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
                 std::vector<std::pair<size_t, double>> indices_dists;
 
@@ -107,27 +108,14 @@ namespace scopi
                 auto nMatches_loc = index.radiusSearch(query_pt, m_kd_tree_radius, ret_matches,
                     nanoflann::SearchParams());
 
-                //std::cout << i << " nMatches = " << nMatches << std::endl;
-
                 for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
-
                     std::size_t j = ret_matches[ic].first;
-                    //double dist = ret_matches[ic].second;
-                    if (i < j)  { //&& (j>=active_ptr)
-                      auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                      m_nMatches++;
-                      if (neigh.dij < m_dmax) {
-                          neigh.i = i;
-                          neigh.j = j;
-                          #pragma omp critical
-                          contacts.emplace_back(std::move(neigh));
-                          // contacts.back().i = i;
-                          // contacts.back().j = j;
-                      }
+                    if (i < j)
+                    { 
+                        compute_exact_distance(particles, i, j, contacts, m_dmax);
+                        m_nMatches++;
                     }
-
                 }
-
             }
 
             // obstacles
@@ -135,13 +123,7 @@ namespace scopi
             {
                 for (std::size_t j = active_ptr; j < particles.size(); ++j)
                 {
-                    auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-                    if (neigh.dij < m_dmax)
-                    {
-                        neigh.i = i;
-                        neigh.j = j;
-                        contacts.emplace_back(std::move(neigh));
-                    }
+                    compute_exact_distance(particles, i, j, contacts, m_dmax);
                 }
             }
 
@@ -151,18 +133,7 @@ namespace scopi
 
 
             tic();
-            std::sort(contacts.begin(), contacts.end(), [](auto& a, auto& b )
-            {
-                if (a.i < b.i) {
-                  return true;
-                }
-                else {
-                  if (a.i == b.i) {
-                    return a.j < b.j;
-                  }
-                }
-                return false;
-            });
+            sort_contacts(contacts);
             duration = toc();
             PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 

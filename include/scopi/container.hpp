@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <functional>
 #include <map>
 #include <memory>
@@ -72,6 +73,9 @@ namespace scopi
         std::size_t size() const;
         std::size_t nb_active() const;
         std::size_t nb_inactive() const;
+
+        std::size_t object_index(std::size_t i) const;
+        std::size_t offset(std::size_t i) const;
 
         void reset_periodic();
 
@@ -359,6 +363,19 @@ namespace scopi
 
         m_periodic_added = false;
         m_periodic_ptr = size;
+    }
+
+    template<std::size_t dim>
+    std::size_t scopi_container<dim>::object_index(std::size_t i) const
+    {
+        auto lower = std::upper_bound(m_offset.cbegin(), m_offset.cend(), i);
+        return std::distance(m_offset.cbegin(), lower)-1;
+    }
+
+    template<std::size_t dim>
+    std::size_t scopi_container<dim>::offset(std::size_t i) const
+    {
+        return m_offset[i];
     }
 
 }

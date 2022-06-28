@@ -5,55 +5,49 @@ namespace scopi
 {
     using namespace monty;
 
-    ConstraintMosek<MatrixOptimSolver>::ConstraintMosek(std::size_t nparticles)
+    ConstraintMosek<DryWithoutFriction>::ConstraintMosek(std::size_t nparticles)
     : m_nparticles(nparticles)
     {}
 
-    std::shared_ptr<ndarray<double, 1>> ConstraintMosek<MatrixOptimSolver>::distances_to_vector(xt::xtensor<double, 1> distances) const
-    {
-        return std::make_shared<ndarray<double, 1>>(distances.data(), shape_t<1>(distances.shape(0)));
-    }
-
-    std::size_t ConstraintMosek<MatrixOptimSolver>::index_first_col_matrix() const
+    std::size_t ConstraintMosek<DryWithoutFriction>::index_first_col_matrix() const
     {
         return 1;
     }
 
-    std::size_t ConstraintMosek<MatrixOptimSolver>::number_col_matrix() const
+    std::size_t ConstraintMosek<DryWithoutFriction>::number_col_matrix() const
     {
         return 1 + 6*m_nparticles + 6*m_nparticles;
     }
 
+    void ConstraintMosek<DryWithoutFriction>::update_dual(std::size_t,
+                                                          std::size_t)
+    {
+        m_dual = m_qc1->dual();
+    }
 
 
 
 
-    ConstraintMosek<MatrixOptimSolverFriction>::ConstraintMosek(std::size_t nparticles)
+
+    ConstraintMosek<DryWithFriction>::ConstraintMosek(std::size_t nparticles)
     : m_nparticles(nparticles)
     {}
 
-    std::shared_ptr<ndarray<double, 1>> ConstraintMosek<MatrixOptimSolverFriction>::distances_to_vector(xt::xtensor<double, 1> distances) const
-    {
-        // TODO clean
-        auto D_mosek = std::make_shared<ndarray<double, 1>>(distances.data(), shape_t<1>(4*distances.shape(0)));
-        for (std::size_t i = 0; i < distances.size(); ++i)
-        {
-            (*D_mosek)[4*i] = distances[i];
-            (*D_mosek)[4*i + 1] = 0.;
-            (*D_mosek)[4*i + 2] = 0.;
-            (*D_mosek)[4*i + 3] = 0.;
-        }
-        return D_mosek;
-    }
-
-    std::size_t ConstraintMosek<MatrixOptimSolverFriction>::index_first_col_matrix() const
+    std::size_t ConstraintMosek<DryWithFriction>::index_first_col_matrix() const
     {
         return 0;
     }
 
-    std::size_t ConstraintMosek<MatrixOptimSolverFriction>::number_col_matrix() const
+    std::size_t ConstraintMosek<DryWithFriction>::number_col_matrix() const
     {
         return 6*m_nparticles;
     }
+
+    void ConstraintMosek<DryWithFriction>::update_dual(std::size_t,
+                                                       std::size_t)
+    {
+        m_dual = m_qc1->dual();
+    }
+
 }
 #endif

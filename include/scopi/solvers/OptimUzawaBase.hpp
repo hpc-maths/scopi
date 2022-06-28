@@ -7,27 +7,48 @@
 
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
+#include <xtensor/xnoalias.hpp>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
+#include "../params/OptimParams.hpp"
+#include "../problems/DryWithoutFriction.hpp"
+
 namespace scopi{
-    template<class Derived>
-    class OptimUzawaBase: public OptimBase<Derived>
+    template<class problem_t>
+    struct OptimParamsUzawaBase
     {
+        OptimParamsUzawaBase();
+        OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
+
+        ProblemParams<problem_t> m_problem_params;
+        double tol;
+        std::size_t max_iter;
+        double rho;
+    };
+
+    template<class Derived, class problem_t = DryWithoutFriction>
+    class OptimUzawaBase: public OptimBase<Derived, problem_t>
+    {
+    private:
+        using problem_type = problem_t; 
+        using base_type = OptimBase<Derived, problem_t>;
+
+    protected:
+        OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params);
+
     public:
-        using base_type = OptimBase<Derived>;
-        OptimUzawaBase(std::size_t nparts, double dt, double tol = 1e-9);
-
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts);
-
+        int solve_optimization_problem_impl(scopi_container<dim>& particles,
+                                            const std::vector<neighbor<dim>>& contacts,
+                                            const std::vector<neighbor<dim>>& contacts_worms);
         auto uadapt_data();
         auto wadapt_data();
+        auto lagrange_multiplier_data();
 
         int get_nb_active_contacts_impl() const;
 
-    protected:
+    private:
         template <std::size_t dim>
         void gemv_inv_P(const scopi_container<dim>& particles);
 
@@ -40,38 +61,38 @@ namespace scopi{
                               const std::vector<neighbor<dim>>& contacts);
 
         template <std::size_t dim>
-        void init_uzawa(const scopi_container<dim>& particles,
-                        const std::vector<neighbor<dim>>& contacts);
+        void init_uzawa(scopi_container<dim>& particles,
+                        const std::vector<neighbor<dim>>& contacts, 
+                        const std::vector<neighbor<dim>>& contacts_worms);
+        void finalize_uzawa();
 
-        const double m_tol;
-        const std::size_t m_max_iter;
-        const double m_rho;
-        const double m_dmin;
+    protected:
         xt::xtensor<double, 1> m_U;
         xt::xtensor<double, 1> m_L;
         xt::xtensor<double, 1> m_R;
+
+    private:
+        const double m_dmin;
     };
 
-    template<class Derived>
-    OptimUzawaBase<Derived>::OptimUzawaBase(std::size_t nparts, double dt, double tol)
-    : base_type(nparts, dt, 2*3*nparts, 0)
-    , m_tol(tol)
-    , m_max_iter(40000)
-    , m_rho(2000.)
-    , m_dmin(0.)
+    template<class Derived, class problem_t>
+    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
     , m_U(xt::zeros<double>({6*nparts}))
+    , m_dmin(0.)
     {}
 
-    template<class Derived>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    int OptimUzawaBase<Derived>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                           const std::vector<neighbor<dim>>& contacts)
+    int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(scopi_container<dim>& particles,
+                                                                            const std::vector<neighbor<dim>>& contacts,
+                                                                            const std::vector<neighbor<dim>>& contacts_worms)
     {
         tic();
-        init_uzawa(particles, contacts);
+        init_uzawa(particles, contacts, contacts_worms);
         auto duration = toc();
-        m_L = xt::zeros_like(this->m_distances);
-        m_R = xt::zeros_like(this->m_distances);
+        m_L = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
+        m_R = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
         PLOG_INFO << "----> CPUTIME : Uzawa matrix = " << duration;
 
         double time_assign_u = 0.;
@@ -85,10 +106,10 @@ namespace scopi{
 
         std::size_t cc = 0;
         double cmax = -1000.0;
-        while ( (cmax<=-m_tol) && (cc <= m_max_iter) )
+        while ( (cmax<=-this->m_params.tol) && (cc <= this->m_params.max_iter) )
         {
             tic();
-            m_U = this->m_c;
+            xt::noalias(m_U) = this->m_c;
             auto duration = toc();
             time_assign_u += duration;
             time_solve += duration;
@@ -106,7 +127,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            m_R = this->m_distances - m_dmin;
+            xt::noalias(m_R) = this->m_distances - m_dmin;
             duration = toc();
             time_assign_r += duration;
             time_solve += duration;
@@ -118,7 +139,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            m_L = xt::maximum( m_L-m_rho*m_R, 0);
+            xt::noalias(m_L) = xt::maximum( m_L-this->m_params.rho*m_R, 0);
             duration = toc();
             time_assign_l += duration;
             time_solve += duration;
@@ -130,11 +151,14 @@ namespace scopi{
             time_solve += duration;
             cc += 1;
 
-            PLOG_VERBOSE << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
+            // std::cout << m_U << std::endl;
+
+            PLOG_VERBOSE << std::setw(24) << std::scientific << "-- C++ -- Projection : minimal constraint : " << cc << '\t' << cmax;
         }
 
-        PLOG_ERROR_IF(cc >= m_max_iter) << "Uzawa does not converge";
+        PLOG_ERROR_IF(cc >= this->m_params.max_iter) << "Uzawa does not converge";
 
+        PLOG_INFO << "----> CPUTIME : solve (total) = " << time_solve;
         PLOG_INFO << "----> CPUTIME : solve (U = c) = " << time_assign_u;
         PLOG_INFO << "----> CPUTIME : solve (U = A^T*L+U) = " << time_gemv_transpose_A;
         PLOG_INFO << "----> CPUTIME : solve (U = -P^-1*U) = " << time_gemv_inv_P;
@@ -143,55 +167,87 @@ namespace scopi{
         PLOG_INFO << "----> CPUTIME : solve (L = max(L-rho*R, 0)) = " << time_assign_l;
         PLOG_INFO << "----> CPUTIME : solve (cmax = min(R)) = " << time_compute_cmax;
 
+        finalize_uzawa();
+
         return cc;
     }
 
-    template<class Derived>
-    auto OptimUzawaBase<Derived>::uadapt_data()
+    template<class Derived, class problem_t>
+    auto OptimUzawaBase<Derived, problem_t>::uadapt_data()
     {
         return m_U.data();
     }
 
-    template<class Derived>
-    auto OptimUzawaBase<Derived>::wadapt_data()
+    template<class Derived, class problem_t>
+    auto OptimUzawaBase<Derived, problem_t>::wadapt_data()
     {
         return m_U.data() + 3*this->m_nparts;
     }
 
-    template<class Derived>
-    int OptimUzawaBase<Derived>::get_nb_active_contacts_impl() const
+    template<class Derived, class problem_t>
+    auto OptimUzawaBase<Derived, problem_t>::lagrange_multiplier_data()
+    {
+        return m_L.data();
+    }
+
+    template<class Derived, class problem_t>
+    int OptimUzawaBase<Derived, problem_t>::get_nb_active_contacts_impl() const
     {
         return xt::sum(xt::where(m_L > 0., xt::ones_like(m_L), xt::zeros_like(m_L)))();
     }
 
-    template<class Derived>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived>::gemv_inv_P(const scopi_container<dim>& particles)
+    void OptimUzawaBase<Derived, problem_t>::gemv_inv_P(const scopi_container<dim>& particles)
     {
         static_cast<Derived&>(*this).gemv_inv_P_impl(particles);
     }
 
-    template<class Derived>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived>::gemv_A(const scopi_container<dim>& particles,
-                                   const std::vector<neighbor<dim>>& contacts)
+    void OptimUzawaBase<Derived, problem_t>::gemv_A(const scopi_container<dim>& particles,
+                                                    const std::vector<neighbor<dim>>& contacts)
     {
         static_cast<Derived&>(*this).gemv_A_impl(particles, contacts);
     }
 
-    template<class Derived>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived>::gemv_transpose_A(const scopi_container<dim>& particles,
-                                             const std::vector<neighbor<dim>>& contacts)
+    void OptimUzawaBase<Derived, problem_t>::gemv_transpose_A(const scopi_container<dim>& particles,
+                                                              const std::vector<neighbor<dim>>& contacts)
     {
         static_cast<Derived&>(*this).gemv_transpose_A_impl(particles, contacts);
     }
 
-    template<class Derived>
+    template<class Derived, class problem_t>
     template <std::size_t dim>
-    void OptimUzawaBase<Derived>::init_uzawa(const scopi_container<dim>& particles,
-                                             const std::vector<neighbor<dim>>& contacts)
+    void OptimUzawaBase<Derived, problem_t>::init_uzawa(scopi_container<dim>& particles,
+                                                        const std::vector<neighbor<dim>>& contacts,
+                                                        const std::vector<neighbor<dim>>& contacts_worms)
     {
-        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts);
+        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts, contacts_worms);
     }
+
+    template<class Derived, class problem_t>
+    void OptimUzawaBase<Derived, problem_t>::finalize_uzawa()
+    {
+        static_cast<Derived&>(*this).finalize_uzawa_impl();
+    }
+
+    template<class problem_t>
+    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase(const OptimParamsUzawaBase& params)
+    : m_problem_params(params.m_problem_params)
+    , tol(params.tol)
+    , max_iter(params.max_iter)
+    , rho(params.rho)
+    {}
+
+    template<class problem_t>
+    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase()
+    : m_problem_params()
+    , tol(1e-9)
+    , max_iter(40000)
+    , rho(2000.)
+    {}
+
 }

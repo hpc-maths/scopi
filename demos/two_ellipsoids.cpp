@@ -27,7 +27,7 @@ int main()
     particles.push_back(s1, prop1);
     particles.push_back(s2, prop2);
 
-    scopi::ScopiSolver<dim> mosek_solver(particles, dt);
-    mosek_solver.solve(total_it);
+    scopi::ScopiSolver<dim> solver(particles, dt);
+    solver.solve(total_it);
     return 0;
 }

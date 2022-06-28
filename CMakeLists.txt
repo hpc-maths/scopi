@@ -44,6 +44,9 @@ endif()
 
 # Dependencies
 # ============
+if(SCOPI_USE_TBB)
+    set(XTENSOR_USE_TBB 1)
+endif()
 find_package(xtensor REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
@@ -97,15 +100,13 @@ endif()
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
-    src/solvers/MatrixOptimSolver.cpp
-    src/solvers/MatrixOptimSolverFriction.cpp
-    src/solvers/OptimScs.cpp
-    src/solvers/OptimUzawaMkl.cpp
-    src/solvers/OptimUzawaMatrixFreeOmp.cpp
-    src/solvers/OptimUzawaMatrixFreeTbb.cpp
+    src/problems/DryWithoutFriction.cpp
+    src/problems/DryWithFriction.cpp
+    src/problems/ProblemBase.cpp
     src/solvers/ConstraintMosek.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
+    src/vap/vap_projection.cpp
     src/minpack.cpp
     src/quaternion.cpp
     src/utils.cpp
@@ -181,7 +182,7 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/objects/dispatch.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/neighbor.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/sphere.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/globule.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/worm.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/superellipsoid.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/constructor.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/types/base.hpp
@@ -189,15 +190,22 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/write_objects.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/closest_points.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/distance.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/matrix_particles.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimMosek.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeOmp.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimScs.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/MatrixOptimSolver.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/MatrixOptimSolverFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeTbb.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMkl.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaBase.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimBase.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/params/ProblemParams.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/params/OptimParams.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/ProblemBase.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousBase.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithoutFriction.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithFriction.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWitouthFriction.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWithFriction.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/quaternion.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/minpack.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/property.hpp
@@ -208,6 +216,7 @@ set(SCOPI_HEADERS
     ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_fpd.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/vap/base.hpp
     ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_fixed.hpp
+    ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_projection.hpp
 )
 
 include(installation)

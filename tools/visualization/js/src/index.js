@@ -31,10 +31,13 @@ init();
 animate();
 
 const sphereObject = function () {
-    const position = new THREE.Vector3();
-    const rotation = new THREE.Euler();
-    const scale = new THREE.Vector3();
-    return function (obj, matrix, quaternion) {
+    return function (obj, matrix, rot) {
+        const position = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion();
+        const scale = new THREE.Vector3();
+        const center = new THREE.Vector3();
+        const vec = new THREE.Vector3();
+
         position.x = obj.position[0];
         position.y = obj.position[1];
 
@@ -62,24 +65,48 @@ const sphereObject = function () {
         quaternion.normalize();
 
         matrix.compose(position, quaternion, scale);
+
+        center.x = obj.position[0];
+        center.y = obj.position[1];
+        center.z = 0.;
+        rot.push(center);
+        if (typeof obj.radius === "number") {
+            vec.x = obj.radius;
+            vec.y = 0.;
+            vec.z = 0.;
+        }
+        else {
+            vec.x = obj.radius[0];
+            vec.y = 0.;
+            vec.z = 0.;
+        }
+        vec.applyQuaternion(quaternion);
+        vec.add(center);
+        rot.push(vec);
     };
 }();
 
 const planObject = function() {
-    let xB = 0.;
-    let yB = 0.;
     return function(obj, plan) {
-        const c = obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1];
-        plan.push(new THREE.Vector3(obj.position[0], obj.position[0], 0.));
-        if (obj.normal[1] === 0.) { // vertical straight line
-            xB = c/obj.normal[0];
-            yB = obj.position[0] + 30;
+
+        var canvasWidth = window.innerWidth;
+        var canvasHeight = window.innerHeight;
+
+        if (Math.abs(obj.normal[1]) < 1e-12) { // vertical straight line 
+            plan.push(new THREE.Vector3(obj.position[0], -canvasHeight, 0));
+            plan.push(new THREE.Vector3(obj.position[0],  canvasHeight, 0));
+        }
+        else if (Math.abs(obj.normal[0]) < 1e-12) { // horizontal straight line 
+            plan.push(new THREE.Vector3(-canvasWidth, obj.position[1], 0));
+            plan.push(new THREE.Vector3( canvasWidth, obj.position[1], 0));
         }
         else {
-            xB = 30.;
-            yB = (c - obj.normal[0] * xB) / obj.normal[1];
+            var a = -obj.normal[0]/obj.normal[1];
+            var b = (obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1]) / obj.normal[1];
+
+            plan.push(new THREE.Vector3((-canvasHeight - b)/a, -canvasHeight, 0));
+            plan.push(new THREE.Vector3(( canvasHeight - b)/a,  canvasHeight, 0));
         }
-        plan.push(new THREE.Vector3(xB, yB, 0.));
     };
 }();
 
@@ -96,35 +123,39 @@ function drawObjects() {
 
             var geometry = new THREE.SphereGeometry(1, 16, 16);
             const material = new THREE.MeshBasicMaterial({ color: 'red' });
-            var mesh = new THREE.InstancedMesh(geometry, material, objects.length);
+
+            var nbSpheres = 0;
+            objects.forEach((obj, index) => {
+                if (obj.type === "globule") {
+                    nbSpheres += 6;
+                }
+                else if (obj.type === "sphere" || obj.type === "superellipsoid") {
+                    nbSpheres += 1;
+                }
+            });
+            var mesh = new THREE.InstancedMesh(geometry, material, nbSpheres);
             scene.add(mesh);
             const plan = [];
-            const rot = []
+            const rot = [];
 
             const matrix = new THREE.Matrix4();
-            const quaternion = new THREE.Quaternion();
-            let center = new THREE.Vector3();
-            let vec = new THREE.Vector3();
+            nbSpheres = 0;
 
             objects.forEach((obj, index) => {
                 if (obj.type === "plan") {
                     planObject(obj, plan);
                 }
+                else if (obj.type === "globule") {
+                    obj.globule.forEach((sphere, indexSphere) => {
+                        sphereObject(sphere, matrix, rot);
+                        mesh.setMatrixAt(nbSpheres, matrix);
+                        nbSpheres += 1;
+                    });
+                }
                 else {
-                    sphereObject(obj, matrix, quaternion);
-                    mesh.setMatrixAt(index, matrix);
-
-                    center = new THREE.Vector3(obj.position[0], obj.position[1], 0.);
-                    rot.push(center);
-                    if (typeof obj.radius === "number") {
-                        vec = new THREE.Vector3(obj.radius, 0., 0.);
-                    }
-                    else {
-                        vec = new THREE.Vector3(obj.radius[0], 0., 0.);
-                    }
-                    vec.applyQuaternion(quaternion);
-                    vec.add(center);
-                    rot.push(vec);
+                    sphereObject(obj, matrix, rot);
+                    mesh.setMatrixAt(nbSpheres, matrix);
+                    nbSpheres += 1;
                 }
 
             });
