@@ -44,7 +44,7 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contact,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms, double dmin);
 
         template<std::size_t dim>
         void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts);
@@ -152,12 +152,12 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
+    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&, double dmin)
     {
         this->m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            this->m_distances[4*i] = contacts[i].dij;
+            this->m_distances[4*i] = contacts[i].dij + dmin;
         }
     }
 
