@@ -36,7 +36,7 @@ namespace scopi
 
     public:
         template <std::size_t dim>
-        void init_uzawa_impl(scopi_container<dim>& particles,
+        void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         void finalize_uzawa_impl();
@@ -68,9 +68,6 @@ namespace scopi
 
         sparse_matrix_t m_A;
         struct matrix_descr m_descrA;
-        std::vector<MKL_INT> m_A_coo_row;
-        std::vector<MKL_INT> m_A_coo_col;
-        std::vector<double> m_A_coo_val;
         sparse_matrix_t m_inv_P;
         struct matrix_descr m_descr_inv_P;
         sparse_status_t m_status;
@@ -79,7 +76,7 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    void OptimUzawaMkl<problem_t>::init_uzawa_impl(scopi_container<dim>& particles,
+    void OptimUzawaMkl<problem_t>::init_uzawa_impl(const scopi_container<dim>& particles,
                                                   const std::vector<scopi::neighbor<dim>>& contacts,
                                                   const std::vector<scopi::neighbor<dim>>& contacts_worms)
     {

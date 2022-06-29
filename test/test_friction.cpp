@@ -30,7 +30,7 @@ namespace scopi {
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
         OptimParams<solver_t> params;
-        params.m_problem_params.mu = mu;
+        params.problem_params.mu = mu;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
@@ -75,7 +75,7 @@ namespace scopi {
         }
 
         OptimParams<solver_t> params;
-        params.m_problem_params.mu = mu;
+        params.problem_params.mu = mu;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
@@ -117,7 +117,7 @@ namespace scopi {
         particles.push_back(s, prop.force({{0., -g}}));
 
         OptimParams<solver_t> params;
-        params.m_problem_params.mu = mu;
+        params.problem_params.mu = mu;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 

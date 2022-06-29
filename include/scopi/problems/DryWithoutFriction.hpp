@@ -28,7 +28,7 @@ namespace scopi
 
     protected:
         template <std::size_t dim>
-        void create_matrix_constraint_coo(scopi_container<dim>& particles,
+        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
@@ -61,7 +61,7 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void DryWithoutFriction::create_matrix_constraint_coo(scopi_container<dim>& particles,
+    void DryWithoutFriction::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                           const std::vector<neighbor<dim>>& contacts,
                                                           const std::vector<neighbor<dim>>& contacts_worms,
                                                           std::size_t firstCol)
@@ -137,11 +137,11 @@ namespace scopi
 
     template<std::size_t dim>
     void DryWithoutFriction::matrix_free_gemv_A(const neighbor<dim>& c,
-                                               const scopi_container<dim>& particles,
-                                               const xt::xtensor<double, 1>& U,
-                                               xt::xtensor<double, 1>& R,
-                                               std::size_t active_offset,
-                                               std::size_t row)
+                                                const scopi_container<dim>& particles,
+                                                const xt::xtensor<double, 1>& U,
+                                                xt::xtensor<double, 1>& R,
+                                                std::size_t active_offset,
+                                                std::size_t row)
     {
         if (c.i >= active_offset)
         {
@@ -188,11 +188,11 @@ namespace scopi
 
     template<std::size_t dim>
     void DryWithoutFriction::matrix_free_gemv_transpose_A(const neighbor<dim>& c,
-                                                         const scopi_container<dim>& particles,
-                                                         const xt::xtensor<double, 1>& L,
-                                                         xt::xtensor<double, 1>& U,
-                                                         std::size_t active_offset,
-                                                         std::size_t row)
+                                                          const scopi_container<dim>& particles,
+                                                          const xt::xtensor<double, 1>& L,
+                                                          xt::xtensor<double, 1>& U,
+                                                          std::size_t active_offset,
+                                                          std::size_t row)
     {
         if (c.i >= active_offset)
         {

@@ -10,6 +10,7 @@ set(SCOPI_EXAMPLES
    viscosity.cpp
    two_spheres_viscosity.cpp
    two_worms.cpp
+   convergence_scheme.cpp
 )
 
 include(generator)

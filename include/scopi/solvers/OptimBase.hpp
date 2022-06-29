@@ -18,7 +18,7 @@ namespace scopi{
         OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& params);
 
         template<std::size_t dim>
-        void run(scopi_container<dim>& particles,
+        void run(const scopi_container<dim>& particles,
                  const std::vector<neighbor<dim>>& contacts,
                  const std::vector<neighbor<dim>>& contacts_worms,
                  const std::size_t nite);
@@ -37,7 +37,7 @@ namespace scopi{
         template<std::size_t dim>
         void create_vector_c(const scopi_container<dim>& particles);
         template<std::size_t dim>
-        int solve_optimization_problem(scopi_container<dim>& particles,
+        int solve_optimization_problem(const scopi_container<dim>& particles,
                                        const std::vector<neighbor<dim>>& contacts,
                                        const std::vector<neighbor<dim>>& contacts_worms);
         int get_nb_active_contacts() const;
@@ -47,10 +47,10 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template<std::size_t dim>
-    void OptimBase<Derived, problem_t>::run(scopi_container<dim>& particles,
-                                 const std::vector<neighbor<dim>>& contacts,
-                                 const std::vector<neighbor<dim>>& contacts_worms,
-                                 const std::size_t)
+    void OptimBase<Derived, problem_t>::run(const scopi_container<dim>& particles,
+                                            const std::vector<neighbor<dim>>& contacts,
+                                            const std::vector<neighbor<dim>>& contacts_worms,
+                                            const std::size_t)
     {
         tic();
         create_vector_c(particles);
@@ -66,7 +66,7 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& params)
-    : problem_t(nparts, dt, params.m_problem_params)
+    : problem_t(nparts, dt, params.problem_params)
     , m_params(params)
     , m_nparts(nparts)
     , m_c(xt::zeros<double>({cSize}))
@@ -101,9 +101,9 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template<std::size_t dim>
-    int OptimBase<Derived, problem_t>::solve_optimization_problem(scopi_container<dim>& particles,
-                                                       const std::vector<neighbor<dim>>& contacts,
-                                                       const std::vector<neighbor<dim>>& contacts_worms)
+    int OptimBase<Derived, problem_t>::solve_optimization_problem(const scopi_container<dim>& particles,
+                                                                  const std::vector<neighbor<dim>>& contacts,
+                                                                  const std::vector<neighbor<dim>>& contacts_worms)
     {
         return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts, contacts_worms);
     }
