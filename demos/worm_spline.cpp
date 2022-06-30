@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <memory>
+#include <vector>
 #include <xtensor/xmath.hpp>
 #include <scopi/objects/types/worm.hpp>
 #include <scopi/solver.hpp>
@@ -68,29 +69,49 @@ int main()
         y2s[i] = y2s[i]*y2s[i+1] + u_i[i];
     }
 
-    std::vector<double> x(6);
+    std::size_t discretization_spline = 10;
+    std::vector<double> x(discretization_spline);
     for (std::size_t i = 0; i < x.size(); ++i)
     {
         x[i] = xs[0] + (i+1)*(xs[xs.size()-1] - xs[0])/(x.size()+1);
-        std::cout << x[i] << "   ";
     }
 
     auto k = searchsorted(xs, x);
 
-    std::vector<double> y(x.size());
-    for(std::size_t i = 0; i < y.size(); ++i)
+    std::vector<double> x_worm;
+    std::vector<double> y_worm;
+    double radius = 0.1;
+    double dist = 0.;
+    double x_prev = xs[0];
+    double y_prev = ys[0];
+    std::size_t nb_spheres = 0;
+    for(std::size_t i = 0; i < x.size(); ++i)
     {
         std::size_t khi = k[i];
         std::size_t klo = khi - 1;
         double step = xs[khi] - xs[klo];
         double x_right = (xs[khi] - x[i])/step;
         double x_left = (x[i] - xs[klo])/step;
-        y[i] = x_right*ys[klo] + x_left*ys[khi]+(
-                x_right*(x_right*x_right - 1)*y2s[klo]+
-                x_left*(x_left*x_left - 1)*y2s[khi])*step*step/6.;
+        double y = x_right*ys[klo] + x_left*ys[khi]+(
+                   x_right*(x_right*x_right - 1)*y2s[klo]+
+                   x_left*(x_left*x_left - 1)*y2s[khi])*step*step/6.;
+        dist += std::sqrt((x[i]-x_prev)*(x[i]-x_prev) + (y-y_prev)*(y-y_prev));
+        if (dist > (nb_spheres+1)*radius)
+        {
+            x_worm.push_back(x[i]);
+            y_worm.push_back(y);
+            nb_spheres++;
+        }
+        x_prev = x[i];
+        y_prev = y;
     }
-    std::cout << std::endl;
 
+    for (std::size_t i = 0; i < x_worm.size(); ++i)
+    {
+        std::cout << x_worm[i] << "  " << y_worm[i] << std::endl;
+    }
+
+    /*
     double dist2 = (xs[0] - xs[xs.size()-1])*(xs[0] - xs[xs.size()-1]) + (ys[0] - ys[ys.size()-1])*(ys[0] - ys[ys.size()-1]);
     scopi::worm<dim> g({{x[0], y[0]}, {x[1], y[1]}, {x[2], y[2]}, {x[3], y[3]}, {x[4], y[4]}, {x[5], y[5]}},
             {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
@@ -103,6 +124,7 @@ int main()
     params.change_default_tol_mosek = false;
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::contact_kdtree> solver(particles, dt, params);
     solver.solve(total_it);
+    */
 
     return 0;
 }
