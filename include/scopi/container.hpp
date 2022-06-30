@@ -74,6 +74,17 @@ namespace scopi
         std::size_t nb_active() const;
         std::size_t nb_inactive() const;
 
+        /**
+         * \brief Get the index of the object from the index of a base object.
+         * \param i index of a base type (sphere, superellipsoid or plan).
+         * \return index of the object (sphere, superellipsoid, plan, or worm). 
+         *
+         * 0 <= i < this->pos().size()
+         * 0 <= retuned index < this->size()
+         *
+         * For example, consider a container with two worms of size 6.
+         * If 0 <= i < 6, returns 0, else returns 1.
+         */
         std::size_t object_index(std::size_t i) const;
         std::size_t offset(std::size_t i) const;
 

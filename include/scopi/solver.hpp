@@ -119,18 +119,21 @@ namespace scopi
             m_vap.set_a_priori_velocity(m_particles);
             this->extra_setps_before_solve(contacts);
 
-            double s = 1.;
-            double s_old = 2.;
+            xt::xtensor<double, 1> s = xt::ones<double>({contacts.size()});
+            xt::xtensor<double, 1> s_old = 2.*xt::ones<double>({contacts.size()});
+            // auto s = xt::ones<double>({contacts.size()});
+            // auto s_old = 2.*xt::ones<double>({contacts.size()});
             std::size_t nb_iter = 0;
-            while (std::abs(s_old - s)/(std::abs(s)+1.) > 1e-3 && nb_iter < 10)
+            while (xt::linalg::norm(s_old - s)/(xt::linalg::norm(s)+1.) > 0.01 && nb_iter < 20)
             {
                 this->run(m_particles, contacts, contacts_worms, nite, m_mu*m_dt*s);
                 s_old = s;
-                s = xt::linalg::norm(this->get_vector_solution(), 2);
-                // std::cout << "s = " << s << "  critère d'arret = " << (std::abs(s_old - s)/(std::abs(s)+1.) ) << std::endl;
+                // std::cout << "solver" << std::endl;
+                // std::cout << this->get_constraint(contacts) << std::endl;
+                s = this->extra_setps_after_solve(contacts, this->get_constraint(contacts));
                 nb_iter++;
             }
-            this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms));
+            // this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms));
             move_active_particles();
             m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
         }
