@@ -22,6 +22,7 @@ int main()
     double h = 2.*radius;
     auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
     scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFriction>> params;
+    params.change_default_tol_mosek = false;
 
     std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001});
     std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000});
@@ -40,7 +41,7 @@ int main()
                 particles.push_back(p, scopi::property<dim>().deactivate());
                 particles.push_back(s, prop.force({{0., -g}}));
 
-                params.m_problem_params.m_mu = mu;
+                params.problem_params.mu = mu;
                 scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i], params);
                 solver.solve(total_it[i]);
 

@@ -56,7 +56,7 @@ namespace scopi
             double t2 = (t - t_impact );
             if(std::tan(alpha) <= 3*mu)
             {
-                v_normal = 2.*g*std::sin(alpha)*t2*t2/3. + 2.*v_t_m/3.;
+                v_normal = 2.*g*std::sin(alpha)*t2/3. + 2.*v_t_m/3.;
                 omega = -2.*g*std::sin(alpha)*t2/(3.*r) - 2*v_t_m/(3.*r);
             }
             else
