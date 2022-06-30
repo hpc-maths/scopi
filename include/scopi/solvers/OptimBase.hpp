@@ -22,11 +22,12 @@ namespace scopi{
                  const std::vector<neighbor<dim>>& contacts,
                  const std::vector<neighbor<dim>>& contacts_worms,
                  const std::size_t nite,
-                 double dmin);
+                 const xt::xtensor<double, 1>& dmin);
 
         auto get_uadapt();
         auto get_wadapt();
-        auto get_vector_solution();
+        template<std::size_t dim>
+        auto get_constraint(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
         auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
@@ -49,11 +50,11 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template<std::size_t dim>
-    void OptimBase<Derived, problem_t>::run(scopi_container<dim>& particles,
-                                 const std::vector<neighbor<dim>>& contacts,
-                                 const std::vector<neighbor<dim>>& contacts_worms,
-                                 const std::size_t,
-                                 double dmin)
+    void OptimBase<Derived, problem_t>::run(const scopi_container<dim>& particles,
+                                            const std::vector<neighbor<dim>>& contacts,
+                                            const std::vector<neighbor<dim>>& contacts_worms,
+                                            const std::size_t,
+                                            const xt::xtensor<double, 1>& dmin)
     {
         tic();
         create_vector_c(particles);
@@ -126,10 +127,17 @@ namespace scopi{
     }
 
     template<class Derived, class problem_t>
-    auto OptimBase<Derived, problem_t>::get_vector_solution()
+    template<std::size_t dim>
+    auto OptimBase<Derived, problem_t>::get_constraint(const std::vector<neighbor<dim>>& contacts)
     {
-        auto data = static_cast<Derived&>(*this).vector_solution_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 6UL});
+        auto data = static_cast<Derived&>(*this).constraint_data();
+        std::cout << "get_constraint   " << data[0] << std::endl;
+        std::cout << data << std::endl;
+        std::cout << &(data[0]) << std::endl;
+        // std::cout << "get_constraint  " << &data[0] << "  " << data[0] << std::endl;
+        // std::cout << data[0] << "  "<< data[1] << "  "<< data[2] << "  "<< data[3] << "  " << std::endl;
+        // std::cout << xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL}) << std::endl;
+        return xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
     }
 
     template<class Derived, class problem_t>
