@@ -1,5 +1,6 @@
 #pragma once
 
+#include <new>
 #ifdef SCOPI_USE_MOSEK
 #include "OptimBase.hpp"
 #include "../problems/DryWithoutFriction.hpp"
@@ -64,6 +65,7 @@ namespace scopi{
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
         ConstraintMosek<problem_t> m_constraint;
          std::shared_ptr<monty::ndarray<double, 1>> m_D_mosek;
+         std::shared_ptr<monty::ndarray<double, 1>> m_result_gemv; 
     };
 
     template<class problem_t>
@@ -196,12 +198,9 @@ namespace scopi{
     {
         using namespace monty;
         auto u = std::make_shared<monty::ndarray<double, 1>>(m_Xlvl->raw()+1, shape_t<1>(m_A->numColumns()));
-        auto y = std::make_shared<monty::ndarray<double, 1>>(m_D_mosek->raw(), shape_t<1>(m_A->numRows()));
-        mosek::LinAlg::gemv(false, m_A->numRows(), m_A->numColumns(), -1., m_A->transpose()->getDataAsArray(), u, 1.,  y);
-        std::cout << "constraint_data   " << y->raw()[0] << std::endl;
-        std::cout << y->raw() << std::endl;
-        std::cout << &(y->raw()[0]) << std::endl;
-        return y->raw();
+        m_result_gemv = std::make_shared<monty::ndarray<double, 1>>(m_D_mosek->raw(), shape_t<1>(m_A->numRows()));
+        mosek::LinAlg::gemv(false, m_A->numRows(), m_A->numColumns(), -1., m_A->transpose()->getDataAsArray(), u, 1.,  m_result_gemv);
+        return m_result_gemv->raw();
     }
 
     template<class problem_t>
