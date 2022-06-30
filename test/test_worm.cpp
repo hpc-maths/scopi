@@ -27,7 +27,7 @@ namespace scopi
         static constexpr std::size_t dim = 2;
         worm<dim> g({{2., 0.7}, {4., 0.7}, {6., 0.7}, {8., 0.7}, {10., 0.7}, {12., 0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
-                1.);
+                1., 6);
         property<dim> p(property<dim>().desired_velocity({{0.25, 0}}));
 
         scopi_container<dim> particles;
@@ -157,7 +157,7 @@ namespace scopi
         static constexpr std::size_t dim = 2;
         const worm<dim> g({{2., 0.7}, {4., 0.7}, {6., 0.7}, {8., 0.7}, {10., 0.7}, {12., 0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
-                1.);
+                1., 6);
         const property<dim> p(property<dim>().desired_velocity({{0.25, 0}}));
 
         scopi_container<dim> particles;
@@ -287,7 +287,7 @@ namespace scopi
         static constexpr std::size_t dim = 3;
         worm<dim> g({{2., 0.7, 0.2}, {4., 0.7, 0.2}, {6., 0.7, 0.2}, {8., 0.7, 0.2}, {10., 0.7, 0.2}, {12., 0.7, 0.2}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
-                1.);
+                1., 6);
         property<dim> p(property<dim>().desired_velocity({{0.25, 0, 0}}));
         scopi_container<dim> particles;
         particles.push_back(g, p);
@@ -362,7 +362,7 @@ namespace scopi
         static constexpr std::size_t dim = 3;
         const worm<dim> g({{2., 0.7, 0.2}, {4., 0.7, 0.2}, {6., 0.7, 0.2}, {8., 0.7, 0.2}, {10., 0.7, 0.2}, {12., 0.7, 0.2}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
-                1.);
+                1., 6);
         const property<dim> p(property<dim>().desired_velocity({{0.25, 0, 0}}));
         scopi_container<dim> particles;
         particles.push_back(g, p);
@@ -444,14 +444,15 @@ namespace scopi
 
         worm<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
-                1.);
+                1., 6);
         worm<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
                 {{quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}, {quaternion(0.)}},
-                1.);
+                1., 6);
         particles.push_back(g1, prop.desired_velocity({-1., 0.}));
         particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
         OptimParams<solver_t> params;
+        set_params_test(params);
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 

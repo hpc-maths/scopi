@@ -18,15 +18,15 @@ int main()
 
     scopi::worm<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
             {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
-            1.);
+            1., 6);
     scopi::worm<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
             {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
-            1.);
+            1., 6);
     particles.push_back(g1, prop.desired_velocity({-1., 0.}));
     particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
     scopi::OptimParams<scopi::OptimMosek<scopi::DryWithoutFriction>> params;
-    params.m_change_default_tol_mosek = false;
+    params.change_default_tol_mosek = false;
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::contact_kdtree> solver(particles, dt, params);
     solver.solve(total_it);
 
