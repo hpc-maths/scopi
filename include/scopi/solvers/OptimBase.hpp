@@ -131,12 +131,6 @@ namespace scopi{
     auto OptimBase<Derived, problem_t>::get_constraint(const std::vector<neighbor<dim>>& contacts)
     {
         auto data = static_cast<Derived&>(*this).constraint_data();
-        std::cout << "get_constraint   " << data[0] << std::endl;
-        std::cout << data << std::endl;
-        std::cout << &(data[0]) << std::endl;
-        // std::cout << "get_constraint  " << &data[0] << "  " << data[0] << std::endl;
-        // std::cout << data[0] << "  "<< data[1] << "  "<< data[2] << "  "<< data[3] << "  " << std::endl;
-        // std::cout << xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL}) << std::endl;
         return xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
     }
 

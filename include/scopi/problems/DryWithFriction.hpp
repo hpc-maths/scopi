@@ -52,7 +52,7 @@ namespace scopi
         void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
         xt::xtensor<double, 1> extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                       xt::xtensor<double, 1> u_tilde);
+                                                       const xt::xtensor<double, 2>& u_tilde);
 
     private:
         ProblemParams<DryWithFriction> m_params;
@@ -169,22 +169,12 @@ namespace scopi
 
     template<std::size_t dim>
     xt::xtensor<double, 1> DryWithFriction::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                                    xt::xtensor<double, 1> u_tilde)
+                                                                    const xt::xtensor<double, 2>& u_tilde)
     {
-        // std::cout << "extra_setps_after_solve" << std::endl;
-        // std::cout << u_tilde << std::endl;
-        // std::vector<std::size_t> shape({contacts.size(), 3UL});
-        // auto u = xt::adapt(u_tilde, shape);
-        // std::cout << u_tilde << std::endl;
-        // u_tilde.reshape({contacts.size(), 3UL});
         xt::xtensor<double, 1> norms = xt::zeros<double>({contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            auto tmp = xt::view(u_tilde, xt::range(4*i+1, 4*i+3)) + u_tilde(4*i)*contacts[i].nij;
-            norms(i) = xt::linalg::norm(tmp, 2);
-            std::cout << "norm = " << norms(i) << std::endl;
-            // std::cout << (xt::view(u_tilde, i, xt::all())) << std::endl;
-            // norms(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::all()));
+            norms(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::all()));
         }
         return norms;
     }
