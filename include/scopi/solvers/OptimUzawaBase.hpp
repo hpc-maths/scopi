@@ -45,6 +45,7 @@ namespace scopi{
         auto uadapt_data();
         auto wadapt_data();
         auto lagrange_multiplier_data();
+        double* constraint_data();
 
         int get_nb_active_contacts_impl() const;
 
@@ -186,6 +187,12 @@ namespace scopi{
     auto OptimUzawaBase<Derived, problem_t>::lagrange_multiplier_data()
     {
         return m_L.data();
+    }
+
+    template<class Derived, class problem_t>
+    double* OptimUzawaBase<Derived, problem_t>::constraint_data()
+    {
+        return NULL;
     }
 
     template<class Derived, class problem_t>

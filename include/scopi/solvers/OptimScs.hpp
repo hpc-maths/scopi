@@ -41,6 +41,7 @@ namespace scopi
         double* uadapt_data();
         double* wadapt_data();
         double* lagrange_multiplier_data();
+        double* constraint_data();
         int get_nb_active_contacts_impl() const;
 
     private:
@@ -190,6 +191,12 @@ namespace scopi
     double* OptimScs<problem_t>::lagrange_multiplier_data()
     {
         return m_sol.y;
+    }
+
+    template<class problem_t>
+    double* OptimScs<problem_t>::constraint_data()
+    {
+        return NULL;
     }
 
     template <class problem_t>

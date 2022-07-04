@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cmath>
+#include <cstddef>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
+#include <vector>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xfixed.hpp>
 
@@ -16,24 +18,23 @@
 
 namespace scopi
 {
-    std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0);
-    std::pair<type::position_t<2>, double> analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0);
-
-    class DryWithFriction;
+    class DryWithFrictionFixedPoint;
 
     template<>
-    struct ProblemParams<DryWithFriction>
+    struct ProblemParams<DryWithFrictionFixedPoint>
     {
         ProblemParams();
-        ProblemParams(const ProblemParams<DryWithFriction>& params);
+        ProblemParams(const ProblemParams<DryWithFrictionFixedPoint>& params);
 
         double mu;
+        double tol_fixed_point;
+        std::size_t max_iter_fixed_point;
     };
 
-    class DryWithFriction : protected ProblemBase
+    class DryWithFrictionFixedPoint : protected ProblemBase
     {
     protected:
-        DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
+        DryWithFrictionFixedPoint(std::size_t nparticles, double dt, const ProblemParams<DryWithFrictionFixedPoint>& problem_params);
 
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
@@ -55,14 +56,17 @@ namespace scopi
         bool should_solve_optimization_problem();
 
     private:
-        ProblemParams<DryWithFriction> m_params;
+        ProblemParams<DryWithFrictionFixedPoint> m_params;
+        xt::xtensor<double, 1> m_s;
+        xt::xtensor<double, 1> m_s_old;
+        std::size_t m_nb_iter;
     };
 
     template<std::size_t dim>
-    void DryWithFriction::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                              const std::vector<neighbor<dim>>& contacts,
-                                                              const std::vector<neighbor<dim>>& contacts_worms,
-                                                              std::size_t firstCol)
+    void DryWithFrictionFixedPoint::create_matrix_constraint_coo(const scopi_container<dim>& particles,
+                                                                 const std::vector<neighbor<dim>>& contacts,
+                                                                 const std::vector<neighbor<dim>>& contacts_worms,
+                                                                 std::size_t firstCol)
     {
         std::size_t index = matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 4);
         std::size_t active_offset = particles.nb_inactive();
@@ -147,34 +151,42 @@ namespace scopi
     }
 
     template <std::size_t dim>
-    std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                                   const std::vector<neighbor<dim>>&)
+    std::size_t DryWithFrictionFixedPoint::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
+                                                             const std::vector<neighbor<dim>>&)
     {
         return 4*contacts.size();
     }
 
     template<std::size_t dim>
-    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
+    void DryWithFrictionFixedPoint::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
     {
         this->m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            this->m_distances[4*i] = contacts[i].dij;
+            this->m_distances[4*i] = contacts[i].dij + m_params.mu*this->m_dt*m_s(i);
         }
     }
 
     template<std::size_t dim>
-    void DryWithFriction::extra_setps_before_solve(const std::vector<neighbor<dim>>&)
+    void DryWithFrictionFixedPoint::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts)
     {
-        this->m_should_solve = true;
+        m_nb_iter = 0;
+        m_s = xt::ones<double>({contacts.size()});
+        m_s_old = 2.*xt::ones<double>({contacts.size()});
     }
 
     template<std::size_t dim>
-    void DryWithFriction::extra_setps_after_solve(const std::vector<neighbor<dim>>&,
-                                                  const xt::xtensor<double, 1>&,
-                                                  const xt::xtensor<double, 2>&)
+    void DryWithFrictionFixedPoint::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                                            const xt::xtensor<double, 1>&,
+                                                            const xt::xtensor<double, 2>& u_tilde)
     {
-        this->m_should_solve = false;
+        m_nb_iter++;
+        m_s_old = m_s;
+        // TODO use xtensor functions to avoid loop
+        for (std::size_t i = 0; i < contacts.size(); ++i)
+        {
+            m_s(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _)));
+        }
     }
   
 }

@@ -47,6 +47,7 @@ namespace scopi
         std::vector<int> m_A_cols;
         std::vector<double> m_A_values;
         xt::xtensor<double, 1> m_distances;
+        bool m_should_solve;
     };
 
     template<std::size_t dim>
@@ -135,4 +136,5 @@ namespace scopi
         }
         return index;
     }
+
 }

@@ -82,4 +82,9 @@ namespace scopi
     , m_params(problem_params)
     {}
 
+    bool DryWithFriction::should_solve_optimization_problem()
+    {
+        return this->m_should_solve;
+    }
+
 }
