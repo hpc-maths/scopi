@@ -122,13 +122,14 @@ namespace scopi
             xt::xtensor<double, 1> s = xt::ones<double>({contacts.size()});
             xt::xtensor<double, 1> s_old = 2.*xt::ones<double>({contacts.size()});
             std::size_t nb_iter = 0;
-            while (xt::linalg::norm(s_old - s)/(xt::linalg::norm(s)+1.) > 0.01 && nb_iter < 20)
+            while (xt::linalg::norm(s_old - s)/(xt::linalg::norm(s)+1.) > 1e-3 && nb_iter < 20)
             {
                 this->run(m_particles, contacts, contacts_worms, nite, m_mu*m_dt*s);
                 s_old = s;
                 s = this->extra_setps_after_solve(contacts, this->get_constraint(contacts));
                 nb_iter++;
             }
+            std::cout << nb_iter << std::endl;
             // this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms));
             move_active_particles();
             m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
