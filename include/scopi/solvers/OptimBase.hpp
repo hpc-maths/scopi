@@ -21,13 +21,12 @@ namespace scopi{
         void run(const scopi_container<dim>& particles,
                  const std::vector<neighbor<dim>>& contacts,
                  const std::vector<neighbor<dim>>& contacts_worms,
-                 const std::size_t nite,
-                 const xt::xtensor<double, 1>& dmin);
+                 const std::size_t nite);
 
         auto get_uadapt();
         auto get_wadapt();
         template<std::size_t dim>
-        auto get_constraint(const std::vector<neighbor<dim>>& contacts);
+        xt::xtensor<double, 2> get_constraint(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
         auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
@@ -53,12 +52,11 @@ namespace scopi{
     void OptimBase<Derived, problem_t>::run(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms,
-                                            const std::size_t,
-                                            const xt::xtensor<double, 1>& dmin)
+                                            const std::size_t)
     {
         tic();
         create_vector_c(particles);
-        this->create_vector_distances(contacts, contacts_worms, dmin);
+        this->create_vector_distances(contacts, contacts_worms);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
@@ -128,10 +126,13 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template<std::size_t dim>
-    auto OptimBase<Derived, problem_t>::get_constraint(const std::vector<neighbor<dim>>& contacts)
+    xt::xtensor<double, 2> OptimBase<Derived, problem_t>::get_constraint(const std::vector<neighbor<dim>>& contacts)
     {
         auto data = static_cast<Derived&>(*this).constraint_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
+        if (data)
+            return xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
+        else
+            return xt::xtensor<double, 2>{};
     }
 
     template<class Derived, class problem_t>

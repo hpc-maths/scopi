@@ -64,7 +64,6 @@ namespace scopi
         scopi_container<dim>& m_particles;
         double m_dt;
         vap_t m_vap;
-        double m_mu;
     };
 
     /*
@@ -93,7 +92,6 @@ namespace scopi
     , m_particles(particles)
     , m_dt(dt)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
-    , m_mu(optim_params.problem_params.mu)
     {}
 
     /*
@@ -118,19 +116,12 @@ namespace scopi
             write_output_files(contacts, nite);
             m_vap.set_a_priori_velocity(m_particles);
             this->extra_setps_before_solve(contacts);
-
-            xt::xtensor<double, 1> s = xt::ones<double>({contacts.size()});
-            xt::xtensor<double, 1> s_old = 2.*xt::ones<double>({contacts.size()});
-            std::size_t nb_iter = 0;
-            while (xt::linalg::norm(s_old - s)/(xt::linalg::norm(s)+1.) > 1e-3 && nb_iter < 20)
+            while (this->should_solve_optimization_problem())
             {
-                this->run(m_particles, contacts, contacts_worms, nite, m_mu*m_dt*s);
-                s_old = s;
-                s = this->extra_setps_after_solve(contacts, this->get_constraint(contacts));
-                nb_iter++;
+                this->run(m_particles, contacts, contacts_worms, nite);
+                // TODO get_constraint computes a matrix-vector product, do it only if needed
+                this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
             }
-            std::cout << nb_iter << std::endl;
-            // this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms));
             move_active_particles();
             m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
         }

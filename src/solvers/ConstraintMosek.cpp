@@ -49,5 +49,29 @@ namespace scopi
         m_dual = m_qc1->dual();
     }
 
+
+
+
+
+    ConstraintMosek<DryWithFrictionFixedPoint>::ConstraintMosek(std::size_t nparticles)
+    : m_nparticles(nparticles)
+    {}
+
+    std::size_t ConstraintMosek<DryWithFrictionFixedPoint>::index_first_col_matrix() const
+    {
+        return 0;
+    }
+
+    std::size_t ConstraintMosek<DryWithFrictionFixedPoint>::number_col_matrix() const
+    {
+        return 6*m_nparticles;
+    }
+
+    void ConstraintMosek<DryWithFrictionFixedPoint>::update_dual(std::size_t,
+                                                                 std::size_t)
+    {
+        m_dual = m_qc1->dual();
+    }
+
 }
 #endif
