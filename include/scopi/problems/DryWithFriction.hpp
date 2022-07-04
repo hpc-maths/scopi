@@ -174,7 +174,7 @@ namespace scopi
         xt::xtensor<double, 1> norms = xt::zeros<double>({contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            norms(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::all()));
+            norms(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _)));
         }
         return norms;
     }
