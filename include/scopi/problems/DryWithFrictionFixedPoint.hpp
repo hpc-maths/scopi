@@ -185,7 +185,7 @@ namespace scopi
         // TODO use xtensor functions to avoid loop
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            m_s(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _)));
+            m_s(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _)))/(this->m_dt*m_params.mu);
         }
     }
   
