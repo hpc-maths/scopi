@@ -20,7 +20,7 @@ int main()
     double width_box = 10.;
     double g = 1.;
 
-    auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
+    auto prop = scopi::property<dim>().mass(mass).moment_inertia({mass*radius*radius/2., mass*radius*radius/2., mass*radius*radius/2.});
     scopi::OptimParams<scopi::OptimMosek<>> params;
     params.change_default_tol_mosek = false;
 
@@ -28,14 +28,14 @@ int main()
     std::size_t total_it = 1;
 
     scopi::scopi_container<dim> particles;
-    scopi::plan<dim> p_left({{0., 0.}}, 0.);
-    scopi::plan<dim> p_right({{width_box, 0.}}, 0.);
-    scopi::plan<dim> p_horizontal({{0., 0.}}, PI/2.);
+    scopi::plan<dim> p_left({{0., 0., 0.}}, 0.);
+    scopi::plan<dim> p_right({{width_box, 0., 0.}}, 0.);
+    scopi::plan<dim> p_horizontal({{0., 0., 0.}}, PI/2.);
     particles.push_back(p_left, scopi::property<dim>().deactivate());
     particles.push_back(p_right, scopi::property<dim>().deactivate());
     particles.push_back(p_horizontal, scopi::property<dim>().deactivate());
 
-    scopi::sphere<dim> s({{5., 5.}}, 1.);
+    scopi::sphere<dim> s({{5., 5., 0.}}, 1.);
     particles.push_back(s, prop.force({{0., -g}}));
 
     scopi::ScopiSolver<dim, scopi::OptimMosek<>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
