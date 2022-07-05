@@ -56,7 +56,12 @@ const sphereObject = function () {
         }
         else {
             position.z = obj.position[2];
-            scale.z = obj.radius[2];
+            if (typeof obj.radius === "number") {
+                scale.z = obj.radius;
+            }
+            else {
+                scale.z = obj.radius[2];
+            }
         }
         quaternion.x = obj.quaternion[1];
         quaternion.y = obj.quaternion[2];
