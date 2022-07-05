@@ -94,9 +94,10 @@ namespace scopi{
                 m_c(mass_dec + 3*i + d) = -particles.m()(active_offset + i)*desired_velocity(i + active_offset)[d];
             }
             auto omega = get_omega(desired_omega(i + active_offset));
+            auto j = get_omega(particles.j()(active_offset+i));
             for (std::size_t d = 0; d < 3; ++d)
             {
-                m_c(moment_dec + 3*i + d) = -particles.j()(active_offset + i)*omega(d);
+                m_c(moment_dec + 3*i + d) = -j(d)*omega(d);
             }
         }
     }
