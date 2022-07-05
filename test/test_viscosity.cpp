@@ -70,6 +70,7 @@ namespace scopi {
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity.json", tolerance));
     }
 
+    /*
     TEST_CASE_TEMPLATE("sphere plan viscosity friction vertical", SolverType, SOLVER_VISCOUS_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
         using solver_t = typename SolverType::solver_type;
@@ -127,5 +128,6 @@ namespace scopi {
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction.json", tolerance));
     }
+    */
 
 }
