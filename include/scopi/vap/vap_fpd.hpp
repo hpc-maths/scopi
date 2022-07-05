@@ -17,6 +17,10 @@ namespace scopi
 
         vap_fpd(std::size_t Nactive, std::size_t active_ptr, double dt);
 
+    private:
+        template <std::size_t dim>
+        void update_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
+
     };
 
     type::moment_t<2> cross_product_vap_fpd(scopi_container<2>& particles, std::size_t i);
@@ -42,7 +46,7 @@ namespace scopi
             {
                 particles.v()(i + m_active_ptr)(d) = uadapt(i, d);
             }
-            particles.omega()(i + m_active_ptr) = wadapt(i, 2);
+            update_omega(particles, i, wadapt);
         }
     }
 
