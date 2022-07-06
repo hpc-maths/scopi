@@ -22,7 +22,7 @@ namespace scopi{
         double m_rho;
         double m_tol_dg;
         double m_tol_l;
-        bool m_verbose,
+        bool m_verbose;
 
         sparse_status_t m_status;
         xt::xtensor<double, 1> m_dg;
