@@ -91,6 +91,7 @@ namespace scopi{
         auto uadapt_data();
         auto wadapt_data();
         auto lagrange_multiplier_data();
+        double* constraint_data();
         int get_nb_active_contacts_impl() const;
 
     private:
@@ -222,6 +223,12 @@ namespace scopi{
     auto OptimProjectedGradient<problem_t, gradient_t>::lagrange_multiplier_data()
     {
         return m_l.data();
+    }
+
+    template<class problem_t, class gradient_t>
+    double* OptimProjectedGradient<problem_t, gradient_t>::constraint_data()
+    {
+        return NULL;
     }
 
     template<class problem_t, class gradient_t>
