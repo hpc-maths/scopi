@@ -177,22 +177,37 @@ namespace scopi{
                                                                                                const std::vector<neighbor<dim>>& contacts,
                                                                                                const std::vector<neighbor<dim>>& contacts_worms)
     {
+        double time_vector_operations = 0.;
+        double time_mat_mat_operations = 0.;
+        double time_projection = 0.;
+
+        tic();
         xt::noalias(m_l) = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
         // u = P^{-1}*c = vap
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_c.data(), 0., m_u.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for u = P^{-1}*c: " << m_status;
+        double time_vector_operations = toc();
 
         create_matrix_B(particles, contacts, contacts_worms);
+        tic();
         create_matrix_A();
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : projected gradient : A = B^T*M^-1*B = " << duration;
 
         // e = -B*u+distances
+        tic();
         xt::noalias(m_e) = this->m_distances;
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_B, m_descrB, m_u.data(), 1., m_e.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for e = B*u+d: " << m_status;
+        time_vector_operations += toc();
 
+        tic();
         std::size_t nb_iter = this->projection(m_A, m_descrA, m_e, m_l);
+        duration = toc();
+        PLOG_INFO << "----> CPUTIME : projected gradient : projection = " << duration;
 
         // u = u - P^{-1}*B^T*l
+        tic();
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_TRANSPOSE, 1., m_B, m_descrB, m_l.data(), 0., m_bl.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for bl = B^T*l: " << m_status;
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, m_bl.data(), 1., m_u.data());
@@ -202,6 +217,8 @@ namespace scopi{
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix B: " << m_status;
         m_status = mkl_sparse_destroy ( m_A );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix A: " << m_status;
+        time_vector_operations += toc();
+        PLOG_INFO << "----> CPUTIME : projected gradient : vectors operations = " << time_vector_operations;
 
         return nb_iter;
     }
@@ -239,7 +256,12 @@ namespace scopi{
         m_descrB.type = SPARSE_MATRIX_TYPE_GENERAL;
         sparse_matrix_t B_coo;
 
+        tic();
         this->create_matrix_constraint_coo(particles, contacts, contacts_worms, 0UL);
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : projected gradient : create_matrix_B : create_matrix_constraint_coo = " << duration;
+
+        tic();
         m_status =  mkl_sparse_d_create_coo(&B_coo,
                                            SPARSE_INDEX_BASE_ZERO,
                                            this->number_row_matrix(contacts, contacts_worms), // number of rows
@@ -249,11 +271,19 @@ namespace scopi{
                                            this->m_A_cols.data(),
                                            this->m_A_values.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_create_coo for matrix B: " << m_status;
+        duration = toc();
+        PLOG_INFO << "----> CPUTIME : projected gradient : create_matrix_B : mkl_sparse_d_create_coo = " << duration;
+
+        tic();
         m_status = mkl_sparse_convert_csr(B_coo, SPARSE_OPERATION_NON_TRANSPOSE, &m_B);
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_convert_csr for matrix B: " << m_status;
         m_status = mkl_sparse_destroy ( B_coo );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix B_coo: " << m_status;
         m_status = mkl_sparse_order(m_B);
+        duration = toc();
+        PLOG_INFO << "----> CPUTIME : projected gradient : create_matrix_B : mkl_sparse_convert_csr = " << duration;
+
+        tic();
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_order for matrix B: " << m_status;
         m_status = mkl_sparse_set_mv_hint(m_B, SPARSE_OPERATION_NON_TRANSPOSE, m_descrB, 1 );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix B SPARSE_OPERATION_NON_TRANSPOSE: " << m_status;
@@ -261,6 +291,8 @@ namespace scopi{
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS && m_status != SPARSE_STATUS_NOT_SUPPORTED) << "Error in mkl_sparse_set_mv_hint for matrix B SPARSE_OPERATION_TRANSPOSE: " << m_status;
         m_status = mkl_sparse_optimize ( m_B );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix B: " << m_status;
+        duration = toc();
+        PLOG_INFO << "----> CPUTIME : projected gradient : create_matrix_B : mkl_sparse_optimize = " << duration;
     }
 
     template <class problem_t, class gradient_t>
