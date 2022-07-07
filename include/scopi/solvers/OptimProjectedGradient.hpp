@@ -178,10 +178,6 @@ namespace scopi{
                                                                                                const std::vector<neighbor<dim>>& contacts,
                                                                                                const std::vector<neighbor<dim>>& contacts_worms)
     {
-        double time_vector_operations = 0.;
-        double time_mat_mat_operations = 0.;
-        double time_projection = 0.;
-
         tic();
         xt::noalias(m_l) = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
         // u = P^{-1}*c = vap
@@ -287,6 +283,7 @@ namespace scopi{
         m_status = mkl_sparse_destroy ( B_coo );
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_destroy for matrix B_coo: " << m_status;
         m_status = mkl_sparse_order(m_B);
+        PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_order for matrix B: " << m_status;
         duration = toc();
         PLOG_INFO << "----> CPUTIME : projected gradient : create_matrix_B : mkl_sparse_convert_csr = " << duration;
 
