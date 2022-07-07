@@ -134,6 +134,9 @@ namespace scopi
 
             ++ic;
         }
+        this->m_A_values.resize(index);
+        this->m_A_cols.resize(index);
+        this->m_A_rows.resize(index);
         return index;
     }
 
