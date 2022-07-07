@@ -13,7 +13,7 @@ set(SCOPI_EXAMPLES
    convergence_scheme.cpp
    worm_spline.cpp
    worms.cpp
-   box_spheres_3d
+   box_spheres_3d.cpp
 )
 
 include(generator)
