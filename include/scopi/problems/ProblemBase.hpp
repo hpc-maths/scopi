@@ -24,11 +24,11 @@ namespace scopi
                                     std::size_t row);
 
         template<std::size_t dim>
-        std::size_t matrix_positive_distance(const scopi_container<dim>& particles,
-                                             const std::vector<neighbor<dim>>& contacts,
-                                             std::size_t firstCol,
-                                             std::size_t nb_row,
-                                             std::size_t nb_row_per_contact);
+        void matrix_positive_distance(const scopi_container<dim>& particles,
+                                      const std::vector<neighbor<dim>>& contacts,
+                                      std::size_t firstCol,
+                                      std::size_t nb_row,
+                                      std::size_t nb_row_per_contact);
 
     private:
         void matrix_free_gemv_inv_P_moment(const scopi_container<2>& particles,
@@ -64,29 +64,27 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t ProblemBase::matrix_positive_distance(const scopi_container<dim>& particles,
-                                                      const std::vector<neighbor<dim>>& contacts,
-                                                      std::size_t firstCol,
-                                                      std::size_t nb_row,
-                                                      std::size_t nb_row_per_contact)
+    void ProblemBase::matrix_positive_distance(const scopi_container<dim>& particles,
+                                               const std::vector<neighbor<dim>>& contacts,
+                                               std::size_t firstCol,
+                                               std::size_t nb_row,
+                                               std::size_t nb_row_per_contact)
     {
         std::size_t active_offset = particles.nb_inactive();
-        this->m_A_rows.resize(12*nb_row);
-        this->m_A_cols.resize(12*nb_row);
-        this->m_A_values.resize(12*nb_row);
+        this->m_A_rows.reserve(12*nb_row);
+        this->m_A_cols.reserve(12*nb_row);
+        this->m_A_values.reserve(12*nb_row);
 
         std::size_t ic = 0;
-        std::size_t index = 0;
         for (auto &c: contacts)
         {
             if (c.i >= active_offset)
             {
                 for (std::size_t d = 0; d < 3; ++d)
                 {
-                    this->m_A_rows[index] = nb_row_per_contact*ic;
-                    this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
-                    this->m_A_values[index] = -this->m_dt*c.nij[d];
-                    index++;
+                    m_A_rows.push_back(nb_row_per_contact*ic);
+                    m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + d);
+                    m_A_values.push_back(-m_dt*c.nij[d]);
                 }
             }
 
@@ -94,10 +92,9 @@ namespace scopi
             {
                 for (std::size_t d = 0; d < 3; ++d)
                 {
-                    this->m_A_rows[index] = nb_row_per_contact*ic;
-                    this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
-                    this->m_A_values[index] = this->m_dt*c.nij[d];
-                    index++;
+                    m_A_rows.push_back(nb_row_per_contact*ic);
+                    m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + d);
+                    m_A_values.push_back(m_dt*c.nij[d]);
                 }
             }
 
@@ -112,10 +109,9 @@ namespace scopi
                 auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    this->m_A_rows[index] = nb_row_per_contact*ic;
-                    this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                    this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
+                    m_A_rows.push_back(nb_row_per_contact*ic);
+                    m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
+                    m_A_values.push_back(m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                 }
             }
 
@@ -125,19 +121,14 @@ namespace scopi
                 auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    this->m_A_rows[index] = nb_row_per_contact*ic;
-                    this->m_A_cols[index] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                    this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                    index++;
+                    m_A_rows.push_back(nb_row_per_contact*ic);
+                    m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
+                    m_A_values.push_back(-m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                 }
             }
 
             ++ic;
         }
-        this->m_A_values.resize(index);
-        this->m_A_cols.resize(index);
-        this->m_A_rows.resize(index);
-        return index;
     }
 
 }

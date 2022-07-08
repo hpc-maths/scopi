@@ -68,7 +68,7 @@ namespace scopi
                                                           const std::vector<neighbor<dim>>& contacts_worms,
                                                           std::size_t firstCol)
     {
-        std::size_t idx = matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 1);
+        matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 1);
         std::size_t ic = contacts.size();
         std::size_t active_offset = particles.nb_inactive();
 
@@ -76,17 +76,15 @@ namespace scopi
         {
             for (std::size_t d = 0; d < 3; ++d)
             {
-                this->m_A_rows[idx] = ic;
-                this->m_A_cols[idx] = firstCol + (c.i - active_offset)*3 + d;
-                this->m_A_values[idx] = this->m_dt*c.nij[d];
-                idx++;
+                this->m_A_rows.push_back(ic);
+                this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + d);
+                this->m_A_values.push_back(this->m_dt*c.nij[d]);
             }
             for (std::size_t d = 0; d < 3; ++d)
             {
-                this->m_A_rows[idx] = ic;
-                this->m_A_cols[idx] = firstCol + (c.j - active_offset)*3 + d;
-                this->m_A_values[idx] = -this->m_dt*c.nij[d];
-                idx++;
+                this->m_A_rows.push_back(ic);
+                this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + d);
+                this->m_A_values.push_back(-this->m_dt*c.nij[d]);
             }
 
             auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
@@ -98,19 +96,17 @@ namespace scopi
             auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                this->m_A_rows[idx] = ic;
-                this->m_A_cols[idx] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                this->m_A_values[idx] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                idx++;
+                this->m_A_rows.push_back(ic);
+                this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
+                this->m_A_values.push_back(-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
             }
             ind_part = c.j - active_offset;
             dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                this->m_A_rows[idx] = ic;
-                this->m_A_cols[idx] = firstCol + 3*particles.nb_active() + 3*ind_part + ip;
-                this->m_A_values[idx] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                idx++;
+                this->m_A_rows.push_back(ic);
+                this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
+                this->m_A_values.push_back(this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
             }
             ic++;
         }
