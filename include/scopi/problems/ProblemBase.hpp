@@ -71,9 +71,12 @@ namespace scopi
                                                std::size_t nb_row_per_contact)
     {
         std::size_t active_offset = particles.nb_inactive();
-        this->m_A_rows.reserve(12*nb_row);
-        this->m_A_cols.reserve(12*nb_row);
-        this->m_A_values.reserve(12*nb_row);
+        m_A_rows.clear();
+        m_A_cols.clear();
+        m_A_values.clear();
+        m_A_rows.reserve(12*nb_row);
+        m_A_cols.reserve(12*nb_row);
+        m_A_values.reserve(12*nb_row);
 
         std::size_t ic = 0;
         for (auto &c: contacts)
