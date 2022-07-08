@@ -166,8 +166,8 @@ namespace scopi
     void DryWithFrictionFixedPoint::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts)
     {
         m_nb_iter = 0;
-        m_s = xt::ones<double>({contacts.size()});
-        m_s_old = 2.*xt::ones<double>({contacts.size()});
+        m_s = xt::zeros<double>({contacts.size()});
+        m_s_old = xt::ones<double>({contacts.size()});
     }
 
     template<std::size_t dim>
