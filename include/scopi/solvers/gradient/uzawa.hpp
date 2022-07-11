@@ -27,6 +27,7 @@ namespace scopi{
         sparse_status_t m_status;
         xt::xtensor<double, 1> m_dg;
         xt::xtensor<double, 1> m_uu;
+        xt::xtensor<double, 1> m_lambda_prev;
     };
 
     template<class projection_t>
@@ -45,15 +46,18 @@ namespace scopi{
         std::size_t iter = 0;
         while (iter < m_max_iter)
         {
-            xt::noalias(m_dg) = c;
+            xt::noalias(m_lambda_prev) = l;
 
+            // dg = Al+c
+            xt::noalias(m_dg) = c;
             m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 1., m_dg.data());
-            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for dg = A*l+dg: " << m_status;
+            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for dg = A*l+c: " << m_status;
 
             xt::noalias(l) = this->projection_cone(l - m_rho * m_dg);
-            double norm_dg = xt::amax(xt::abs(m_dg))(0);
-            double norm_l = xt::amax(xt::abs(l))(0);
-            double cmax = double((xt::amin(m_dg))(0));
+            // double norm_dg = xt::amax(xt::abs(m_dg))(0);
+            // double norm_l = xt::amax(xt::abs(l))(0);
+            // double cmax = double((xt::amin(m_dg))(0));
+            double diff_lambda = xt::amax(xt::abs(l - m_lambda_prev))(0) / (xt::amax(xt::abs(m_lambda_prev))(0) + 1.);
 
             if (m_verbose)
             {
@@ -65,7 +69,8 @@ namespace scopi{
                 PLOG_VERBOSE << constraint;
             }
 
-            if (norm_dg < m_tol_dg || norm_l < m_tol_l || cmax > -m_tol_dg)
+            if (diff_lambda < m_tol_l)
+            // if (norm_dg < m_tol_dg || norm_l < m_tol_l || cmax > -m_tol_dg)
             {
                 return iter+1;
             }
