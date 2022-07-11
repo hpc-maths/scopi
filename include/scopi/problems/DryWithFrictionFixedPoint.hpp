@@ -84,7 +84,7 @@ namespace scopi
                         this->m_A_values.push_back(-this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col]);
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[this->m_A_values.size()] += this->m_dt*m_params.mu;
+                            this->m_A_values[this->m_A_values.size()-1] += this->m_dt*m_params.mu;
                         }
                     }
                 }
@@ -101,7 +101,7 @@ namespace scopi
                         this->m_A_values.push_back(this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col]);
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[this->m_A_values.size()] -= this->m_dt*m_params.mu;
+                            this->m_A_values[this->m_A_values.size()-1] -= this->m_dt*m_params.mu;
                         }
                     }
                 }
@@ -144,7 +144,6 @@ namespace scopi
             ++ic;
         }
     }
-
     template <std::size_t dim>
     std::size_t DryWithFrictionFixedPoint::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                                              const std::vector<neighbor<dim>>&)
