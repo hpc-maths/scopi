@@ -1,0 +1,74 @@
+#include <cstddef>
+#include <vector>
+#include <xtensor/xmath.hpp>
+#include <scopi/objects/types/sphere.hpp>
+#include <scopi/objects/types/plan.hpp>
+#include <scopi/solver.hpp>
+#include <scopi/property.hpp>
+
+#include <scopi/solvers/OptimMosek.hpp>
+#include <scopi/vap/vap_fpd.hpp>
+#include <scopi/contact/contact_brute_force.hpp>
+
+int main()
+{
+    plog::init(plog::info, "friction.log");
+
+    constexpr std::size_t dim = 3;
+    double PI = xt::numeric_constants<double>::PI;
+
+    double dt = 0.01;
+    std::size_t total_it = 1000;
+    double width_box = 10.;
+    std::size_t n = 4; // n^3 spheres
+    double g = 1.;
+    double r0 = 1.; // 0 < r0 <= 1
+
+    scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFriction>> params;
+    params.change_default_tol_mosek = false;
+    params.problem_params.mu = 0.1;
+
+    scopi::scopi_container<dim> particles;
+    auto prop = scopi::property<dim>().force({{0., -g, 0.}});
+    // auto prop = scopi::property<dim>().force({{0., -g}});
+
+    scopi::plan<dim> p_horizontal({{0., 0., 0.}}, PI/2.);
+    // scopi::plan<dim> p_horizontal({{0., 0.}}, PI/2.);
+    particles.push_back(p_horizontal, scopi::property<dim>().deactivate());
+
+    std::default_random_engine generator;
+    std::uniform_real_distribution<double> distrib_m(1., 2.);
+    double r = r0*width_box/2./(n+1);
+
+    for (std::size_t i = 0; i < n; ++i)
+    {
+        for (std::size_t j = 1; j < n; ++j)
+        {
+            for (std::size_t k = 0; k < n; ++k)
+            {
+                double m = distrib_m(generator);
+                scopi::sphere<dim> s({{i*2.*r, r + j*2.*r, k*2.*r}}, r);
+                particles.push_back(s, prop.mass(m).moment_inertia({m*r*r/2., m*r*r/2., m*r*r/2.}));
+                // scopi::sphere<dim> s({{(width_box/2./n+0.1) + i*width_box/n+dx, (width_box/2./n) + j*width_box/(n+1)}}, r);
+                // particles.push_back(s, prop.mass(m).moment_inertia({m*r*r/2.}));
+            }
+        }
+    }
+
+    // j = 0
+    double dec_x = 0.5*r;
+    for (std::size_t i = 0; i < n; ++i)
+    {
+        for (std::size_t k = 0; k < n; ++k)
+        {
+            double m = distrib_m(generator);
+            scopi::sphere<dim> s({{i*2.*r + dec_x, r, k*2.*r}}, r);
+            particles.push_back(s, prop.mass(m).moment_inertia({m*r*r/2., m*r*r/2., m*r*r/2.}));
+        }
+    }
+
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_brute_force, scopi::vap_fpd> solver(particles, dt, params);
+    solver.solve(total_it);
+
+    return 0;
+}

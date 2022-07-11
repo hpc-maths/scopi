@@ -12,6 +12,7 @@ set(SCOPI_EXAMPLES
    two_worms.cpp
    convergence_scheme.cpp
    box_spheres_3d.cpp
+   friction.cpp
 )
 
 include(generator)
