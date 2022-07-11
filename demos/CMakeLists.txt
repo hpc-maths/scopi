@@ -14,6 +14,7 @@ set(SCOPI_EXAMPLES
    worm_spline.cpp
    worms.cpp
    box_spheres_3d.cpp
+   friction.cpp
 )
 
 include(generator)
