@@ -40,6 +40,7 @@ const sphereObject = function () {
 
         position.x = obj.position[0];
         position.y = obj.position[1];
+        console.log(position);
 
         if (typeof obj.radius === "number") {
             scale.x = obj.radius;
@@ -127,7 +128,17 @@ function drawObjects() {
             clean(scene);
 
             var geometry = new THREE.SphereGeometry(1, 16, 16);
-            const material = new THREE.MeshBasicMaterial({ color: 'red' });
+            const diffuseColor = new THREE.Color().setHSL(0., 0.5, 0.25);
+            const material = new THREE.MeshPhysicalMaterial({ color: 'red', metalness: 0.5, roughness: 0., clearcoat: 0., clearcoatRoughness: 0., reflectivity: 0. });
+            scene.add( new THREE.AmbientLight( 0x222222 ) );
+            const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+            directionalLight.position.set( 1, 1, 1 ).normalize();
+            scene.add( directionalLight );
+            const particleLight = new THREE.Mesh( new THREE.SphereGeometry( -1, -1, -1 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+            scene.add( particleLight );
+            const pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
+            particleLight.add( pointLight );
+            // const material = new THREE.MeshBasicMaterial({ color: 'red' });
 
             var nbSpheres = 0;
             objects.forEach((obj, index) => {
