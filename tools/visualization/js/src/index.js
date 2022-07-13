@@ -40,7 +40,6 @@ const sphereObject = function () {
 
         position.x = obj.position[0];
         position.y = obj.position[1];
-        console.log(position);
 
         if (typeof obj.radius === "number") {
             scale.x = obj.radius;
