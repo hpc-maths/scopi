@@ -73,7 +73,11 @@ namespace scopi{
                 m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 1., m_uu.data());
                 PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for uu = A*l+c: " << m_status;
                 double constraint = double((xt::amin(m_uu))(0));
-                PLOG_VERBOSE << constraint;
+                // cout = 1./2.*l^T*A*l
+                double cout;
+                m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1./2., A, descr, l.data(), 0., m_uu.data(), &cout);
+                PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for cout = 1/2*l^T*A*l: " << m_status;
+                PLOG_VERBOSE << constraint << "  " << cout + xt::linalg::dot(c, l)(0);
             }
 
             // if (norm_dg < m_tol_dg || norm_l < m_tol_l || cmax > -m_tol_dg)
