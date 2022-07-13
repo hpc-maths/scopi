@@ -32,14 +32,14 @@ namespace scopi
                 x_normal = g*(std::sin(alpha) - mu*std::cos(alpha))*t2*t2/2. + (v_t_m + mu*v_n_m)*t2 + x_impact;
                 theta = -mu*g*std::cos(alpha)*t2*t2/r + 2*mu*v_n_m*t2/r;
             }
-            x[0] =  x_normal*std::cos(alpha) + r*std::sin(alpha);
-            x[1] = -x_normal*std::sin(alpha) + r*std::cos(alpha);
+            x(0) =  x_normal*std::cos(alpha) + r*std::sin(alpha);
+            x(1) = -x_normal*std::sin(alpha) + r*std::cos(alpha);
             return std::make_pair(x, theta);
         }
         else
         {
-            x[0] = y0*std::sin(alpha);
-            x[1] = y0*std::cos(alpha) - g*t*t/2.;
+            x(0) = y0*std::sin(alpha);
+            x(1) = y0*std::cos(alpha) - g*t*t/2.;
             return std::make_pair(x, 0.);
         }
     }
