@@ -66,26 +66,6 @@ namespace scopi
         vap_t m_vap;
     };
 
-    /*
-    template<std::size_t dim,
-             class optim_solver_t,
-             class contact_t,
-             class vap_t
-             >
-    class ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 2>: public ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>
-    {
-    public:
-        using problem_t = typename optim_solver_t::problem_type;
-        using solver_type = optim_solver_t;
-        ScopiSolver(scopi_container<dim>& particles,
-                    double dt,
-                    const OptimParams<optim_solver_t>& optim_params = OptimParams<optim_solver_t>());
-        void solve(std::size_t total_it, std::size_t initial_iter = 0);
-    private:
-        vap_projection m_vap_projection;
-    };
-    */
-
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params)
     : optim_solver_t(particles.nb_active(), dt, particles, optim_params)
@@ -93,14 +73,6 @@ namespace scopi
     , m_dt(dt)
     , m_vap(m_particles.nb_active(), m_particles.nb_inactive(), m_dt)
     {}
-
-    /*
-    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
-    ScopiSolver<dim, optim_solver_t, contact_t, vap_t, 2>::ScopiSolver(scopi_container<dim>& particles, double dt, const OptimParams<optim_solver_t>& optim_params)
-    : ScopiSolverBase<dim, optim_solver_t, contact_t, vap_t>(particles, dt, optim_params)
-    , m_vap_projection(this->m_particles.nb_active(), this->m_particles.nb_inactive(), this->m_dt)
-    {}
-    */
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
@@ -126,50 +98,6 @@ namespace scopi
             m_vap.update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
         }
     }
-
-    /*
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
-    {
-        // Time Loop
-        for (std::size_t nite = initial_iter; nite < total_it; ++nite)
-        {
-            PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
-
-            this->displacement_obstacles();
-            auto contacts = this->compute_contacts();
-
-            tic();
-            this->m_problem.set_gamma(contacts);
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : set gamma = " << duration;
-
-            this->write_output_files(contacts, nite);
-            this->m_vap.set_a_priori_velocity(this->m_particles);
-
-            this->m_problem.setup_first_resolution();
-            this->m_solver.run(this->m_particles, contacts, this->m_problem, nite);
-
-            tic();
-            this->m_problem.correct_lambda(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_particles, this->m_problem), this->m_particles, this->m_solver.get_uadapt());
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
-
-            m_vap_projection.set_u_w(this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
-            m_vap_projection.set_a_priori_velocity(this->m_particles);
-            this->m_problem.setup_projection();
-            this->m_solver.run(this->m_particles, contacts, this->m_problem,  nite);
-
-            tic();
-            this->m_problem.update_gamma(contacts, this->m_solver.get_lagrange_multiplier(contacts, this->m_particles, this->m_problem));
-            duration = toc();
-            PLOG_INFO << "----> CPUTIME : update gamma = " << duration;
-
-            this->move_active_particles();
-            this->m_vap.update_velocity(this->m_particles, this->m_solver.get_uadapt(), this->m_solver.get_wadapt());
-        }
-    }
-    */
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::displacement_obstacles()

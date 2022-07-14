@@ -22,7 +22,6 @@ int main()
     double width_box = 10.;
     std::size_t n = 4; // n^3 spheres
     double g = 1.;
-    double r0 = 1.; // 0 < r0 <= 1
 
     scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFriction>> params;
     params.change_default_tol_mosek = false;
@@ -30,10 +29,8 @@ int main()
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
-    // auto prop = scopi::property<dim>().force({{0., -g}});
 
     scopi::plan<dim> p_horizontal({{0., 0., 0.}}, PI/2.);
-    // scopi::plan<dim> p_horizontal({{0., 0.}}, PI/2.);
     particles.push_back(p_horizontal, scopi::property<dim>().deactivate());
 
     std::default_random_engine generator;
@@ -49,8 +46,6 @@ int main()
                 double m = distrib_m(generator);
                 scopi::sphere<dim> s({{i*2.*r, r + j*2.*r, k*2.*r}}, r);
                 particles.push_back(s, prop.mass(m).moment_inertia({m*r*r/2., m*r*r/2., m*r*r/2.}));
-                // scopi::sphere<dim> s({{(width_box/2./n+0.1) + i*width_box/n+dx, (width_box/2./n) + j*width_box/(n+1)}}, r);
-                // particles.push_back(s, prop.mass(m).moment_inertia({m*r*r/2.}));
             }
         }
     }
