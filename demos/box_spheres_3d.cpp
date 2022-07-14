@@ -25,9 +25,6 @@ int main()
     std::size_t n = 13; // n^3 spheres
     double g = 1.;
 
-    // scopi::OptimParams<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::uzawa<>>> params;
-    // params.tol_dg = 1e-3;
-    // params.tol_l = 1e-3;
     scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFriction>> params;
     params.change_default_tol_mosek = false;
     params.problem_params.mu = 0.1;
@@ -61,20 +58,15 @@ int main()
             {
                 double r = distrib_r(generator);
                 double m = distrib_m(generator);
-                // double dx = distrib_mouve_center(generator);
-                // double dy = distrib_mouve_center(generator);
-                // double dz = distrib_mouve_center(generator);
-                double dx = 0.;
-                double dy = 0.;
-                double dz = 0.;
+                double dx = distrib_mouve_center(generator);
+                double dy = distrib_mouve_center(generator);
+                double dz = distrib_mouve_center(generator);
                 scopi::sphere<dim> s({{r0+0.1 + i*2.*r0 + dx, 1.1*r0 + 2.1*r0*j + dy, r0+0.1 + k*2.*r0 + dz}}, r);
                 particles.push_back(s, prop.mass(m).moment_inertia({m*r*r/2., m*r*r/2., m*r*r/2.}));
-                // particles.push_back(s, prop.mass(m).moment_inertia(m*r*r/2.));
             }
         }
     }
 
-    // scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::uzawa<>>, scopi::contact_brute_force, scopi::vap_fpd> solver(particles, dt, params);
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_brute_force, scopi::vap_fpd> solver(particles, dt, params);
     solver.solve(total_it);
 
