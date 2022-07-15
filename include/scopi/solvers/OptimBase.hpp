@@ -26,6 +26,8 @@ namespace scopi{
         auto get_uadapt();
         auto get_wadapt();
         template<std::size_t dim>
+        xt::xtensor<double, 2> get_constraint(const std::vector<neighbor<dim>>& contacts);
+        template<std::size_t dim>
         auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
     protected:
@@ -92,9 +94,10 @@ namespace scopi{
                 m_c(mass_dec + 3*i + d) = -particles.m()(active_offset + i)*desired_velocity(i + active_offset)[d];
             }
             auto omega = get_omega(desired_omega(i + active_offset));
+            auto j = get_omega(particles.j()(active_offset+i));
             for (std::size_t d = 0; d < 3; ++d)
             {
-                m_c(moment_dec + 3*i + d) = -particles.j()(active_offset + i)*omega(d);
+                m_c(moment_dec + 3*i + d) = -j(d)*omega(d);
             }
         }
     }
@@ -120,6 +123,17 @@ namespace scopi{
     {
         auto data = static_cast<Derived&>(*this).wadapt_data();
         return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
+    }
+
+    template<class Derived, class problem_t>
+    template<std::size_t dim>
+    xt::xtensor<double, 2> OptimBase<Derived, problem_t>::get_constraint(const std::vector<neighbor<dim>>& contacts)
+    {
+        auto data = static_cast<Derived&>(*this).constraint_data();
+        if (data)
+            return xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
+        else
+            return xt::xtensor<double, 2>{};
     }
 
     template<class Derived, class problem_t>

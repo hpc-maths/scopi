@@ -50,7 +50,9 @@ namespace scopi
         std::size_t get_nb_gamma_min();
         void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
         void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     xt::xtensor<double, 1> lambda);
+                                     const xt::xtensor<double, 1>& lambda,
+                                     const xt::xtensor<double, 2>& u_tilde);
+        bool should_solve_optimization_problem();
 
     private:
         void correct_lambda(const std::vector<neighbor<dim>>& contacts,
@@ -308,6 +310,7 @@ namespace scopi
     template<std::size_t dim>
     void ViscousWithFriction<dim>::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new)
     {
+        this->m_should_solve = true;
         this->set_gamma_base(contacts_new);
         this->m_nb_gamma_neg = 0;
         m_nb_gamma_min = 0;
@@ -363,8 +366,10 @@ namespace scopi
 
     template<std::size_t dim>
     void ViscousWithFriction<dim>::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                xt::xtensor<double, 1>)
+                                                           const xt::xtensor<double, 1>&,
+                                                           const xt::xtensor<double, 2>&)
     {
+        this->m_should_solve = false;
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
         for (std::size_t ic = 0; ic < this->m_gamma.size(); ++ic)
@@ -418,6 +423,11 @@ namespace scopi
         return m_nb_gamma_min;
     }
 
+    template<std::size_t dim>
+    bool ViscousWithFriction<dim>::should_solve_optimization_problem()
+    {
+        return this->m_should_solve;
+    }
 
     template<std::size_t dim>
     ProblemParams<ViscousWithFriction<dim>>::ProblemParams()

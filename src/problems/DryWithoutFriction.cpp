@@ -7,5 +7,9 @@ namespace scopi
     : ProblemBase(nparticles, dt)
     {}
 
+    bool DryWithoutFriction::should_solve_optimization_problem()
+    {
+        return this->m_should_solve;
+    }
 
 }

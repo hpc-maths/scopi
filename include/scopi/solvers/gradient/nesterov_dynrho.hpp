@@ -22,7 +22,8 @@ namespace scopi{
         double m_rho;
         double m_tol_dg;
         double m_tol_l;
-        bool m_verbose,
+        bool m_verbose;
+        double m_rho_init;
 
         sparse_status_t m_status;
         xt::xtensor<double, 1> m_dg;
@@ -30,6 +31,7 @@ namespace scopi{
         xt::xtensor<double, 1> m_y;
         xt::xtensor<double, 1> m_l_old;
         xt::xtensor<double, 1> m_tmp;
+        xt::xtensor<double, 1> m_lambda_prev;
     };
 
     template<class projection_t>
@@ -40,6 +42,7 @@ namespace scopi{
     , m_tol_dg(tol_dg)
     , m_tol_l(tol_l)
     , m_verbose(verbose)
+    , m_rho_init(rho)
     {}
 
     template<class projection_t>
@@ -49,10 +52,13 @@ namespace scopi{
         double theta_old = 1.;
         m_y = l;
         m_l_old = l;
-        double lipsch = 1.;
+        m_rho = m_rho_init;
+        double lipsch = 1./m_rho;
+        m_rho = 1./lipsch;
         m_tmp.resize({l.size()});
         while (iter < m_max_iter)
         {
+            xt::noalias(m_lambda_prev) = l;
             // dg = A*y+c
             xt::noalias(m_dg) = c;
             m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 1., m_dg.data());
@@ -92,20 +98,27 @@ namespace scopi{
             double theta = 0.5*(theta_old*std::sqrt(4.+theta_old*theta_old) - theta_old*theta_old);
             double beta = theta_old*(1. - theta_old)/(theta_old*theta_old + theta);
             m_y = l + beta*(l - m_l_old);
-            double norm_dg = xt::amax(xt::abs(m_dg))(0);
-            double norm_l = xt::amax(xt::abs(l))(0);
+            // double norm_dg = xt::amax(xt::abs(m_dg))(0);
+            // double norm_l = xt::amax(xt::abs(l))(0);
+            // double cmax = double((xt::amin(m_dg))(0));
+            double diff_lambda = xt::amax(xt::abs(l - m_lambda_prev))(0) / (xt::amax(xt::abs(m_lambda_prev))(0) + 1.);
 
-            if( m_verbose)
+            if (m_verbose)
             {
                 // uu = A*l + c
                 xt::noalias(m_uu) = c;
                 m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 1., m_uu.data());
                 PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for uu = A*l+c: " << m_status;
                 double constraint = double((xt::amin(m_uu))(0));
-                PLOG_VERBOSE << constraint;
+                // cout = 1./2.*l^T*A*l
+                double cout;
+                m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1./2., A, descr, l.data(), 0., m_uu.data(), &cout);
+                PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for cout = 1/2*l^T*A*l: " << m_status;
+                PLOG_VERBOSE << constraint << "  " << cout + xt::linalg::dot(c, l)(0);
             }
 
-            if (norm_dg < m_tol_dg || norm_l < m_tol_l)
+            if (diff_lambda < m_tol_l)
+            // if (norm_dg < m_tol_dg || norm_l < m_tol_l || cmax > -m_tol_dg)
             {
                 return iter+1;
             }

@@ -17,7 +17,8 @@ namespace scopi
         inline std::size_t kdtree_get_point_count() const
         {
           //std::cout << "KDTREE m_p.size() = "<< m_p.size() <<std::endl;
-          return m_p.pos().size() - m_actptr;
+          return m_p.pos().size();
+          // return m_p.pos().size() - m_actptr;
         }
         inline double kdtree_get_pt(std::size_t idx, const std::size_t d) const
         {

@@ -1,4 +1,5 @@
 #include "scopi/vap/vap_fpd.hpp"
+#include <cstddef>
 
 namespace scopi
 {
@@ -26,5 +27,20 @@ namespace scopi
         res[2] = omega_1*omega_2*(j2-j1);
 
         return res;
+    }
+
+    template<>
+    void vap_fpd::update_omega(scopi_container<2>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
+    {
+        particles.omega()(i + m_active_ptr) = wadapt(i, 2);
+    }
+
+    template<>
+    void vap_fpd::update_omega(scopi_container<3>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
+    {
+        for (std::size_t d = 0; d < 3; ++d)
+        {
+            particles.omega()(i + m_active_ptr)(d) = wadapt(i, d);
+        }
     }
 }

@@ -59,7 +59,9 @@ namespace scopi
 
         void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
         void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     xt::xtensor<double, 1> lambda);
+                                     const xt::xtensor<double, 1>& lambda,
+                                     const xt::xtensor<double, 2>& u_tilde);
+        bool should_solve_optimization_problem();
 
     private:
         std::size_t get_nb_gamma_min();
@@ -74,7 +76,7 @@ namespace scopi
                                                                    std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t index = matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 1);
+        matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 1);
         std::size_t ic = 0;
         for (auto &c: contacts)
         {
@@ -84,10 +86,9 @@ namespace scopi
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
-                        this->m_A_rows[index] = contacts.size() + ic;
-                        this->m_A_cols[index] = firstCol + (c.i - active_offset)*3 + d;
-                        this->m_A_values[index] = this->m_dt*c.nij[d];
-                        index++;
+                        this->m_A_rows.push_back(contacts.size() + ic);
+                        this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + d);
+                        this->m_A_values.push_back(this->m_dt*c.nij[d]);
                     }
                 }
             }
@@ -98,10 +99,9 @@ namespace scopi
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
-                        this->m_A_rows[index] = contacts.size() + ic;
-                        this->m_A_cols[index] = firstCol + (c.j - active_offset)*3 + d;
-                        this->m_A_values[index] = -this->m_dt*c.nij[d];
-                        index++;
+                        this->m_A_rows.push_back(contacts.size() + ic);
+                        this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + d);
+                        this->m_A_values.push_back(-this->m_dt*c.nij[d]);
                     }
                 }
             }
@@ -119,10 +119,9 @@ namespace scopi
                 {
                     if (this->m_gamma[ic] < -m_params.tol)
                     {
-                        this->m_A_rows[index] = contacts.size() + ic;
-                        this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
-                        this->m_A_values[index] = -this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                        index++;
+                        this->m_A_rows.push_back(contacts.size() + ic);
+                        this->m_A_cols.push_back(firstCol + 3*this->m_nparticles + 3*ind_part + ip);
+                        this->m_A_values.push_back(-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
             }
@@ -135,10 +134,9 @@ namespace scopi
                 {
                     for (std::size_t ip = 0; ip < 3; ++ip)
                     {
-                        this->m_A_rows[index] = contacts.size() + ic;
-                        this->m_A_cols[index] = firstCol + 3*this->m_nparticles + 3*ind_part + ip;
-                        this->m_A_values[index] = this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip));
-                        index++;
+                        this->m_A_rows.push_back(contacts.size() + ic);
+                        this->m_A_cols.push_back(firstCol + 3*this->m_nparticles + 3*ind_part + ip);
+                        this->m_A_values.push_back(this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
             }
@@ -156,6 +154,7 @@ namespace scopi
     template<std::size_t dim>
     void ViscousWithoutFriction<dim>::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new)
     {
+        this->m_should_solve = true;
         this->set_gamma_base(contacts_new);
         this->m_nb_gamma_neg = 0;
         for (auto& g : this->m_gamma)
@@ -167,8 +166,10 @@ namespace scopi
 
     template<std::size_t dim>
     void ViscousWithoutFriction<dim>::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                              xt::xtensor<double, 1> lambda)
+                                                              const xt::xtensor<double, 1>& lambda,
+                                                              const xt::xtensor<double, 2>&)
     {
+        this->m_should_solve = false;
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
         std::size_t ind_gamma_neg = 0;
@@ -363,6 +364,11 @@ namespace scopi
         }
     }
 
+    template<std::size_t dim>
+    bool ViscousWithoutFriction<dim>::should_solve_optimization_problem()
+    {
+        return this->m_should_solve;
+    }
 
     template<std::size_t dim>
     ProblemParams<ViscousWithoutFriction<dim>>::ProblemParams()

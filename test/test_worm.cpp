@@ -452,6 +452,7 @@ namespace scopi
         particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
         OptimParams<solver_t> params;
+        set_params_test(params);
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 

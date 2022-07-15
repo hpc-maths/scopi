@@ -5,6 +5,7 @@
 
 #include "../problems/DryWithoutFriction.hpp"
 #include "../problems/DryWithFriction.hpp"
+#include "../problems/DryWithFrictionFixedPoint.hpp"
 #include "../problems/ViscousWithoutFriction.hpp"
 #include "../problems/ViscousWithFriction.hpp"
 
@@ -82,6 +83,48 @@ namespace scopi
 
     template <std::size_t dim>
     void ConstraintMosek<DryWithFriction>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+                                                                     mosek::fusion::Matrix::t A,
+                                                                     mosek::fusion::Variable::t X,
+                                                                     mosek::fusion::Model::t model,
+                                                                     const std::vector<neighbor<dim>>& contacts)
+    {
+        using namespace mosek::fusion;
+        m_qc1 = model->constraint("qc1"
+                , Expr::reshape(Expr::sub(D, Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))), contacts.size(), 4)
+                , Domain::inQCone());
+    }
+
+
+
+
+
+
+    // DryWithFrictionFixedPoint
+    template<>
+    class ConstraintMosek<DryWithFrictionFixedPoint>
+    {
+    public:
+        ConstraintMosek(std::size_t nparts);
+        std::size_t number_col_matrix() const;
+        std::size_t index_first_col_matrix() const;
+        template <std::size_t dim>
+        void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
+                             mosek::fusion::Matrix::t A,
+                             mosek::fusion::Variable::t X,
+                             mosek::fusion::Model::t model,
+                             const std::vector<neighbor<dim>>& contacts);
+        void update_dual(std::size_t nb_row_matrix,
+                         std::size_t nb_contacts);
+
+        std::shared_ptr<monty::ndarray<double,1>> m_dual;
+
+    private:
+        std::size_t m_nparticles;
+        mosek::fusion::Constraint::t m_qc1;
+    };
+
+    template <std::size_t dim>
+    void ConstraintMosek<DryWithFrictionFixedPoint>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                                                                      mosek::fusion::Matrix::t A,
                                                                      mosek::fusion::Variable::t X,
                                                                      mosek::fusion::Model::t model,
