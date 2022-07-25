@@ -12,6 +12,7 @@ set(SCOPI_EXAMPLES
    two_worms.cpp
    convergence_scheme.cpp
    worm_spline.cpp
+   worms.cpp
 )
 
 include(generator)

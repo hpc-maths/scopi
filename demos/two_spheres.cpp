@@ -2,7 +2,7 @@
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/solver.hpp>
 #include <scopi/property.hpp>
-#include <scopi/solvers/OptimProjectedGradient.hpp>
+// #include <scopi/solvers/OptimProjectedGradient.hpp>
 
 int main()
 {
@@ -18,7 +18,7 @@ int main()
     particles.push_back(s1, scopi::property<dim>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia(0.1));
     particles.push_back(s2, scopi::property<dim>().desired_velocity({{-0.25, 0}}).mass(1.).moment_inertia(0.1));
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction>> solver(particles, dt);
+    scopi::ScopiSolver<dim> solver(particles, dt);
     solver.solve(total_it);
 
     return 0;
