@@ -33,8 +33,8 @@ namespace scopi
         using position_type = typename base_type::position_type;
         using quaternion_type = typename base_type::quaternion_type;
 
-        worm(position_type pos, double radius);
-        worm(position_type pos, quaternion_type q, double radius);
+        worm(position_type pos, double radius, std::size_t size);
+        worm(position_type pos, quaternion_type q, double radius, std::size_t size);
 
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         virtual void print() const override;
@@ -55,16 +55,16 @@ namespace scopi
     // worm implementation //
     ////////////////////////////
     template<std::size_t dim, bool owner>
-    worm<dim, owner>::worm(position_type pos, double radius)
-    : base_type(pos, {quaternion()}, 6)
+    worm<dim, owner>::worm(position_type pos, double radius, std::size_t size)
+    : base_type(pos, {quaternion()}, size)
     , m_radius(radius)
     {
         create_hash();
     }
 
     template<std::size_t dim, bool owner>
-    worm<dim, owner>::worm(position_type pos, quaternion_type q, double radius)
-    : base_type(pos, q, 6)
+    worm<dim, owner>::worm(position_type pos, quaternion_type q, double radius, std::size_t size)
+    : base_type(pos, q, size)
     , m_radius(radius)
     {
         create_hash();
@@ -73,7 +73,7 @@ namespace scopi
     template<std::size_t dim, bool owner>
     std::unique_ptr<base_constructor<dim>> worm<dim, owner>::construct() const
     {
-        return make_object_constructor<worm<dim, false>>(m_radius);
+        return make_object_constructor<worm<dim, false>>(m_radius, this->size());
     }
 
     template<std::size_t dim, bool owner>
@@ -92,7 +92,7 @@ namespace scopi
     void worm<dim, owner>::create_hash()
     {
         std::stringstream ss;
-        ss << "worm<" << dim << ">(" << m_radius << ")";
+        ss << "worm<" << dim << ">(" << m_radius << ", " << this->size() << ")";
         m_hash = std::hash<std::string>{}(ss.str());
     }
 

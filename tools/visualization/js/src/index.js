@@ -141,7 +141,7 @@ function drawObjects() {
 
             var nbSpheres = 0;
             objects.forEach((obj, index) => {
-                if (obj.type === "globule") {
+                if (obj.type === "worm") {
                     nbSpheres += 6;
                 }
                 else if (obj.type === "sphere" || obj.type === "superellipsoid") {
@@ -160,8 +160,8 @@ function drawObjects() {
                 if (obj.type === "plan") {
                     planObject(obj, plan);
                 }
-                else if (obj.type === "globule") {
-                    obj.globule.forEach((sphere, indexSphere) => {
+                else if (obj.type === "worm") {
+                    obj.worm.forEach((sphere, indexSphere) => {
                         sphereObject(sphere, matrix, rot);
                         mesh.setMatrixAt(nbSpheres, matrix);
                         nbSpheres += 1;
