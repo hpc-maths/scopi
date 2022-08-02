@@ -92,7 +92,7 @@ namespace scopi
     void worm<dim, owner>::create_hash()
     {
         std::stringstream ss;
-        ss << "worm<" << dim << ">(" << m_radius << ")";
+        ss << "worm<" << dim << ">(" << m_radius << ", " << this->size() << ")";
         m_hash = std::hash<std::string>{}(ss.str());
     }
 

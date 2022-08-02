@@ -11,7 +11,6 @@ set(SCOPI_EXAMPLES
    two_spheres_viscosity.cpp
    two_worms.cpp
    convergence_scheme.cpp
-   worms.cpp
    box_spheres_3d.cpp
    friction.cpp
 )
