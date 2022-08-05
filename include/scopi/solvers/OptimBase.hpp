@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <plog/Log.h>
 #include <vector>
 #include "plog/Initializers/RollingFileInitializer.h"
@@ -8,14 +9,14 @@
 #include "../crtp.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
-#include "../params/OptimParams.hpp"
+#include "../params.hpp"
 
 namespace scopi{
     template <class Derived, class problem_t>
     class OptimBase : protected problem_t
     {
     protected:
-        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& params);
+        OptimBase(std::size_t nparts, std::size_t active_ptr, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params);
 
         template<std::size_t dim>
         void run(const scopi_container<dim>& particles,
@@ -67,9 +68,9 @@ namespace scopi{
 
 
     template<class Derived, class problem_t>
-    OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& params)
-    : problem_t(nparts, dt, params.problem_params)
-    , m_params(params)
+    OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, std::size_t active_ptr, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params)
+    : problem_t(nparts, active_ptr, dt, problem_params)
+    , m_params(optim_params)
     , m_nparts(nparts)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)

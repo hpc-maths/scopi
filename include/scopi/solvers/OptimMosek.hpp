@@ -5,7 +5,6 @@
 #include "OptimBase.hpp"
 #include "../problems/DryWithoutFriction.hpp"
 #include "ConstraintMosek.hpp"
-#include "../params/OptimParams.hpp"
 
 #include <memory>
 #include <fusion.h>
@@ -21,7 +20,6 @@ namespace scopi{
         OptimParams();
         OptimParams(const OptimParams<OptimMosek<problem_t>>& params);
 
-        ProblemParams<problem_t> problem_params;
         bool change_default_tol_mosek;
     };
 
@@ -35,7 +33,12 @@ namespace scopi{
 
     protected:
         template <std::size_t dim>
-        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimMosek<problem_t>>& optim_params);
+        OptimMosek(std::size_t nparts,
+                   std::size_t active_ptr,
+                   double dt,
+                   const scopi_container<dim>& particles,
+                   const OptimParams<OptimMosek<problem_t>>& optim_params,
+                   const ProblemParams<problem_t>& problem_params);
 
     public:
         template <std::size_t dim>
@@ -135,8 +138,13 @@ namespace scopi{
 
     template<class problem_t>
     template <std::size_t dim>
-    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimMosek<problem_t>>& optim_params)
-    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, optim_params)
+    OptimMosek<problem_t>::OptimMosek(std::size_t nparts,
+                                      std::size_t active_ptr,
+                                      double dt,
+                                      const scopi_container<dim>& particles,
+                                      const OptimParams<OptimMosek<problem_t>>& optim_params,
+                                      const ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, active_ptr, dt, 1 + 2*3*nparts + 2*3*nparts, 1, optim_params, problem_params)
     , m_constraint(nparts)
     {
         using namespace mosek::fusion;
@@ -260,14 +268,12 @@ namespace scopi{
 
     template<class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams(const OptimParams<OptimMosek<problem_t>>& params)
-    : problem_params(params.problem_params)
-    , change_default_tol_mosek(params.change_default_tol_mosek)
+    : change_default_tol_mosek(params.change_default_tol_mosek)
     {}
 
     template<class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams()
-    : problem_params()
-    , change_default_tol_mosek(true)
+    : change_default_tol_mosek(true)
     {}
 }
 #endif

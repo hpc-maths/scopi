@@ -18,8 +18,9 @@ namespace scopi{
     class OptimUzawaMatrixFreeOmp;
 
     template<class problem_t>
-    class OptimParams<OptimUzawaMatrixFreeOmp<problem_t>> : public OptimParamsUzawaBase<problem_t>
-    {};
+    struct OptimParams<OptimUzawaMatrixFreeOmp<problem_t>> : public OptimParamsUzawaBase
+    {
+    };
 
     template<class problem_t = DryWithoutFriction>
     class OptimUzawaMatrixFreeOmp :public OptimUzawaBase<OptimUzawaMatrixFreeOmp<problem_t>, problem_t>
@@ -31,7 +32,12 @@ namespace scopi{
 
     protected:
         template <std::size_t dim>
-        OptimUzawaMatrixFreeOmp(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimUzawaMatrixFreeOmp>& optim_params);
+        OptimUzawaMatrixFreeOmp(std::size_t nparts,
+                                std::size_t active_ptr,
+                                double dt,
+                                const scopi_container<dim>& particles,
+                                const OptimParams<OptimUzawaMatrixFreeOmp<problem_t>>& optim_params,
+                                const ProblemParams<problem_t>& problem_params);
 
     public:
         template <std::size_t dim>
@@ -106,8 +112,13 @@ namespace scopi{
 
     template <class problem_t>
     template <std::size_t dim>
-    OptimUzawaMatrixFreeOmp<problem_t>::OptimUzawaMatrixFreeOmp(std::size_t nparts, double dt, const scopi_container<dim>&, const OptimParams<OptimUzawaMatrixFreeOmp>& optim_params)
-    : base_type(nparts, dt, optim_params)
+    OptimUzawaMatrixFreeOmp<problem_t>::OptimUzawaMatrixFreeOmp(std::size_t nparts,
+                                                                std::size_t active_ptr,
+                                                                double dt,
+                                                                const scopi_container<dim>&,
+                                                                const OptimParams<OptimUzawaMatrixFreeOmp<problem_t>>& optim_params,
+                                                                const ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, active_ptr, dt, optim_params, problem_params)
     {}
 
 }
