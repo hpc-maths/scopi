@@ -4,11 +4,17 @@
 #include "../objects/methods/closest_points.hpp"
 #include "../objects/methods/select.hpp"
 #include "../objects/neighbor.hpp"
+#include "../params.hpp"
 #include <cstddef>
 #include <nanoflann.hpp>
 
 namespace scopi
 {
+    struct ContactsParamsBase
+    {
+        ContactsParamsBase();
+        ContactsParamsBase(const ContactsParamsBase& params);
+    };
 
     template <class D>
     class contact_base: public crtp_base<D>

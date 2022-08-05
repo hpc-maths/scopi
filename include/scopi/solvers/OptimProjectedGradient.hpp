@@ -11,7 +11,6 @@
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
-#include "../params/OptimParams.hpp"
 #include "../problems/DryWithoutFriction.hpp"
 #include "gradient/uzawa.hpp"
 
@@ -26,7 +25,6 @@ namespace scopi{
         OptimParams();
         OptimParams(const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& params);
 
-        ProblemParams<problem_t> problem_params;
         double tol_dg;
         double tol_l;
         std::size_t max_iter;
@@ -81,7 +79,11 @@ namespace scopi{
 
     protected:
         template<std::size_t dim>
-        OptimProjectedGradient(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params);
+        OptimProjectedGradient(std::size_t nparts,
+                               double dt,
+                               const scopi_container<dim>& particles,
+                               const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params,
+                               const ProblemParams<problem_t>& problem_params);
 
     public:
         template <std::size_t dim>
@@ -127,8 +129,12 @@ namespace scopi{
 
     template<class problem_t, class gradient_t>
     template<std::size_t dim>
-    OptimProjectedGradient<problem_t, gradient_t>::OptimProjectedGradient(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params)
-    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
+    OptimProjectedGradient<problem_t, gradient_t>::OptimProjectedGradient(std::size_t nparts,
+                                                                          double dt,
+                                                                          const scopi_container<dim>& particles,
+                                                                          const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params,
+                                                                          const ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
     , gradient_t(optim_params.max_iter, optim_params.rho, optim_params.tol_dg, optim_params.tol_l, optim_params.verbose)
     , m_u(xt::zeros<double>({6*nparts}))
     , m_bl(xt::zeros<double>({6*nparts}))
@@ -370,8 +376,7 @@ namespace scopi{
 
     template<class problem_t, class gradient_t>
     OptimParams<OptimProjectedGradient<problem_t, gradient_t>>::OptimParams(const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& params)
-    : problem_params(params.problem_params)
-    , tol_dg(params.tol_dg)
+    : tol_dg(params.tol_dg)
     , tol_l(params.tol_l)
     , max_iter(params.max_iter)
     , rho(params.rho)
@@ -380,8 +385,7 @@ namespace scopi{
 
     template<class problem_t, class gradient_t>
     OptimParams<OptimProjectedGradient<problem_t, gradient_t>>::OptimParams()
-    : problem_params()
-    , tol_dg(1e-9)
+    : tol_dg(1e-9)
     , tol_l(1e-9)
     , max_iter(40000)
     , rho(2000.)

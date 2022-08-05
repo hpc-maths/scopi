@@ -17,7 +17,7 @@ namespace scopi {
     void set_params_test(OptimParams<solver_t>&)
     {}
 
-    void set_params_test_uzawa(OptimParamsUzawaBase<ViscousWithoutFriction<2>>& params)
+    void set_params_test_uzawa(OptimParamsUzawaBase& params)
     {
         params.rho = 200.;
     }
@@ -42,7 +42,7 @@ namespace scopi {
 
     TEST_CASE_TEMPLATE("sphere plan viscosity", SolverType, SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
     {
-        using solver_t = typename SolverType::solver_type;
+        using params_t = typename SolverType::params_t;
         constexpr std::size_t dim = 2;
 
         double radius = 1.;
@@ -59,8 +59,8 @@ namespace scopi {
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{g, -g}}));
 
-        OptimParams<solver_t> params;
-        set_params_test(params);
+        params_t params;
+        set_params_test(params.optim_params);
 
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
@@ -73,7 +73,7 @@ namespace scopi {
     /*
     TEST_CASE_TEMPLATE("sphere plan viscosity friction vertical", SolverType, SOLVER_VISCOUS_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
-        using solver_t = typename SolverType::solver_type;
+        using params_t = typename SolverType::params_t;
         constexpr std::size_t dim = 2;
 
         double radius = 1.;
@@ -90,7 +90,7 @@ namespace scopi {
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0, -g}}));
 
-        OptimParams<solver_t> params;
+        params_t params;
         params.problem_params.mu = 0.1;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
@@ -102,7 +102,7 @@ namespace scopi {
 
     TEST_CASE_TEMPLATE("sphere plan viscosity friction", SolverType, SOLVER_VISCOUS_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_VISCOUS_WITH_FRICTION(2, contact_brute_force, vap_fpd))
     {
-        using solver_t = typename SolverType::solver_type;
+        using params_t = typename SolverType::params_t;
         constexpr std::size_t dim = 2;
 
         double radius = 1.;
@@ -119,7 +119,7 @@ namespace scopi {
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{g, -g}}));
 
-        OptimParams<solver_t> params;
+        params_t params;
         params.problem_params.mu = 0.1;
         SolverType solver(particles, dt, params);
         solver.solve(total_it);

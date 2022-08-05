@@ -1,9 +1,10 @@
 #pragma once
 
 #ifdef SCOPI_USE_SCS
+#include <scs.h>
+
 #include "OptimBase.hpp"
 #include "../problems/DryWithoutFriction.hpp"
-#include <scs.h>
 
 namespace scopi
 {
@@ -16,7 +17,6 @@ namespace scopi
         OptimParams();
         OptimParams(const OptimParams<OptimScs<problem_t>>& params);
 
-        ProblemParams<problem_t> problem_params;
         double tol;
         double tol_infeas;
     };
@@ -31,7 +31,11 @@ namespace scopi
 
     protected:
         template <std::size_t dim>
-        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params);
+        OptimScs(std::size_t nparts,
+                 double dt,
+                 const scopi_container<dim>& particles,
+                 const OptimParams<OptimScs<problem_t>>& optim_params,
+                 const ProblemParams<problem_t>& problem_params);
 
     public:
         template <std::size_t dim>
@@ -132,8 +136,12 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimScs>& optim_params)
-    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
+    OptimScs<problem_t>::OptimScs(std::size_t nparts,
+                                  double dt,
+                                  const scopi_container<dim>& particles,
+                                  const OptimParams<OptimScs<problem_t>>& optim_params,
+                                  const ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
     , m_P_p(6*nparts+1)
@@ -214,8 +222,8 @@ namespace scopi
     }
 
     template <class problem_t>
-    void OptimScs<problem_t>::coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals,
-                              std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals)
+    void OptimScs<problem_t>::coo_to_csr(std::vector<int> coo_rows,   std::vector<int> coo_cols,  std::vector<double> coo_vals,
+                                          std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals)
     {
         // https://www-users.cse.umn.edu/~saad/software/SPARSKIT/
         std::size_t nrow = 6*this->m_nparts;
@@ -300,15 +308,13 @@ namespace scopi
 
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams()
-    : problem_params()
-    , tol(1e-7)
+    : tol(1e-7)
     , tol_infeas(1e-10)
     {}
 
     template<class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams(const OptimParams<OptimScs<problem_t>>& params)
-    : problem_params(params.problem_params)
-    , tol(params.tol)
+    : tol(params.tol)
     , tol_infeas(params.tol_infeas)
     {}
 }

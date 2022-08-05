@@ -11,7 +11,7 @@
 #include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
-#include "../params/ProblemParams.hpp"
+#include "../params.hpp"
 #include "ProblemBase.hpp"
 
 namespace scopi

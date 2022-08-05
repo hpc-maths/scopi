@@ -18,8 +18,9 @@ namespace scopi
     class OptimUzawaMkl;
 
     template<class problem_t>
-    class OptimParams<OptimUzawaMkl<problem_t>> : public OptimParamsUzawaBase<problem_t>
-    {};
+    struct OptimParams<OptimUzawaMkl<problem_t>> : public OptimParamsUzawaBase
+    {
+    };
 
     template <class problem_t = DryWithoutFriction>
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>
@@ -31,7 +32,10 @@ namespace scopi
 
     protected:
         template <std::size_t dim>
-        OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimUzawaMkl>& optim_params);
+        OptimUzawaMkl(std::size_t nparts,
+                      double dt,
+                      const scopi_container<dim>& particles,
+                      const OptimParams<OptimUzawaMkl<problem_t>>& optim_params);
         ~OptimUzawaMkl();
 
     public:
@@ -145,8 +149,12 @@ namespace scopi
 
     template <class problem_t>
     template<std::size_t dim>
-    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts, double dt, const scopi_container<dim>& particles, const OptimParams<OptimUzawaMkl>& optim_params)
-    : base_type(nparts, dt, optim_params)
+    OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts,
+                                            double dt,
+                                            const scopi_container<dim>& particles,
+                                            const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
+                                            const ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, optim_params, problem_params)
     {
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;
@@ -234,10 +242,10 @@ namespace scopi
 
     template <class problem_t>
     void OptimUzawaMkl<problem_t>::set_moment_matrix(std::size_t nparts,
-                                          std::vector<MKL_INT>& invP_csr_row,
-                                          std::vector<MKL_INT>& invP_csr_col,
-                                          std::vector<double>& invP_csr_val,
-                                          const scopi_container<2>& particles)
+                                                     std::vector<MKL_INT>& invP_csr_row,
+                                                     std::vector<MKL_INT>& invP_csr_col,
+                                                     std::vector<double>& invP_csr_val,
+                                                     const scopi_container<2>& particles)
     {
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
@@ -256,10 +264,10 @@ namespace scopi
 
     template <class problem_t>
     void OptimUzawaMkl<problem_t>::set_moment_matrix(std::size_t nparts,
-                                         std::vector<MKL_INT>& invP_csr_row,
-                                         std::vector<MKL_INT>& invP_csr_col,
-                                         std::vector<double>& invP_csr_val,
-                                         const scopi_container<3>& particles)
+                                                     std::vector<MKL_INT>& invP_csr_row,
+                                                     std::vector<MKL_INT>& invP_csr_col,
+                                                     std::vector<double>& invP_csr_val,
+                                                     const scopi_container<3>& particles)
     {
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)

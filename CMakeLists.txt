@@ -49,7 +49,7 @@ endif()
 find_package(xtensor REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
-find_package(plog REQUIRED)
+# find_package(plog REQUIRED)
 # find_package(nanoflann)
 
 # section needed to use xtensor-blas
@@ -100,6 +100,9 @@ endif()
 set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
+    src/contact/base.cpp
+    src/contact/contact_brute_force.cpp
+    src/contact/contact_kdtree.cpp
     src/problems/DryWithoutFriction.cpp
     src/problems/DryWithFriction.cpp
     src/problems/DryWithFrictionFixedPoint.cpp
@@ -122,7 +125,7 @@ target_include_directories(scopi PUBLIC
 target_link_libraries(scopi PUBLIC xtensor
                       nlohmann_json::nlohmann_json
                       fmt::fmt
-                      plog::plog
+                      # plog::plog
                       #nanoflann::nanoflann
                       ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 

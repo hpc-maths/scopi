@@ -2,6 +2,7 @@
 
 #include "OptimBase.hpp"
 
+#include <cstddef>
 #include <omp.h>
 #include "tbb/tbb.h"
 
@@ -11,17 +12,14 @@
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
-#include "../params/OptimParams.hpp"
 #include "../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
-    template<class problem_t>
     struct OptimParamsUzawaBase
     {
         OptimParamsUzawaBase();
         OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
 
-        ProblemParams<problem_t> problem_params;
         double tol;
         std::size_t max_iter;
         double rho;
@@ -35,7 +33,10 @@ namespace scopi{
         using base_type = OptimBase<Derived, problem_t>;
 
     protected:
-        OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params);
+        OptimUzawaBase(std::size_t nparts,
+                       double dt,
+                       const OptimParams<Derived>& optim_params,
+                       const ProblemParams<problem_t>& problem_params);
 
     public:
         template <std::size_t dim>
@@ -77,8 +78,11 @@ namespace scopi{
     };
 
     template<class Derived, class problem_t>
-    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts, double dt, const OptimParams<Derived>& optim_params)
-    : base_type(nparts, dt, 2*3*nparts, 0, optim_params)
+    OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts,
+                                                       double dt,
+                                                       const OptimParams<Derived>& optim_params,
+                                                       const ProblemParams<problem_t>& problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
     , m_U(xt::zeros<double>({6*nparts}))
     , m_dmin(0.)
     {}
@@ -239,18 +243,14 @@ namespace scopi{
         static_cast<Derived&>(*this).finalize_uzawa_impl();
     }
 
-    template<class problem_t>
-    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase(const OptimParamsUzawaBase& params)
-    : problem_params(params.problem_params)
-    , tol(params.tol)
+    OptimParamsUzawaBase::OptimParamsUzawaBase(const OptimParamsUzawaBase& params)
+    : tol(params.tol)
     , max_iter(params.max_iter)
     , rho(params.rho)
     {}
 
-    template<class problem_t>
-    OptimParamsUzawaBase<problem_t>::OptimParamsUzawaBase()
-    : problem_params()
-    , tol(1e-9)
+    OptimParamsUzawaBase::OptimParamsUzawaBase()
+    : tol(1e-9)
     , max_iter(40000)
     , rho(2000.)
     {}

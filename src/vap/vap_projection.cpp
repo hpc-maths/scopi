@@ -2,7 +2,7 @@
 
 namespace scopi
 {
-    vap_projection::vap_projection(std::size_t Nactive, std::size_t active_ptr, double dt)
+    vap_projection::vap_projection(std::size_t Nactive, std::size_t active_ptr, double dt, const VapParams<vap_projection>&)
         : base_type(Nactive, active_ptr, dt)
     {}
 

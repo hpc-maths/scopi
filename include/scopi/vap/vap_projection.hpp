@@ -4,6 +4,13 @@
 
 namespace scopi
 {
+    class vap_projection;
+     
+    template<>
+    struct VapParams<vap_projection>
+    {
+    };
+
     class vap_projection: public vap_base<vap_projection>
     {
     public:
@@ -14,7 +21,7 @@ namespace scopi
         template <std::size_t dim>
         void update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
 
-        vap_projection(std::size_t Nactive, std::size_t active_ptr, double dt);
+        vap_projection(std::size_t Nactive, std::size_t active_ptr, double dt, const VapParams<vap_projection>& params);
 
         void set_u_w(xt::xtensor<double, 2> u, xt::xtensor<double, 2> w);
 
