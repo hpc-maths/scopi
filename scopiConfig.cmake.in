@@ -13,19 +13,19 @@ find_dependency(nlohmann_json @nlohmann_json_REQUIRED_VERSION@)
 find_dependency(fmt @fmt_REQUIRED_VERSION@)
 find_dependency(plog @plog_REQUIRED_VERSION@)
 
-if(SCOPI_USE_OPENMP)
+if(@SCOPI_USE_OPENMP@)
     find_dependency(OpenMP @openmp_REQUIRED_VERSION@)
 endif()
 
-if(SCOPI_USE_TBB)
+if(@SCOPI_USE_TBB@)
     find_dependency(TBB @tbb_REQUIRED_VERSION@)
 endif()
 
-if(SCOPI_USE_MKL)
+if(@SCOPI_USE_MKL@)
     find_dependency(MKL @mkl_REQUIRED_VERSION@)
 endif()
 
-if(SCOPI_USE_MOSEK)
+if(@SCOPI_USE_MOSEK@)
   find_dependency(MOSEK @mosek_REQUIRED_VERSION@)
 endif()
 
