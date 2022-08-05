@@ -15,7 +15,7 @@
 #include "../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
-    struct OptimParamsUzawaBase
+    inline struct OptimParamsUzawaBase
     {
         OptimParamsUzawaBase();
         OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
