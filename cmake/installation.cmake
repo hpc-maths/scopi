@@ -12,8 +12,8 @@ function (install_project)
     export(EXPORT ${PROJECT_NAME}-targets
         FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
 
-    install(FILES ${${PROJECT_CAP}_HEADERS}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_LOW})
+    install(DIRECTORY ${${PROJECT_CAP}_INCLUDE_DIR}/${PROJECT_LOW}
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
     set(${PROJECT_CAP}_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
         STRING "install path for ${PROJECT_NAME}Config.cmake")

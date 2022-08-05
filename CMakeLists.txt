@@ -16,7 +16,6 @@ set (CMAKE_CXX_STANDARD 17)
 message(STATUS "CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-
 set(SCOPI_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Versionning
@@ -50,6 +49,7 @@ endif()
 find_package(xtensor REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
+find_package(plog REQUIRED)
 # find_package(nanoflann)
 
 # section needed to use xtensor-blas
@@ -119,11 +119,12 @@ target_include_directories(scopi PUBLIC
                                  $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
                                  $<INSTALL_INTERFACE:include>)
 
-                             target_link_libraries(scopi PUBLIC xtensor
-                                   nlohmann_json::nlohmann_json
-                                   fmt::fmt
-                                        #   nanoflann::nanoflann
-                                   ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+target_link_libraries(scopi PUBLIC xtensor
+                      nlohmann_json::nlohmann_json
+                      fmt::fmt
+                      plog::plog
+                      #nanoflann::nanoflann
+                      ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 # set_target_properties(scopi PROPERTIES
 #                       PUBLIC_HEADER "${SCOPI_HEADERS}"
@@ -150,13 +151,15 @@ endif()
 
 if(SCOPI_USE_MOSEK)
     include_directories(SYSTEM ${MOSEK_INCLUDE_DIR})
-    target_link_libraries(scopi PUBLIC ${MOSEK_LIBRARIES})
+    target_link_libraries(scopi LINK_PUBLIC ${MOSEK_LIBRARIES})
+    target_include_directories(scopi PUBLIC ${MOSEK_INCLUDE_DIR})
     target_compile_definitions(scopi PUBLIC SCOPI_USE_MOSEK)
 endif()
 
 if(SCOPI_USE_SCS)
     include_directories(SYSTEM ${scs_INCLUDE_DIR})
     target_link_libraries(scopi PUBLIC ${scs_LIBRARIES})
+    target_include_directories(scopi PUBLIC ${scs_INCLUDE_DIR})
     target_compile_definitions(scopi PUBLIC SCOPI_USE_SCS)
 endif()
 
@@ -173,53 +176,5 @@ endif()
 
 # Installation
 # ============
-
-set(SCOPI_HEADERS
-    ${SCOPI_INCLUDE_DIR}/scopi/container.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/contact/contact_brute_force.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/contact/base.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/contact/contact_kdtree.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solver.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/dispatch.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/neighbor.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/sphere.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/worm.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/superellipsoid.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/constructor.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/base.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/types/plan.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/write_objects.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/closest_points.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/distance.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/objects/methods/matrix_particles.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimMosek.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeOmp.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimScs.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMatrixFreeTbb.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaMkl.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimUzawaBase.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/solvers/OptimBase.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/params/ProblemParams.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/params/OptimParams.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/ProblemBase.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousBase.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithoutFriction.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithFriction.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/DryWithFrictionFixedPoint.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWitouthFriction.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/problems/ViscousWithFriction.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/quaternion.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/minpack.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/property.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/crtp.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/utils.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/types.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/scopi_config.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_fpd.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/vap/base.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_fixed.hpp
-    ${SCOPI_INCLUDE_DIR}/scopi/vap/vap_projection.hpp
-)
-
 include(installation)
 install_project()

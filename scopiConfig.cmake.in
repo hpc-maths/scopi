@@ -8,6 +8,26 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
+find_dependency(xtensor @xtensor_REQUIRED_VERSION@)
+find_dependency(nlohmann_json @nlohmann_json_REQUIRED_VERSION@)
+find_dependency(fmt @fmt_REQUIRED_VERSION@)
+find_dependency(plog @plog_REQUIRED_VERSION@)
+
+if(@SCOPI_USE_OPENMP@)
+    find_dependency(OpenMP @openmp_REQUIRED_VERSION@)
+endif()
+
+if(@SCOPI_USE_TBB@)
+    find_dependency(TBB @tbb_REQUIRED_VERSION@)
+endif()
+
+if(@SCOPI_USE_MKL@)
+    find_dependency(MKL @mkl_REQUIRED_VERSION@)
+endif()
+
+if(@SCOPI_USE_MOSEK@)
+  find_dependency(MOSEK @mosek_REQUIRED_VERSION@)
+endif()
 
 if(NOT TARGET @PROJECT_NAME@)
   include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
