@@ -34,7 +34,6 @@ namespace scopi{
 
     protected:
         OptimUzawaBase(std::size_t nparts,
-                       std::size_t active_ptr,
                        double dt,
                        const OptimParams<Derived>& optim_params,
                        const ProblemParams<problem_t>& problem_params);
@@ -80,11 +79,10 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts,
-                                                       std::size_t active_ptr,
                                                        double dt,
                                                        const OptimParams<Derived>& optim_params,
                                                        const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, active_ptr, dt, 2*3*nparts, 0, optim_params, problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
     , m_U(xt::zeros<double>({6*nparts}))
     , m_dmin(0.)
     {}

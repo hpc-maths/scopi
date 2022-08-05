@@ -26,7 +26,7 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&);
+    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&)
     {}
 
     template <std::size_t dim>

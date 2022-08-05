@@ -16,7 +16,7 @@ namespace scopi{
     class OptimBase : protected problem_t
     {
     protected:
-        OptimBase(std::size_t nparts, std::size_t active_ptr, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params);
+        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params);
 
         template<std::size_t dim>
         void run(const scopi_container<dim>& particles,
@@ -68,8 +68,8 @@ namespace scopi{
 
 
     template<class Derived, class problem_t>
-    OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, std::size_t active_ptr, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params)
-    : problem_t(nparts, active_ptr, dt, problem_params)
+    OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params)
+    : problem_t(nparts, dt, problem_params)
     , m_params(optim_params)
     , m_nparts(nparts)
     , m_c(xt::zeros<double>({cSize}))

@@ -80,7 +80,6 @@ namespace scopi{
     protected:
         template<std::size_t dim>
         OptimProjectedGradient(std::size_t nparts,
-                               std::size_t active_ptr,
                                double dt,
                                const scopi_container<dim>& particles,
                                const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params,
@@ -131,12 +130,11 @@ namespace scopi{
     template<class problem_t, class gradient_t>
     template<std::size_t dim>
     OptimProjectedGradient<problem_t, gradient_t>::OptimProjectedGradient(std::size_t nparts,
-                                                                          std::size_t active_ptr,
                                                                           double dt,
                                                                           const scopi_container<dim>& particles,
                                                                           const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params,
                                                                           const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, active_ptr, dt, 2*3*nparts, 0, optim_params, problem_params)
+    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
     , gradient_t(optim_params.max_iter, optim_params.rho, optim_params.tol_dg, optim_params.tol_l, optim_params.verbose)
     , m_u(xt::zeros<double>({6*nparts}))
     , m_bl(xt::zeros<double>({6*nparts}))

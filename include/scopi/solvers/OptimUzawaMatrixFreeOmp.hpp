@@ -33,7 +33,6 @@ namespace scopi{
     protected:
         template <std::size_t dim>
         OptimUzawaMatrixFreeOmp(std::size_t nparts,
-                                std::size_t active_ptr,
                                 double dt,
                                 const scopi_container<dim>& particles,
                                 const OptimParams<OptimUzawaMatrixFreeOmp<problem_t>>& optim_params,
@@ -113,12 +112,11 @@ namespace scopi{
     template <class problem_t>
     template <std::size_t dim>
     OptimUzawaMatrixFreeOmp<problem_t>::OptimUzawaMatrixFreeOmp(std::size_t nparts,
-                                                                std::size_t active_ptr,
                                                                 double dt,
                                                                 const scopi_container<dim>&,
                                                                 const OptimParams<OptimUzawaMatrixFreeOmp<problem_t>>& optim_params,
                                                                 const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, active_ptr, dt, optim_params, problem_params)
+    : base_type(nparts, dt, optim_params, problem_params)
     {}
 
 }

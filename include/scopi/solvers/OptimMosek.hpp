@@ -34,7 +34,6 @@ namespace scopi{
     protected:
         template <std::size_t dim>
         OptimMosek(std::size_t nparts,
-                   std::size_t active_ptr,
                    double dt,
                    const scopi_container<dim>& particles,
                    const OptimParams<OptimMosek<problem_t>>& optim_params,
@@ -139,12 +138,11 @@ namespace scopi{
     template<class problem_t>
     template <std::size_t dim>
     OptimMosek<problem_t>::OptimMosek(std::size_t nparts,
-                                      std::size_t active_ptr,
                                       double dt,
                                       const scopi_container<dim>& particles,
                                       const OptimParams<OptimMosek<problem_t>>& optim_params,
                                       const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, active_ptr, dt, 1 + 2*3*nparts + 2*3*nparts, 1, optim_params, problem_params)
+    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1, optim_params, problem_params)
     , m_constraint(nparts)
     {
         using namespace mosek::fusion;

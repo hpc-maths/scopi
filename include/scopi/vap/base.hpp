@@ -2,6 +2,7 @@
 
 #include "../container.hpp"
 #include "../utils.hpp"
+#include "../params.hpp"
 
 namespace scopi
 {
