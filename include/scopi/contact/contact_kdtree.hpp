@@ -50,7 +50,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, const ContactsParams<contact_kdtree>& params);
+        contact_kdtree(double dmax, const ContactsParams<contact_kdtree>& params = ContactsParams<contact_kdtree>());
         std::size_t get_nMatches() const;
 
         template <std::size_t dim>

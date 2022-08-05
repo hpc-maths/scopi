@@ -48,6 +48,7 @@ namespace scopi
     private:
         using problem_t = typename optim_solver_t::problem_type;
     public:
+        using params_t = Params<optim_solver_t, problem_t, contact_t, vap_t>;
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
                     const Params<optim_solver_t, problem_t, contact_t, vap_t>& params = Params<optim_solver_t, problem_t, contact_t, vap_t>());

@@ -24,7 +24,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_brute_force>;
 
-        contact_brute_force(double dmax, const ContactsParams<contact_brute_force>& params);
+        contact_brute_force(double dmax, const ContactsParams<contact_brute_force>& params = ContactsParams<contact_brute_force>());
 
         template <std::size_t dim>
         std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);

@@ -23,7 +23,7 @@ namespace scopi
         particles.push_back(s2);
         particles.push_back(s3);
 
-        contact_kdtree cont(2., 100);
+        contact_kdtree cont(2.);
         auto contacts = cont.run(particles, 0);
         std::size_t nMatches = cont.get_nMatches();
 

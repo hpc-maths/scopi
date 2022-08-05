@@ -434,7 +434,7 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("two worms", SolverType, SOLVER_WORMS(2, contact_kdtree, vap_fixed), SOLVER_WORMS(2, contact_brute_force, vap_fixed))
     {
-        using solver_t = typename SolverType::solver_type;
+        using params_t = typename SolverType::params_t;
 
         constexpr std::size_t dim = 2;
         double dt = .005;
@@ -451,8 +451,8 @@ namespace scopi
         particles.push_back(g1, prop.desired_velocity({-1., 0.}));
         particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
-        OptimParams<solver_t> params;
-        set_params_test(params);
+        params_t params;
+        set_params_test(params.optim_params);
         SolverType solver(particles, dt, params);
         solver.solve(total_it);
 
