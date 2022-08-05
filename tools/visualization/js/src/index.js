@@ -142,7 +142,9 @@ function drawObjects() {
             var nbSpheres = 0;
             objects.forEach((obj, index) => {
                 if (obj.type === "worm") {
-                    nbSpheres += 6;
+                    obj.worm.forEach((sphere, indexSphere) => {
+                        nbSpheres += 1;
+                    });
                 }
                 else if (obj.type === "sphere" || obj.type === "superellipsoid") {
                     nbSpheres += 1;
