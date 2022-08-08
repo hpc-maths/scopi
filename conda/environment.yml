@@ -15,3 +15,6 @@ dependencies:
   - mkl-static
   - nanoflann
   - nlohmann_json
+  - plog
+  - doctest
+  - mkl
