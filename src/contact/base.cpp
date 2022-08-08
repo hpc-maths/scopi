@@ -5,7 +5,7 @@ namespace scopi
     ContactsParamsBase::ContactsParamsBase()
     {}
 
-    ContactsParamsBase::ContactsParamsBase(const ContactsParamsBase& params)
+    ContactsParamsBase::ContactsParamsBase(const ContactsParamsBase&)
     {}
 
 }
