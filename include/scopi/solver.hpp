@@ -88,7 +88,7 @@ namespace scopi
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
             write_output_files(contacts, nite);
-            this->set_a_priori_velocity(m_particles);
+            this->set_a_priori_velocity(m_particles, contacts_worms);
             this->extra_setps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
             {

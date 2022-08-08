@@ -2,6 +2,7 @@
 
 #include "base.hpp"
 #include <cstddef>
+#include <vector>
 
 namespace scopi
 {
@@ -17,7 +18,7 @@ namespace scopi
     public:
         using base_type = vap_base<vap_fpd>;
         template <std::size_t dim>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles);
+        void set_a_priori_velocity_impl(scopi_container<dim>& particles, std::vector<neighbor<dim>>& contacts_worms);
 
         template <std::size_t dim>
         void update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
@@ -34,7 +35,7 @@ namespace scopi
     type::moment_t<3> cross_product_vap_fpd(scopi_container<3>& particles, std::size_t i);
 
     template <std::size_t dim>
-    void vap_fpd::set_a_priori_velocity_impl(scopi_container<dim>& particles)
+    void vap_fpd::set_a_priori_velocity_impl(scopi_container<dim>& particles, std::vector<neighbor<dim>>&)
     {
         for (std::size_t i=0; i<m_Nactive; ++i)
         {

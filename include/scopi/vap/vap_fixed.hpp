@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base.hpp"
+#include <vector>
 
 namespace scopi
 {
@@ -16,7 +17,7 @@ namespace scopi
     public:
         using base_type = vap_base<vap_fixed>;
         template <std::size_t dim>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles);
+        void set_a_priori_velocity_impl(scopi_container<dim>& particles, std::vector<neighbor<dim>>& contacts_worms);
 
         template <std::size_t dim>
         void update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
@@ -26,7 +27,7 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&)
+    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&, std::vector<neighbor<dim>>&)
     {}
 
     template <std::size_t dim>
