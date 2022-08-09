@@ -3,6 +3,8 @@
 #include "../container.hpp"
 #include "../utils.hpp"
 #include "../params.hpp"
+#include "../objects/neighbor.hpp"
+#include <vector>
 
 namespace scopi
 {
@@ -11,7 +13,7 @@ namespace scopi
     {
     public:
         template <std::size_t dim>
-        void set_a_priori_velocity(scopi_container<dim>& particles);
+        void set_a_priori_velocity(scopi_container<dim>& particles, std::vector<neighbor<dim>>& contacts_worms);
         template <std::size_t dim>
         void update_velocity(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
         vap_base(std::size_t Nactive, std::size_t active_ptr, double dt);
@@ -31,10 +33,10 @@ namespace scopi
 
     template <class D>
     template <std::size_t dim>
-    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles)
+    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles, std::vector<neighbor<dim>>& contacts_worms)
     {
         tic();
-        this->derived_cast().set_a_priori_velocity_impl(particles);
+        this->derived_cast().set_a_priori_velocity_impl(particles, contacts_worms);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : set vap = " << duration;
     }
