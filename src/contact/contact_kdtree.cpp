@@ -5,7 +5,7 @@ namespace scopi
     contact_kdtree::contact_kdtree(const ContactsParams<contact_kdtree>& params)
     : contact_base()
     , m_params(params)
-    {};
+    {}
 
     std::size_t contact_kdtree::get_nMatches() const
     {
