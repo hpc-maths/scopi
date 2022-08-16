@@ -20,9 +20,6 @@ namespace scopi
         template <std::size_t dim>
         void set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts_pos, const std::vector<neighbor<dim>>& contacts_neg);
 
-        template <std::size_t dim>
-        void update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
-
         vap_projection(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt, const VapParams<vap_projection>& params);
 
         void set_u_w(const xt::xtensor<double, 2>& u, const xt::xtensor<double, 2>& w);
@@ -46,7 +43,4 @@ namespace scopi
         }
     }
 
-    template <std::size_t dim>
-    void vap_projection::update_velocity_impl(scopi_container<dim>&, const xt::xtensor<double, 2>&, const xt::xtensor<double, 2>&)
-    {}
 }
