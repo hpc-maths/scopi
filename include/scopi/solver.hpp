@@ -89,12 +89,12 @@ namespace scopi
             auto contacts_worms = compute_contacts_worms();
             write_output_files(contacts, nite);
             this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
-            this->extra_setps_before_solve(contacts);
+            this->extra_steps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
             {
                 optim_solver_t::run(m_particles, contacts, contacts_worms, nite);
                 // TODO get_constraint computes a matrix-vector product, do it only if needed
-                this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
+                this->extra_steps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
             }
             move_active_particles();
             this->update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
