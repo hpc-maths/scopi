@@ -8,7 +8,7 @@ namespace scopi
     {}
 
 
-    void vap_projection::set_u_w(xt::xtensor<double, 2> u, xt::xtensor<double, 2> w)
+    void vap_projection::set_u_w(const xt::xtensor<double, 2>& u, const xt::xtensor<double, 2>& w)
     {
         m_u = u;
         m_w = w;

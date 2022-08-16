@@ -329,9 +329,9 @@ namespace scopi
 
     template<std::size_t dim>
     void ViscousWithFriction<dim>::correct_lambda(const std::vector<neighbor<dim>>& contacts,
-                                                          xt::xtensor<double, 1> lambda,
-                                                          const scopi_container<dim>& particles,
-                                                          const xt::xtensor<double, 2>& u)
+                                                  xt::xtensor<double, 1> lambda,
+                                                  const scopi_container<dim>& particles,
+                                                  const xt::xtensor<double, 2>& u)
     {
         // TODO will work only for sphere and plan test
         m_lambda.resize(contacts.size());

@@ -59,7 +59,7 @@ namespace scopi
 
         std::vector<neighbor<dim>> compute_contacts();
         std::vector<neighbor<dim>> compute_contacts_worms();
-        void write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite);
+        void write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite);
         void move_active_particles();
         scopi_container<dim>& m_particles;
         double m_dt;
@@ -160,7 +160,7 @@ namespace scopi
     }
 
     template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         tic();
         nl::json json_output;

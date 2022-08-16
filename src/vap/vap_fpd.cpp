@@ -7,12 +7,12 @@ namespace scopi
     : base_type(Nactive, active_ptr, dt)
     {}
 
-    type::moment_t<2> cross_product_vap_fpd(scopi_container<2>&, std::size_t)
+    type::moment_t<2> cross_product_vap_fpd(const scopi_container<2>&, std::size_t)
     {
         return 0.;
     }
 
-    type::moment_t<3> cross_product_vap_fpd(scopi_container<3>& particles, std::size_t i)
+    type::moment_t<3> cross_product_vap_fpd(const scopi_container<3>& particles, std::size_t i)
     {
         double omega_1 = particles.omega()(i)[0];
         double omega_2 = particles.omega()(i)[1];

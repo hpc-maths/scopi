@@ -60,9 +60,9 @@ namespace scopi
 
     template<std::size_t dim>
     void DryWithFriction::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                              const std::vector<neighbor<dim>>& contacts,
-                                                              const std::vector<neighbor<dim>>& contacts_worms,
-                                                              std::size_t firstCol)
+                                                       const std::vector<neighbor<dim>>& contacts,
+                                                       const std::vector<neighbor<dim>>& contacts_worms,
+                                                       std::size_t firstCol)
     {
         matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 4);
         std::size_t active_offset = particles.nb_inactive();
