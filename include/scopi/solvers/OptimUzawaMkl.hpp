@@ -35,7 +35,8 @@ namespace scopi
         OptimUzawaMkl(std::size_t nparts,
                       double dt,
                       const scopi_container<dim>& particles,
-                      const OptimParams<OptimUzawaMkl<problem_t>>& optim_params);
+                      const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
+                      const ProblemParams<problem_t>& problem_params);
         ~OptimUzawaMkl();
 
     public:
