@@ -2,8 +2,8 @@
 
 namespace scopi
 {
-    contact_brute_force::contact_brute_force(double dmax, const ContactsParams<contact_brute_force>& params)
-    : contact_base(dmax)
+    contact_brute_force::contact_brute_force(const ContactsParams<contact_brute_force>& params)
+    : contact_base()
     , m_params(params)
     {};
 

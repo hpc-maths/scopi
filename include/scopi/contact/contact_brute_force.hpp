@@ -24,7 +24,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_brute_force>;
 
-        contact_brute_force(double dmax, const ContactsParams<contact_brute_force>& params = ContactsParams<contact_brute_force>());
+        contact_brute_force(const ContactsParams<contact_brute_force>& params = ContactsParams<contact_brute_force>());
 
         template <std::size_t dim>
         std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
@@ -48,7 +48,7 @@ namespace scopi
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_dmax);
+                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
             }
         }
 
@@ -57,7 +57,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_dmax);
+                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
             }
         }
 

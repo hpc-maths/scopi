@@ -75,7 +75,7 @@ namespace scopi
                                                                     const Params<optim_solver_t, problem_t, contact_t, vap_t>& params)
     : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
     , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
-    , contact_t(2., params.contacts_params)
+    , contact_t(params.contacts_params)
     , m_particles(particles)
     , m_dt(dt)
     {}

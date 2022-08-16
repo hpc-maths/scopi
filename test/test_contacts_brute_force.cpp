@@ -21,7 +21,8 @@ namespace scopi
         particles.push_back(s2);
         particles.push_back(s3);
 
-        contact_brute_force cont(2);
+        ContactsParams<contact_brute_force> params;
+        contact_brute_force cont(params);
         auto contacts = cont.run(particles, 0);
 
         SUBCASE("nbContacts")

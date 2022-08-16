@@ -14,17 +14,17 @@ namespace scopi
     {
         ContactsParamsBase();
         ContactsParamsBase(const ContactsParamsBase& params);
+
+        double dmax;
     };
 
     template <class D>
     class contact_base: public crtp_base<D>
     {
     public:
-        contact_base(double dmax): m_dmax(dmax){}
+        contact_base() {}
         template <std::size_t dim>
         std::vector<neighbor<dim>> run(scopi_container<dim>& particles, std::size_t active_ptr);
-    protected:
-      double m_dmax;
     };
 
     template <class D>
