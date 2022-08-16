@@ -65,6 +65,7 @@ namespace scopi
         void move_active_particles();
         void update_velocity();
 
+        ScopiParams m_params;
         scopi_container<dim>& m_particles;
         double m_dt;
     };
@@ -76,6 +77,7 @@ namespace scopi
     : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
     , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
     , contact_t(params.contacts_params)
+    , m_params(params.scopi_params)
     , m_particles(particles)
     , m_dt(dt)
     {}
@@ -91,6 +93,7 @@ namespace scopi
             displacement_obstacles();
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
+            if (nite % m_params.frequence_output == 0 || m_params.frequence_output == std::size_t(-1))
             write_output_files(contacts, nite);
             this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
             this->extra_steps_before_solve(contacts);
@@ -265,6 +268,7 @@ namespace scopi
             particles.omega()(i + particles.nb_inactive())(d) = wadapt(i, d);
         }
     }
+
     
 }
 
