@@ -34,7 +34,7 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void vap_projection::set_a_priori_velocity_impl(scopi_container<dim>& particles, std::vector<neighbor<dim>>&)
+    void vap_projection::set_a_priori_velocity_impl(scopi_container<dim>& particles, std::vector<neighbor<dim>>&, std::vector<neighbor<dim>>&)
     {
         for (std::size_t i=0; i< this->m_Nactive; ++i)
         {
