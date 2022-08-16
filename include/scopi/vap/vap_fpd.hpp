@@ -25,10 +25,6 @@ namespace scopi
 
         vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt, const VapParams<vap_fpd>& params);
 
-    private:
-        template <std::size_t dim>
-        void update_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
-
     };
 
     type::moment_t<2> cross_product_vap_fpd(const scopi_container<2>& particles, std::size_t i);
@@ -42,19 +38,6 @@ namespace scopi
             particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*particles.f()(m_active_ptr + i)/particles.m()(m_active_ptr + i);
             // TODO should be dt * (R_i * t_i^{ext , n} - omega'_i * (J_i omega'_i)
             particles.desired_omega()(m_active_ptr + i) = particles.omega()(m_active_ptr + i) + cross_product_vap_fpd(particles, m_active_ptr + i);
-        }
-    }
-
-    template <std::size_t dim>
-    void vap_fpd::update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt)
-    {
-        for (std::size_t i=0; i<m_Nactive; ++i)
-        {
-            for (std::size_t d=0; d<dim; ++d)
-            {
-                particles.v()(i + m_active_ptr)(d) = uadapt(i, d);
-            }
-            update_omega(particles, i, wadapt);
         }
     }
 
