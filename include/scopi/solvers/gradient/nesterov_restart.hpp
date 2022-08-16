@@ -45,6 +45,7 @@ namespace scopi{
     template<class projection_t>
     std::size_t nesterov_restart<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
+        PLOG_INFO << "Projection: Nesterov with restart";
         std::size_t iter = 0;
         double theta_old = 1.;
         m_y = l;
