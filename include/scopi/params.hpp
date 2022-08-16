@@ -41,6 +41,7 @@ namespace scopi
         ScopiParams(const ScopiParams& params);
 
         std::size_t frequence_output;
+        std::string filename;
     };
 
     // TODO fix compilation with default template parameters
