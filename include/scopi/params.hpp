@@ -40,7 +40,7 @@ namespace scopi
         ScopiParams();
         ScopiParams(const ScopiParams& params);
 
-        std::size_t frequence_output;
+        std::size_t output_frequency;
         std::string filename;
     };
 
