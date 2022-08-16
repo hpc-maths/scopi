@@ -17,7 +17,7 @@ namespace scopi
     public:
         using base_type = vap_base<vap_fixed>;
         template <std::size_t dim>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles, std::vector<neighbor<dim>>& contacts_worms);
+        void set_a_priori_velocity_impl(scopi_container<dim>& particles, std::vector<neighbor<dim>>& contacts_pos, std::vector<neighbor<dim>>& contacts_neg);
 
         template <std::size_t dim>
         void update_velocity_impl(scopi_container<dim>& particles, const xt::xtensor<double, 2>& uadapt, const xt::xtensor<double, 2>& wadapt);
@@ -27,7 +27,7 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&, std::vector<neighbor<dim>>&)
+    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&, std::vector<neighbor<dim>>&, std::vector<neighbor<dim>>&)
     {}
 
     template <std::size_t dim>

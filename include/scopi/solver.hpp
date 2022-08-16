@@ -70,7 +70,7 @@ namespace scopi
                                                                     double dt,
                                                                     const Params<optim_solver_t, problem_t, contact_t, vap_t>& params)
     : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
-    , vap_t(particles.nb_active(), particles.nb_inactive(), dt, params.vap_params)
+    , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
     , contact_t(2., params.contacts_params)
     , m_particles(particles)
     , m_dt(dt)
@@ -88,7 +88,7 @@ namespace scopi
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
             write_output_files(contacts, nite);
-            this->set_a_priori_velocity(m_particles, contacts_worms);
+            this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
             this->extra_setps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
             {
