@@ -48,9 +48,9 @@ namespace scopi
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
         template<std::size_t dim>
-        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
-        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
         bool should_solve_optimization_problem();
@@ -162,7 +162,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void DryWithFrictionFixedPoint::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts)
+    void DryWithFrictionFixedPoint::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts)
     {
         m_nb_iter = 0;
         m_s = xt::zeros<double>({contacts.size()});
@@ -170,7 +170,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void DryWithFrictionFixedPoint::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+    void DryWithFrictionFixedPoint::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                                             const xt::xtensor<double, 1>&,
                                                             const xt::xtensor<double, 2>& u_tilde)
     {

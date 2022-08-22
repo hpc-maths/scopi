@@ -83,10 +83,10 @@ namespace scopi
 
     template <std::size_t dim>
     void ConstraintMosek<DryWithFriction>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
-                                                                     mosek::fusion::Matrix::t A,
-                                                                     mosek::fusion::Variable::t X,
-                                                                     mosek::fusion::Model::t model,
-                                                                     const std::vector<neighbor<dim>>& contacts)
+                                                           mosek::fusion::Matrix::t A,
+                                                           mosek::fusion::Variable::t X,
+                                                           mosek::fusion::Model::t model,
+                                                           const std::vector<neighbor<dim>>& contacts)
     {
         using namespace mosek::fusion;
         m_qc1 = model->constraint("qc1"
@@ -235,10 +235,10 @@ namespace scopi
 
     template <std::size_t dim>
     void ConstraintMosek<ViscousWithFriction<dim>>::add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
-                                                                           mosek::fusion::Matrix::t A,
-                                                                           mosek::fusion::Variable::t X,
-                                                                           mosek::fusion::Model::t model,
-                                                                           const std::vector<neighbor<dim>>& contacts)
+                                                                    mosek::fusion::Matrix::t A,
+                                                                    mosek::fusion::Variable::t X,
+                                                                    mosek::fusion::Model::t model,
+                                                                    const std::vector<neighbor<dim>>& contacts)
     {
         using namespace mosek::fusion;
         using namespace monty;

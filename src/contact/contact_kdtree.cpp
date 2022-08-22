@@ -2,11 +2,10 @@
 
 namespace scopi
 {
-    contact_kdtree::contact_kdtree(double dmax, const ContactsParams<contact_kdtree>& params)
-    : contact_base(dmax)
+    contact_kdtree::contact_kdtree(const ContactsParams<contact_kdtree>& params)
+    : contact_base()
     , m_params(params)
-    , m_kd_tree_radius(17.)
-    {};
+    {}
 
     std::size_t contact_kdtree::get_nMatches() const
     {
@@ -15,10 +14,12 @@ namespace scopi
 
     ContactsParams<contact_kdtree>::ContactsParams()
     : ContactsParamsBase()
+    , kd_tree_radius(17.)
     {}
 
     ContactsParams<contact_kdtree>::ContactsParams(const ContactsParams<contact_kdtree>& params)
     : ContactsParamsBase(params)
+    , kd_tree_radius(params.kd_tree_radius)
     {}
 
 }

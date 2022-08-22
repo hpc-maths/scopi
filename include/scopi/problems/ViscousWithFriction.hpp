@@ -48,8 +48,8 @@ namespace scopi
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
         std::size_t get_nb_gamma_min();
-        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
-        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
+        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
         bool should_solve_optimization_problem();
@@ -308,7 +308,7 @@ namespace scopi
     {}
 
     template<std::size_t dim>
-    void ViscousWithFriction<dim>::extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts_new)
+    void ViscousWithFriction<dim>::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new)
     {
         this->m_should_solve = true;
         this->set_gamma_base(contacts_new);
@@ -329,9 +329,9 @@ namespace scopi
 
     template<std::size_t dim>
     void ViscousWithFriction<dim>::correct_lambda(const std::vector<neighbor<dim>>& contacts,
-                                                          xt::xtensor<double, 1> lambda,
-                                                          const scopi_container<dim>& particles,
-                                                          const xt::xtensor<double, 2>& u)
+                                                  xt::xtensor<double, 1> lambda,
+                                                  const scopi_container<dim>& particles,
+                                                  const xt::xtensor<double, 2>& u)
     {
         // TODO will work only for sphere and plan test
         m_lambda.resize(contacts.size());
@@ -365,7 +365,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void ViscousWithFriction<dim>::extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+    void ViscousWithFriction<dim>::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                                            const xt::xtensor<double, 1>&,
                                                            const xt::xtensor<double, 2>&)
     {

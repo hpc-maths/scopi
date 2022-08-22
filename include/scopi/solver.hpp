@@ -36,6 +36,9 @@ using namespace xt::placeholders;
 
 namespace scopi
 {
+    template<std::size_t dim>
+    void update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
+
     template<std::size_t dim,
              class optim_solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
              class contact_t = contact_kdtree,
@@ -56,11 +59,13 @@ namespace scopi
 
     private:
         void displacement_obstacles();
-
         std::vector<neighbor<dim>> compute_contacts();
         std::vector<neighbor<dim>> compute_contacts_worms();
-        void write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite);
+        void write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite);
         void move_active_particles();
+        void update_velocity();
+
+        ScopiParams m_params;
         scopi_container<dim>& m_particles;
         double m_dt;
     };
@@ -70,13 +75,14 @@ namespace scopi
                                                                     double dt,
                                                                     const Params<optim_solver_t, problem_t, contact_t, vap_t>& params)
     : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
-    , vap_t(particles.nb_active(), particles.nb_inactive(), dt, params.vap_params)
-    , contact_t(2., params.contacts_params)
+    , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
+    , contact_t(params.contacts_params)
+    , m_params(params.scopi_params)
     , m_particles(particles)
     , m_dt(dt)
     {}
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
@@ -87,21 +93,22 @@ namespace scopi
             displacement_obstacles();
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
+            if (nite % m_params.output_frequency == 0 || m_params.output_frequency == std::size_t(-1))
             write_output_files(contacts, nite);
-            this->set_a_priori_velocity(m_particles, contacts_worms);
-            this->extra_setps_before_solve(contacts);
+            this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
+            this->extra_steps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
             {
                 optim_solver_t::run(m_particles, contacts, contacts_worms, nite);
                 // TODO get_constraint computes a matrix-vector product, do it only if needed
-                this->extra_setps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
+                this->extra_steps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
             }
             move_active_particles();
-            this->update_velocity(m_particles, this->get_uadapt(), this->get_wadapt());
+            update_velocity();
         }
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::displacement_obstacles()
     {
         tic();
@@ -131,7 +138,7 @@ namespace scopi
         PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
         auto contacts = contact_t::run(m_particles, m_particles.nb_inactive());
@@ -139,7 +146,7 @@ namespace scopi
         return contacts;
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts_worms()
     {
         std::vector<neighbor<dim>> contacts;
@@ -159,13 +166,14 @@ namespace scopi
         return contacts;
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(std::vector<neighbor<dim>>& contacts, std::size_t nite)
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         tic();
         nl::json json_output;
 
-        std::ofstream file(fmt::format("./Results/scopi_objects_{:04d}.json", nite));
+        // std::ofstream file(fmt::format("./Results/scopi_objects_{:04d}.json", nite));
+        std::ofstream file(fmt::format("{}{:04d}.json", m_params.filename, nite));
 
         json_output["objects"] = {};
 
@@ -195,7 +203,7 @@ namespace scopi
         PLOG_INFO << "----> CPUTIME : write output files = " << duration;
     }
 
-    template<std::size_t dim, class optim_solver_t,class contact_t, class vap_t>
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::move_active_particles()
     {
         tic();
@@ -227,5 +235,41 @@ namespace scopi
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
     }
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::update_velocity()
+    {
+        tic();
+        std::size_t active_offset = m_particles.nb_inactive();
+        auto uadapt = this->get_uadapt();
+        auto wadapt = this->get_wadapt();
+
+        for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
+        {
+            for (std::size_t d = 0; d < dim; ++d)
+            {
+                m_particles.v()(i + active_offset)(d) = uadapt(i, d);
+            }
+            update_velocity_omega(m_particles, i, wadapt);
+        }
+        auto duration = toc();
+        PLOG_INFO << "----> CPUTIME : update velocity = " << duration;
+    }
+
+    template<>
+    void update_velocity_omega(scopi_container<2>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
+    {
+        particles.omega()(i + particles.nb_inactive()) = wadapt(i, 2);
+    }
+
+    void update_velocity_omega(scopi_container<3>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
+    {
+        for (std::size_t d = 0; d < 3; ++d)
+        {
+            particles.omega()(i + particles.nb_inactive())(d) = wadapt(i, d);
+        }
+    }
+
+    
 }
 

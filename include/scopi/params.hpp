@@ -35,6 +35,15 @@ namespace scopi
         VapParams();
     };
 
+    struct ScopiParams
+    {
+        ScopiParams();
+        ScopiParams(const ScopiParams& params);
+
+        std::size_t output_frequency;
+        std::string filename;
+    };
+
     // TODO fix compilation with default template parameters
     // template<class solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
     //          class problem_t = DryWithoutFriction,
@@ -53,6 +62,7 @@ namespace scopi
         ProblemParams<problem_t> problem_params;
         ContactsParams<contact_t> contacts_params;
         VapParams<vap_t> vap_params;
+        ScopiParams scopi_params;
     };
 
     template<class solver_t, class problem_t, class contact_t, class vap_t> 
@@ -61,6 +71,7 @@ namespace scopi
     , problem_params()
     , contacts_params()
     , vap_params()
+    , scopi_params()
     {}
 
     template<class solver_t, class problem_t, class contact_t, class vap_t>
@@ -69,6 +80,7 @@ namespace scopi
     , problem_params(params.problem_params)
     , contacts_params(params.contacts_params)
     , vap_params(params.vap_params)
+    , scopi_params(params.scopi_params)
     {}
 
 }

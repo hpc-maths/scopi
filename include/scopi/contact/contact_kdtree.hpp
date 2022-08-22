@@ -16,6 +16,8 @@ namespace scopi
     {
         ContactsParams();
         ContactsParams(const ContactsParams<contact_kdtree>& params);
+
+        double kd_tree_radius;
     };
 
     template<std::size_t dim>
@@ -50,7 +52,7 @@ namespace scopi
     public:
         using base_type = contact_base<contact_kdtree>;
 
-        contact_kdtree(double dmax, const ContactsParams<contact_kdtree>& params = ContactsParams<contact_kdtree>());
+        contact_kdtree(const ContactsParams<contact_kdtree>& params = ContactsParams<contact_kdtree>());
         std::size_t get_nMatches() const;
 
         template <std::size_t dim>
@@ -60,7 +62,6 @@ namespace scopi
         ContactsParams<contact_kdtree> m_params;
 
     private:
-        double m_kd_tree_radius;
         std::size_t m_nMatches;
     };
 
@@ -114,18 +115,18 @@ namespace scopi
             std::vector<std::pair<size_t, double>> indices_dists;
 
             nanoflann::RadiusResultSet<double, std::size_t> resultSet(
-                m_kd_tree_radius, indices_dists);
+                m_params.kd_tree_radius, indices_dists);
 
             std::vector<std::pair<std::size_t, double>> ret_matches;
 
-            auto nMatches_loc = index.radiusSearch(query_pt, m_kd_tree_radius, ret_matches,
+            auto nMatches_loc = index.radiusSearch(query_pt, m_params.kd_tree_radius, ret_matches,
                 nanoflann::SearchParams());
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
                 std::size_t j = ret_matches[ic].first;
                 if (i < j)
                 { 
-                    compute_exact_distance(particles, i, j, contacts, m_dmax);
+                    compute_exact_distance(particles, i, j, contacts, m_params.dmax);
                     m_nMatches++;
                 }
             }
@@ -136,7 +137,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_dmax);
+                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
             }
         }
 

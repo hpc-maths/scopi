@@ -112,6 +112,7 @@ set(SCOPI_SRC
     src/vap/vap_fpd.cpp
     src/vap/vap_projection.cpp
     src/minpack.cpp
+    src/params.cpp
     src/quaternion.cpp
     src/utils.cpp
 )

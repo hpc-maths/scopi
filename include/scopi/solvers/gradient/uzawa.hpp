@@ -43,6 +43,7 @@ namespace scopi{
     template<class projection_t>
     std::size_t uzawa<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
+        PLOG_INFO << "Projection: Uzawa";
         std::size_t iter = 0;
         while (iter < m_max_iter)
         {

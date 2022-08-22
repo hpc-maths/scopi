@@ -54,9 +54,9 @@ namespace scopi
                                           std::size_t row);
 
         template<std::size_t dim>
-        void extra_setps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
         template<std::size_t dim>
-        void extra_setps_after_solve(const std::vector<neighbor<dim>>& contacts,
+        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
         bool should_solve_optimization_problem();
@@ -238,13 +238,13 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void DryWithoutFriction::extra_setps_before_solve(const std::vector<neighbor<dim>>&)
+    void DryWithoutFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&)
     {
         this->m_should_solve = true;
     }
 
     template<std::size_t dim>
-    void DryWithoutFriction::extra_setps_after_solve(const std::vector<neighbor<dim>>&,
+    void DryWithoutFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
                                                      const xt::xtensor<double, 1>&,
                                                      const xt::xtensor<double, 2>&)
     {
