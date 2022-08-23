@@ -20,13 +20,13 @@ int main()
     double PI = xt::numeric_constants<double>::PI;
 
     double dt = 0.01;
-    std::size_t total_it = 1000;
+    std::size_t total_it = 10;
     double width_box = 10.;
-    std::size_t n = 13; // n^3 spheres
+    std::size_t n = 3; // n^3 spheres
     double g = 1.;
 
-    scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFriction>> params;
-    params.change_default_tol_mosek = false;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_brute_force, scopi::vap_fpd> params;
+    params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 0.1;
 
     scopi::scopi_container<dim> particles;
