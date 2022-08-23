@@ -152,7 +152,7 @@ function drawObjects() {
             });
             var mesh = new THREE.InstancedMesh(geometry, material, nbSpheres);
             scene.add(mesh);
-            const plan = [];
+            // const plan = [];
             const rot = [];
 
             const matrix = new THREE.Matrix4();
@@ -160,7 +160,20 @@ function drawObjects() {
 
             objects.forEach((obj, index) => {
                 if (obj.type === "plan") {
-                    planObject(obj, plan);
+                    const normal = new THREE.Vector3();
+                    const position = new THREE.Vector3();
+                    // TODO this is 3D only
+                    normal.x = obj.normal[0];
+                    normal.y = obj.normal[1];
+                    normal.z = obj.normal[2];
+                    position.x = obj.position[0];
+                    position.y = obj.position[1];
+                    position.z = obj.position[2];
+                    const plane = new THREE.Plane( normal); 
+                    var canvasWidth = window.innerWidth;
+                    const helper = new THREE.PlaneHelper( plane, canvasWidth, 'red' );
+                    scene.add( helper );
+                    // planObject(obj, plan);
                 }
                 else if (obj.type === "worm") {
                     obj.worm.forEach((sphere, indexSphere) => {
@@ -176,12 +189,12 @@ function drawObjects() {
                 }
 
             });
-            const line_geometry_plan = new THREE.BufferGeometry().setFromPoints(plan);
-            const line_material_plan = new THREE.LineBasicMaterial({
-                color: 'red',
-            });
-            var line_mesh_plan = new THREE.LineSegments(line_geometry_plan, line_material_plan);
-            scene.add(line_mesh_plan);
+            // const line_geometry_plan = new THREE.BufferGeometry().setFromPoints(plan);
+            // const line_material_plan = new THREE.LineBasicMaterial({
+            //     color: 'red',
+            // });
+            // var line_mesh_plan = new THREE.LineSegments(line_geometry_plan, line_material_plan);
+            // scene.add(line_mesh_plan);
 
             const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
             const line_material_rot = new THREE.LineBasicMaterial({
