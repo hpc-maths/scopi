@@ -91,30 +91,6 @@ const sphereObject = function () {
     };
 }();
 
-const planObject = function() {
-    return function(obj, plan) {
-
-        var canvasWidth = window.innerWidth;
-        var canvasHeight = window.innerHeight;
-
-        if (Math.abs(obj.normal[1]) < 1e-12) { // vertical straight line 
-            plan.push(new THREE.Vector3(obj.position[0], -canvasHeight, 0));
-            plan.push(new THREE.Vector3(obj.position[0],  canvasHeight, 0));
-        }
-        else if (Math.abs(obj.normal[0]) < 1e-12) { // horizontal straight line 
-            plan.push(new THREE.Vector3(-canvasWidth, obj.position[1], 0));
-            plan.push(new THREE.Vector3( canvasWidth, obj.position[1], 0));
-        }
-        else {
-            var a = -obj.normal[0]/obj.normal[1];
-            var b = (obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1]) / obj.normal[1];
-
-            plan.push(new THREE.Vector3((-canvasHeight - b)/a, -canvasHeight, 0));
-            plan.push(new THREE.Vector3(( canvasHeight - b)/a,  canvasHeight, 0));
-        }
-    };
-}();
-
 function drawObjects() {
 
     if (options.current_frame < oFiles.length) {
@@ -152,7 +128,6 @@ function drawObjects() {
             });
             var mesh = new THREE.InstancedMesh(geometry, material, nbSpheres);
             scene.add(mesh);
-            // const plan = [];
             const rot = [];
 
             const matrix = new THREE.Matrix4();
@@ -169,11 +144,10 @@ function drawObjects() {
                     position.x = obj.position[0];
                     position.y = obj.position[1];
                     position.z = obj.position[2];
-                    const plane = new THREE.Plane( normal); 
+                    const plane = new THREE.Plane( normal, - position.dot(normal)); 
                     var canvasWidth = window.innerWidth;
                     const helper = new THREE.PlaneHelper( plane, canvasWidth, 'red' );
                     scene.add( helper );
-                    // planObject(obj, plan);
                 }
                 else if (obj.type === "worm") {
                     obj.worm.forEach((sphere, indexSphere) => {
@@ -189,12 +163,6 @@ function drawObjects() {
                 }
 
             });
-            // const line_geometry_plan = new THREE.BufferGeometry().setFromPoints(plan);
-            // const line_material_plan = new THREE.LineBasicMaterial({
-            //     color: 'red',
-            // });
-            // var line_mesh_plan = new THREE.LineSegments(line_geometry_plan, line_material_plan);
-            // scene.add(line_mesh_plan);
 
             const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
             const line_material_rot = new THREE.LineBasicMaterial({
