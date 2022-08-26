@@ -32,7 +32,7 @@ namespace scopi {
         params_t params;
         params.problem_params.mu = mu;
         SolverType solver(particles, dt, params);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
     }
@@ -77,7 +77,7 @@ namespace scopi {
         params_t params;
         params.problem_params.mu = mu;
         SolverType solver(particles, dt, params);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
     }
@@ -119,7 +119,7 @@ namespace scopi {
         params_t params;
         params.problem_params.mu = mu;
         SolverType solver(particles, dt, params);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         auto pos = particles.pos();
         auto q = particles.q();

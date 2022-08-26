@@ -51,7 +51,7 @@ namespace scopi
         {
             particles.push_back(s, prop);
             SolverType solver(particles, dt);
-            solver.solve(total_it);
+            solver.run(total_it);
             check_result_sphere_plan(particles);
         }
 
@@ -59,7 +59,7 @@ namespace scopi
         {
             particles.push_back(s, prop.desired_velocity({{0., -1.}}));
             SolverType solver(particles, dt);
-            solver.solve(total_it);
+            solver.run(total_it);
             check_result_sphere_plan(particles);
         }
     }
@@ -81,7 +81,7 @@ namespace scopi
 
         particles.push_back(s, prop.force({{0., -1.}}));
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
         check_result_sphere_plan(particles);
     }
 
@@ -122,7 +122,7 @@ namespace scopi
         {
             particles.push_back(sphere, prop);
             SolverType solver(particles, dt);
-            solver.solve(total_it);
+            solver.run(total_it);
             check_result_sphere_sphere(particles);
         }
 
@@ -130,7 +130,7 @@ namespace scopi
         {
             particles.push_back(sphere, prop.desired_velocity({{0., -1.}}));
             SolverType solver(particles, dt);
-            solver.solve(total_it);
+            solver.run(total_it);
             check_result_sphere_sphere(particles);
         }
     }
@@ -151,7 +151,7 @@ namespace scopi
 
         particles.push_back(sphere, prop.force({{0., -1.}}));
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
         check_result_sphere_sphere(particles);
     }
 
@@ -171,7 +171,7 @@ namespace scopi
         particles.push_back(sphere, prop.force({{0., -10.}}));
 
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
     }
@@ -203,7 +203,7 @@ namespace scopi
         particles.push_back(s, prop.force({{0., -g}}));
 
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         auto pos = particles.pos();
         auto q = particles.q();

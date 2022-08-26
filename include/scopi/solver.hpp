@@ -39,6 +39,29 @@ namespace scopi
     template<std::size_t dim>
     void update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
 
+    /**
+     * @brief Entry point of SCoPI
+     *
+     * @tparam dim dimension (2 or 3)
+     * @tparam optim_solver_t Optimization solver (Mosek, Uzawa, ...)
+     * @tparam contact_t Algorithm to search closest contacts (k-d tree, brute force, ...)
+     * @tparam vap_t A priori velocity, problem dependant
+     *
+     * Solve the contact problem: at eah time step
+     * <ul>
+     * <li> Move obstacles (particles with an imposed velocity)
+     * <li> Compute the list of contacts
+     * <li> Write output files (json format)
+     * <li> Set a priori velocity: describe how the particles would move is they weren't interacting with the other ones
+     * <li> Compute the effective velocity as the solution of an optimization problem 
+     * <li> Use these velocities to move the particles
+     * <li> Store the computed velocities
+     * </ul>
+     *
+     * The optimization solver \c optim_solver_t describes which algorithm is used to solve the optimization problem.
+     * It is itself templated by a \c problem_t that describes which model is used.
+     *
+     */
     template<std::size_t dim,
              class optim_solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
              class contact_t = contact_kdtree,
@@ -52,10 +75,25 @@ namespace scopi
         using problem_t = typename optim_solver_t::problem_type;
     public:
         using params_t = Params<optim_solver_t, problem_t, contact_t, vap_t>;
+
+        /**
+         * @brief Constructor
+         *
+         * @param particles "Array" of particles.
+         * @param dt Time step. It is fixed during the simulation.
+         * @param params Parameters for the different steps of the algorithm
+         */
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
                     const Params<optim_solver_t, problem_t, contact_t, vap_t>& params = Params<optim_solver_t, problem_t, contact_t, vap_t>());
-        void solve(std::size_t total_it, std::size_t initial_iter = 0);
+
+        /**
+         * @brief Run the simulation
+         *
+         * @param total_it Total number of iterations to perform
+         * @param initial_iter Initial index of iteration. Used for restart or to change external parameters
+         */
+        void run(std::size_t total_it, std::size_t initial_iter = 0);
 
     private:
         void displacement_obstacles();
@@ -94,7 +132,7 @@ namespace scopi
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
             if (nite % m_params.output_frequency == 0 || m_params.output_frequency == std::size_t(-1))
-            write_output_files(contacts, nite);
+                write_output_files(contacts, nite);
             this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
             this->extra_steps_before_solve(contacts);
             while (this->should_solve_optimization_problem())

@@ -454,7 +454,7 @@ namespace scopi
         params_t params;
         set_params_test(params.optim_params);
         SolverType solver(particles, dt, params);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_worms.json", tolerance));
     }
