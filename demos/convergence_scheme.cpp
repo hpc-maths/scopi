@@ -43,7 +43,7 @@ int main()
 
                 params.problem_params.mu = mu;
                 scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i], params);
-                solver.solve(total_it[i]);
+                solver.run(total_it[i]);
 
                 auto pos = particles.pos();
                 auto q = particles.q();

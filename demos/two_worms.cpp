@@ -28,7 +28,7 @@ int main()
     scopi::Params<scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fixed> params;
     params.optim_params.change_default_tol_mosek = false;
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::contact_kdtree> solver(particles, dt, params);
-    solver.solve(total_it);
+    solver.run(total_it);
 
     return 0;
 }

@@ -22,7 +22,7 @@ int main()
     particles.push_back(s2, prop.velocity({0., 0.}));
 
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousWithFriction<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
-    solver.solve(total_it);
+    solver.run(total_it);
 
     return 0;
 }

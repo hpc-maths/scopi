@@ -416,7 +416,7 @@ namespace scopi
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/two_ellipsoids_symmetrical.json", tolerance));
     }
@@ -436,7 +436,7 @@ namespace scopi
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0049.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance));
     }
@@ -456,7 +456,7 @@ namespace scopi
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_asymmetrical.json", tolerance));
     }
@@ -476,7 +476,7 @@ namespace scopi
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
     }
@@ -525,7 +525,7 @@ namespace scopi
         }
 
         SolverType solver(particles, dt);
-        solver.solve(total_it);
+        solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
     }
