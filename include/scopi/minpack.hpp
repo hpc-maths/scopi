@@ -19,6 +19,20 @@
 using namespace std;
 
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @tparam F
+ * @tparam A
+ * @param n
+ * @param x[]
+ * @param fvec[]
+ * @param 
+ * @param f
+ * @param args
+ */
 template<typename F, typename A>
 void fcn (int n, double x[], double fvec[], int& , F f, A args) {
   if (n==4) { // n=4 dim=3
@@ -50,6 +64,29 @@ void fcn (int n, double x[], double fvec[], int& , F f, A args) {
 }
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @tparam F
+ * @tparam DF
+ * @tparam A
+ * @param F
+ * @param grad_f
+ * @param args
+ * @param n
+ * @param x[]
+ * @param double[]
+ * @param fjac[]
+ * @param ldfjac
+ * @param 
+ * @param int
+ * @param int
+ * @param double
+ * @param double[]
+ * @param double[]
+ */
 template<typename F, typename DF, typename A>
 void fdjac_analytic ( F , DF grad_f, A args,
   int n, double x[], double[], double fjac[], int ldfjac, int &,
@@ -87,54 +124,219 @@ void fdjac_analytic ( F , DF grad_f, A args,
 
 
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param i1
+ * @param i2
+ *
+ * @return 
+ */
 int i4_max ( int i1, int i2 );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param i1
+ * @param i2
+ *
+ * @return 
+ */
 int i4_min ( int i1, int i2 );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param n
+ * @param x[]
+ *
+ * @return 
+ */
 double enorm ( int n, double x[] );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @return 
+ */
 double r8_epsilon ( );
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @return 
+ */
 double r8_huge ( );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param x
+ * @param y
+ *
+ * @return 
+ */
 double r8_max ( double x, double y );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param x
+ * @param y
+ *
+ * @return 
+ */
 double r8_min ( double x, double y );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param n
+ * @param r[]
+ * @param int
+ * @param diag[]
+ * @param qtb[]
+ * @param delta
+ * @param x[]
+ * @param wa1[]
+ * @param wa2[]
+ */
 void dogleg ( int n, double r[], int , double diag[], double qtb[],
               double delta, double x[], double wa1[], double wa2[] );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * @param m
+ * @param n
+ * @param q[]
+ * @param ldq
+ */
 void qform ( int m, int n, double q[], int ldq );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param m
+ * @param n
+ * @param a[]
+ * @param lda
+ * @param v[]
+ * @param w[]
+ */
 void r1mpyq ( int m, int n, double a[], int lda, double v[], double w[] );
 
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param m
+ * @param n
+ * @param s[]
+ * @param int
+ * @param u[]
+ * @param v[]
+ * @param w[]
+ *
+ * @return 
+ */
 bool r1updt ( int m, int n, double s[], int , double u[], double v[],
               double w[] );
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @param m
+ * @param n
+ * @param a[]
+ * @param lda
+ * @param pivot
+ * @param ipvt[]
+ * @param int
+ * @param rdiag[]
+ * @param acnorm[]
+ */
 void qrfac ( int m, int n, double a[], int lda, bool pivot, int ipvt[],
              int , double rdiag[], double acnorm[] );
 //****************************************************************************80
 
+/**
+ * @brief 
+ *
+ * TODO
+ *
+ * @tparam F
+ * @tparam DF
+ * @tparam A
+ * @param f
+ * @param grad_f
+ * @param args
+ * @param n
+ * @param x[]
+ * @param fvec[]
+ * @param xtol
+ * @param maxfev
+ * @param ml
+ * @param mu
+ * @param epsfcn
+ * @param diag[]
+ * @param mode
+ * @param factor
+ * @param nprint
+ * @param nfev
+ * @param fjac[]
+ * @param ldfjac
+ * @param r[]
+ * @param lr
+ * @param qtf[]
+ * @param wa1[]
+ * @param wa2[]
+ * @param wa3[]
+ * @param wa4[]
+ *
+ * @return 
+ */
 template<typename F, typename DF, typename A>
 int hybrd (F f, DF grad_f, A args,
   int n, double x[],
@@ -615,6 +817,20 @@ int hybrd (F f, DF grad_f, A args,
 
 // int hybrd1 ( void fcn ( int n, double x[], double fvec[], int &iflag ), int n,
 //   double x[], double fvec[], double tol, double wa[], int lwa ) {
+/**
+ * @brief 
+ *
+ * @tparam F
+ * @tparam DF
+ * @tparam U
+ * @tparam A
+ * @param u0
+ * @param f
+ * @param grad_f
+ * @param args
+ *
+ * @return 
+ */
 template<typename F, typename DF, typename U, typename A>
 auto hybrd1 (U u0, F f, DF grad_f, A args) {
   int n = u0.size();
