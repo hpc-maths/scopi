@@ -45,7 +45,7 @@ namespace scopi
      * @tparam dim Dimension (2 or 3).
      * @param particles Container whose field \c omega is updated.
      * @param i Index of the particle to update.
-     * @param wadapt $N \times 3$ array that containes the new velocity, where $N$ is the total number of particles.
+     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
      */
     template<std::size_t dim>
     void update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
@@ -64,7 +64,7 @@ namespace scopi
      * <li> Compute the list of contacts;
      * <li> Write output files (json format) for visualization;
      * <li> Set a priori velocity: describe how the particles would move is they weren't interacting with the other ones;
-     * <li> Compute the effective velocity as the solution of an optimization problem under constraint $D > 0$;
+     * <li> Compute the effective velocity as the solution of an optimization problem under constraint \f$D > 0\f$;
      * <li> Use these velocities to move the particles;
      * <li> Store the computed velocities.
      * </ul>
@@ -83,8 +83,14 @@ namespace scopi
                       , public contact_t
     {
     private:
+        /**
+         * @brief Shortcut for problem type. 
+         */
         using problem_t = typename optim_solver_t::problem_type;
     public:
+        /**
+         * @brief Shortcut for the type of parameters class.
+         */
         using params_t = Params<optim_solver_t, problem_t, contact_t, vap_t>;
 
         /**
@@ -120,9 +126,9 @@ namespace scopi
         std::vector<neighbor<dim>> compute_contacts();
 
         /**
-         * @brief Compute the list of contacts to impose $D < 0$.
+         * @brief Compute the list of contacts to impose \f$D < 0\f$.
          *
-         * If some particles are of type worms, compute a second list of contacts to also impose $D < 0$ between the spheres that form the worm.
+         * If some particles are of type worms, compute a second list of contacts to also impose \f$D < 0\f$ between the spheres that form the worm.
          *
          * @return Vector containing all the contacts involved in a worm.
          */
@@ -131,7 +137,7 @@ namespace scopi
         /**
          * @brief Write output files (json format) for visualization.
          *
-         * @param contacts List of contacts (only $D > 0$).
+         * @param contacts List of contacts (only \f$D > 0\f$).
          * @param nite Current index of iteration in time.
          */
         void write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite);
@@ -348,12 +354,31 @@ namespace scopi
         PLOG_INFO << "----> CPUTIME : update velocity = " << duration;
     }
 
+    /**
+     * @brief Store the rotation velocities, solution of the optimization problem.
+     *
+     * 2D specialization
+     *
+     * @param particles Container whose field \c omega is updated.
+     * @param i Index of the particle to update.
+     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
+     */
     template<>
     void update_velocity_omega(scopi_container<2>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
     {
         particles.omega()(i + particles.nb_inactive()) = wadapt(i, 2);
     }
 
+    /**
+     * @brief Store the rotation velocities, solution of the optimization problem.
+     *
+     * 3D specialization
+     *
+     * @param particles Container whose field \c omega is updated.
+     * @param i Index of the particle to update.
+     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
+     */
+    template<>
     void update_velocity_omega(scopi_container<3>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
     {
         for (std::size_t d = 0; d < 3; ++d)
