@@ -43,9 +43,9 @@ namespace scopi
      * Therefore, the way to update it in the container is different.
      *
      * @tparam dim Dimension (2 or 3).
-     * @param particles Container whose field \c omega is updated.
-     * @param i Index of the particle to update.
-     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
+     * @param particles [out] Container whose field \c omega is updated.
+     * @param i [in] Index of the particle to update.
+     * @param wadapt [in] \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
      */
     template<std::size_t dim>
     void update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
@@ -107,8 +107,8 @@ namespace scopi
         /**
          * @brief Run the simulation.
          *
-         * @param total_it Total number of iterations to perform.
-         * @param initial_iter Initial index of iteration. Used for restart or to change external parameters.
+         * @param total_it [in] Total number of iterations to perform.
+         * @param initial_iter [in] Initial index of iteration. Used for restart or to change external parameters.
          */
         void run(std::size_t total_it, std::size_t initial_iter = 0);
 
@@ -137,8 +137,8 @@ namespace scopi
         /**
          * @brief Write output files (json format) for visualization.
          *
-         * @param contacts List of contacts (only \f$D > 0\f$).
-         * @param nite Current index of iteration in time.
+         * @param contacts [in] List of contacts (only \f$D > 0\f$).
+         * @param nite [in] Current index of iteration in time.
          */
         void write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite);
 
