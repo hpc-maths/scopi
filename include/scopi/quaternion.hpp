@@ -9,11 +9,55 @@ using namespace xt::placeholders;
 
 namespace scopi
 {
+    /**
+     * @brief Normalize quaternion.
+     *
+     * After calling this function \f$q(0)^2 + q(1)^2 + q(2)^2 + q(3)^2 = 1\f$.
+     *
+     * @param q [in/out] Quaternion to be normalized.
+     */
     void normalize(type::quaternion_t& q);
 
+    /**
+     * @brief Rotation of angle "angle" around the axis "axes".
+     *
+     * Rotation in 3D.
+     *
+     * @param angle [in] Angle of the rotation.
+     * @param axes [in] The rotation is around this axis.
+     *
+     * @return Quaternion representing the rotation.
+     */
     type::quaternion_t quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<3>>& axes);
+
+    /**
+     * @brief Rotation of angle "angle" around the axis "axes".
+     *
+     * Rotation in 2D.
+     *
+     * @param angle [in] Angle of the rotation.
+     * @param axes [in] The rotation is around this axis.
+     *
+     * @return Quaternion representing the rotation.
+     */
     type::quaternion_t quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<2>>& axes);
+
+    /**
+     * @brief Rotation of angle "angle" around the axis (0, 0, 1)..
+     *
+     * @param angle [in] Angle of the rotation.
+     *
+     * @return Quaternion representing the rotation.
+     */
     type::quaternion_t quaternion(double angle=0);
+
+    /**
+     * @brief Compute the conjugate of \c q.
+     *
+     * @param q [in] Quaternion.
+     *
+     * @return Conjuguate of \c q.
+     */
     auto conj(const type::quaternion_t& q);
 
     namespace detail
@@ -72,5 +116,16 @@ namespace scopi
         return detail::rotation_matrix_impl(q, std::integral_constant<std::size_t, dim>{});
     }
 
+    /**
+     * @brief Compute the multiplication between two quaternions.
+     *
+     * If \f$ q_1 = (q_1^0, \vec{q_0}) \f$ and \f$ q_2 = (q_2^0, \vec{q_2}) \f$, with \f$ q_1^0, q_2^0 \in \mathbb{R} \f$ and \f$ \vec{q_1}, \vec{q_2} \in \mathcal{R}^3 \f$, then
+     * \f$ q_1 \circ q_2 = (q_1^0 q_2^0 - \vec{q_1} \cdot \vec{q_2}, q_1^0 \vec{q_2} + q_2^0 \vec{q_1} + \vec{q_1} \land \vec{q_2}) \f$.
+     *
+     * @param q1 [in] Quaternion.
+     * @param q2 [in] Quaternion.
+     *
+     * @return \f$ p = q_1 \circ q_2 \f$.
+     */
     type::quaternion_t mult_quaternion(const type::quaternion_t& q1, const type::quaternion_t& q2);
 }
