@@ -49,7 +49,9 @@ namespace scopi
         using matrix_rotation_t = xt::xtensor_fixed<double, xt::xshape<dim, dim>>;
 
         /**
-         * @brief Type of vector for rotation vector.
+         * @brief Type of rotation.
+         *
+         * Scalar in 2D, vector with three elements in 3D.
          *
          * @tparam dim Dimension (2 or 3).
          */
