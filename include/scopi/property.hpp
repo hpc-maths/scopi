@@ -25,7 +25,7 @@ namespace scopi
          */
         using velocity_type = type::velocity_t<dim>;
         /**
-         * @brief Alias for the type of the rotation vector (scalar in 2D, vector in 3D).
+         * @brief Alias for the type of the rotation.
          */
         using rotation_type = type::rotation_t<dim>;
         /**
@@ -71,31 +71,31 @@ namespace scopi
         const velocity_type desired_velocity() const;
 
         /**
-         * @brief Set the rotation vector (scalar in 2D, vector in 3D).
+         * @brief Set the rotation.
          *
-         * @param omega [in] New rotation vector.
+         * @param omega [in] New rotation.
          *
-         * @return Property with the new rotation vector.
+         * @return Property with the new rotation.
          */
         property& omega(const rotation_type& omega);
         /**
-         * @brief Get the rotation vector (scalar in 2D, vector in 3D).
+         * @brief Get the rotation.
          *
-         * @return Rotation vector in the property.
+         * @return Rotation in the property.
          */
         const rotation_type omega() const;
         /**
-         * @brief Set the desired rotation vector (scalar in 2D, vector in 3D).
+         * @brief Set the desired rotation.
          *
-         * @param domega [in] New desired rotation vector.
+         * @param domega [in] New desired rotation.
          *
-         * @return Property with the new desired rotation vector.
+         * @return Property with the new desired rotation.
          */
         property& desired_omega(const rotation_type& domega);
         /**
-         * @brief Get the desired rotation vector (scalar in 2D, vector in 3D).
+         * @brief Get the desired rotation.
          *
-         * @return Desired rotation vector in the property.
+         * @return Desired rotation in the property.
          */
         const rotation_type desired_omega() const;
 
@@ -172,11 +172,11 @@ namespace scopi
          */
         velocity_type m_dv;
         /**
-         * @brief Rotation vector (scalar in 2D, vector in 3D).
+         * @brief Rotation.
          */
         rotation_type m_omega;
         /**
-         * @brief Desired rotation vector (scalar in 2D, vector in 3D).
+         * @brief Desired rotation.
          */
         rotation_type m_domega;
         /**

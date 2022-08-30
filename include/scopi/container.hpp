@@ -47,7 +47,7 @@ namespace scopi
          */
         using velocity_type = type::velocity_t<dim>;
         /**
-         * @brief Alias for the type of the rotation vector (scalar in 2D, vector in 3D).
+         * @brief Alias for the type of the rotation.
          */
         using rotation_type = type::rotation_t<dim>;
         /**
