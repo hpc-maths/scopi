@@ -4,48 +4,196 @@
 
 namespace scopi
 {
+    /**
+     * @brief Add properties to the particles.
+     *
+     * All the methods are applied to one particle, when it is pushed back into the container.
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     class property
     {
     public:
 
+        /**
+         * @brief Alias for the type of the position.
+         */
         using position_type = type::position_t<dim>;
+        /**
+         * @brief Alias for the type of the velocity.
+         */
         using velocity_type = type::velocity_t<dim>;
+        /**
+         * @brief Alias for the type of the rotation vector (scalar in 2D, vector in 3D).
+         */
         using rotation_type = type::rotation_t<dim>;
+        /**
+         * @brief Alias for the type of the force.
+         */
         using force_type = type::force_t<dim>;
+        /**
+         * @brief Alias for the type of the mass.
+         */
         using mass_type = double;
+        /**
+         * @brief Alias for the type of the moment of inertia.
+         */
         using moment_type = type::moment_t<dim>;
 
+        /**
+         * @brief Set the velocity.
+         *
+         * @param v [in] New velocity.
+         *
+         * @return Property with new velocity.
+         */
         property& velocity(const velocity_type& v);
+        /**
+         * @brief Get the velocity.
+         *
+         * @return Velocity in the property.
+         */
         const velocity_type velocity() const;
+        /**
+         * @brief Set the desired velocity.
+         *
+         * @param dv [in] New desired velocity.
+         *
+         * @return Property with the new desired velocity.
+         */
         property& desired_velocity(const velocity_type& dv);
+        /**
+         * @brief Get the desired velocity.
+         *
+         * @return Desired velocity in the property.
+         */
         const velocity_type desired_velocity() const;
 
+        /**
+         * @brief Set the rotation vector (scalar in 2D, vector in 3D).
+         *
+         * @param omega [in] New rotation vector.
+         *
+         * @return Property with the new rotation vector.
+         */
         property& omega(const rotation_type& omega);
+        /**
+         * @brief Get the rotation vector (scalar in 2D, vector in 3D).
+         *
+         * @return Rotation vector in the property.
+         */
         const rotation_type omega() const;
+        /**
+         * @brief Set the desired rotation vector (scalar in 2D, vector in 3D).
+         *
+         * @param domega [in] New desired rotation vector.
+         *
+         * @return Property with the new desired rotation vector.
+         */
         property& desired_omega(const rotation_type& domega);
+        /**
+         * @brief Get the desired rotation vector (scalar in 2D, vector in 3D).
+         *
+         * @return Desired rotation vector in the property.
+         */
         const rotation_type desired_omega() const;
 
+        /**
+         * @brief Set the external force.
+         *
+         * @param f [in] New external force.
+         *
+         * @return Property with the new external force.
+         */
         property& force(const force_type& f);
+        /**
+         * @brief Get the external force.
+         *
+         * @return External force in the property.
+         */
         const force_type force() const;
 
+        /**
+         * @brief Set the mass.
+         *
+         * @param m [in] New mass.
+         *
+         * @return Property with the new mass.
+         */
         property& mass(const mass_type& m);
+        /**
+         * @brief Get the mass.
+         *
+         * @return Mass in the property
+         */
         mass_type mass() const;
-        property& moment_inertia(const moment_type& m); // TODO fix moments for a sphere
+        /**
+         * @brief Set the moment of inertia.
+         *
+         * @param m [in] New moment of inertia.
+         *
+         * @return Property with the new moment of inertia.
+         */
+        property& moment_inertia(const moment_type& m); 
+        /**
+         * @brief Get the moment of inertia.
+         *
+         * @return Moment of inertia in the property.
+         */
         const moment_type moment_inertia() const;
 
+        /**
+         * @brief Deactivate a particle (an obstacle).
+         *
+         * @return Property with deactivated particle.
+         */
         property& deactivate();
+        /**
+         * @brief Activate a particle.
+         *
+         * @return Property with activated particle.
+         */
         property& activate();
+        /**
+         * @brief Whether the property is active.
+         *
+         * @return Whether the property is active.
+         */
         bool is_active() const;
 
     private:
+        /**
+         * @brief Velocity.
+         */
         velocity_type m_v;
+        /**
+         * @brief Desired velocity.
+         */
         velocity_type m_dv;
+        /**
+         * @brief Rotation vector (scalar in 2D, vector in 3D).
+         */
         rotation_type m_omega;
+        /**
+         * @brief Desired rotation vector (scalar in 2D, vector in 3D).
+         */
         rotation_type m_domega;
+        /**
+         * @brief Force.
+         */
         force_type m_f;
+        /**
+         * @brief Mass.
+         */
         mass_type m_m;
+        /**
+         * @brief Moment of inertia
+         */
         moment_type m_j;
+        /**
+         * @brief Whether the particle is active.
+         */
         bool m_active = true;
     };
 
