@@ -11,30 +11,6 @@
 namespace scopi
 {
     /**
-     * @brief Shared parameters for contacts.
-     */
-    struct ContactsParamsBase
-    {
-        /**
-         * @brief Default constructor.
-         */
-        ContactsParamsBase();
-        /**
-         * @brief Copy constructor.
-         *
-         * @param params Parameters to be copied.
-         */
-        ContactsParamsBase(const ContactsParamsBase& params);
-
-        /**
-         * @brief Maximum distance between two neighboring particles.
-         *
-         * Default value: 2.
-         */
-        double dmax;
-    };
-
-    /**
      * @brief Base class to compute contacts.
      *
      * @tparam D Class that implements the algorithm for contacts.
