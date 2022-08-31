@@ -171,10 +171,16 @@ function drawObjects() {
                     // TODO this is 3D only
                     normal.x = obj.normal[0];
                     normal.y = obj.normal[1];
-                    normal.z = obj.normal[2];
                     position.x = obj.position[0];
                     position.y = obj.position[1];
-                    position.z = obj.position[2];
+                    if (obj.position.length == 2) {
+                        normal.z = 0.;
+                        position.z = 0.;
+                    }
+                    else {
+                        normal.z = obj.normal[2];
+                        position.z = obj.position[2];
+                    }
                     const plane = new THREE.Plane( normal, - position.dot(normal)); 
                     plane.normalize();
                     var canvasWidth = window.innerWidth;
