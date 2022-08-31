@@ -18,7 +18,7 @@ namespace scopi
      * Specialization of ContactsParams in params.hpp.
      */
     template<>
-    struct ContactsParams<contact_brute_force> : ContactsParamsBase
+    struct ContactsParams<contact_brute_force> 
     {
         /**
          * @brief Default constructor.
@@ -30,6 +30,13 @@ namespace scopi
          * @param params Parameters to be copied.
          */
         ContactsParams(const ContactsParams<contact_brute_force>& params);
+
+        /**
+         * @brief Maximum distance between two neighboring particles.
+         *
+         * Default value: 2.
+         */
+        double dmax;
     };
 
     /**

@@ -12,11 +12,17 @@ namespace scopi
     class contact_kdtree;
 
     template<>
-    struct ContactsParams<contact_kdtree> : ContactsParamsBase
+    struct ContactsParams<contact_kdtree>
     {
         ContactsParams();
         ContactsParams(const ContactsParams<contact_kdtree>& params);
 
+        /**
+         * @brief Maximum distance between two neighboring particles.
+         *
+         * Default value: 2.
+         */
+        double dmax;
         double kd_tree_radius;
     };
 
