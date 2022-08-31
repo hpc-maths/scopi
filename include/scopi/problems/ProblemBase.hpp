@@ -17,14 +17,15 @@ namespace scopi
      *
      * All problems (models) solve 
      * \f[
-     *      \min \frac{1}{2} \mathbf{u} \cdot \mathbb{P} \mathbf{u} + \mathbf{u} \cdot \mathbf{x}
+     *      \min \frac{1}{2} \u \cdot \P \u + \u \cdot \c
      * \f]
      * under constraint
      * \f[
-     *      \mathbf{D} + \mathbb{B} \mathbf{u} \ge \mathbf{f} (\mathbf{u}).
+     *      \d + \B \u \ge \mathbf{f} (\u).
      * \f]
+     * The vector \f$ \c $\f is known and does not depends on the problem.
      * The function \f$ \mathbf{f} \f$ differs with the problem.
-     * So does the implentation of the vector \f$ \mathbf{D} \f$ and the matrix \f$ \mathbb{B} \f$.
+     * So does the implentation of the vector \f$ \d \f$ and the matrix \f$ \B \f$.
      * However, they share some elements, thay are set by this class.
      *
      * Different solvers can be used to solve the problem, see solvers/OptimBase.hpp.
@@ -41,13 +42,13 @@ namespace scopi
         ProblemBase(std::size_t nparts, double dt);
 
         /**
-         * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$.
+         * @brief Matrix-free product \f$ \u = \P^{-1} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (to get masses and moments of inertia).
-         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
+         * @param U [in/out] Vector \f$ \u \f$.
          * @param active_offset [in] Index of the first active particle.
-         * @param row [in] Row of \f$ \mathbf{u} \f$ to compute.
+         * @param row [in] Row of \f$ \u \f$ to compute.
          */
         template<std::size_t dim>
         void matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
@@ -56,7 +57,7 @@ namespace scopi
                                     std::size_t row);
 
         /**
-         * @brief COO storage of the shared row of \f$ \mathbb{B} \f$.
+         * @brief COO storage of the shared row of \f$ \B \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (to get the position).
@@ -74,30 +75,30 @@ namespace scopi
 
     private:
         /**
-         * @brief 2D implementation of rows in matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$ that involve moments of inertia.
+         * @brief 2D implementation of rows in matrix-free product \f$ \n = \P^{-1} \u \f$ that involve moments of inertia.
          *
          * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
          * The implentation is different in 2D or in 3D.
          *
          * @param particles [in] Array of particles (for the moments of inertia).
-         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
+         * @param U [in/out] Vector \f$ \u \f$.
          * @param active_offset [in] Index of the first active particle.
-         * @param row [in] Row of \f$ \mathbf{u} \f$ to compute.
+         * @param row [in] Row of \f$ \u \f$ to compute.
          */
         void matrix_free_gemv_inv_P_moment(const scopi_container<2>& particles,
                                            xt::xtensor<double, 1>& U,
                                            std::size_t active_offset,
                                            std::size_t row);
         /**
-         * @brief 3D implementation of rows in matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$ that involve moments of inertia.
+         * @brief 3D implementation of rows in matrix-free product \f$ \u = \P^{-1} \u \f$ that involve moments of inertia.
          *
          * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
          * The implentation is different in 2D or in 3D.
          *
          * @param particles [in] Array of particles (for the moments of inertia).
-         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
+         * @param U [in/out] Vector \f$ \u \f$.
          * @param active_offset [in] Index of the first active particle.
-         * @param row [in] Row of \f$ \mathbf{u} \f$ to compute.
+         * @param row [in] Row of \f$ \u \f$ to compute.
          */
         void matrix_free_gemv_inv_P_moment(const scopi_container<3>& particles,
                                            xt::xtensor<double, 1>& U,
@@ -114,25 +115,25 @@ namespace scopi
          */
         double m_dt;
         /**
-         * @brief Rows' indices of \f$ \mathbb{B} \f$ in COO storage.
+         * @brief Rows' indices of \f$ \B \f$ in COO storage.
          *
          * Modified by the problem.
          */
         std::vector<int> m_A_rows;
         /**
-         * @brief Columns' indices of \f$ \mathbb{B} \f$ in COO storage.
+         * @brief Columns' indices of \f$ \B \f$ in COO storage.
          *
          * Modified by the problem.
          */
         std::vector<int> m_A_cols;
         /**
-         * @brief Values of \f$ \mathbb{B} \f$ in COO storage.
+         * @brief Values of \f$ \B \f$ in COO storage.
          *
          * Modified by the problem.
          */
         std::vector<double> m_A_values;
         /**
-         * @brief Vector \f$ \mathbf{D} \f$.
+         * @brief Vector \f$ \d \f$.
          *
          * Modified by the problem.
          */
