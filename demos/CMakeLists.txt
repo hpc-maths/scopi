@@ -13,6 +13,7 @@ set(SCOPI_EXAMPLES
    convergence_scheme.cpp
    box_spheres_3d.cpp
    pile_of_sand_spheres.cpp
+   pile_of_sand_superellipsoids.cpp
 )
 
 include(generator)
