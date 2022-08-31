@@ -156,9 +156,9 @@ namespace scopi
          */
         property& activate();
         /**
-         * @brief Whether the property is active.
+         * @brief Whether the particle is active.
          *
-         * @return Whether the property is active.
+         * @return Whether the particle is active.
          */
         bool is_active() const;
 
