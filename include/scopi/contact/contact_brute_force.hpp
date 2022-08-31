@@ -27,7 +27,7 @@ namespace scopi
         /**
          * @brief Copy constructor.
          *
-         * @param params Parameters to be copied.
+         * @param params [in] Parameters to be copied.
          */
         ContactsParams(const ContactsParams<contact_brute_force>& params);
 
@@ -55,25 +55,30 @@ namespace scopi
         /**
          * @brief Constructor.
          *
-         * @param params Parameters, see <tt>ContactsParams<contact_brute_force></tt>.
+         * @param params [in] Parameters, see <tt>ContactsParams<contact_brute_force></tt>.
          */
         contact_brute_force(const ContactsParams<contact_brute_force>& params = ContactsParams<contact_brute_force>());
 
         /**
          * @brief Compute contacts between particles using brute force algorithm.
          *
+         * Only the contact between particles \c i and \c j is computed, not the contact between \c j and \c i, with \c i < \c j.
+         *
+         * The returned array of neighbors is sorted.
+         * See sort_contacts in contact/base.hpp.
+         *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
          * @param active_ptr [in] Index of the first active particle.
          *
-         * @return Array of neighbors.
+         * @return Array of neighbors. 
          */
         template <std::size_t dim>
         std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
 
     protected:
         /**
-         * @brief Parameters.
+         * @brief Parameters, see ContactsParams<contact_brute_force>.
          */
         ContactsParams<contact_brute_force> m_params;
 
@@ -82,13 +87,9 @@ namespace scopi
     template <std::size_t dim>
     std::vector<neighbor<dim>> contact_brute_force::run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
     {
-        // std::cout << "----> CONTACTS : run implementation contact_brute_force" << std::endl;
-
         std::vector<neighbor<dim>> contacts;
-
         tic();
-
-        #pragma omp parallel for //num_threads(1)
+        #pragma omp parallel for
         for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
@@ -113,12 +114,6 @@ namespace scopi
         sort_contacts(contacts);
         duration = toc();
         PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
-
-        // for (std::size_t ic=0; ic<contacts.size(); ++ic)
-        // {
-        //     std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
-        //     // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
-        // }
 
         return contacts;
 

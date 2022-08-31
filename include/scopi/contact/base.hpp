@@ -44,6 +44,16 @@ namespace scopi
         return this->derived_cast().run_impl(particles, active_ptr);
     }
 
+    /**
+     * @brief Compute the exact distance between two particles.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param particles [in] Array of particles.
+     * @param i [in] Index of the first particle.
+     * @param j [in] Index of the second particle.
+     * @param contacts [out] Array of neighbors, if the distance between the two particles is small enough, add a neighbor in this array.
+     * @param dmax [in] Maximum distance to consider two particles to be neighbors.
+     */
     template <std::size_t dim>
     void compute_exact_distance(scopi_container<dim>& particles, std::size_t i, std::size_t j, std::vector<neighbor<dim>>& contacts, double dmax)
     {
@@ -59,6 +69,19 @@ namespace scopi
         }
     }
 
+    /**
+     * @brief Sort contacts.
+     *
+     * When the array is sorted, indices i of a contact (i, j) are increasing.
+     * For a fixed i, then indices j are increasing.
+     * Furthermore, we always have i < j.
+     *
+     * For example, consider particles (0, 1, 2, 3) and assume all these particles are in contact two by two.
+     * Then, the sorted array of neighbors is (0, 1) (0, 2) (0, 3) (1, 2) (1, 3) (2, 3).
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param contacts [out] Array of contacts.
+     */
     template <std::size_t dim>
     void sort_contacts(std::vector<neighbor<dim>>& contacts)
     {

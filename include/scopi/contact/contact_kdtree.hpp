@@ -11,10 +11,23 @@ namespace scopi
 
     class contact_kdtree;
 
+    /**
+     * @brief Parameters for contact_kdtree.
+     *
+     * Specialization of ContactsParams in params.hpp.
+     */
     template<>
     struct ContactsParams<contact_kdtree>
     {
+        /**
+         * @brief Default constructor.
+         */
         ContactsParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params [in] Parameters to be copied.
+         */
         ContactsParams(const ContactsParams<contact_kdtree>& params);
 
         /**
@@ -23,13 +36,35 @@ namespace scopi
          * Default value: 2.
          */
         double dmax;
+        /**
+         * @brief Kd-tree radius.
+         *
+         * For two particles \c i and \c j, compute the exact distance only if the squared distance between a point in \c i and a point in \j is less tan \c kdtree_radius.
+         * For a sphere or a superellipsoid, this point is the center.
+         * For a plan, it is the point used to construct it. 
+         */
         double kd_tree_radius;
     };
 
+    /**
+     * @brief 
+     *
+     * TODO
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     class KdTree
     { 
     public:
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @param p [in] Array of particles.
+         * @param actptr [in] Index of the first active particle.
+         */
         KdTree(scopi_container<dim> &p, std::size_t actptr) : m_p{p}, m_actptr{actptr} {}
         inline std::size_t kdtree_get_point_count() const
         {
@@ -37,37 +72,102 @@ namespace scopi
           return m_p.pos().size();
           // return m_p.pos().size() - m_actptr;
         }
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @param idx
+         * @param d
+         *
+         * @return 
+         */
         inline double kdtree_get_pt(std::size_t idx, const std::size_t d) const
         {
           //std::cout << "KDTREE m_p["<< m_actptr+idx << "][" << d << "] = " << m_p.pos()(m_actptr+idx)[d] << std::endl;
           return m_p.pos()(m_actptr+idx)(d); //m_p[idx]->pos()[d];
           // return m_p.pos()(idx)[d];
         }
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @tparam BBOX
+         * @param 
+         *
+         * @return 
+         */
         template<class BBOX>
         bool kdtree_get_bbox(BBOX & /* bb */) const
         {
           return false;
         }
     private:
+        /**
+         * @brief Array of particles.
+         */
         scopi_container<dim> &m_p;
+        /**
+         * @brief Index of the first active particle.
+         */
         std::size_t m_actptr;
     };
 
+    /**
+     * @brief Contacts with Kd-tree.
+     *
+     * Use a Kd-tree to select particles close enough the compute the exact distance.
+     */
     class contact_kdtree: public contact_base<contact_kdtree>
     {
     public:
+        /**
+         * @brief Alias for the base class \c contact_base.
+         */
         using base_type = contact_base<contact_kdtree>;
 
+        /**
+         * @brief Constructor.
+         *
+         * @param params [in] Parameters, see <tt>ContactsParams<contact_kdtree></tt>.
+         */
         contact_kdtree(const ContactsParams<contact_kdtree>& params = ContactsParams<contact_kdtree>());
+        /**
+         * @brief Get the number of exact distances computed.
+         */
         std::size_t get_nMatches() const;
 
+        /**
+         * @brief Compute neighboring particles.
+         *
+         * Compute contacts between particles using a Kd-tree to select particles close enough.
+         * Then, compute the exact distance.
+         *
+         * Only the contact between particles \c i and \c j is computed, not the contact between \c j and \c i, with \c i < \c j.
+         *
+         * The returned array of neighbors is sorted.
+         * See sort_contacts in contact/base.hpp.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param active_ptr [in] Index of the first active particle.
+         *
+         * @return Array of neighbors.
+         */
         template <std::size_t dim>
         std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
 
     protected:
+        /**
+         * @brief Parameters, see ContactsParams<contact_kdtree>.
+         */
         ContactsParams<contact_kdtree> m_params;
 
     private:
+        /**
+         * @brief Number of exact distances computed.
+         */
         std::size_t m_nMatches;
     };
 
