@@ -31,7 +31,7 @@ namespace scopi
      *
      * The constraint is 
      * \f[
-     *      \mathbf{D} + \mathbb{B} \mathbf{u} \ge 0.
+     *      \d + \B \u \ge 0.
      * \f]
      * We impose that the distance between all the particles should be non-negative.
      * For worms, we also impose that the distance between spheres in a worm is non-positive.
@@ -51,7 +51,7 @@ namespace scopi
 
     protected:
         /**
-         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
+         * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
          *
          * @tparam dim
          * @param particles
