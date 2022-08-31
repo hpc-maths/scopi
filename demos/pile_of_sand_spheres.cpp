@@ -12,7 +12,7 @@
 
 int main()
 {
-    plog::init(plog::info, "friction.log");
+    plog::init(plog::info, "pile_of_sand_spheres.log");
 
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
@@ -20,11 +20,11 @@ int main()
     double dt = 0.01;
     std::size_t total_it = 1000;
     double width_box = 10.;
-    std::size_t n = 4; // n^3 spheres
+    std::size_t n = 3; // n^3 spheres
     double g = 1.;
 
-    scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFriction>> params;
-    params.change_default_tol_mosek = false;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_brute_force, scopi::vap_fpd> params;
+    params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 0.1;
 
     scopi::scopi_container<dim> particles;
@@ -35,7 +35,7 @@ int main()
 
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distrib_m(1., 2.);
-    double r = r0*width_box/2./(n+1);
+    double r = width_box/2./(n+1);
 
     for (std::size_t i = 0; i < n; ++i)
     {
