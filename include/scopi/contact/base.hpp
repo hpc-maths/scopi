@@ -10,19 +10,53 @@
 
 namespace scopi
 {
+    /**
+     * @brief Shared parameters for contacts.
+     */
     struct ContactsParamsBase
     {
+        /**
+         * @brief Default constructor.
+         */
         ContactsParamsBase();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to be copied.
+         */
         ContactsParamsBase(const ContactsParamsBase& params);
 
+        /**
+         * @brief Maximum distance between two neighboring particles.
+         *
+         * Default value: 2.
+         */
         double dmax;
     };
 
+    /**
+     * @brief Base class to compute contacts.
+     *
+     * @tparam D Class that implements the algorithm for contacts.
+     */
     template <class D>
     class contact_base: public crtp_base<D>
     {
     public:
+        /**
+         * @brief Default constructor.
+         */
         contact_base() {}
+
+        /**
+         * @brief Compute contacts between particles.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param active_ptr [in] Index of the first active particle.
+         *
+         * @return Array of neighbors.
+         */
         template <std::size_t dim>
         std::vector<neighbor<dim>> run(scopi_container<dim>& particles, std::size_t active_ptr);
     };

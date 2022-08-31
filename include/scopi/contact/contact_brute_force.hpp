@@ -12,24 +12,62 @@ namespace scopi
 
     class contact_brute_force;
 
+    /**
+     * @brief Parameters for contact_brute_force.
+     *
+     * Specialization of ContactsParams in params.hpp.
+     */
     template<>
     struct ContactsParams<contact_brute_force> : ContactsParamsBase
     {
+        /**
+         * @brief Default constructor.
+         */
         ContactsParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to be copied.
+         */
         ContactsParams(const ContactsParams<contact_brute_force>& params);
     };
 
+    /**
+     * @brief Brute force contatcs.
+     *
+     * Contacts between particles are computed using brute force algorithm.
+     */
     class contact_brute_force: public contact_base<contact_brute_force>
     {
     public:
+        /**
+         * @brief Alias for the base class \c contact_base.
+         */
         using base_type = contact_base<contact_brute_force>;
 
+        /**
+         * @brief Constructor.
+         *
+         * @param params Parameters, see <tt>ContactsParams<contact_brute_force></tt>.
+         */
         contact_brute_force(const ContactsParams<contact_brute_force>& params = ContactsParams<contact_brute_force>());
 
+        /**
+         * @brief Compute contacts between particles using brute force algorithm.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param active_ptr [in] Index of the first active particle.
+         *
+         * @return Array of neighbors.
+         */
         template <std::size_t dim>
         std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
 
     protected:
+        /**
+         * @brief Parameters.
+         */
         ContactsParams<contact_brute_force> m_params;
 
     };
