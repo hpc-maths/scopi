@@ -17,16 +17,48 @@ namespace scopi
 {
     class DryWithoutFriction;
 
+    /**
+     * @brief Parameters for \c DryWithoutFrixion..
+     *
+     * Defined for compatibility.
+     */
     template<>
     struct ProblemParams<DryWithoutFriction>
     {};
 
+    /**
+     * @brief Problem that models contacts without friction and without viscosity.
+     *
+     * The constraint is 
+     * \f[
+     *      \mathbf{D} + \mathbb{B} \mathbf{u} \ge 0.
+     * \f]
+     * We impose that the distance between all the particles should be non-negative.
+     * For worms, we also impose that the distance between spheres in a worm is non-positive.
+     * More exactly, we impose that minus the distance is non-negative.
+     */
     class DryWithoutFriction : protected ProblemBase
     {
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param problem_params [in] Parameters (for compatibilty).
+         */
         DryWithoutFriction(std::size_t nparts, double dt, const ProblemParams<DryWithoutFriction>& problem_params);
 
     protected:
+        /**
+         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
+         *
+         * @tparam dim
+         * @param particles
+         * @param contacts
+         * @param contacts_worms
+         * @param firstCol
+         */
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
