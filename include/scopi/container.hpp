@@ -27,6 +27,7 @@ namespace scopi
      * Array of particles.
      *
      * Inactive particles are placed at the begining of the container.
+     * Fictive particles for periodic boundary conditions are placed at the end of the container.
      *
      * In the following, "particle" means a base object (sphere, superellipsoid or plan) and an "object" can be a more complex object, such as a worm.
      * Particles are objects.
@@ -235,24 +236,77 @@ namespace scopi
 
     private:
 
+        /**
+         * @brief 
+         *
+         * TODO
+         */
         std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
+        /**
+         * @brief Array of particles' positions.
+         */
         std::vector<position_type> m_positions;  // pos()
+        /**
+         * @brief Array of particles' quaternions.
+         */
         std::vector<quaternion_type> m_quaternions;  // q()
+        /**
+         * @brief Array of particles' forces.
+         */
         std::vector<force_type> m_forces;  // f()
-        std::vector<mass_type> m_masses;  // f()
-        std::vector<moment_type> m_moments_inertia;  // f()
+        /**
+         * @brief Array of particles' masses.
+         */
+        std::vector<mass_type> m_masses;  // m()
+        /**
+         * @brief Array of particles' moments of inertia.
+         */
+        std::vector<moment_type> m_moments_inertia;  // j()
+        /**
+         * @brief Array of particles' velocities.
+         */
         std::vector<velocity_type> m_velocities;  // v()
+        /**
+         * @brief Array of particles' desired velocities.
+         */
         std::vector<velocity_type> m_desired_velocities;  // vd()
+        /**
+         * @brief Array of particles' rotations.
+         */
         std::vector<rotation_type> m_omega;  // omega()
+        /**
+         * @brief Array of particles' desired rotations.
+         */
         std::vector<rotation_type> m_desired_omega;  // desired_omega()
+        /**
+         * @brief Array of particles' hashes.
+         */
         std::vector<std::size_t> m_shapes_id;
+        /**
+         * @brief Array of objetcts' offsets.
+         *
+         * If the container is (obj_0, obj_1, ...), then <tt>m\_offset[j]</tt> = \f$\sum_{i = 0}^{j-1}{obj\_i.size()}\f$ for j > 0 and <tt>m_offset[0] = 0</tt>.
+         *
+         */
         std::vector<std::size_t> m_offset;
+        /**
+         * @brief Indices of particles that are duplicated for periodic boundary conditions.
+         */
         std::vector<std::size_t> m_periodic_indices;
 
+        /**
+         * @brief Index of the first duplicated particle.
+         */
         std::size_t m_periodic_ptr;
 
+        /**
+         * @brief Number of obstacles (inactive particles).
+         */
         std::size_t m_nb_inactive_core_objects;
 
+        /**
+         * @brief Whether there already is fictive particles in the container.
+         */
         bool m_periodic_added;
     };
 
