@@ -39,7 +39,7 @@ namespace scopi
         /**
          * @brief Kd-tree radius.
          *
-         * For two particles \c i and \c j, compute the exact distance only if the squared distance between a point in \c i and a point in \j is less tan \c kdtree_radius.
+         * For two particles \c i and \c j, compute the exact distance only if the squared distance between a point in \c i and a point in \c j is less than \c kdtree_radius.
          * For a sphere or a superellipsoid, this point is the center.
          * For a plan, it is the point used to construct it. 
          */
