@@ -108,6 +108,8 @@ namespace scopi
         /**
          * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
          *
+         * \todo It should be the same function as in DryWithFriction.hpp
+         *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
          * @param contacts [in] Array of contacts.
@@ -121,6 +123,8 @@ namespace scopi
                                           std::size_t firstCol);
         /**
          * @brief Get the number of rows in the matrix.
+         *
+         * See \c create_vector_distances for the order of the rows of the matrix.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
