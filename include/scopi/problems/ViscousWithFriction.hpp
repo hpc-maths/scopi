@@ -19,14 +19,44 @@ namespace scopi
     template<std::size_t dim>
     class ViscousWithFriction;
 
+    /**
+     * @brief Parameters for ViscousWithFriction<dim>.
+     *
+     * Specialization of ProblemParams in params.hpp
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     struct ProblemParams<ViscousWithFriction<dim>>
     {
+        /**
+         * @brief Default constructor.
+         */
         ProblemParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         ProblemParams(const ProblemParams<ViscousWithFriction<dim>>& params);
 
+        /**
+         * @brief Friction coefficient.
+         *
+         * Default value is 0.
+         */
         double mu;
+        /**
+         * @brief \f$ \gm \f$
+         *
+         * Default value is -3.
+         */
         double gamma_min;
+        /**
+         * @brief Tolerance to consider \f$ \g < 0 \f$ .
+         *
+         * Default value is \f$ 10^{-6} \f$.
+         */
         double tol;
     };
 
@@ -50,7 +80,7 @@ namespace scopi
         std::size_t get_nb_gamma_min();
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     const xt::xtensor<double, 1>& lambda,
+                                        const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
         bool should_solve_optimization_problem();
 
