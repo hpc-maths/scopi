@@ -60,7 +60,7 @@ namespace scopi
     };
 
     /**
-     * @brief Problem that models contacts without friction and without viscosity. A fixed point algorithm is used to ensure \f$ D = 0 \f$.
+     * @brief Problem that models contacts with friction and without viscosity. A fixed point algorithm is used to ensure \f$ D = 0 \f$.
      *
      * See ProblemBase.hpp for the notations.
      * The constraint is 

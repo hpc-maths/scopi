@@ -118,7 +118,7 @@ namespace scopi
     };
 
     /**
-     * @brief Problem that models contacts without friction and without viscosity.
+     * @brief Problem that models contacts with friction and without viscosity.
      *
      * See ProblemBase.hpp for the notations.
      * The constraint is 
