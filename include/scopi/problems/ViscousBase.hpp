@@ -13,18 +13,53 @@
 
 namespace scopi
 {
+    /**
+     * @brief Shared methods for models with viscosity.
+     *
+     * For each contact \f$ \ij \f$, there is a new variable \f$ \g_{ij} \f$.
+     * The value of \f$ \g_{\ij} \f$ dictates the behavior (problem-depedant).
+     * \f$ \g_{\ij} \f$ depends on the time.
+     * When there is no contact between particles \c i and \c j, \f$ \g_{\ij} = 0 \f$ by convention, the variable is not stored.
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     class ViscousBase
     {
     protected:
+        /**
+         * @brief Default constructor.
+         */
         ViscousBase();
 
+        /**
+         * @brief Set \f$ \g_{\ij}^n \f$ from the previous time step.
+         *
+         * Look if particles \c i and \c j were already in contact.
+         *
+         * @param contacts_new [in] Array of contacts at time \f$ t^{n+1} \f$.
+         */
         void set_gamma_base(const std::vector<neighbor<dim>>& contacts_new);
+        /**
+         * @brief Returns the number of contacts with \f$ \g_{\ij} < 0 \f$.
+         */
         std::size_t get_nb_gamma_neg() const;
 
+        /**
+         * @brief Array of contacts at time \f$ t^n \f$.
+         */
         std::vector<neighbor<dim>> m_contacts_old;
+        /**
+         * @brief Array of \f$ \g^{n+1} \f$.
+         */
         std::vector<double> m_gamma;
+        /**
+         * @brief Array of \f$ \g^{n} \f$.
+         */
         std::vector<double> m_gamma_old;
+        /**
+         * @brief Number of contacts at time \f$ t^{n+1} \f$ with \f$ \g_{\ij} < 0 \f$.
+         */
         std::size_t m_nb_gamma_neg;
     };
 
