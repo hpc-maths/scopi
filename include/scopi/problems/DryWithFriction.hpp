@@ -150,10 +150,10 @@ namespace scopi
          * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param particles Array of particles (for positions).
-         * @param contacts Array of contacts.
-         * @param contacts_worms Array of contacts to impose non-positive distance (for compatibility with other problems).
-         * @param firstCol Index of the first column (solver-dependent).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other problems).
+         * @param firstCol [in] Index of the first column (solver-dependent).
          */
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
@@ -164,8 +164,8 @@ namespace scopi
          * @brief Get the number of rows in the matrix.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param contacts Array of contacts.
-         * @param contacts_worms Array of contacts to impose non-positive distance (for compatibility with other models).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          *
          * @return Number of rows in the matrix.
          */
@@ -180,8 +180,8 @@ namespace scopi
          * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param contacts Array of contacts.
-         * @param contacts_worms Array of contacts to impose non-positive distance (for compatibility with other models).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          */
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
