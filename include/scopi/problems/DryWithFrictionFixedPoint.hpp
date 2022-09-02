@@ -20,17 +20,74 @@ namespace scopi
 {
     class DryWithFrictionFixedPoint;
 
+    /**
+     * @brief Parameters for \c DryWithoutFriction.
+     *
+     * Specialization of ProblemParams in params.hpp.
+     */
     template<>
     struct ProblemParams<DryWithFrictionFixedPoint>
     {
+        /**
+         * @brief Default constructor.
+         */
         ProblemParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         ProblemParams(const ProblemParams<DryWithFrictionFixedPoint>& params);
 
+        /**
+         * @brief Friction coefficient.
+         *
+         * Default value is 0.
+         */
         double mu;
+        /**
+         * @brief Tolerance for the fixed point algorithm.
+         *
+         * Default value is \f$ 10^{-2} \f$.
+         */
         double tol_fixed_point;
+        /**
+         * @brief Maximum number of iterations for the fixed point algorithm.
+         *
+         * Default value is 20.
+         */
         std::size_t max_iter_fixed_point;
     };
 
+#if 0
+#endif
+    /**
+     * @brief Problem that models contacts without friction and without viscosity. A fixed point algorithm is used to ensure \f$ D = 0 \f$.
+     *
+     * See ProblemBase.hpp for the notations.
+     * The constraint is 
+     * \f[ 
+     *      \d_{\ij} + \B \u_{\ij} \ge \left( \norm{\T \u_{\ij}} - \mu \Delta t \s_{\ij} \right),
+     * \f]
+     * for all contacts \f$ (\ij) \f$, with \f$ \s \in \R^{\Nc} \f$.
+     * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
+     * \f[
+     *      \begin{aligned}
+     *          \F : & \R^{\Nc} \to \R^{\Nc} \\
+     *               & \s_{\ij} \mapsto \norm{\T \us_{\ij}},
+     *      \end{aligned}
+     * \f]
+     * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \R^{\Nc} \f$ such that \f$ \F(\s) = \s \f$.
+     *
+     * This leads to the following algorithm:
+     * - \f$ \sWithIndex{0} \f$;
+     * - \f$ \indexFixedPoint = 0 \f$;
+     * - While \f$ \frac{\norm{\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}}}{\norm{\sWithIndex{\indexFixedPoint}} + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
+     *   - Compute \f$ \usWithIndex{\indexFixedPoint} \f$ as the solution of the optimization problem under the constraint written above;
+     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{\ij} = \norm{\T \usWithIndex{\indexFixedPoint}_{\ij}} \f$ for all contacts \f$ \ij \f$;
+     *   - \f$ \indexFixedPoint ++ \f$.
+     * 
+     */
     class DryWithFrictionFixedPoint : protected ProblemBase
     {
     protected:
