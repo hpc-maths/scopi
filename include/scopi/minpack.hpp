@@ -29,7 +29,6 @@ using namespace std;
  * @param n
  * @param x[]
  * @param fvec[]
- * @param 
  * @param f
  * @param args
  */
@@ -72,20 +71,12 @@ void fcn (int n, double x[], double fvec[], int& , F f, A args) {
  * @tparam F
  * @tparam DF
  * @tparam A
- * @param F
  * @param grad_f
  * @param args
  * @param n
  * @param x[]
- * @param double[]
  * @param fjac[]
  * @param ldfjac
- * @param 
- * @param int
- * @param int
- * @param double
- * @param double[]
- * @param double[]
  */
 template<typename F, typename DF, typename A>
 void fdjac_analytic ( F , DF grad_f, A args,
@@ -222,7 +213,6 @@ double r8_min ( double x, double y );
  *
  * @param n
  * @param r[]
- * @param int
  * @param diag[]
  * @param qtb[]
  * @param delta
@@ -271,7 +261,6 @@ void r1mpyq ( int m, int n, double a[], int lda, double v[], double w[] );
  * @param m
  * @param n
  * @param s[]
- * @param int
  * @param u[]
  * @param v[]
  * @param w[]
@@ -293,7 +282,6 @@ bool r1updt ( int m, int n, double s[], int , double u[], double v[],
  * @param lda
  * @param pivot
  * @param ipvt[]
- * @param int
  * @param rdiag[]
  * @param acnorm[]
  */
