@@ -126,7 +126,7 @@ namespace scopi
          * @return Number of rows in the matrix.
          */
         template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contact,
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         /**
          * @brief Create vector \f$ \d \f$.
