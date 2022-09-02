@@ -43,18 +43,21 @@ namespace scopi
          * @brief Friction coefficient.
          *
          * Default value is 0.
+         * \note \c mu > 0
          */
         double mu;
         /**
          * @brief Tolerance for the fixed point algorithm.
          *
          * Default value is \f$ 10^{-2} \f$.
+         * \note \c tol_fixed_point > 0
          */
         double tol_fixed_point;
         /**
          * @brief Maximum number of iterations for the fixed point algorithm.
          *
          * Default value is 20.
+         * \note \c max_iter_fixed_point > 0
          */
         std::size_t max_iter_fixed_point;
     };

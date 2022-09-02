@@ -44,6 +44,7 @@ namespace scopi
          * @brief Tolerance to consider \f$ \g < 0 \f$ .
          *
          * Default value is \f$ 10^{-6} \f$.
+         * \note \c tol > 0
          */
         double tol;
     };

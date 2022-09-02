@@ -44,18 +44,21 @@ namespace scopi
          * @brief Friction coefficient.
          *
          * Default value is 0.
+         * \note \c mu > 0
          */
         double mu;
         /**
          * @brief \f$ \gm \f$
          *
          * Default value is -3.
+         * \note \c gamma_min < 0
          */
         double gamma_min;
         /**
          * @brief Tolerance to consider \f$ \g < 0 \f$ .
          *
          * Default value is \f$ 10^{-6} \f$.
+         * \note \c tol > 0
          */
         double tol;
     };

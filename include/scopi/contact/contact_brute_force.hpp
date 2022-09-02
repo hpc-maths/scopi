@@ -35,6 +35,7 @@ namespace scopi
          * @brief Maximum distance between two neighboring particles.
          *
          * Default value: 2.
+         * \note \c dmax > 0
          */
         double dmax;
     };
