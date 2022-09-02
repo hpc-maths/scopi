@@ -152,7 +152,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param particles Array of particles (for positions).
          * @param contacts Array of contacts.
-         * @param contacts_worms Array of contacts to impose non-positive distance.
+         * @param contacts_worms Array of contacts to impose non-positive distance (for compatibility with other problems).
          * @param firstCol Index of the first column (solver-dependent).
          */
         template <std::size_t dim>
