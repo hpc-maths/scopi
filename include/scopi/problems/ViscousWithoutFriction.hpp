@@ -89,6 +89,8 @@ namespace scopi
         /**
          * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
          *
+         * See \c create_vector_distances for the order of the rows of the matrix.
+         *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
          * @param contacts [in] Array of contacts.
@@ -169,7 +171,7 @@ namespace scopi
          * @brief Compute the value of \f$ \g^{n+1} \f$.
          *
          * \f[
-         *      \g^{n+1}_{\ij} = \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right)
+         *      \g^{n+1}_{\ij} = \max \left( \gm, \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \right).
          * \f]
          *
          * @param contacts [in] Array of contacts.
@@ -187,6 +189,13 @@ namespace scopi
         bool should_solve_optimization_problem();
 
     private:
+        /**
+         * @brief 
+         *
+         * \todo Is it necessary or is a rest from a previous attempt?
+         *
+         * @return 
+         */
         std::size_t get_nb_gamma_min();
 
         /**

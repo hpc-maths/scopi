@@ -176,6 +176,8 @@ namespace scopi
         /**
          * @brief Create vector \f$ \d \f$.
          *
+         * See \c create_vector_distances for the order of the rows of the matrix.
+         *
          * \f$ \d \in \R^{4\Nc} \f$ can be seen as a block vector, each block has the form
          * \f$ (d_{\ij}, 0, 0, 0) \f$,
          * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
