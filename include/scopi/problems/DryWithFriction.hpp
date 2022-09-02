@@ -113,6 +113,7 @@ namespace scopi
          * @brief Friction coefficient.
          *
          * Default value is 0.
+         * \note \c mu > 0
          */
         double mu;
     };

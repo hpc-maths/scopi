@@ -34,6 +34,7 @@ namespace scopi
          * @brief Maximum distance between two neighboring particles.
          *
          * Default value: 2.
+         * \note \c dmax > 0
          */
         double dmax;
         /**
@@ -42,6 +43,7 @@ namespace scopi
          * For two particles \c i and \c j, compute the exact distance only if the squared distance between a point in \c i and a point in \c j is less than \c kdtree_radius.
          * For a sphere or a superellipsoid, this point is the center.
          * For a plan, it is the point used to construct it. 
+         * \note \c kd_tree_radius > 0
          */
         double kd_tree_radius;
     };
