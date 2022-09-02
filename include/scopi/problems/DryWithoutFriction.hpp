@@ -20,6 +20,8 @@ namespace scopi
     /**
      * @brief Parameters for \c DryWithoutFrixion..
      *
+     * Specialization of ProblemParams in params.hpp
+     *
      * Defined for compatibility.
      */
     template<>
