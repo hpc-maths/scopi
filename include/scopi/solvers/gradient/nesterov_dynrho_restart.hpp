@@ -11,26 +11,114 @@
 #include "projection_max.hpp"
 
 namespace scopi{
+    /**
+     * @brief Accelerated Projected Gradient Descent algorithm with Adaptive Step and Adaptive Restart.
+     *
+     * See OptimProjectedGradient for the notations.
+     * The algorithm is
+     *  - \f$ \indexUzawa = 0 \f$;
+     *  - \f$ \l^{\indexUzawa} = 0 \f$;
+     *  - \f$ \y^{\indexUzawa} = 0 \f$;
+     *  - \f$ \theta^{\indexUzawa} = 1 \f$.
+     *  - \f$ \rho^{\indexUzawa} \f$ given;
+     *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
+     *  - While (\f$ \convergenceCriterion \f$)
+     *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho^{\indexUzawa} \dg^{\indexUzawa}, 0 \right) \f$;
+     *      - While (\f$ \frac{1}{2} \l^{\indexUzawa+1} \cdot \A \l^{\indexUzawa+1} + \e \cdot \l^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \e \cdot \y^{\indexUzawa+1} + \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
+     *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
+     *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
+     *          - \f$ \l^{\indexUzawa+1} = \max \left( \y^{\indexUzawa} - \rho^{\indexUzawa} \dg^{\indexUzawa}, 0 \right) \f$;
+     *
+     *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
+     *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
+     *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
+     *      - If (\f$ \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) > 0 \f$ )
+     *          - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} \f$;
+     *          - \f$ \theta^{\indexUzawa+1} = 1 \f$;
+     *
+     *      - \f$ \indexUzawa++ \f$.
+     *
+     * @tparam projection_t Projection on admissible velocities.
+     */
     template<class projection_t = projection_max>
     class nesterov_dynrho_restart: public projection_t
     {
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param max_iter [in] Maximal number of iterations.
+         * @param rho [in] Step for the gradient descent.
+         * @param tol_dg [in] Tolerance for \f$ \dg \f$ criterion.
+         * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
+         * @param verbose [in] Whether to compute and print the function cost.
+         */
         nesterov_dynrho_restart(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
+        /**
+         * @brief Gradient descent algorithm.
+         *
+         * @param A [in] Matrix \f$ \A \f$.
+         * @param descr [in] Structure specifying \f$ \A \f$ properties. 
+         * @param c [in] Vector \f$ \e \f$.
+         * @param l [out] vector \f$ \l \f$.
+         *
+         * @return Number of iterations the algorithm needed to converge.
+         */
         std::size_t projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l);
     private:
+        /**
+         * @brief Maximal number of iterations.
+         */
         std::size_t m_max_iter;
+        /**
+         * @brief Initial guess for the step for the gradient descent.
+         */
         double m_rho;
+        /**
+         * @brief Tolerance for \f$ \dg \f$ criterion (unused).
+         */
         double m_tol_dg;
+        /**
+         * @brief Tolerance for \f$ \l \f$ criterion.
+         */
         double m_tol_l;
+        /**
+         * @brief Whether to compute and print the function cost.
+         */
         bool m_verbose;
+        /**
+         * @brief Step for the gradient descent.
+         */
         double m_rho_init;
 
+        /**
+         * @brief Value indicating whether the operation was successful or not, and why.
+         */
         sparse_status_t m_status;
+        /**
+         * @brief Vector \f$ \dg^{\indexUzawa} \f$.
+         */
         xt::xtensor<double, 1> m_dg;
+        /**
+         * @brief Vector \f$ \A \l^{\indexUzawa+1} + \e \f$.
+         */
         xt::xtensor<double, 1> m_uu;
+        /**
+         * @brief Vector \f$ \y^{\indexUzawa+1} \f$.
+         */
         xt::xtensor<double, 1> m_y;
+        /**
+         * @brief Vector \f$ \l^{\indexUzawa} \f$.
+         */
         xt::xtensor<double, 1> m_l_old;
+        /**
+         * @brief Temporary vector used to compute \f$ \transpose{\l} \cdot \A \l \f$ and \f$ \transpose{\y} \cdot \A \y \f$.
+         */
         xt::xtensor<double, 1> m_tmp;
+        /**
+         * @brief Vector \f$ \l^{\indexUzawa} \f$.
+         */
         xt::xtensor<double, 1> m_lambda_prev;
     };
 
