@@ -177,7 +177,7 @@ namespace scopi
          */
         sparse_matrix_t m_inv_P;
         /**
-         * @brief Structure specifying \f$ \B \f$ properties. 
+         * @brief Structure specifying \f$ \P^{-1} \f$ properties. 
          */
         struct matrix_descr m_descr_inv_P;
         /**
