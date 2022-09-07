@@ -78,11 +78,11 @@ namespace scopi{
          */
         sparse_status_t m_status;
         /**
-         * @brief Vector \f$ \dg \f$.
+         * @brief Vector \f$ \dg^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \A \l + \e \f$.
+         * @brief Vector \f$ \A \l^{\indexUzawa+1} + \e \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**
