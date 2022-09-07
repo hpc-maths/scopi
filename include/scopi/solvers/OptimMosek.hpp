@@ -142,7 +142,7 @@ namespace scopi{
          */
         double* wadapt_data();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f^$ is the solution of the optimization problem..
+         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
