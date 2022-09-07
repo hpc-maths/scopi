@@ -54,6 +54,7 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      *
      * The documentation of SCS is available here: https://www.cvxgrp.org/scs/
+     * Matrices are stored using CSC storage.
      * \warning Only rhe case <tt> problem_t = DriWithoutFriction </tt> has been tested, and only with spheres and superellipsoids.
      *
      * @tparam problem_t Problem to be solved.
@@ -149,6 +150,10 @@ namespace scopi
         /**
          * @brief Convert a matrix stored in COO format to CSR format.
          *
+         * This function is used knowing that
+         *  - the CSC storage of a matrix is the CSR storage of its transpose;
+         *  - the COO storage of the transpose of a matrix is obtained by inversing the row and columns array of the matrix in COO storage.
+         *
          * @param coo_rows [in] Rows' indicies of to COO storage.
          * @param coo_cols [in] Column's indicies of the COO storage.
          * @param coo_vals [in] Values of the COO storage.
@@ -158,32 +163,100 @@ namespace scopi
          */
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
+        /**
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         *
+         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, 0, \dots, m_{\N}, m_{\N}, 0, 0, 0, J_0, \dots, 0, 0, J_{\N}) \f$,
+         * where \f$ m_i \f$ (resp. \f$ J_i \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
+         * This function set the second part of the matrix.
+         *
+         * @param nparts [in] Number of particles.
+         * @param particles [in] Array of particles (for the moments of inertia).
+         * @param index [in] Index of the first row with moments.
+         */
         void set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
+        /**
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         *
+         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, m_0, \dots, m_{\N}, m_{\N}, m_{\N}, J_0^x, J_0^y, J_0^z, \dots, J_{\N}^x, J_{\N}^y, J_{\N}^z) \f$,
+         * where \f$ m_i \f$ (resp. \f$ \mathbf{J}_i = (J_i^x, J_i^y, J_i^z) \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
+         * This function set the second part of the matrix.
+         *
+         * @param nparts [in] Number of particles.
+         * @param particles [in] Array of particles (for the moments of inertia).
+         * @param index [in] Index of the first row with moments.
+         */
         void set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
         
 
+        /**
+         * @brief SCS' data structure for the matrix \f$ \P \f$.
+         */
         ScsMatrix m_P;
+        /**
+         * @brief Values of \f$ \P \f$ in CSC storage.
+         */
         std::vector<scs_float> m_P_x;
+        /**
+         * @brief Row indices of \f$ \P \f$ in CSC storage.
+         */
         std::vector<scs_int> m_P_i;
+        /**
+         * @brief Column indices of \f$ \P \f$ in CSC storage.
+         */
         std::vector<scs_int> m_P_p;
 
+        /**
+         * @brief SCS' data structure for the matrix \f$ \B \f$.
+         */
         ScsMatrix m_A;
+        /**
+         * @brief Values of \f$ \B \f$ in CSC storage.
+         */
         std::vector<scs_float> m_A_x;
+        /**
+         * @brief Row indices of \f$ \B \f$ in CSC storage.
+         */
         std::vector<scs_int> m_A_i;
+        /**
+         * @brief Column indices of \f$ \B \f$ in CSC storage.
+         */
         std::vector<scs_int> m_A_p;
 
+        /**
+         * @brief SCS' data structure for \f$ \d \f$.
+         */
         ScsData m_d;
+        /**
+         * @brief SCS' data structure for the constraints.
+         */
         ScsCone m_k;
 
+        /**
+         * @brief SCS' data structure for the solution of the optimization problem.
+         */
         ScsSolution m_sol;
+        /**
+         * @brief Solution of the optimization problem.
+         */
         std::vector<scs_float> m_sol_x;
+        /**
+         * @brief Solution of the dual problem.
+         */
         std::vector<scs_float> m_sol_y;
+        /**
+         * @brief Slack variable.
+         */
         std::vector<scs_float> m_sol_s;
 
+        /**
+         * @brief Contains information about the solve run at termination.
+         */
         ScsInfo m_info;
+        /**
+         * @brief Struct containing all settings. 
+         */
         ScsSettings m_stgs;
-        OptimScs(const OptimScs &);
-        OptimScs & operator=(const OptimScs &);
     };
 
     template <class problem_t>
