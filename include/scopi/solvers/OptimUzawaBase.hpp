@@ -70,7 +70,8 @@ namespace scopi{
      *      - \f$ \u^{\indexUzawa+1} = \P^{-1} \left( \c - \transpose{B} \l^{\indexUzawa} \right) \f$;
      *      - \f$ \r^{\indexUzawa+1} = \B \u^{\indexUzawa+1} - \d \f$;
      *      - \f$ \l^{\indexUzawa+1}_{\ij} = \max \left( \l_{\ij}^{\indexUzawa} - \rho \r_{\ij}^{\indexUzawa+1}, 0 \right) \f$;
-     *      - \f$ cmax = \min_{\ij} \left( \r_{\ij}^{\indexUzawa+1} \right) \f$.
+     *      - \f$ cmax = \min_{\ij} \left( \r_{\ij}^{\indexUzawa+1} \right) \f$;
+     *      - \f$ \indexUzawa++\f$.
      *
      * @tparam Derived Class that implements matrix-vector products.
      * @tparam problem_t Problem to be solved.
