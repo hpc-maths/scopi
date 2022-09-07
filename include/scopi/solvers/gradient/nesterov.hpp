@@ -94,7 +94,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_y;
         /**
-         * @brief Vector \f$ \y^{\indexUzawa} \f$.
+         * @brief Vector \f$ \l^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
         /**
