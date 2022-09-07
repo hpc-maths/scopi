@@ -158,7 +158,7 @@ namespace scopi{
          */
         double* lagrange_multiplier_data();
         /**
-         * @brief Number of Lagrange multipliers > 0 (active constraints)
+         * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
         int get_nb_active_contacts_impl() const;
 

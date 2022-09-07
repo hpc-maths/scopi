@@ -133,7 +133,7 @@ namespace scopi{
                                        const std::vector<neighbor<dim>>& contacts,
                                        const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Number of Lagrange multipliers > 0 (active constraints)
+         * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
         int get_nb_active_contacts() const;
 
