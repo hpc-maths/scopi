@@ -17,64 +17,172 @@ namespace scopi
     template<class problem_t>
     class OptimUzawaMkl;
 
+    /**
+     * @brief Parameters for \c OptimUzawaMatrixFreeOmp<problem_t>
+     *
+     * Specialization of ProblemParams.
+     * See OptimParamsUzawaBase.
+     *
+     * @tparam problem_t Problem to be solved.
+     */
     template<class problem_t>
     struct OptimParams<OptimUzawaMkl<problem_t>> : public OptimParamsUzawaBase
     {
     };
 
+    /**
+     * @brief Uzawa algorithm where the matrices are stored and matrix-vector products are computed with the MKL.
+     *
+     * See OptimUzawaBase for the algorithm.
+     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     *
+     * @tparam problem_t Problem to be solved.
+     */
     template <class problem_t = DryWithoutFriction>
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>
     {
     protected:
+        /**
+         * @brief Alias for the problem.
+         */
         using problem_type = problem_t; 
     private:
+        /**
+         * @brief Alias for the base class \c OptimUzawaBase.
+         */
         using base_type = OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>;
 
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * Buils the matrix \f$ \P^{-1} \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param particles [in] Array of particles.
+         * @param optim_params [in] Parameters.
+         * @param problem_params [in] Parameters for the problem.
+         */
         template <std::size_t dim>
         OptimUzawaMkl(std::size_t nparts,
                       double dt,
                       const scopi_container<dim>& particles,
                       const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
                       const ProblemParams<problem_t>& problem_params);
+        /**
+         * @brief Free the memory allocated for the matrix \f$ \P^{-1} \f$..
+         */
         ~OptimUzawaMkl();
 
     public:
+        /**
+         * @brief Initialize the matrices for matrix-vector products with stored matrix.
+         *
+         * Builds the matrix \f$ \B \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         */
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Free the memory allocated for the matrix \f$ \B \f$..
+         */
         void finalize_uzawa_impl();
 
+        /**
+         * @brief Implements the product \f$ \P^{-1} \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for masses and moments of inertia).
+         */
         template <std::size_t dim>
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
+        /**
+         * @brief Implements the product \f$ \r = \r - \B \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         */
         template <std::size_t dim>
         void gemv_A_impl(const scopi_container<dim>& particles,
                          const std::vector<neighbor<dim>>& contacts);
 
+        /**
+         * @brief Implements the product \f$ \u = \transpose{\B} \l + \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         */
         template <std::size_t dim>
         void gemv_transpose_A_impl(const scopi_container<dim>& particles,
                                    const std::vector<neighbor<dim>>& contacts);
 
     private:
-        void print_csr_matrix(const sparse_matrix_t);
+        /**
+         * @brief Prints a matrix on standard output.
+         *
+         * @param A [in] Matrix to print.
+         */
+        void print_csr_matrix(const sparse_matrix_t A);
 
+        /**
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         *
+         * @param nparts [in] Number of particles.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param particles [in] Array for particles (for moments of inertia).
+         */
         void set_moment_matrix(std::size_t nparts,
                                std::vector<MKL_INT>& invP_csr_row,
                                std::vector<MKL_INT>& invP_csr_col,
                                std::vector<double>& invP_csr_val,
                                const scopi_container<2>& particles);
+        /**
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         *
+         * @param nparts [in] Number of particles.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param particles [in] Array for particles (for moments of inertia).
+         */
         void set_moment_matrix(std::size_t nparts,
                                std::vector<MKL_INT>& invP_csr_row,
                                std::vector<MKL_INT>& invP_csr_col,
                                std::vector<double>& invP_csr_val,
                                const scopi_container<3>& particles);
 
+        /**
+         * @brief MKL's data structure for the matrix \f$ \B \f$.
+         */
         sparse_matrix_t m_A;
+        /**
+         * @brief Structure specifying \f$ \B \f$ properties. 
+         */
         struct matrix_descr m_descrA;
+        /**
+         * @brief MKL's data structure for the matrix \f$ \P^{-1} \f$.
+         */
         sparse_matrix_t m_inv_P;
+        /**
+         * @brief Structure specifying \f$ \B \f$ properties. 
+         */
         struct matrix_descr m_descr_inv_P;
+        /**
+         * @brief Value indicating whether the operation was successful or not, and why.
+         */
         sparse_status_t m_status;
 
     };
