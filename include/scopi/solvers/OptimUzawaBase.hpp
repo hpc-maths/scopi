@@ -15,65 +15,214 @@
 #include "../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
+    /**
+     * @brief Shared parameters for different implementation of Uzawa algorithm.
+     */
     struct OptimParamsUzawaBase
     {
+        /**
+         * @brief Default constructor.
+         */
         OptimParamsUzawaBase();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
 
+        /**
+         * @brief Tolerance.
+         *
+         * Default value is \f$ 10^{-9} \f$.
+         * \note \c tol > 0
+         */
         double tol;
+        /**
+         * @brief Maximal number of iterations.
+         *
+         * Default value is 40000.
+         */
         std::size_t max_iter;
+        /**
+         * @brief Step for the gradient descent.
+         *
+         * Default value is 2000.
+         * \note \c rho > 0
+         *
+         * Reasonable performances are obtained with \c rho = \f$ \frac{0.2}{\Delta t^2} \f$.
+         */
         double rho;
     };
 
+    /**
+     * @brief Uzawa algorithm to solve the optimization problem.
+     *
+     * See ProblemBase for the notations.
+     * The algortihm requires matrix-vector products.
+     * Several methods are implemented.
+     *
+     * The algorithm is:
+     *  - \f$ \indexUzawa = 0 \f$;
+     *  - \f$ \l^{\indexUzawa} = 0 \f$;
+     *  - \f$ cmax = - \infty \f$;
+     *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
+     *      - \f$ \u^{\indexUzawa+1} = \P^{-1} \left( \c - \transpose{B} \l^{\indexUzawa} \right) \f$;
+     *      - \f$ \r^{\indexUzawa+1} = \B \u^{\indexUzawa+1} - \d \f$;
+     *      - \f$ \l^{\indexUzawa+1}_{\ij} = \max \left( \l_{\ij}^{\indexUzawa} - \rho \r_{\ij}^{\indexUzawa+1}, 0 \right) \f$;
+     *      - \f$ cmax = \min_{\ij} \left( \r_{\ij}^{\indexUzawa+1} \right) \f$.
+     *
+     * @tparam Derived Class that implements matrix-vector products.
+     * @tparam problem_t Problem to be solved.
+     */
     template<class Derived, class problem_t = DryWithoutFriction>
     class OptimUzawaBase: public OptimBase<Derived, problem_t>
     {
     private:
+        /**
+         * @brief Alias for the problem.
+         */
         using problem_type = problem_t; 
+        /**
+         * @brief Alias for the base class \c OptimBase.
+         */
         using base_type = OptimBase<Derived, problem_t>;
 
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param optim_params [in] Parameters.
+         * @param problem_params [in] Parameters for the problem.
+         */
         OptimUzawaBase(std::size_t nparts,
                        double dt,
                        const OptimParams<Derived>& optim_params,
                        const ProblemParams<problem_t>& problem_params);
 
     public:
+        /**
+         * @brief Solve the optimization problem.
+         *
+         * Implements Uzawa algorithm, without knowing how the matrix-vector product is implemented.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return Number of iterations Uzawa algorithm needed to converge.
+         */
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ 3 \N \f$ elements.
+         */
         auto uadapt_data();
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ 3 \N \f$ elements.
+         */
         auto wadapt_data();
+        /**
+         * @brief Returns the Lagrange multipliers (solution of the dual problem) when the optimization is solved.
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ \Nc \f$ elements.
+         */
         auto lagrange_multiplier_data();
+        /**
+         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ \Nc \f$ elements.
+         */
         double* constraint_data();
-
+        /**
+         * @brief Number of Lagrange multipliers > 0 (active constraints).
+         */
         int get_nb_active_contacts_impl() const;
 
     private:
+        /**
+         * @brief Computes \f$ \P^{-1} \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         */
         template <std::size_t dim>
         void gemv_inv_P(const scopi_container<dim>& particles);
 
+        /**
+         * @brief Computes \f$ \r = \r - \B \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         */
         template <std::size_t dim>
         void gemv_A(const scopi_container<dim>& particles,
                     const std::vector<neighbor<dim>>& contacts);
 
+        /**
+         * @brief Computes \f$ \u = \transpose{\B} \l + \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         */
         template <std::size_t dim>
         void gemv_transpose_A(const scopi_container<dim>& particles,
                               const std::vector<neighbor<dim>>& contacts);
 
+        /**
+         * @brief Initialize the matrices for matrix-vector products with stored matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         */
         template <std::size_t dim>
         void init_uzawa(const scopi_container<dim>& particles,
                         const std::vector<neighbor<dim>>& contacts, 
                         const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Free the memory allocated for the matrices.
+         */
         void finalize_uzawa();
 
     protected:
+        /**
+         * @brief Vector \f$ \u \f$.
+         */
         xt::xtensor<double, 1> m_U;
+        /**
+         * @brief Vector \f$ \l \f$.
+         */
         xt::xtensor<double, 1> m_L;
+        /**
+         * @brief Vector \f$ \l \f$.
+         */
         xt::xtensor<double, 1> m_R;
 
     private:
+        /**
+         * @brief Instead of imposing \f$ D > 0 \f$ between the particles, impose \f$ D > dmin \f$.
+         */
         const double m_dmin;
     };
 
