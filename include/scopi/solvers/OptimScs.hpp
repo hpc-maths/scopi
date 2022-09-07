@@ -14,7 +14,7 @@ namespace scopi
     /**
      * @brief Parameters for \c OptimScs<problem_t>
      *
-     * Specialization of ProblemParams in params.hpp
+     * Specialization of ProblemParams.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -55,7 +55,7 @@ namespace scopi
      *
      * The documentation of SCS is available here: https://www.cvxgrp.org/scs/
      * Matrices are stored using CSC storage.
-     * \warning Only rhe case <tt> problem_t = DriWithoutFriction </tt> has been tested, and only with spheres and superellipsoids.
+     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
      *
      * @tparam problem_t Problem to be solved.
      */
