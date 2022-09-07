@@ -77,7 +77,7 @@ namespace scopi
 
     private:
         /**
-         * @brief 2D implementation of rows in matrix-free product \f$ \n = \P^{-1} \u \f$ that involve moments of inertia.
+         * @brief 2D implementation of rows in matrix-free product \f$ \u = \P^{-1} \u \f$ that involve moments of inertia.
          *
          * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
          * The implentation is different in 2D or in 3D.

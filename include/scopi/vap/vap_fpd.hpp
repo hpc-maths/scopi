@@ -56,7 +56,7 @@ namespace scopi
     /**
      * @brief Compute the product \f$\vec{\omega'}^n \land ( \mathbb{J} \vec{\omega'}^n ) \f$.
      *
-     * 2D function.
+     * 2D implementation.
      *
      * @param particles [in] Particles, to access \f$ \vec{\omega'}^n \f$.
      * @param i [in] Index of the particle.
@@ -67,7 +67,7 @@ namespace scopi
     /**
      * @brief Compute the product \f$\vec{\omega'}^n \land ( \mathbb{J} \vec{\omega'}^n ) \f$.
      *
-     * 3D function.
+     * 3D implementation.
      *
      * @param particles [in] Particles, to access \f$ \vec{\omega'}^n \f$.
      * @param i [in] Index of the particle.
