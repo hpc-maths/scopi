@@ -11,24 +11,95 @@
 #include "projection_max.hpp"
 
 namespace scopi{
+    /**
+     * @brief Accelerated Projected Gradient Descent.
+     *
+     * See OptimProjectedGradient for the notations.
+     * The algorithm is
+     *  - \f$ \indexUzawa = 0 \f$;
+     *  - \f$ \l^{\indexUzawa} = 0 \f$;
+     *  - \f$ \y^{\indexUzawa} = 0 \f$;
+     *  - \f$ \theta^{\indexUzawa} = 1 \f$.
+     *  - While (\f$ \convergenceCriterion \f$)
+     *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho \dg^{\indexUzawa}, 0 \right) \f$;
+     *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
+     *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
+     *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
+     *      - \f$ \indexUzawa++ \f$.
+     *
+     * @tparam projection_t Projection on admissible velocities.
+     */
     template<class projection_t = projection_max>
     class nesterov: public projection_t
     {
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param max_iter [in] Maximal number of iterations.
+         * @param rho [in] Step for the gradient descent.
+         * @param tol_dg [in] Tolerance for \f$ \dg \f$ criterion.
+         * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
+         * @param verbose [in] Whether to compute and print the function cost.
+         */
         nesterov(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
+        /**
+         * @brief Gradient descent algorithm.
+         *
+         * @param A [in] Matrix \f$ \A \f$.
+         * @param descr [in] Structure specifying \f$ \A \f$ properties. 
+         * @param c [in] Vector \f$ \e \f$.
+         * @param l [out] vector \f$ \l \f$.
+         *
+         * @return Number of iterations the algorithm needed to converge.
+         */
         std::size_t projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l);
     private:
+        /**
+         * @brief Maximal number of iterations.
+         */
         std::size_t m_max_iter;
+        /**
+         * @brief Step for the gradient descent.
+         */
         double m_rho;
+        /**
+         * @brief Tolerance for \f$ \dg \f$ criterion (unused).
+         */
         double m_tol_dg;
+        /**
+         * @brief Tolerance for \f$ \l \f$ criterion.
+         */
         double m_tol_l;
+        /**
+         * @brief Whether to compute and print the function cost.
+         */
         bool m_verbose;
 
+        /**
+         * @brief Value indicating whether the operation was successful or not, and why.
+         */
         sparse_status_t m_status;
+        /**
+         * @brief Vector \f$ \dg^{\indexUzawa} \f$.
+         */
         xt::xtensor<double, 1> m_dg;
+        /**
+         * @brief Vector \f$ \A \l^{\indexUzawa+1} + \e \f$.
+         */
         xt::xtensor<double, 1> m_uu;
+        /**
+         * @brief Vector \f$ \y^{\indexUzawa+1} \f$.
+         */
         xt::xtensor<double, 1> m_y;
+        /**
+         * @brief Vector \f$ \y^{\indexUzawa} \f$.
+         */
         xt::xtensor<double, 1> m_l_old;
+        /**
+         * @brief Vector \f$ \l^{\indexUzawa} \f$.
+         */
         xt::xtensor<double, 1> m_lambda_prev;
     };
 
