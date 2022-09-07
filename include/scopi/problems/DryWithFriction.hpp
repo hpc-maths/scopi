@@ -93,7 +93,6 @@ namespace scopi
      * @brief Parameters for \c DryWithFriction
      *
      * Specialization of ProblemParams in params.hpp
-     *
      */
     template<>
     struct ProblemParams<DryWithFriction>
