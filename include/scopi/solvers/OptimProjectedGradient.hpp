@@ -180,7 +180,7 @@ namespace scopi{
          * @param contacts [in] Array of contacts.
          * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
-         * @return Number of iterations Mosek's solver needed to converge.
+         * @return Number of iterations gradient descent algorithm needed to converge.
          */
         template <std::size_t dim>
         std::size_t solve_optimization_problem_impl(const scopi_container<dim>& particles,
