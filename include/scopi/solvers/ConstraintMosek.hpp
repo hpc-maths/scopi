@@ -11,33 +11,82 @@
 
 namespace scopi
 {
+    /**
+     * @brief Helper to set the constraint in OptimMosek.
+     *
+     * The constraint depends on the problem, template specializations of this class help manage the dependance on the problem.
+     *
+     * @tparam problem_t Problem to be solved.
+     */
     template<class problem_t>
     class ConstraintMosek
     {
     };
 
-    // DryWithoutFriction
+    /**
+     * @brief Specialization of \c ConstraintMosek for \c DryWithoutFriction.
+     */
     template<>
     class ConstraintMosek<DryWithoutFriction>
     {
     public:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         */
         ConstraintMosek(std::size_t nparts);
+        /**
+         * @brief Number of columns in the matrix (\f$ 1 + 6\N + 6\N \f$).
+         */
         std::size_t number_col_matrix() const;
+        /**
+         * @brief A matrix larger than \f$ \B \f$ is built (see OptimMosek), the function returns the index of the first column of \f$ \B \f$ in \f$ \BMosek \f$.
+         *
+         * @return 1.
+         */
         std::size_t index_first_col_matrix() const;
 
+        /**
+         * @brief Add the constraint \f$ \d + \B \u \ge 0 \f$ in Mosek's solver.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param D [in] Array \f$ \d \d$.
+         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param X [in] Unknown \f$ \u \f$.
+         * @param model [in] Mosek's solver.
+         * @param contacts [in] Array of contatcs (for compatibility with other problems).
+         */
         template <std::size_t dim>
         void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                              mosek::fusion::Matrix::t A,
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Get the solution of the dual problem.
+         *
+         * Call \pre <tt> model->solve() </tt> before this function.
+         *
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
+         */
         void update_dual(std::size_t nb_row_matrix,
-                        std::size_t nb_contacts);
+                         std::size_t nb_contacts);
 
+        /**
+         * @brief Mosek's data structure for the solution of the dual problem.
+         */
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
     private:
+        /**
+         * @brief Number of particles.
+         */
         std::size_t m_nparticles;
+        /**
+         * @brief Mosek's data structure for the constraint.
+         */
         mosek::fusion::Constraint::t m_qc1;
     };
 
@@ -57,27 +106,69 @@ namespace scopi
 
 
 
-    // DryWithFriction
+    /**
+     * @brief Specialization of \c ConstraintMosek for \c DryWithFriction.
+     */
     template<>
     class ConstraintMosek<DryWithFriction>
     {
     public:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         */
         ConstraintMosek(std::size_t nparts);
+        /**
+         * @brief Number of columns in the matrix (\f$ 6 \N \f$).
+         */
         std::size_t number_col_matrix() const;
+        /**
+         * @brief The matrix \f$ \BMosek \f$ contains the matrices \f$ \B \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         *
+         * @return 0.
+         */
         std::size_t index_first_col_matrix() const;
+        /**
+         * @brief Add the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ in Mosek's solver.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param D [in] Array \f$ \d \d$.
+         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param X [in] Unknown \f$ \u \f$.
+         * @param model [in] Mosek's solver.
+         * @param contacts [in] Array of contatcs.
+         */
         template <std::size_t dim>
         void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                              mosek::fusion::Matrix::t A,
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Get the solution of the dual problem.
+         *
+         * Call \pre <tt> model->solve() </tt> before this function.
+         *
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
+         */
         void update_dual(std::size_t nb_row_matrix,
                          std::size_t nb_contacts);
 
+        /**
+         * @brief Mosek's data structure for the solution of the dual problem.
+         */
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
     private:
+        /**
+         * @brief Number of particles.
+         */
         std::size_t m_nparticles;
+        /**
+         * @brief Mosek's data structure for the constraint.
+         */
         mosek::fusion::Constraint::t m_qc1;
     };
 
@@ -99,27 +190,69 @@ namespace scopi
 
 
 
-    // DryWithFrictionFixedPoint
+    /**
+     * @brief Specialization of \c ConstraintMosek for \c DryWithFrictionFixedPoint.
+     */
     template<>
     class ConstraintMosek<DryWithFrictionFixedPoint>
     {
     public:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         */
         ConstraintMosek(std::size_t nparts);
+        /**
+         * @brief Number of columns in the matrix (\f$ 6 \N \f$).
+         */
         std::size_t number_col_matrix() const;
+        /**
+         * @brief The matrix \f$ \BMosek \f$ contains the matrices \f$ \B \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         *
+         * @return 0.
+         */
         std::size_t index_first_col_matrix() const;
+        /**
+         * @brief Add the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ in Mosek's solver.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param D [in] Array \f$ \d \d$.
+         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param X [in] Unknown \f$ \u \f$.
+         * @param model [in] Mosek's solver.
+         * @param contacts [in] Array of contatcs.
+         */
         template <std::size_t dim>
         void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                              mosek::fusion::Matrix::t A,
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Get the solution of the dual problem.
+         *
+         * Call \pre <tt> model->solve() </tt> before this function.
+         *
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
+         */
         void update_dual(std::size_t nb_row_matrix,
                          std::size_t nb_contacts);
 
+        /**
+         * @brief Mosek's data structure for the solution of the dual problem.
+         */
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
     private:
+        /**
+         * @brief Number of particles.
+         */
         std::size_t m_nparticles;
+        /**
+         * @brief Mosek's data structure for the constraint.
+         */
         mosek::fusion::Constraint::t m_qc1;
     };
 
@@ -141,27 +274,71 @@ namespace scopi
 
 
 
-    // ViscousWithoutFriction
+    /**
+     * @brief Specialization of \c ConstraintMosek for \c ViscousWithoutFriction<dim>.
+     *
+     * @tparam dim Dimension(2 or 3).
+     */
     template<std::size_t dim>
     class ConstraintMosek<ViscousWithoutFriction<dim>>
     {
     public:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         */
         ConstraintMosek(std::size_t nparts);
+        /**
+         * @brief Number of columns in the matrix (\f$ 1 + 6\N + 6\N \f$).
+         */
         std::size_t number_col_matrix() const;
+        /**
+         * @brief A matrix larger than \f$ \B \f$ is built (see OptimMosek), the function returns the index of the first column of \f$ \B \f$ in \f$ \BMosek \f$.
+         *
+         * @return 1.
+         */
         std::size_t index_first_col_matrix() const;
 
+        /**
+         * @brief Add the constraint \f$ \d + \B \u \ge 0 \f$ in Mosek's solver.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param D [in] Array \f$ \d \d$.
+         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param X [in] Unknown \f$ \u \f$.
+         * @param model [in] Mosek's solver.
+         * @param contacts [in] Array of contatcs (for compatibility with other problems).
+         */
         void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                              mosek::fusion::Matrix::t A,
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Get the solution of the dual problem.
+         *
+         * Call \pre <tt> model->solve() </tt> before this function.
+         *
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
+         */
         void update_dual(std::size_t nb_row_matrix,
                          std::size_t nb_contacts);
 
+        /**
+         * @brief Mosek's data structure for the solution of the dual problem.
+         */
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
     private:
+        /**
+         * @brief Number of particles.
+         */
         std::size_t m_nparticles;
+        /**
+         * @brief Mosek's data structure for the constraint.
+         */
         mosek::fusion::Constraint::t m_qc1;
     };
 
@@ -208,28 +385,75 @@ namespace scopi
 
 
 
-    // ViscousWithFriction
+    /**
+     * @brief Specialization of \c ConstraintMosek for \c ViscousWithFriction<dim>.
+     *
+     * @tparam dim Dimension(2 or 3).
+     */
     template<std::size_t dim>
     class ConstraintMosek<ViscousWithFriction<dim>> : protected ViscousWithFriction<dim>
     {
     public:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         */
         ConstraintMosek(std::size_t nparts);
+        /**
+         * @brief Number of columns in the matrix (\f$ 6 \N \f$).
+         */
         std::size_t number_col_matrix() const;
+        /**
+         * @brief The matrix \f$ \BMosek \f$ contains the matrices \f$ \B \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         *
+         * @return 0.
+         */
         std::size_t index_first_col_matrix() const;
 
+        /**
+         * @brief Add the constraints \f$ \d + \B \u \ge 0 \f$ and \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ in Mosek's solver.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param D [in] Array \f$ \d \d$.
+         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param X [in] Unknown \f$ \u \f$.
+         * @param model [in] Mosek's solver.
+         * @param contacts [in] Array of contatcs.
+         */
         void add_constraints(std::shared_ptr<monty::ndarray<double, 1>> D,
                              mosek::fusion::Matrix::t A,
                              mosek::fusion::Variable::t X,
                              mosek::fusion::Model::t model,
                              const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Get the solution of the dual problem.
+         *
+         * Call \pre <tt> model->solve() </tt> before this function.
+         *
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$.
+         * @param nb_contacts [in] Number of contacts.
+         */
         void update_dual(std::size_t nb_row_matrix,
                          std::size_t nb_contacts);
 
+        /**
+         * @brief Mosek's data structure for the solution of the dual problem.
+         */
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
     private:
+        /**
+         * @brief Number of particles.
+         */
         std::size_t m_nparticles;
+        /**
+         * @brief Mosek's data structure for the constraint \f$ \d + \B \u \ge 0 \f$.
+         */
         mosek::fusion::Constraint::t m_qc1;
+        /**
+         * @brief Mosek's data structure for the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$.
+         */
         mosek::fusion::Constraint::t m_qc4;
     };
 
