@@ -42,6 +42,12 @@ namespace scopi
 
         std::size_t output_frequency;
         std::string filename;
+        /**
+         * @brief Whether to write the velocity of the particles in the output files.
+         *
+         * Default value is false.
+         */
+        bool write_velocity;
     };
 
     // TODO fix compilation with default template parameters

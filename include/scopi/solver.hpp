@@ -172,7 +172,6 @@ namespace scopi
         tic();
         nl::json json_output;
 
-        // std::ofstream file(fmt::format("./Results/scopi_objects_{:04d}.json", nite));
         std::ofstream file(fmt::format("{}{:04d}.json", m_params.filename, nite));
 
         json_output["objects"] = {};
@@ -180,6 +179,14 @@ namespace scopi
         for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
             json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i]));
+        }
+
+        if (m_params.write_velocity)
+        {
+            for (std::size_t i = 0; i < m_particles.size(); ++i)
+            {
+                json_output["objects"][i]["velocity"] = particles.v()(i);
+            }
         }
 
         json_output["contacts"] = {};
