@@ -53,7 +53,7 @@ int main()
             auto pos_analytical = tmp.first;
             error_pos += xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
         }
-        PLOG_WARNING << "dt = " << dt << " err = " << error_pos;
+        PLOG_WARNING << "dt = " << dt[i] << " err = " << error_pos;
     }
 
     return 0;
