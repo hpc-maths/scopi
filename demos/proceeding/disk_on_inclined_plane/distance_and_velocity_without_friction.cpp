@@ -11,6 +11,7 @@
 
 int main()
 {
+    // Figure 3: Disk falling on a plane without friction. Distance, tangential velocity, and normal velocity.
     plog::init(plog::error, "distance_and_velocity_without_friction.log");
 
     constexpr std::size_t dim = 2;
