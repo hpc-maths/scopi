@@ -185,7 +185,7 @@ namespace scopi
         {
             for (std::size_t i = 0; i < m_particles.size(); ++i)
             {
-                json_output["objects"][i]["velocity"] = particles.v()(i);
+                json_output["objects"][i]["velocity"] = m_particles.v()(i);
             }
         }
 
