@@ -11,10 +11,8 @@
 
 int main()
 {
-    // Figure 2: Disk placed on a plane without friction. Evolution of the constraint and cost as a function of the iterations for the APGD-AR algorithm.
     // Table 1: Disk placed on a plane without friction. Number of iterations for the APGD-AR algorithm and tolerance 10^{-3}.
-    // The constraint is the first column in the log, the cost is the second column.
-    plog::init(plog::verbose, "disk_on_inclined_plane_oneStep_apdgar_largeTol.log");
+    plog::init(plog::info, "disk_on_inclined_plane_oneStep_apdgar_largeTol.log");
 
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;

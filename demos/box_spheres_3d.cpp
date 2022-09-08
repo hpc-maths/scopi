@@ -25,7 +25,7 @@ int main()
     double g = 1.;
 
     double r0 = width_box/n/2.;
-    double dt = 0.2*0.9*r0/(2.*g);
+    double dt = 0.2*0.9*r0/(2.*g); ////// dt = 0.2*r/(sqrt(2*width_box*g))
     double rho = 0.2/(dt*dt);
     std::cout << "dt = " << dt << "  rho = " << rho << std::endl;
 
@@ -56,7 +56,7 @@ int main()
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distrib_r(0.8*r0, 0.9*r0);
     std::uniform_real_distribution<double> distrib_m(1., 2.);
-    std::uniform_real_distribution<double> distrib_mouve_center(-0.05, 0.05);
+    std::uniform_real_distribution<double> distrib_mouve_center(-0.05, 0.05); ////////////
 
     for (std::size_t i = 0; i < n; ++i)
     {
