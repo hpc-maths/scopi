@@ -4,6 +4,11 @@ set(SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE
     oneStep_apgdas_smallTol.cpp
     oneStep_apgdar_smallTol.cpp
     oneStep_apgdasr_smallTol.cpp
+    oneStep_pgd_largeTol.cpp
+    oneStep_apgd_largeTol.cpp
+    oneStep_apgdas_largeTol.cpp
+    oneStep_apgdar_largeTol.cpp
+    oneStep_apgdasr_largeTol.cpp
 )
 
 generate_executable(${SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE})
