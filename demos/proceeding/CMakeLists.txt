@@ -1,0 +1,4 @@
+set(SCOPI_PROCEEDING_EXAMPLES
+)
+
+generate_executable(${SCOPI_PROCEEDING_EXAMPLES})
