@@ -9,7 +9,7 @@ set(SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE
     oneStep_apgdas_largeTol.cpp
     oneStep_apgdar_largeTol.cpp
     oneStep_apgdasr_largeTol.cpp
-    distance_and_velocity_without_frition.cpp
+    distance_and_velocity_without_friction.cpp
 )
 
 generate_executable(${SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE})
