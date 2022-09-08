@@ -1,6 +1,8 @@
 #include <cstddef>
 #include <vector>
 #include <xtensor/xmath.hpp>
+#include <plog/Log.h>
+#include "plog/Initializers/RollingFileInitializer.h"
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/objects/types/plan.hpp>
 #include <scopi/solver.hpp>
@@ -29,8 +31,8 @@ int main()
     params.optim_params.rho = 2.;
     params.scopi_params.write_velocity = true;
 
-    std::vector<double> dt({0.1, 0.05, 0.01, 0.005, 0.001});
-    std::vector<std::size_t> total_it({100, 200, 1000, 2000, 10000});
+    std::vector<double> dt({0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05});
+    std::vector<std::size_t> total_it({100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200});
 
     for (std::size_t i = 0; i < dt.size(); ++i)
     {
