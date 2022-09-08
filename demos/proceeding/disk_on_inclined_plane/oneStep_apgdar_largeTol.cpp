@@ -25,7 +25,6 @@ int main()
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = 2.;
-    params.optim_params.verbose = true;
 
     double dt = 0.05;
     std::size_t total_it = 1;
