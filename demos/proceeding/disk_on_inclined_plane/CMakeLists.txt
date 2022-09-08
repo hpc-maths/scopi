@@ -11,6 +11,10 @@ set(SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE
     oneStep_apgdasr_largeTol.cpp
     distance_and_velocity_without_friction.cpp
     error_without_friction.cpp
+    distance_and_velocity_with_friction_mu01_convex.cpp
+    distance_and_velocity_with_friction_mu01_fixedPoint.cpp
+    distance_and_velocity_with_friction_mu1_convex.cpp
+    distance_and_velocity_with_friction_mu1_fixedPoint.cpp
 )
 
 generate_executable(${SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE})

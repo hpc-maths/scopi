@@ -107,7 +107,7 @@ namespace scopi
          */
         std::string filename;
         /**
-         * @brief Whether to write the velocity of the particles in the output files.
+         * @brief Whether to write the velocity and the rotation velocity of the particles in the output files.
          *
          * Default value is false.
          */
