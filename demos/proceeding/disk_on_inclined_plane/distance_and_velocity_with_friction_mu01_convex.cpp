@@ -24,6 +24,7 @@ int main()
     double h = 2.*radius;
     auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
     scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFriction>> params;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.problem_params.mu = 0.1;
     params.optim_params.change_default_tol_mosek = false;
     params.scopi_params.write_velocity = true;
