@@ -14,7 +14,7 @@ int main()
     // Figure 2: Disk placed on a plane without friction. Evolution of the constraint and cost as a function of the iterations for the PGD algorithm.
     // Table 1: Disk placed on a plane without friction. Number of iterations for the PGD algorithm and tolerance 10^{-3}.
     // The constraint is the first column in the log, the cost is the second column.
-    plog::init(plog::verbose, "disk_on_inclined_plane_oneStep_pdg_smallTol.log");
+    plog::init(plog::verbose, "disk_on_inclined_plane_oneStep_pdg_largeTol.log");
 
     constexpr std::size_t dim = 2;
     double PI = xt::numeric_constants<double>::PI;
