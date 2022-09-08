@@ -29,7 +29,7 @@ int main()
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_dynrho_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-9;
     params.optim_params.rho = 2.;
-    params.scopi_params.write_velocity = true;
+    params.scopi_params.output_frequency = 100000;
 
     std::vector<double> dt({0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05});
     std::vector<std::size_t> total_it({100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200});
