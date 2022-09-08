@@ -43,17 +43,23 @@ int main()
         particles.push_back(s, prop.force({{0., -g}}));
 
         double error_pos = 0.;
+        double error_rot = 0.;
         for (std::size_t n = 1; n < total_it[i]; ++n)
         {
             scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_dynrho_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i], params);
             solver.solve(n, n-1);
 
-            auto pos = particles.pos();
             auto tmp = scopi::analytical_solution_sphere_plan(alpha, 0., dt[i]*n, radius, g, h);
+
+            auto pos = particles.pos();
             auto pos_analytical = tmp.first;
-            error_pos += xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
+            error_pos += (xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical)) * (xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical));
+
+            auto q = particles.q();
+            auto q_analytical = scopi::quaternion(tmp.second);
+            error_rot += (xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical)) * (xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical));
         }
-        PLOG_WARNING << "dt = " << dt[i] << " err = " << error_pos;
+        PLOG_WARNING << "dt = " << dt[i] << " err pos = " << std::sqrt(dt[i]*error_pos) << " err rot = " << std::sqrt(dt[i]*error_rot);
     }
 
     return 0;
