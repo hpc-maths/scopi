@@ -33,7 +33,7 @@ int main()
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
     params.scopi_params.output_frequency = 20;
-    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_pile_sand_friction/mu1_convex_"
+    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_pile_sand_friction/mu1_convex_";
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
