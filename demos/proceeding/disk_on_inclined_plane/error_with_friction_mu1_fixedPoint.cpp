@@ -30,7 +30,7 @@ int main()
     auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
     scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::DryWithFrictionFixedPoint, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.problem_params.mu = 1.;
-    params.problem_params.tol_fixed_point = 1e-6;
+    params.problem_params.tol_fixed_point = 1e-2;
     params.scopi_params.output_frequency = 100000;
 
     std::vector<double> dt({0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05});
