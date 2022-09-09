@@ -1,1 +1,2 @@
 add_subdirectory(disk_on_inclined_plane)
+add_subdirectory(multiparticles_tests)
