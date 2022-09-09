@@ -32,6 +32,7 @@ int main()
     params.problem_params.mu = 0.1;
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
+    params.scopi_params.output_frequency = 2000;
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
