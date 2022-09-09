@@ -17,6 +17,7 @@ set(SCOPI_PROCEEDING_MULTIPARTICLES
     pile_of_sand_large_config_mu01_fixed_point.cpp
     pile_of_sand_large_config_mu1_convex.cpp
     pile_of_sand_large_config_mu1_fixed_point.cpp
+    pile_of_sand_ellipses.cpp
 )
 
 generate_executable(${SCOPI_PROCEEDING_MULTIPARTICLES})
