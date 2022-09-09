@@ -12,7 +12,7 @@
 
 int main()
 {
-    // Figure 8 and table 3: spheres falling in a box with APGD-AS solver.
+    // Figure 8 and table 3: spheres falling in a box with APGD-AS solver and 8^3 spheres.
     plog::init(plog::info, "spheres_in_box_small_config_apgdas.log");
 
     constexpr std::size_t dim = 3;
