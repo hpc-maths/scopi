@@ -12,7 +12,7 @@
 
 int main()
 {
-    // Figure 8 and table 3: spheres falling in a box with APGD-ASR solver.
+    // Figure 8 and table 3: spheres falling in a box with APGD-ASR solver and 8^3 spheres.
     plog::init(plog::info, "spheres_in_box_small_config_apgdasr.log");
 
     constexpr std::size_t dim = 3;
