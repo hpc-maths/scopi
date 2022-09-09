@@ -49,7 +49,7 @@ int main()
             scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i], params);
             solver.solve(n, n-1);
 
-            auto tmp = scopi::analytical_solution_sphere_plan(alpha, 0., dt[i]*n, radius, g, h);
+            auto tmp = scopi::analytical_solution_sphere_plan(alpha, params.problem_params.mu, dt[i]*n, radius, g, h);
 
             auto pos = particles.pos();
             auto pos_analytical = tmp.first;
