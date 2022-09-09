@@ -15,6 +15,10 @@ set(SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE
     distance_and_velocity_with_friction_mu01_fixedPoint.cpp
     distance_and_velocity_with_friction_mu1_convex.cpp
     distance_and_velocity_with_friction_mu1_fixedPoint.cpp
+    error_with_friction_mu01_convex.cpp
+    error_with_friction_mu01_fixedPoint.cpp
+    error_with_friction_mu1_convex.cpp
+    error_with_friction_mu1_fixedPoint.cpp
 )
 
 generate_executable(${SCOPI_PROCEEDING_DISK_ON_INCLINED_PLANE})

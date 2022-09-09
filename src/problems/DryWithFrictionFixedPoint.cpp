@@ -22,7 +22,12 @@ namespace scopi
 
     bool DryWithFrictionFixedPoint::should_solve_optimization_problem()
     {
-        return (xt::linalg::norm(m_s_old - m_s)/(xt::linalg::norm(m_s)+1.) > m_params.tol_fixed_point && m_nb_iter < m_params.max_iter_fixed_point);
+        bool res = (xt::linalg::norm(m_s_old - m_s)/(xt::linalg::norm(m_s)+1.) > m_params.tol_fixed_point && m_nb_iter < m_params.max_iter_fixed_point);
+        if (!res)
+        {
+            PLOG_WARNING << "Number iterations fixed point " << m_nb_iter;
+        }
+        return res;
     }
 
 }
