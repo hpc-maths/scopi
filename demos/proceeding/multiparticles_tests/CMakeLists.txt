@@ -9,6 +9,10 @@ set(SCOPI_PROCEEDING_MULTIPARTICLES
     spheres_in_box_large_config_apgdas.cpp
     spheres_in_box_large_config_apgdar.cpp
     spheres_in_box_large_config_apgdasr.cpp
+    pile_of_sand_small_config_mu01_convex.cpp
+    pile_of_sand_small_config_mu01_fixed_point.cpp
+    pile_of_sand_small_config_mu1_convex.cpp
+    pile_of_sand_small_config_mu1_fixed_point.cpp
 )
 
 generate_executable(${SCOPI_PROCEEDING_MULTIPARTICLES})
