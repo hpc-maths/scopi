@@ -109,6 +109,8 @@ namespace scopi
         /**
          * @brief Get the outer normal of the sphere in 3D.
          *
+         * \todo Add drawing.
+         *
          * @param a [in] Angle of the point to compute the normal.
          * @param b [in] Angle of the point to compute the normal.
          *

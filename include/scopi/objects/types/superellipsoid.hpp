@@ -9,42 +9,207 @@ namespace scopi
     ///////////////////////
     // superellipsoid definition //
     ///////////////////////
+    /**
+     * @brief Superellipsoid.
+     *
+     * In 2D, for \f$ b \in[-\pi, \pi] \f$, the parametric representation of a superellipsoid is
+     * \f[
+     *      r_x \sgn (\cos b ) \abs{\cos b}^{e_0}\\
+     *      r_y \sgn (\sin b ) \abs{\sin b}^{e_0}.
+     * \f]
+     * In 3D, for \f$ a \in [-\frac{\pi}{2}, \frac{\pi}{2}] \f$ and \f$ b \in[-\pi, \pi] \f$, the parametric representation of a superellipsoid is
+     * \f[
+     *      r_x \sgn (\cos b ) \abs{\cos b}^{e_0} \sgn (\cos a ) \abs{\cos a}^{e_1}
+     *      r_y \sgn (\cos b ) \abs{\cos b}^{e_0} \sgn (\sin a ) \abs{\sin a}^{e_1}
+     *      r_z \sgn (\sin b ) \abs{\sin b}^{e_0}.
+     * \f]
+     * \f$ (r_x, r_y, r_z) \f$ are the radiuses of the superllipsoid and \f$ (e_0, e_1 ) \f$ is its squareness.
+     * See https://en.wikipedia.org/wiki/Superellipsoid for more details.
+     * We only consider the cases where the surface of the superellipsoid is of class \f$ C^1 \f$.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner
+     */
     template<std::size_t dim, bool owner=true>
     class superellipsoid: public object<dim, owner>
     {
     public:
 
+        /**
+         * @brief Alias for the base class \c object.
+         */
         using base_type = object<dim, owner>;
+        /**
+         * @brief Alias for position type.
+         */
         using position_type = typename base_type::position_type;
+        /**
+         * @brief Alias for quaternion type.
+         */
         using quaternion_type = typename base_type::quaternion_type;
 
+        /**
+         * @brief Constructor with default rotation.
+         *
+         * @param pos [in] Position of the center of the superellipsoid.
+         * @param radius [in] Radiuses in all the direction (2 elements in 2D, 3 elements in 3D).
+         * @param squareness [in] Squareness (1 element in 2D, 2 elements in 3D).
+         */
         superellipsoid(position_type pos, type::position_t<dim> radius, type::position_t<dim-1>  squareness);
+        /**
+         * @brief Constructor with given rotation.
+         *
+         * @param pos [in] Position of the center of the superellipsoid.
+         * @param q [in] Quaternion describing the rotation of the sphere.
+         * @param radius [in] Radiuses in all the direction (2 elements in 2D, 3 elements in 3D).
+         * @param squareness [in] Squareness (1 element in 2D, 2 elements in 3D).
+         */
         superellipsoid(position_type pos, quaternion_type q, type::position_t<dim> radius, type::position_t<dim-1>  squareness);
 
         // superellipsoid(const superellipsoid&) = default;
         // superellipsoid& operator=(const superellipsoid&) = default;
 
+        /**
+         * @brief Get the radiuses of the superellispoid.
+         */
         auto radius() const;
+        /**
+         * @brief Get the squarness of the superellipsoid.
+         */
         auto squareness() const; // e, n
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @return 
+         */
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
+        /**
+         * @brief Print the elements of the superellipsoid on standard output.
+         */
         virtual void print() const override;
+        /**
+         * @brief Get the hash of the superellipsoid.
+         */
         virtual std::size_t hash() const override;
+        /**
+         * @brief Get the rotation matrix of the sphere.
+         */
         auto rotation() const;
-        auto point(const double b) const; // dim = 2
-        auto point(const double a, const double b) const; // dim = 3
-        auto normal(const double b) const; // dim = 2
-        auto normal(const double a, const double b) const; // dim = 3
-        auto tangent(const double b) const; // dim = 2
+        /**
+         * @brief Get the coordinates of the point at the surface of the superellipsoid in 2D.
+         *
+         * \todo Add drawing.
+         *
+         * @param b [in] Angle of the point.
+         *
+         * @return (x, y) coordinates of the point.
+         */
+        auto point(const double b) const; 
+        /**
+         * @brief Get the coordinates of the point at the surface of the superellispoid in 3D.
+         *
+         * \todo Add drawing.
+         *
+         * @param a [in] Angle of the point.
+         * @param b [in] Angle of the point.
+         *
+         * @return (x, y, z) coordinates of the point.
+         */
+        auto point(const double a, const double b) const;
+        /**
+         * @brief Get the outer normal of the superellipsoid in 2D.
+         *
+         * \todo Add drawing.
+         *
+         * @param b [in] Angle of the point to compute the normal.
+         *
+         * @return (x, y) coordinates of the normal.
+         */
+        auto normal(const double b) const;
+        /**
+         * @brief Get the outer normal of the superellipsoid in 3D.
+         *
+         * \todo Add drawing.
+         *
+         * @param a [in] Angle of the point to compute the normal.
+         * @param b [in] Angle of the point to compute the normal.
+         *
+         * @return  (x, y, z) coordinates of the normal.
+         */
+        auto normal(const double a, const double b) const;
+        /**
+         * @brief Get the vector included in the straight line tangent to the superellipsoid in 2D.
+         *
+         * \todo Add drawing.
+         *
+         * @param b [in] Angle of the point to compute the tangent straight line.
+         *
+         * @return (x, y) coordinates of a vector in the tangent straight line.
+         */
+        auto tangent(const double b) const; 
+        /**
+         * @brief Get the vectors included in the plane tangent to the superellipsoid in 3D.
+         *
+         * \todo Add drawing.
+         *
+         * @param a [in] Angle of the point to compute the tangent plane.
+         * @param b [in] Angle of the point to compute the tangent plane.
+         *
+         * @return (x, y, z) coordinates of two vectors in the tangent plane.
+         */
         auto tangents(const double a, const double b) const; // dim = 3
+        /**
+         * @brief Return a regular angle b distribution, used to initialize newton method.
+         *
+         * TODO
+         *
+         * @param n
+         *
+         * @return 
+         */
         std::vector<double> binit_xy(const int n) const; // dim = 2 et 3
+        /**
+         * @brief Return a regular angle b distribution, used to initialize newton method.
+         *
+         * TODO
+         *
+         * @param n
+         *
+         * @return 
+         */
         std::vector<double> ainit_yz(const int n) const; // dim  3
+        /**
+         * @brief Return a regular angle b distribution, used to initialize newton method.
+         *
+         * TODO
+         *
+         * @param n
+         *
+         * @return 
+         */
         std::vector<double> ainit_xz(const int n) const; // dim  3
     private:
 
+        /**
+         * @brief Create the hash of the spheres.
+         *
+         * Two superellipsoids with the same dimension, same radiuses, same squareness and same rotation have the same hash. 
+         */
         void create_hash();
 
+        /**
+         * @brief Radiuses of the superellipsoid.
+         */
         type::position_t<dim>  m_radius;
+        /**
+         * @brief Squarness of the superellipsoid.
+         */
         type::position_t<dim-1>  m_squareness; // e, n
+        /**
+         * @brief Hash of the superellipsoid.
+         */
         std::size_t m_hash;
     };
 
