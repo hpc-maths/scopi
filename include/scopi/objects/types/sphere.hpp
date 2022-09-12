@@ -121,7 +121,7 @@ namespace scopi
     private:
 
         /**
-         * @brief Create the hash of the spheres.
+         * @brief Create the hash of the sphere.
          *
          * Two spheres with the same dimension and the same radius have the same hash. 
          */
