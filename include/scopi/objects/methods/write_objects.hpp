@@ -27,6 +27,14 @@ namespace scopi
     // SORTIES PREVUES POUR LE FORMAT JSON
 
     // SPHERE
+    /**
+     * @brief Write the elements of a sphere in json format.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param s [in] Sphere.
+     *
+     * @return nlohmann json object.
+     */
     template<std::size_t dim>
     nl::json write_objects(const sphere<dim, false>& s)
     {
@@ -56,6 +64,14 @@ namespace scopi
 
 
     // SUPERELLIPSOID
+    /**
+     * @brief Write the elements of a superellipsoid in json format.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param s [in] Superellipsoid.
+     *
+     * @return nlohmann json object.
+     */
     template<std::size_t dim>
     nl::json write_objects(const superellipsoid<dim, false>& s)
     {
@@ -87,6 +103,15 @@ namespace scopi
     }
 
     // PLAN
+    /**
+     * @brief 
+     * @brief Write the elements of a plane in json format.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param p [in] Plane.
+     *
+     * @return nlohmann json object.
+     */
     template<std::size_t dim>
     nl::json write_objects(const plan<dim, false> p)
     {
@@ -116,6 +141,14 @@ namespace scopi
     }
 
     // WORM
+    /**
+     * @brief Write the elements of a worm in json format.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param g [in] Worm.
+     *
+     * @return nlohmann json object.
+     */
     template<std::size_t dim>
     nl::json write_objects(const worm<dim, false> g)
     {
@@ -136,23 +169,59 @@ namespace scopi
         // return ss.str();
     }
 
+    /**
+     * @brief 
+     *
+     * TODO
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template <std::size_t dim>
     struct write_objects_functor
     {
+        /**
+         * @brief Alias for nlohmann json object.
+         */
         using return_type = nl::json;
 
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @tparam T1
+         * @param obj1
+         *
+         * @return 
+         */
         template <class T1>
         return_type run(const T1& obj1) const
         {
             return write_objects(obj1);
         }
 
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @param object
+         *
+         * @return 
+         */
         return_type on_error(const object<dim, false>&) const
         {
             return nl::json::object();
         }
     };
 
+    /**
+     * @brief 
+     *
+     * TODO
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template <std::size_t dim>
     using write_objects_dispatcher = unit_static_dispatcher
     <
