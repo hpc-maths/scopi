@@ -13,30 +13,103 @@ namespace scopi
     /////////////////////
     // plan definition //
     /////////////////////
+    /**
+     * @brief Plane.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner
+     */
     template<std::size_t dim, bool owner=true>
     class plan: public object<dim, owner>
     {
     public:
 
+        /**
+         * @brief Alias for the base class \c object.
+         */
         using base_type = object<dim, owner>;
+        /**
+         * @brief Alias for position type.
+         */
         using position_type = typename base_type::position_type;
+        /**
+         * @brief Alias for quaternion type.
+         */
         using quaternion_type = typename base_type::quaternion_type;
 
+        /**
+         * @brief Constructor with given rotation (2D).
+         *
+         * @param pos [in] Position of a point in the plane.
+         * @param angle [in] Angle of the rotation.
+         */
         plan(position_type pos, double angle=0);
+        /**
+         * @brief Constructor with given rotation.
+         *
+         * @param pos [in] Position of a point in the plane.
+         * @param q [in] Quaternion describing the rotation of the plane.
+         */
         plan(position_type pos, quaternion_type q);
 
+        /**
+         * @brief Get the rotation matrix of the plane.
+         */
         auto rotation() const;
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @param b
+         *
+         * @return 
+         */
         auto point(const double b) const; // dim = 2
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @param a
+         * @param b
+         *
+         * @return 
+         */
         auto point(const double a, const double b) const; // dim = 3
+        /**
+         * @brief Outer normal to the plane.
+         */
         auto normal() const;
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @return 
+         */
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
+        /**
+         * @brief Print the elements of the plane on standard output.
+         */
         virtual void print() const override;
+        /**
+         * @brief Get the hash of the plane.
+         */
         virtual std::size_t hash() const override;
 
     private:
 
+        /**
+         * @brief Create the hash of the plane.
+         *
+         * Two planes with the same dimension have the same hash. 
+         */
         void create_hash();
 
+        /**
+         * @brief Hash of the plane.
+         */
         std::size_t m_hash;
     };
 
