@@ -20,6 +20,18 @@
 namespace scopi
 {
     // SPHERE - SPHERE
+    /**
+     * @brief Neighbor between two spheres.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner 
+     * @param si [in] Sphere \c i.
+     * @param sj [in] Sphere \c j.
+     *
+     * @return Neighbor struct for contact between sphere \c i and sphere \c j.
+     */
     template<std::size_t dim, bool owner>
     auto closest_points(const sphere<dim, owner>& si, const sphere<dim, owner>& sj)
     {
@@ -37,6 +49,17 @@ namespace scopi
     }
 
     // SUPERELLIPSOID 2D - SUPERELLIPSOID 2D
+    /**
+     * @brief Neighbor between two superellipsoids in 2D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param s1 [in] Superellipsoid \c i.
+     * @param s2 [in] Superellipsoid \c j.
+     *
+     * @return Neighbor struct for contact between superellipsoid \c i and superellipsoid \c j.
+     */
     template<bool owner>
     auto closest_points(const superellipsoid<2, owner>& s1, const superellipsoid<2, owner>& s2)
     {
@@ -223,6 +246,17 @@ namespace scopi
     }
 
     // SUPERELLIPSOID 3D - SUPERELLIPSOID 3D
+    /**
+     * @brief Neighbor between two superellipsoids in 3D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param s1 [in] Superellipsoid \c i.
+     * @param s2 [in] Superellipsod \c j.
+     *
+     * @return Neighbor struct for contact between superellispoid \c i and superellipsoid \c j.
+     */
     template<bool owner>
     auto closest_points(const superellipsoid<3, owner>& s1, const superellipsoid<3, owner>& s2)
     {
@@ -674,13 +708,38 @@ namespace scopi
     }
 
     // PLAN - PLAN
+    /**
+     * @brief Neighbor between two planes.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner
+     * @param p1 [in] Plane \c i.
+     * @param p2 [in] Plane \c j.
+     *
+     * @return 
+     * @return Neighbor struct for contact between plane \c i and plane \c j.
+     */
     template<std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner>, const plan<dim, owner>)
+    auto closest_points(const plan<dim, owner> /* p1 */, const plan<dim, owner> /* p2 */)
     {
         return neighbor<dim>();
     }
 
     // SPHERE - PLAN
+    /**
+     * @brief Neighbor between a sphere and a plane.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner 
+     * @param s [in] Sphere \c i.
+     * @param p [in] Plane \c j.
+     *
+     * @return Neighbor struct for contact between sphere \c i and plane \c j.
+     */
     template<std::size_t dim, bool owner>
     auto closest_points(const sphere<dim, owner>& s, const plan<dim, owner>& p)
     {
@@ -703,6 +762,18 @@ namespace scopi
     }
 
     // PLAN - SPHERE
+    /**
+     * @brief Neighbor between a plane and a sphere.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner 
+     * @param p [in] Plane \c i.
+     * @param s [in] Sphere \c j.
+     *
+     * @return Neighbor struct for contact between plane \c i and sphere \c j.
+     */
     template<std::size_t dim, bool owner>
     auto closest_points(const plan<dim, owner>& p, const sphere<dim, owner>& s)
     {
@@ -713,6 +784,17 @@ namespace scopi
     }
 
     // SUPERELLIPSOID 3D - SPHERE 3D
+    /**
+     * @brief Neighbor between a sphere and a superellipsoid in 3D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param s2 [in] Sphere \c i.
+     * @param s1 [in] Superellipsoid \c j.
+     *
+     * @return Neighbor struct for contact between sphere \c i and superellipsoid \c j.
+     */
     template<bool owner>
     auto closest_points(const sphere<3, owner>& s2, const superellipsoid<3, owner>& s1)
     {
@@ -1039,6 +1121,17 @@ namespace scopi
     }
 
     // SPHERE 3D - SUPERELLIPSOID 3D
+    /**
+     * @brief Neighbor between a superellipsoid and a sphere in 3D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param s2 [in] Superellipsoid \c i.
+     * @param s1 [in] Sphere \c j.
+     *
+     * @return Neighbor struct for contact between superellipsoid \c i and sphere \c j.
+     */
     template<bool owner>
     auto closest_points(const superellipsoid<3, owner>& s2, const sphere<3, owner>& s1)
     {
@@ -1048,6 +1141,17 @@ namespace scopi
         return neigh;
     }
 
+    /**
+     * @brief Neighbor between a sphere and a superellipsoid in 2D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param s2 [in] Sphere \c i.
+     * @param s1 [in] Superellipsoid \c j.
+     *
+     * @return Neighbor struct for contact between sphere \c i and superellipsoid \c j.
+     */
     // SUPERELLIPSOID 2D - SPHERE 2D
     template<bool owner>
     auto closest_points(const sphere<2, owner> s2, const superellipsoid<2, owner> s1)
@@ -1186,6 +1290,17 @@ namespace scopi
     }
 
     // SUPERELLIPSOID 2D - SPHERE 2D
+    /**
+     * @brief Neighbor between a superellipsoid and a sphere in 2D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param superellipsoid [in] Superellipsoid \c i.
+     * @param sphere [in] Sphere \c j.
+     *
+     * @return Neighbor struct for contact between superellipsoid \c i and sphere \c j.
+     */
     template<bool owner>
     auto closest_points(const superellipsoid<2, owner> superellipsoid, const sphere<2, owner> sphere)
     {
@@ -1196,6 +1311,17 @@ namespace scopi
     }
 
     // SUPERELLIPSOID 3D - PLAN 3D
+    /**
+     * @brief Neighbor between a superellipsoid and a plane in 3D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param s1 [in] Superellipsoid \c i.
+     * @param p2 [in] Plane \c j.
+     *
+     * @return Neighbor struct for contact between superellipsod \c i and plane \c j.
+     */
     template<bool owner>
     auto closest_points(const superellipsoid<3, owner> s1, const plan<3, owner> p2)
     {
@@ -1474,6 +1600,18 @@ namespace scopi
     }
 
     // PLAN 3D - SUPERELLIPSOID 3D
+    /**
+     * @brief Neighbor between a plane and a superellipsoid in 3D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner 
+     * @param p2 [in] Plane \c i.
+     * @param s1 [in] Superellipsoid \c j.
+     *
+     * @return Neighbor struct for contact between plane \c i and superellipsoid \c j.
+     */
     template<bool owner>
     auto closest_points(const plan<3, owner> p2, const superellipsoid<3, owner> s1)
     {
@@ -1483,6 +1621,17 @@ namespace scopi
         return neigh;
     }
 
+    /**
+     * @brief Neighbor between a superellipsoid and a plane in 2D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam owner 
+     * @param s1 [in] Superellipsoid \c i.
+     * @param d2 [in] Plane \c j.
+     *
+     * @return Neighbor struct for contact between superellipsod \c i and plane \c j.
+     */
     // SUPERELLIPSOID 2D - DROITE 2D
     template<bool owner>
     auto closest_points(const superellipsoid<2, owner> s1, const plan<2, owner> d2)
@@ -1637,6 +1786,18 @@ namespace scopi
       return neigh;
     }
 
+    /**
+     * @brief Neighbor between a plane and a superellipsoid in 2D.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner 
+     * @param d2 [in] Plane \c i.
+     * @param s1 [in] Superellipsoid \c j.
+     *
+     * @return Neighbor struct for contact between plane \c i and superellipsoid \c j.
+     */
     // DROITE 2D - SUPERELLIPSOID 2D
     template<bool owner>
     auto closest_points(const plan<2, owner> d2, const superellipsoid<2, owner> s1)
@@ -1647,26 +1808,80 @@ namespace scopi
         return neigh;
     }
 
+    /**
+     * @brief 
+     *
+     * TODO
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template <std::size_t dim>
     struct closest_points_functor
     {
+        /**
+         * @brief Alias for the neighbor struct for contact between particles \c i and \c j.
+         */
         using return_type = neighbor<dim>;
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @tparam T1
+         * @tparam T2
+         * @param obj1
+         * @param obj2
+         *
+         * @return 
+         */
         template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2) const
         {
             return closest_points(obj1, obj2);
         }
-         template <class T1, class T2>
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @tparam T1
+         * @tparam T2
+         * @param obj1
+         * @param obj2
+         * @param i1
+         * @param i2
+         *
+         * @return 
+         */
+        template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2, std::size_t i1, std::size_t i2) const
         {
             return closest_points(obj1, obj2, i1, i2);
         }
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @param object
+         * @param object
+         *
+         * @return 
+         */
          return_type on_error(const object<dim, false>&, const object<dim, false>&) const
         {
             return {};
         }
     };
 
+    /**
+     * @brief 
+     *
+     * TODO
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam ower
+     */
     template <std::size_t dim, bool owner=false>
     using closest_points_dispatcher = double_static_dispatcher
     <
