@@ -24,6 +24,7 @@ namespace scopi
         particles.push_back(s3);
 
         ContactsParams<contact_kdtree> params;
+        params.kd_tree_radius = 100.;
         contact_kdtree cont(params);
         auto contacts = cont.run(particles, 0);
         std::size_t nMatches = cont.get_nMatches();
