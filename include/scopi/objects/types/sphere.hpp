@@ -8,36 +8,130 @@ namespace scopi
     ///////////////////////
     // sphere definition //
     ///////////////////////
+    /**
+     * @brief Sphere.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner
+     */
     template<std::size_t dim, bool owner=true>
     class sphere: public object<dim, owner>
     {
     public:
 
+        /**
+         * @brief Alias for the base class \c object.
+         */
         using base_type = object<dim, owner>;
+        /**
+         * @brief Alias for position type.
+         */
         using position_type = typename base_type::position_type;
+        /**
+         * @brief Alias for quaternion type.
+         */
         using quaternion_type = typename base_type::quaternion_type;
 
+        /**
+         * @brief Constructor with default rotation.
+         *
+         * @param pos [in] Position of the center of the sphere.
+         * @param radius [in] Radius of the sphere.
+         */
         sphere(position_type pos, double radius);
+        /**
+         * @brief Constructor with given rotation.
+         *
+         * @param pos [in] Position of the center of the sphere.
+         * @param q [in] Quaternion describing the rotation of the sphere.
+         * @param radius [in] Radius of the sphere.
+         */
         sphere(position_type pos, quaternion_type q, double radius);
 
         // sphere(const sphere&) = default;
         // sphere& operator=(const sphere&) = default;
 
+        /**
+         * @brief Get the radius of the sphere.
+         */
         double radius() const;
+        /**
+         * @brief 
+         *
+         * TODO
+         *
+         * @return 
+         */
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
+        /**
+         * @brief Print the elements of the sphere on standard output.
+         */
         virtual void print() const override;
+        /**
+         * @brief Get the hash of the sphere.
+         */
         virtual std::size_t hash() const override;
+        /**
+         * @brief Get the rotation matrix of the sphere.
+         */
         auto rotation() const;
-        auto point(const double b) const; // dim = 2
-        auto point(const double a, const double b) const; // dim = 3
-        auto normal(const double b) const; // dim = 2
-        auto normal(const double a, const double b) const; // dim = 3
+        /**
+         * @brief Get the coordinates of the point at the surface of the sphere in 2D.
+         *
+         * \todo Add drawing.
+         *
+         * @param b [in] Angle of the point.
+         *
+         * @return (x, y) coordinates of the point.
+         */
+        auto point(const double b) const;
+        /**
+         * @brief Get the coordinates of the point at the surface of the sphere in 3D.
+         *
+         * \todo Add drawing.
+         *
+         * @param a [in] Angle of the point.
+         * @param b [in] Angle of the point.
+         *
+         * @return (x, y, z) coordinates of the point.
+         */
+        auto point(const double a, const double b) const;
+        /**
+         * @brief Get the outer normal of the sphere in 2D.
+         *
+         * \todo Add drawing.
+         *
+         * @param b [in] Angle of the point to compute the normal.
+         *
+         * @return (x, y) coordinates of the normal.
+         */
+        auto normal(const double b) const;
+        /**
+         * @brief Get the outer normal of the sphere in 3D.
+         *
+         * @param a [in] Angle of the point to compute the normal.
+         * @param b [in] Angle of the point to compute the normal.
+         *
+         * @return  (x, y, z) coordinates of the normal.
+         */
+        auto normal(const double a, const double b) const;
 
     private:
 
+        /**
+         * @brief Create the hash of the spheres.
+         *
+         * Two spheres with the same dimension and the same radius have the same hash. 
+         */
         void create_hash();
 
+        /**
+         * @brief Radius of the sphere.
+         */
         double m_radius;
+        /**
+         * @brief Hash of the sphere.
+         */
         std::size_t m_hash;
     };
 
