@@ -36,11 +36,6 @@ int main()
     params.contacts_params.dmax = 0.9*r0;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*0.9*r0;
 
-    // scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_brute_force, scopi::vap_fpd> params;
-    // params.optim_params.change_default_tol_mosek = false;
-    // params.problem_params.mu = 1.;
-    // params.contacts_params.dmax = 4.*(r0-0.1);
-
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
 
@@ -80,9 +75,8 @@ int main()
         }
     }
 
-    // scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_brute_force, scopi::vap_fpd> solver(particles, dt, params);
     scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
-    solver.solve(total_it);
+    solver.run(total_it);
 
     return 0;
 }
