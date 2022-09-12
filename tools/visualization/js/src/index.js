@@ -30,6 +30,32 @@ document.getElementById("uploadResult").addEventListener("change", function (eve
 init();
 animate();
 
+/*
+class ContactsCurve extends THREE.CurvePath {
+	constructor(contacts) {
+		super();
+        contacts.forEach((obj, index) => {
+            const pi = new THREE.Vector3();
+            const pj = new THREE.Vector3();
+            pi.x = obj.pi[0];
+            pi.y = obj.pi[1];
+            pj.x = obj.pj[0];
+            pj.y = obj.pj[1];
+            if (obj.pi.length == 2) {
+                pi.z = 0.;
+                pj.z = 0.;
+            }
+            else {
+                pi.z = obj.pi[2];
+                pj.z = obj.pj[2];
+            }
+            super.add(new THREE.LineCurve3(pi, pj));
+        });
+        console.log(super.curves);
+	}
+}
+*/
+
 const sphereObject = function () {
     return function (obj, matrix, rot) {
         const position = new THREE.Vector3();
@@ -73,7 +99,12 @@ const sphereObject = function () {
 
         center.x = obj.position[0];
         center.y = obj.position[1];
-        center.z = 0.;
+        if (obj.position.length == 2) {
+            center.z = 0.;
+        }
+        else {
+            center.z = obj.position[2];
+        }
         rot.push(center);
         if (typeof obj.radius === "number") {
             vec.x = obj.radius;
@@ -85,33 +116,9 @@ const sphereObject = function () {
             vec.y = 0.;
             vec.z = 0.;
         }
-        vec.applyQuaternion(quaternion);
         vec.add(center);
+        vec.applyQuaternion(quaternion);
         rot.push(vec);
-    };
-}();
-
-const planObject = function() {
-    return function(obj, plan) {
-
-        var canvasWidth = window.innerWidth;
-        var canvasHeight = window.innerHeight;
-
-        if (Math.abs(obj.normal[1]) < 1e-12) { // vertical straight line 
-            plan.push(new THREE.Vector3(obj.position[0], -canvasHeight, 0));
-            plan.push(new THREE.Vector3(obj.position[0],  canvasHeight, 0));
-        }
-        else if (Math.abs(obj.normal[0]) < 1e-12) { // horizontal straight line 
-            plan.push(new THREE.Vector3(-canvasWidth, obj.position[1], 0));
-            plan.push(new THREE.Vector3( canvasWidth, obj.position[1], 0));
-        }
-        else {
-            var a = -obj.normal[0]/obj.normal[1];
-            var b = (obj.normal[0] * obj.position[0] + obj.normal[1] * obj.position[1]) / obj.normal[1];
-
-            plan.push(new THREE.Vector3((-canvasHeight - b)/a, -canvasHeight, 0));
-            plan.push(new THREE.Vector3(( canvasHeight - b)/a,  canvasHeight, 0));
-        }
     };
 }();
 
@@ -131,7 +138,7 @@ function drawObjects() {
             const material = new THREE.MeshPhysicalMaterial({ color: 'red', metalness: 0.5, roughness: 0., clearcoat: 0., clearcoatRoughness: 0., reflectivity: 0. });
             scene.add( new THREE.AmbientLight( 0x222222 ) );
             const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-            directionalLight.position.set( 1, 1, 1 ).normalize();
+            directionalLight.position.set( -1, -1, -1 ).normalize();
             scene.add( directionalLight );
             const particleLight = new THREE.Mesh( new THREE.SphereGeometry( -1, -1, -1 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
             scene.add( particleLight );
@@ -152,7 +159,6 @@ function drawObjects() {
             });
             var mesh = new THREE.InstancedMesh(geometry, material, nbSpheres);
             scene.add(mesh);
-            const plan = [];
             const rot = [];
 
             const matrix = new THREE.Matrix4();
@@ -160,7 +166,26 @@ function drawObjects() {
 
             objects.forEach((obj, index) => {
                 if (obj.type === "plan") {
-                    planObject(obj, plan);
+                    const normal = new THREE.Vector3();
+                    const position = new THREE.Vector3();
+                    // TODO this is 3D only
+                    normal.x = obj.normal[0];
+                    normal.y = obj.normal[1];
+                    position.x = obj.position[0];
+                    position.y = obj.position[1];
+                    if (obj.position.length == 2) {
+                        normal.z = 0.;
+                        position.z = 0.;
+                    }
+                    else {
+                        normal.z = obj.normal[2];
+                        position.z = obj.position[2];
+                    }
+                    const plane = new THREE.Plane( normal, - position.dot(normal)); 
+                    plane.normalize();
+                    var canvasWidth = window.innerWidth;
+                    const helper = new THREE.PlaneHelper( plane, canvasWidth, 'red' );
+                    scene.add( helper );
                 }
                 else if (obj.type === "worm") {
                     obj.worm.forEach((sphere, indexSphere) => {
@@ -176,13 +201,8 @@ function drawObjects() {
                 }
 
             });
-            const line_geometry_plan = new THREE.BufferGeometry().setFromPoints(plan);
-            const line_material_plan = new THREE.LineBasicMaterial({
-                color: 'red',
-            });
-            var line_mesh_plan = new THREE.LineSegments(line_geometry_plan, line_material_plan);
-            scene.add(line_mesh_plan);
 
+            // radius of spheres
             const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
             const line_material_rot = new THREE.LineBasicMaterial({
                 color: 'blue',
@@ -191,6 +211,7 @@ function drawObjects() {
             var line_mesh_rot = new THREE.LineSegments(line_geometry_rot, line_material_rot);
             scene.add(line_mesh_rot);
 
+            // contacts
             const points = [];
             contacts.forEach((obj, index) => {
                 if (obj.pi.length == 2) {
@@ -209,12 +230,24 @@ function drawObjects() {
             var line_mesh = new THREE.LineSegments(line_geometry, line_material);
             scene.add(line_mesh);
 
+            /*
+            const path = new ContactsCurve(contacts);
+            const line_geometry = new THREE.TubeGeometry(path, 64, 0.01);
+            const line_material = new THREE.MeshBasicMaterial( { color: 'green' } );
+            const line_mesh = new THREE.Mesh( line_geometry, line_material );
+            scene.add( line_mesh );
+            */
+
             guiStatsEl.innerHTML = [
 
                 '<i>Number of objects</i>: ' + objects.length,
                 '<i>Number of contacts</i>: ' + contacts.length
 
             ].join('<br/>');
+
+            // The X axis is red. The Y axis is green. The Z axis is blue. 
+            // const axesHelper = new THREE.AxesHelper( 5 );
+            // scene.add( axesHelper );
 
         });
         reader.readAsText(oFiles[options.current_frame]);

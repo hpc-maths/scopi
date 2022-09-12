@@ -25,8 +25,8 @@ int main()
     particles.push_back(g1, prop.desired_velocity({-1., 0.}));
     particles.push_back(g2, prop.desired_velocity({1., 0.}));
 
-    scopi::OptimParams<scopi::OptimMosek<scopi::DryWithoutFriction>> params;
-    params.change_default_tol_mosek = false;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fixed> params;
+    params.optim_params.change_default_tol_mosek = false;
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::contact_kdtree> solver(particles, dt, params);
     solver.solve(total_it);
 
