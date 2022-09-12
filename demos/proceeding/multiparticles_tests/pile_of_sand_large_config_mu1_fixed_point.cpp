@@ -20,7 +20,7 @@ int main()
     double PI = xt::numeric_constants<double>::PI;
 
     double width_box = 10.;
-    std::size_t n = 13; // n^3 spheres
+    std::size_t n = 12; // n^3 spheres
     std::size_t total_it = 1000;
     double g = 1.;
 
@@ -30,6 +30,8 @@ int main()
     scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::DryWithFrictionFixedPoint, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 1.;
+    params.problem_params.tol_fixed_point = 1e-2;
+    params.problem_params.max_iter_fixed_point = 100;
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
     params.scopi_params.output_frequency = 20;

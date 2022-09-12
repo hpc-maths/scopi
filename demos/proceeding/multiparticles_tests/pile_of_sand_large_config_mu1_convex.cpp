@@ -20,7 +20,7 @@ int main()
     double PI = xt::numeric_constants<double>::PI;
 
     double width_box = 10.;
-    std::size_t n = 13; // n^3 spheres
+    std::size_t n = 12; // n^3 spheres
     std::size_t total_it = 1000;
     double g = 1.;
 
