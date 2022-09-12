@@ -361,40 +361,5 @@ namespace scopi
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : update velocity = " << duration;
     }
-
-    /**
-     * @brief Store the rotation velocities, solution of the optimization problem.
-     *
-     * 2D specialization
-     *
-     * @param particles Container whose field \c omega is updated.
-     * @param i Index of the particle to update.
-     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
-     */
-    template<>
-    void update_velocity_omega(scopi_container<2>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
-    {
-        particles.omega()(i + particles.nb_inactive()) = wadapt(i, 2);
-    }
-
-    /**
-     * @brief Store the rotation velocities, solution of the optimization problem.
-     *
-     * 3D specialization
-     *
-     * @param particles Container whose field \c omega is updated.
-     * @param i Index of the particle to update.
-     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
-     */
-    template<>
-    void update_velocity_omega(scopi_container<3>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
-    {
-        for (std::size_t d = 0; d < 3; ++d)
-        {
-            particles.omega()(i + particles.nb_inactive())(d) = wadapt(i, d);
-        }
-    }
-
-    
 }
 
