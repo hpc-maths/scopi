@@ -63,9 +63,9 @@ namespace scopi {
         set_params_test(params.optim_params);
 
         SolverType solver(particles, dt, params);
-        solver.solve(total_it);
+        solver.run(total_it);
         particles.f()(1)(1) *= -1.;
-        solver.solve(2*total_it, total_it);
+        solver.run(2*total_it, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity.json", tolerance));
     }
@@ -93,9 +93,9 @@ namespace scopi {
         params_t params;
         params.problem_params.mu = 0.1;
         SolverType solver(particles, dt, params);
-        solver.solve(total_it);
+        solver.run(total_it);
         particles.f()(1)(1) *= -1.;
-        solver.solve(2*total_it, total_it);
+        solver.run(2*total_it, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction_vertical.json", tolerance));
     }
@@ -122,9 +122,9 @@ namespace scopi {
         params_t params;
         params.problem_params.mu = 0.1;
         SolverType solver(particles, dt, params);
-        solver.solve(total_it);
+        solver.run(total_it);
         particles.f()(1)(1) *= -1.;
-        solver.solve(2*total_it, total_it);
+        solver.run(2*total_it, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction.json", tolerance));
     }

@@ -21,95 +21,292 @@ namespace scopi
     ////////////////////////////////
     // scopi_container definition //
     ////////////////////////////////
+    /**
+     * @brief Main data structure used in SCoPI.
+     *
+     * Array of particles.
+     *
+     * Inactive particles are placed at the begining of the container.
+     * Fictive particles for periodic boundary conditions are placed at the end of the container.
+     *
+     * In the following, "particle" means a base object (sphere, superellipsoid or plan) and an "object" can be a more complex object, such as a worm.
+     * Particles are objects.
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     class scopi_container
     {
     public:
 
+        /**
+         * @brief Alias for the type of the position.
+         */
         using position_type = type::position_t<dim>;
+        /**
+         * @brief Alias for the type of the velocity.
+         */
         using velocity_type = type::velocity_t<dim>;
+        /**
+         * @brief Alias for the type of the rotation.
+         */
         using rotation_type = type::rotation_t<dim>;
+        /**
+         * @brief Alias for the type of the force.
+         */
         using force_type = type::force_t<dim>;
+        /**
+         * @brief Alias for the type of the mass.
+         */
         using mass_type = double;
+        /**
+         * @brief Alias for the type of the momentum of inertia.
+         */
         using moment_type = type::moment_t<dim>;
+        /**
+         * @brief Alias for the type of the quaternion.
+         */
         using quaternion_type = type::quaternion_t;
 
+        /**
+         * @brief Constructor.
+         */
         scopi_container();
 
+        /**
+         * @brief Reconstructs an object.
+         *
+         * An object can be a sphere, a superellipsoid, a plan, a worm,...
+         *
+         * @param i Index of the object.
+         *
+         * @return Object.
+         */
         std::unique_ptr<object<dim, false>> operator[](std::size_t i);
 
+        /**
+         * @brief Appends the given element value to the end of the container. 
+         *
+         * @param s [in] Object to append. 
+         * @param p [in] Properties of the object (see property.hpp).
+         */
         void push_back(const object<dim>& s, const property<dim>& p = property<dim>());
+        /**
+         * @brief Copy a particle that was already in the container with a new position.
+         *
+         * The original particle remains unchanged.
+         * All the other physical properties of the particle are copied, only the position is different.
+         * Used for periodic boundary conditions.
+         *
+         * @param i [in] Index of the particle to copy.
+         * @param pos [in] Position of the new particle.
+         */
         void push_back(std::size_t i, const position_type& pos);
 
+        /**
+         * @brief Increase the capacity of the container.
+         *
+         * Increase the capacity of the container (the total number of particles that the container can hold without requiring reallocation) to a value that's greater or equal to \c size.
+         * If \c size is greater than the current capacity, new storage is allocated, otherwise the function does nothing.
+         *
+         * \c reserve does not change the size of the container.
+         *
+         * @param size [in] New capacity of the container.
+         */
         void reserve(std::size_t size);
 
+        /**
+         * @brief Array of particles' positions.
+         */
         auto pos() const;
+        /**
+         * @brief Array of particles' positions.
+         */
         auto pos();
 
+        /**
+         * @brief Array of particles' quaternions.
+         */
         auto q() const;
+        /**
+         * @brief Array of particles' quaternions.
+         */
         auto q();
 
+        /**
+         * @brief Array of particles' forces.
+         */
         auto f() const;
+        /**
+         * @brief Array of particles' forces.
+         */
         auto f();
 
+        /**
+         * @brief Array of particles' masses.
+         */
         auto m() const;
+        /**
+         * @brief Array of particles' masses.
+         */
         auto m();
 
+        /**
+         * @brief Array of particles' moments of inertia.
+         */
         auto j() const;
+        /**
+         * @brief Array of particles' moments of inertia.
+         */
         auto j();
 
+        /**
+         * @brief Array of particles' velocities.
+         */
         auto v() const;
+        /**
+         * @brief Array of particles' velocities.
+         */
         auto v();
 
+        /**
+         * @brief Array of particles' rotation.
+         */
         auto omega() const;
+        /**
+         * @brief Array of particles' rotation.
+         */
         auto omega();
 
+        /**
+         * @brief Array of particles' desired rotation.
+         */
         auto desired_omega() const;
+        /**
+         * @brief Array of particles' desired rotations.
+         */
         auto desired_omega();
 
+        /**
+         * @brief Array of particles' desired velocities.
+         */
         auto vd() const;
+        /**
+         * @brief Array of particles' desired velocities.
+         */
         auto vd();
 
+        /**
+         * @brief Number of objects in the container.
+         */
         std::size_t size() const;
+        /**
+         * @brief Number of active particles in the container.
+         */
         std::size_t nb_active() const;
+        /**
+         * @brief Number of inactive particles in the container.
+         */
         std::size_t nb_inactive() const;
 
         /**
-         * \brief Get the index of the object from the index of a base object.
-         * \param i index of a base type (sphere, superellipsoid or plan).
-         * \return index of the object (sphere, superellipsoid, plan, or worm). 
+         * @brief Convert a particle index into an object index.
          *
-         * 0 <= i < this->pos().size()
-         * 0 <= retuned index < this->size()
+         * The particle \c i is part of the object \c j, where \c j is the index of an object.
+         * TODO a diagram would help a lot, but I didn't manage to do it.
          *
-         * For example, consider a container with two worms of size 6.
-         * If 0 <= i < 6, returns 0, else returns 1.
+         * @param i [in] Index of a particle.
+         *
+         * @return Index of the object.
          */
         std::size_t object_index(std::size_t i) const;
+        /**
+         * @brief Convert an object index into a particle index.
+         *
+         * @param i [in] Index of an object.
+         *
+         * @return Index of the first particle in the object.
+         */
         std::size_t offset(std::size_t i) const;
 
+        /**
+         * @brief Remove all fictive particles.
+         */
         void reset_periodic();
 
     private:
 
+        /**
+         * @brief 
+         *
+         * TODO
+         */
         std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
+        /**
+         * @brief Array of particles' positions.
+         */
         std::vector<position_type> m_positions;  // pos()
+        /**
+         * @brief Array of particles' quaternions.
+         */
         std::vector<quaternion_type> m_quaternions;  // q()
+        /**
+         * @brief Array of particles' forces.
+         */
         std::vector<force_type> m_forces;  // f()
-        std::vector<mass_type> m_masses;  // f()
-        std::vector<moment_type> m_moments_inertia;  // f()
+        /**
+         * @brief Array of particles' masses.
+         */
+        std::vector<mass_type> m_masses;  // m()
+        /**
+         * @brief Array of particles' moments of inertia.
+         */
+        std::vector<moment_type> m_moments_inertia;  // j()
+        /**
+         * @brief Array of particles' velocities.
+         */
         std::vector<velocity_type> m_velocities;  // v()
+        /**
+         * @brief Array of particles' desired velocities.
+         */
         std::vector<velocity_type> m_desired_velocities;  // vd()
+        /**
+         * @brief Array of particles' rotations.
+         */
         std::vector<rotation_type> m_omega;  // omega()
+        /**
+         * @brief Array of particles' desired rotations.
+         */
         std::vector<rotation_type> m_desired_omega;  // desired_omega()
+        /**
+         * @brief Array of particles' hashes.
+         */
         std::vector<std::size_t> m_shapes_id;
+        /**
+         * @brief Array of objetcts' offsets.
+         *
+         * If the container is (obj_0, obj_1, ...), then <tt>m\_offset[j]</tt> = \f$\sum_{i = 0}^{j-1}{obj\_i.size()}\f$ for j > 0 and <tt>m_offset[0] = 0</tt>.
+         *
+         */
         std::vector<std::size_t> m_offset;
+        /**
+         * @brief Indices of particles that are duplicated for periodic boundary conditions.
+         */
         std::vector<std::size_t> m_periodic_indices;
 
+        /**
+         * @brief Index of the first duplicated particle.
+         */
         std::size_t m_periodic_ptr;
 
+        /**
+         * @brief Number of obstacles (inactive particles).
+         */
         std::size_t m_nb_inactive_core_objects;
 
+        /**
+         * @brief Whether there already is fictive particles in the container.
+         */
         bool m_periodic_added;
     };
 

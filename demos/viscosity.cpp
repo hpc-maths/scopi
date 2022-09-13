@@ -33,15 +33,10 @@ int main()
     particles.push_back(p, scopi::property<dim>().deactivate());
     particles.push_back(s, prop.force({{g*std::cos(alpha), -g*std::sin(alpha)}}));
 
-    scopi::OptimParams<scopi::OptimMosek<scopi::ViscousWithoutFriction<dim>>> optim_params;
-    scopi::ProblemParams<scopi::ViscousWithoutFriction<dim>> problem_params;
-    // problem_params.m_mu = 0.15; // on glisse
-    // problem_params.m_mu = 1.; // on roule
-
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousWithoutFriction<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, optim_params, problem_params);
-    solver.solve(total_it);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousWithoutFriction<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    solver.run(total_it);
     particles.f()(1)(1) *= -1.;
-    solver.solve(5*total_it, total_it);
+    solver.run(5*total_it, total_it);
 
     return 0;
 }

@@ -21,7 +21,7 @@ int main()
     double mass = 1.;
     double h = 2.*radius;
     auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
-    scopi::OptimParams<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>> params;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::DryWithFrictionFixedPoint, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.problem_params.mu = 0.1;
 
     double dt = 0.05;
@@ -35,7 +35,7 @@ int main()
     particles.push_back(s, prop.force({{0., -g}}));
 
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
-    solver.solve(total_it);
+    solver.run(total_it);
 
     return 0;
 }

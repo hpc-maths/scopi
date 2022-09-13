@@ -17,27 +17,90 @@ namespace scopi
 {
     class DryWithoutFriction;
 
+    /**
+     * @brief Parameters for \c DryWithoutFrixion..
+     *
+     * Specialization of ProblemParams in params.hpp
+     *
+     * Defined for compatibility.
+     */
     template<>
     struct ProblemParams<DryWithoutFriction>
     {};
 
+    /**
+     * @brief Problem that models contacts without friction and without viscosity.
+     *
+     * See ProblemBase.hpp for the notations.
+     * The constraint is 
+     * \f[
+     *      \d + \B \u \ge 0,
+     * \f]
+     * with \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, and \f$ \B \in \R^{\Nc \times 6 \N} \f$.
+     * We impose that the distance between all the particles should be non-negative.
+     * For worms, we also impose that the distance between spheres in a worm is non-positive.
+     * More exactly, we impose that minus the distance is non-negative.
+     */
     class DryWithoutFriction : protected ProblemBase
     {
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param problem_params [in] Parameters (for compatibilty).
+         */
         DryWithoutFriction(std::size_t nparts, double dt, const ProblemParams<DryWithoutFriction>& problem_params);
 
     protected:
+        /**
+         * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         * @param firstCol [in] Index of the first column (solver-dependent).
+         */
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
+        /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return Number of rows in the matrix.
+         */
         template <std::size_t dim>
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Create vector \f$ \d \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         */
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
+        /**
+         * @brief Matrix-free product \f$ \r = \r - \B \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param c [in] Contact of the computed row \c row.
+         * @param particles [in] Array of particles (to get positions).
+         * @param U [in] Vector \f$ \u \f$.
+         * @param R [in/out] Vector \f$ \r \f$.
+         * @param active_offset [in] Index of the first active particle.
+         * @param row [in] Index of the computed row.
+         */
         template<std::size_t dim>
         void matrix_free_gemv_A(const neighbor<dim>& c,
                                 const scopi_container<dim>& particles,
@@ -45,6 +108,17 @@ namespace scopi
                                 xt::xtensor<double, 1>& R,
                                 std::size_t active_offset,
                                 std::size_t row);
+        /**
+         * @brief Matrix-free product \f$ \u = \transpose{\B} \l + \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param c [in] Contact of the computed row \c row.
+         * @param particles [in] Array of particles (to get positions).
+         * @param L [in] Vector \f$ \l \f$.
+         * @param U [in/out] Vector \f$ \u \f$.
+         * @param active_offset [in] Index of the first active particle.
+         * @param row [in] Index of the computed row.
+         */
         template<std::size_t dim>
         void matrix_free_gemv_transpose_A(const neighbor<dim>& c,
                                           const scopi_container<dim>& particles,
@@ -53,12 +127,35 @@ namespace scopi
                                           std::size_t active_offset,
                                           std::size_t row);
 
+        /**
+         * @brief Extra steps before solving the optimization problem.
+         *
+         * For compatibility with the other problems.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         */
         template<std::size_t dim>
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Extra steps after solving the optimization problem.
+         *
+         * For compatibility with the other problems.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param lambda [in] Lagrange multipliers.
+         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
+        /**
+         * @brief Whether the optimization problem should be solved.
+         *
+         * For compatibility with the other problems.
+         */
         bool should_solve_optimization_problem();
     };
 

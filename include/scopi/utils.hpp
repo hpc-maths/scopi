@@ -14,23 +14,65 @@
 // Functions for the timer //
 /////////////////////////////
 
-/// Timer used in tic & toc
+/**
+ * @brief Timer used in tic & toc.
+ */
 static auto tic_timer = std::chrono::high_resolution_clock::now();
-/// Launching the timer
+/**
+ * @brief Launching the timer.
+ */
 void tic();
-/// Stopping the timer and returning the duration in seconds
+/**
+ * @brief Stopping the timer.
+ *
+ * @return Duration in seconds.
+ */
 double toc();
 
-// recursive function to initialize 2D newton (superellipsoid)
+/**
+ * @brief Recursive function to initialize 2D newton (superellipsoid)
+ *
+ * TODO
+ *
+ * @param binit
+ * @param n
+ * @param theta_g
+ * @param theta_d
+ * @param rx
+ * @param ry
+ * @param e
+ *
+ * @return 
+ */
 std::vector<double> create_binit(std::vector<double> binit, int n,
   double theta_g, double theta_d, double rx, double ry, double e);
 
 
-// sign function (-1 if <0, +1 if >0 and 0 otherwise)
+/**
+ * @brief Sign function.
+ *
+ * @param val Variable to get the sign.
+ *
+ * @return -1 if \c val < 0, 1 if \c val > 0, and 0 otherwise.
+ */
 int sign(double val);
 
-// newton method (with linesearch)
 template<typename F, typename DF, typename U, typename A>
+/**
+ * @brief Newton method (with linesearch).
+ *
+ * TODO
+ *
+ * @param u0
+ * @param f
+ * @param grad_f
+ * @param args
+ * @param itermax
+ * @param ftol
+ * @param xtol
+ *
+ * @return 
+ */
 auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double ftol, const double xtol){
   // std::cout << "newton_method : u0 = " << u0 << std::endl;
   // std::cout << "newton_method : args = " << args << std::endl;
@@ -113,12 +155,39 @@ namespace scopi
                     { -e(1),  e(0),     0}};
         }
     }
+    /**
+     * @brief 
+     *
+     * TODO
+     *
+     * @tparam dim
+     * @tparam E
+     * @param e
+     *
+     * @return 
+     */
     template <std::size_t dim, class E>
     auto cross_product(const E& e)
     {
         return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
     }
 
+    /**
+     * @brief Get rotation velocity (3D vector) from a scalar value (2D simulation)
+     *
+     * @param w Rotation velocity in 2D
+     *
+     * @return (0, 0, w)
+     */
     xt::xtensor_fixed<double, xt::xshape<3>> get_omega(double w);
+    /**
+     * @brief Get rotation velocity (3D simulation)
+     *
+     * This function allows to be consistent between 2D and 3D simulations.
+     *
+     * @param w Rotation velocity in 3D
+     *
+     * @return  w
+     */
     const xt::xtensor_fixed<double, xt::xshape<3>>& get_omega(const xt::xtensor_fixed<double, xt::xshape<3>>& w);
 }

@@ -19,7 +19,7 @@ int main()
     particles.push_back(s2, scopi::property<dim>().desired_velocity({{-0.25, 0}}).mass(1.).moment_inertia(0.1));
 
     scopi::ScopiSolver<dim> solver(particles, dt);
-    solver.solve(total_it);
+    solver.run(total_it);
 
     return 0;
 }

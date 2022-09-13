@@ -36,9 +36,43 @@ using namespace xt::placeholders;
 
 namespace scopi
 {
+    /**
+     * @brief Store the rotation velocities, solution of the optimization problem.
+     *
+     * In 2D, the rotation velocity is a scalar, whereas in 3D it is a vector.
+     * Therefore, the way to update it in the container is different.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param particles [out] Container whose field \c omega is updated.
+     * @param i [in] Index of the particle to update.
+     * @param wadapt [in] \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
+     */
     template<std::size_t dim>
     void update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
 
+    /**
+     * @brief Entry point of SCoPI.
+     *
+     * @tparam dim dimension (2 or 3)
+     * @tparam optim_solver_t Optimization solver (Mosek, Uzawa, ...)
+     * @tparam contact_t Algorithm to search closest contacts (k-d tree, brute force, ...)
+     * @tparam vap_t A priori velocity, problem dependant
+     *
+     * Solve the contact problem: at eah time step
+     * <ul>
+     * <li> Move obstacles (particles with an imposed velocity);
+     * <li> Compute the list of contacts;
+     * <li> Write output files (json format) for visualization;
+     * <li> Set a priori velocity: describe how the particles would move is they weren't interacting with the other ones;
+     * <li> Compute the effective velocity as the solution of an optimization problem under constraint \f$D > 0\f$;
+     * <li> Use these velocities to move the particles;
+     * <li> Store the computed velocities.
+     * </ul>
+     *
+     * The optimization solver \c optim_solver_t describes which algorithm is used to solve the optimization problem.
+     * It is itself templated by a \c problem_t that describes which model is used.
+     *
+     */
     template<std::size_t dim,
              class optim_solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
              class contact_t = contact_kdtree,
@@ -49,24 +83,88 @@ namespace scopi
                       , public contact_t
     {
     private:
+        /**
+         * @brief Shortcut for problem type. 
+         */
         using problem_t = typename optim_solver_t::problem_type;
     public:
+        /**
+         * @brief Shortcut for the type of parameters class.
+         */
         using params_t = Params<optim_solver_t, problem_t, contact_t, vap_t>;
+
+        /**
+         * @brief Constructor.
+         *
+         * @param particles "Array" of particles.
+         * @param dt Time step. It is fixed during the simulation.
+         * @param params Parameters for the different steps of the algorithm.
+         */
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
                     const Params<optim_solver_t, problem_t, contact_t, vap_t>& params = Params<optim_solver_t, problem_t, contact_t, vap_t>());
-        void solve(std::size_t total_it, std::size_t initial_iter = 0);
+
+        /**
+         * @brief Run the simulation.
+         *
+         * @param total_it [in] Total number of iterations to perform.
+         * @param initial_iter [in] Initial index of iteration. Used for restart or to change external parameters.
+         */
+        void run(std::size_t total_it, std::size_t initial_iter = 0);
 
     private:
+        /**
+         * @brief Move obstacles (particles with an imposed velocity).
+         */
         void displacement_obstacles();
+
+        /**
+         * @brief Compute the list of contacts.
+         *
+         * @return Vector containing all the contacts in a cut-off radius.
+         */
         std::vector<neighbor<dim>> compute_contacts();
+
+        /**
+         * @brief Compute the list of contacts to impose \f$D < 0\f$.
+         *
+         * If some particles are of type worms, compute a second list of contacts to also impose \f$D < 0\f$ between the spheres that form the worm.
+         *
+         * @return Vector containing all the contacts involved in a worm.
+         */
         std::vector<neighbor<dim>> compute_contacts_worms();
+
+        /**
+         * @brief Write output files (json format) for visualization.
+         *
+         * @param contacts [in] List of contacts (only \f$D > 0\f$).
+         * @param nite [in] Current index of iteration in time.
+         */
         void write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite);
+
+        /**
+         * @brief Use the velocities solution of the optimization problem to move the particles;
+         */
         void move_active_particles();
+
+        /**
+         * @brief Store the computed velocities.
+         */
         void update_velocity();
 
+        /**
+         * @brief Parameters specific to the main algorithm.
+         */
         ScopiParams m_params;
+
+        /**
+         * @brief Array of particles.
+         */
         scopi_container<dim>& m_particles;
+
+        /**
+         * @brief Time step, fixed during the simulation.
+         */
         double m_dt;
     };
 
@@ -83,7 +181,7 @@ namespace scopi
     {}
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
-    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::solve(std::size_t total_it, std::size_t initial_iter)
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::run(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
@@ -256,12 +354,31 @@ namespace scopi
         PLOG_INFO << "----> CPUTIME : update velocity = " << duration;
     }
 
+    /**
+     * @brief Store the rotation velocities, solution of the optimization problem.
+     *
+     * 2D specialization
+     *
+     * @param particles Container whose field \c omega is updated.
+     * @param i Index of the particle to update.
+     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
+     */
     template<>
     void update_velocity_omega(scopi_container<2>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
     {
         particles.omega()(i + particles.nb_inactive()) = wadapt(i, 2);
     }
 
+    /**
+     * @brief Store the rotation velocities, solution of the optimization problem.
+     *
+     * 3D specialization
+     *
+     * @param particles Container whose field \c omega is updated.
+     * @param i Index of the particle to update.
+     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
+     */
+    template<>
     void update_velocity_omega(scopi_container<3>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
     {
         for (std::size_t d = 0; d < 3; ++d)

@@ -19,53 +19,222 @@ namespace scopi
     template<std::size_t dim>
     class ViscousWithFriction;
 
+    /**
+     * @brief Parameters for ViscousWithFriction<dim>.
+     *
+     * Specialization of ProblemParams in params.hpp
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     struct ProblemParams<ViscousWithFriction<dim>>
     {
+        /**
+         * @brief Default constructor.
+         */
         ProblemParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         ProblemParams(const ProblemParams<ViscousWithFriction<dim>>& params);
 
+        /**
+         * @brief Friction coefficient.
+         *
+         * Default value is 0.
+         * \note \c mu > 0
+         */
         double mu;
+        /**
+         * @brief \f$ \gm \f$
+         *
+         * Default value is -3.
+         * \note \c gamma_min < 0
+         */
         double gamma_min;
+        /**
+         * @brief Tolerance to consider \f$ \g < 0 \f$ .
+         *
+         * Default value is \f$ 10^{-6} \f$.
+         * \note \c tol > 0
+         */
         double tol;
     };
 
+    /**
+     * @brief Problem that models contacts without friction and with viscosity.
+     *
+     * See ProblemBase.hpp for the notations.
+     * We introduce the variable \f$ \g \f$ such that, for each contact \f$ \ij \f$,  we impose
+     * - \f$ \d_{\ij} + \B \u_{\ij} \ge 0 \f$ if \f$ \g_{\ij} = 0 \f$;
+     * - \f$ \d_{\ij} + \B \u_{\ij} = 0 \f$ if \f$ \gm < \g_{\ij} < 0 \f$;
+     * - \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ if \f$ \g_{\ij} < \gm \f$.
+     *
+     * \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, \f$ \B \in \R^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.
+     *
+     * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
+     * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
+     * - \f$ \frac{\diff \g_{\ij}}{\diff t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
+     *
+     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
+     * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
+     *
+     * Only one matrix is built.
+     * See \c create_vector_distances for the order of the rows of the matrix.
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     class ViscousWithFriction: protected ProblemBase
                              , protected ViscousBase<dim>
     {
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param problem_params [in] Parameters.
+         */
         ViscousWithFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithFriction<dim>>& problem_params);
+        /**
+         * @brief Constructor.
+         *
+         * \todo Is it necessary or is a rest from a previous attempt?
+         *
+         * @param nparts [in] Number of particles.
+         */
         ViscousWithFriction(std::size_t nparts);
 
+        /**
+         * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
+         *
+         * See \c create_vector_distances for the order of the rows of the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other problems).
+         * @param firstCol [in] Index of the first column (solver-dependent).
+         */
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
+        /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
+         *
+         * @return Number of rows in the matrix.
+         */
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Create vector \f$ \d \f$.
+         *
+         * For each contact \f$ \ij \f$, depending on the constraint, \f$ \d_{\ij} \f$ can be of the form:
+         *  - one element if \f$ \g_{\ij} = 0 \f$;
+         *  - four elements if \f$ \g_{\ij} < \gm \f$;
+         *  - one element corresponding to \f$ D > 0 \f$ and a second element corresponding to \f$ D < 0 \f$, after all the other constraints, if \f$ \gm < \g_{\ij} < 0 \f$.
+         *
+         *  In other words, \f$ d \f$ is a block vector like
+         *  \f[
+         *      \d = \left( \text{mix of blocks with one or four elements corresponding to } D > 0  \text{ or to the friction model, blocks of one element corresponding to } D < 0 \right).
+         * \f]
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
+         */
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
+        /**
+         * @brief Returns the number of contacts \f$ \ij \f$ with \f$ \g_{\ij} < \gm \f$.
+         */
         std::size_t get_nb_gamma_min();
+        /**
+         * @brief Set \f$ \g_{\ij}^n \f$ from the previous time step, compute the number of contacts with \f$ \g_{\ij} < 0 \f$ and \f$ \g_{\ij} < \gm \f$.
+         *
+         * Look if particles \c i and \c j were already in contact.
+         *
+         * @param contacts_new
+         */
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
+        /**
+         * @brief Compute the value of \f$ \g^{n+1} \f$.
+         *
+         * \f[
+         *      \g^{n+1}_{\ij} = \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right).
+         * \f]
+         *
+         * @param contacts [in] Array of contacts.
+         * @param lambda [in] Lagrange multipliers.
+         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         */
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
+        /**
+         * @brief Whether the optimization problem should be solved.
+         *
+         * For compatibility with the other problems.
+         */
         bool should_solve_optimization_problem();
 
     private:
+        /**
+         * @brief For ViscousWithFrictionFixedPoint
+         *
+         * \todo To be removed.
+         *
+         * @param contacts
+         * @param lambda
+         * @param particles
+         * @param u
+         */
         void correct_lambda(const std::vector<neighbor<dim>>& contacts,
                             xt::xtensor<double, 1> lambda,
                             const scopi_container<dim>& particles,
                             const xt::xtensor<double, 2>& u);
+        /**
+         * @brief For ViscousWithFrictionFixedPoint.
+         *
+         * \todo To be removed.
+         */
         void setup_first_resolution();
+        /**
+         * @brief For ViscousWithFrictionFixedPoint.
+         *
+         * \todo To be removed.
+         */
         void setup_projection();
 
+        /**
+         * @brief Number of contacts \f$ \ij \f$ with \f$ \g_{\ij} < \gm \f$.
+         */
         std::size_t m_nb_gamma_min;
+        /**
+         * @brief For ViscousWithFrictionFixedPoint.
+         *
+         * \todo To be removed.
+         */
         std::vector<double> m_lambda;
+        /**
+         * @brief For ViscousWithFrictionFixedPoint.
+         *
+         * \todo To be removed.
+         */
         bool m_projection;
 
+        /**
+         * @brief Parameters
+         */
         ProblemParams<ViscousWithFriction<dim>> m_params;
     };
 

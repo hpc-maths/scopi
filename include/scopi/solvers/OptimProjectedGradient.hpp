@@ -18,20 +18,69 @@ namespace scopi{
     template<class problem_t, class gradient_t>
     class OptimProjectedGradient;
 
+    /**
+     * @brief Parameters for \c OptimProjectedGradient<problem_t, gradient_t>
+     *
+     * Specialization of ProblemParams in params.hpp
+     *
+     * @tparam problem_t Problem to be solved.
+     * @tparam gradient_t Gradient descent algorithm.
+     */
     template<class problem_t, class gradient_t>
     class OptimParams<OptimProjectedGradient<problem_t, gradient_t>>
     {
     public:
+        /**
+         * @brief Default constructor.
+         */
         OptimParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         OptimParams(const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& params);
 
+        /**
+         * @brief Tolerance for \f$ \dg \f$ criterion.
+         *
+         * Default value is \f$ 10^{-9} \f$.
+         * \note \c tol_dg > 0
+         */
         double tol_dg;
+        /**
+         * @brief Tolerance for \f$ \l \f$ criterion.
+         *
+         * Default value is \f$ 10^{-9} \f$.
+         * \note \c tol_l > 0
+         */
         double tol_l;
+        /**
+         * @brief Maximal number of iterations.
+         *
+         * Default value is 40000.
+         */
         std::size_t max_iter;
+        /**
+         * @brief Step for the gradient descent.
+         *
+         * Default value is 2000.
+         * \note \c rho > 0
+         */
         double rho;
+        /**
+         * @brief Whether to compute and print the function cost.
+         *
+         * Sould be used with <tt> PLOG_VERBOSE </tt>.
+         */
         bool verbose;
     };
 
+    /**
+     * @brief Prints a matrix on standard output.
+     *
+     * @param A [in] Matrix to print.
+     */
     void print_csr_matrix(const sparse_matrix_t A)
     {
         MKL_INT* csr_row_begin = NULL;
@@ -68,16 +117,53 @@ namespace scopi{
         std::cout << "_____________________________________________________________________  \n" ;
     }
 
+    /**
+     * @brief Solve the optimization problem with gradients-like algorithm.
+     *
+     * See ProblemBase for the notations.
+     * The implemented algorithm is:
+     *  - \f$ \A = \transpose{\B} \P^{-1} \B \f$;
+     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \d - \B \u \right) \f$;
+     *  - \f$ \u = \P^{-1} \left( \c - \transpose{\B} \l \right) \f$.
+     *
+     *  The gradient algorithm is given by \c gradient_t.
+     *  \c gradient_t depends on \c projection_t, which should be used with the appropriate problem.
+     *
+     *  \todo Use template specialization with \c problem_t to determine wich projection to use, instead of letting the user decide which \c projection_t use.
+     *
+     *  All matrices and matrix-vector products use the MKL.
+     *
+     * @tparam problem_t Problem to be solved.
+     * @tparam gradient_t Gradient algorithm.
+     */
     template<class problem_t = DryWithoutFriction, class gradient_t = uzawa<projection_max>>
     class OptimProjectedGradient: public OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>
                                 , public gradient_t
     {
     public:
+        /**
+         * @brief Alias for the problem.
+         */
         using problem_type = problem_t; 
     private:
+        /**
+         * @brief Alias for the base class \c OptimBase.
+         */
         using base_type = OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>;
 
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * Build the matrix \f$ \AzMosek \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param particles [in] Array of particles.
+         * @param optim_params [in] Parameters.
+         * @param problem_params [in] Parameters for the problem.
+         */
         template<std::size_t dim>
         OptimProjectedGradient(std::size_t nparts,
                                double dt,
@@ -86,44 +172,147 @@ namespace scopi{
                                const ProblemParams<problem_t>& problem_params);
 
     public:
+        /**
+         * @brief Solve the optimization problem.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return Number of iterations gradient descent algorithm needed to converge.
+         */
         template <std::size_t dim>
         std::size_t solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                     const std::vector<neighbor<dim>>& contacts,
                                                     const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ 3 \N \f$ elements.
+         */
         auto uadapt_data();
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ 3 \N \f$ elements.
+         */
         auto wadapt_data();
+        /**
+         * @brief Returns the Lagrange multipliers (solution of the dual problem) when the optimization is solved.
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ \Nc \f$ elements.
+         */
         auto lagrange_multiplier_data();
+        /**
+         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ \Nc \f$ elements.
+         */
         double* constraint_data();
+        /**
+         * @brief Number of Lagrange multipliers > 0 (active constraints).
+         */
         int get_nb_active_contacts_impl() const;
 
     private:
+        /**
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         *
+         * @param nparts [in] Number of particles.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param particles [in] Array for particles (for moments of inertia).
+         */
         void set_moment_matrix(std::size_t nparts,
                                std::vector<MKL_INT>& invP_csr_row,
                                std::vector<MKL_INT>& invP_csr_col,
                                std::vector<double>& invP_csr_val,
                                const scopi_container<2>& particles);
+        /**
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         *
+         * @param nparts [in] Number of particles.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param particles [in] Array for particles (for moments of inertia).
+         */
         void set_moment_matrix(std::size_t nparts,
                                std::vector<MKL_INT>& invP_csr_row,
                                std::vector<MKL_INT>& invP_csr_col,
                                std::vector<double>& invP_csr_val,
                                const scopi_container<3>& particles);
+        /**
+         * @brief Build the matrix \f$ \B \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         */
         template <std::size_t dim>
         void create_matrix_B(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Build matrix \f$ \A = \transpose{\B} \P^{-1} \B \f$.
+         */
         void create_matrix_A();
 
+        /**
+         * @brief Vector \f$ \l \f$.
+         */
         xt::xtensor<double, 1> m_l;
+        /**
+         * @brief Vector \f$ \e = \d - \B \u \f$.
+         */
         xt::xtensor<double, 1> m_e; // vector c in 220517_PbDual_MiniForces.pdf
+        /**
+         * @brief Vector \f$ \u \f$.
+         */
         xt::xtensor<double, 1> m_u;
+        /**
+         * @brief Vecotr \f$ \B \l \f$.
+         */
         xt::xtensor<double, 1> m_bl;
 
+        /**
+         * @brief Matrix \f$ \A \f$.
+         */
         sparse_matrix_t m_A;
+        /**
+         * @brief Structure specifying \f$ \A \f$ properties. 
+         */
         struct matrix_descr m_descrA;
+        /**
+         * @brief Matrix \f$ \B \f$.
+         */
         sparse_matrix_t m_B;
+        /**
+         * @brief Structure specifying \f$ \B \f$ properties. 
+         */
         struct matrix_descr m_descrB;
+        /**
+         * @brief Matrix \f$ \P^{-1} \f$.
+         */
         sparse_matrix_t m_inv_P;
+        /**
+         * @brief Structure specifying \f$ \P^{-1} \f$ properties. 
+         */
         struct matrix_descr m_descr_inv_P;
+        /**
+         * @brief Value indicating whether the operation was successful or not, and why.
+         */
         sparse_status_t m_status;
     };
 

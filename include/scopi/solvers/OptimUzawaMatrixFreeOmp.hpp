@@ -17,20 +17,52 @@ namespace scopi{
     template<class problem_t>
     class OptimUzawaMatrixFreeOmp;
 
+    /**
+     * @brief Parameters for \c OptimUzawaMatrixFreeOmp<problem_t>
+     *
+     * Specialization of ProblemParams.
+     * See OptimParamsUzawaBase.
+     *
+     * @tparam problem_t Problem to be solved.
+     */
     template<class problem_t>
     struct OptimParams<OptimUzawaMatrixFreeOmp<problem_t>> : public OptimParamsUzawaBase
     {
     };
 
+    /**
+     * @brief Uzawa algorithm with matrix-free matrix-vector products parallelized with OpenMP.
+     *
+     * See OptimUzawaBase for the algorithm.
+     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     *
+     * @tparam problem_t Problem to be solved.
+     */
     template<class problem_t = DryWithoutFriction>
     class OptimUzawaMatrixFreeOmp :public OptimUzawaBase<OptimUzawaMatrixFreeOmp<problem_t>, problem_t>
     {
     protected:
+        /**
+         * @brief Alias for the problem.
+         */
         using problem_type = problem_t; 
     private:
+        /**
+         * @brief Alias for the base class \c OptimUzawaBase.
+         */
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeOmp<problem_t>, problem_t>;
 
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param particles [in] Array of particles.
+         * @param optim_params [in] Parameters.
+         * @param problem_params [in] Parameters for the problem.
+         */
         template <std::size_t dim>
         OptimUzawaMatrixFreeOmp(std::size_t nparts,
                                 double dt,
@@ -39,21 +71,52 @@ namespace scopi{
                                 const ProblemParams<problem_t>& problem_params);
 
     public:
+        /**
+         * @brief Implements the product \f$ \P^{-1} \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for masses and moments of inertia).
+         */
         template <std::size_t dim>
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
+        /**
+         * @brief Implements the product \f$ \r = \r - \B \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         */
         template <std::size_t dim>
         void gemv_A_impl(const scopi_container<dim>& particles,
                          const std::vector<neighbor<dim>>& contacts);
 
+        /**
+         * @brief Implements the product \f$ \u = \transpose{\B} \l + \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         */
         template <std::size_t dim>
         void gemv_transpose_A_impl(const scopi_container<dim>& particles,
                                    const std::vector<neighbor<dim>>& contacts);
 
+        /**
+         * @brief For compatibility with other methods to compute matrix-vector products.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         */
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief For compatibility with other methods to compute matrix-vector products.
+         */
         void finalize_uzawa_impl();
 
     };

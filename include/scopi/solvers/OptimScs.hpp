@@ -11,25 +11,81 @@ namespace scopi
     template<class problem_t>
     class OptimScs;
 
+    /**
+     * @brief Parameters for \c OptimScs<problem_t>
+     *
+     * Specialization of ProblemParams.
+     *
+     * @tparam problem_t Problem to be solved.
+     */
     template<class problem_t>
     struct OptimParams<OptimScs<problem_t>>
     {
+        /**
+         * @brief Default constructor.
+         */
         OptimParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         OptimParams(const OptimParams<OptimScs<problem_t>>& params);
 
+        /**
+         * @brief Tolerance of the solver.
+         *
+         * Default value is \f$ 10^{-7} \f$.
+         * \note \c tol_infeas > 0
+         */
         double tol;
+        /**
+         * @brief Infeasible convergence tolerance.
+         *
+         * Default value is \f$ 10^{-10} \f$
+         * \note \c tol_infeas > 0
+         */
         double tol_infeas;
     };
 
+    /**
+     * @brief Solve optimization problem using Mosek.
+     *
+     * See ProblemBase.hpp for the notations.
+     *
+     * The documentation of SCS is available here: https://www.cvxgrp.org/scs/
+     * Matrices are stored using CSC storage.
+     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     *
+     * @tparam problem_t Problem to be solved.
+     */
     template <class problem_t = DryWithoutFriction>
     class OptimScs: public OptimBase<OptimScs<problem_t>, problem_t>
     {
     protected:
+        /**
+         * @brief Alias for the problem.
+         */
         using problem_type = problem_t; 
     private:
+        /**
+         * @brief Alias for the base class \c OptimBase
+         */
         using base_type = OptimBase<OptimScs<problem_t>, problem_t>;
 
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * Build the matrix \f$ \P \f$ with SCS' data structure.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param particles [in] Array of particles.
+         * @param optim_params [in] Parameters.
+         * @param problem_params [in] Parameters for the problem.
+         */
         template <std::size_t dim>
         OptimScs(std::size_t nparts,
                  double dt,
@@ -38,45 +94,169 @@ namespace scopi
                  const ProblemParams<problem_t>& problem_params);
 
     public:
+        /**
+         * @brief Solve the optimization problem.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return Number of iterations SCS' solver needed to converge.
+         */
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts, 
                                             const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ 3 \N \f$ elements.
+         */
         double* uadapt_data();
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ 3 \N \f$ elements.
+         */
         double* wadapt_data();
+        /**
+         * @brief Returns the Lagrange multipliers (solution of the dual problem) when the optimization is solved.
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         *
+         * @return \f$ \Nc \f$ elements.
+         */
         double* lagrange_multiplier_data();
+        /**
+         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         *
+         * \pre \c solve_optimization_problem has to be called before this function.
+         * \warning The method is not implemented, it is defined so all solvers have the same interface.
+         *
+         * @return Null pointer instead of \f$ \Nc \f$ elements.
+         */
         double* constraint_data();
+        /**
+         * @brief Number of Lagrange multipliers > 0 (active constraints).
+         */
         int get_nb_active_contacts_impl() const;
 
     private:
+        /**
+         * @brief Convert a matrix stored in COO format to CSR format.
+         *
+         * This function is used knowing that
+         *  - the CSC storage of a matrix is the CSR storage of its transpose;
+         *  - the COO storage of the transpose of a matrix is obtained by inversing the row and columns array of the matrix in COO storage.
+         *
+         * @param coo_rows [in] Rows' indicies of to COO storage.
+         * @param coo_cols [in] Column's indicies of the COO storage.
+         * @param coo_vals [in] Values of the COO storage.
+         * @param csr_rows [out] Rows' indicies of the CSR storage.
+         * @param csr_cols [out] Column's indicies of the CSR storage.
+         * @param csr_vals [out] Values of the CSR storage.
+         */
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
+        /**
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         *
+         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, 0, \dots, m_{\N}, m_{\N}, 0, 0, 0, J_0, \dots, 0, 0, J_{\N}) \f$,
+         * where \f$ m_i \f$ (resp. \f$ J_i \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
+         * This function set the second part of the matrix.
+         *
+         * @param nparts [in] Number of particles.
+         * @param particles [in] Array of particles (for the moments of inertia).
+         * @param index [in] Index of the first row with moments.
+         */
         void set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
+        /**
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         *
+         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, m_0, \dots, m_{\N}, m_{\N}, m_{\N}, J_0^x, J_0^y, J_0^z, \dots, J_{\N}^x, J_{\N}^y, J_{\N}^z) \f$,
+         * where \f$ m_i \f$ (resp. \f$ \mathbf{J}_i = (J_i^x, J_i^y, J_i^z) \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
+         * This function set the second part of the matrix.
+         *
+         * @param nparts [in] Number of particles.
+         * @param particles [in] Array of particles (for the moments of inertia).
+         * @param index [in] Index of the first row with moments.
+         */
         void set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
         
 
+        /**
+         * @brief SCS' data structure for the matrix \f$ \P \f$.
+         */
         ScsMatrix m_P;
+        /**
+         * @brief Values of \f$ \P \f$ in CSC storage.
+         */
         std::vector<scs_float> m_P_x;
+        /**
+         * @brief Row indices of \f$ \P \f$ in CSC storage.
+         */
         std::vector<scs_int> m_P_i;
+        /**
+         * @brief Column indices of \f$ \P \f$ in CSC storage.
+         */
         std::vector<scs_int> m_P_p;
 
+        /**
+         * @brief SCS' data structure for the matrix \f$ \B \f$.
+         */
         ScsMatrix m_A;
+        /**
+         * @brief Values of \f$ \B \f$ in CSC storage.
+         */
         std::vector<scs_float> m_A_x;
+        /**
+         * @brief Row indices of \f$ \B \f$ in CSC storage.
+         */
         std::vector<scs_int> m_A_i;
+        /**
+         * @brief Column indices of \f$ \B \f$ in CSC storage.
+         */
         std::vector<scs_int> m_A_p;
 
+        /**
+         * @brief SCS' data structure for \f$ \d \f$.
+         */
         ScsData m_d;
+        /**
+         * @brief SCS' data structure for the constraints.
+         */
         ScsCone m_k;
 
+        /**
+         * @brief SCS' data structure for the solution of the optimization problem.
+         */
         ScsSolution m_sol;
+        /**
+         * @brief Solution of the optimization problem.
+         */
         std::vector<scs_float> m_sol_x;
+        /**
+         * @brief Solution of the dual problem.
+         */
         std::vector<scs_float> m_sol_y;
+        /**
+         * @brief Slack variable.
+         */
         std::vector<scs_float> m_sol_s;
 
+        /**
+         * @brief Contains information about the solve run at termination.
+         */
         ScsInfo m_info;
+        /**
+         * @brief Struct containing all settings. 
+         */
         ScsSettings m_stgs;
-        OptimScs(const OptimScs &);
-        OptimScs & operator=(const OptimScs &);
     };
 
     template <class problem_t>

@@ -8,11 +8,11 @@ namespace scopi
     {}
 
     ContactsParams<contact_brute_force>::ContactsParams()
-    : ContactsParamsBase()
+    : dmax(2.)
     {}
 
     ContactsParams<contact_brute_force>::ContactsParams(const ContactsParams<contact_brute_force>& params)
-    : ContactsParamsBase(params)
+    : dmax(params.dmax)
     {}
 
 }

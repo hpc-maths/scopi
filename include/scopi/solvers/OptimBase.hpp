@@ -12,39 +12,134 @@
 #include "../params.hpp"
 
 namespace scopi{
+    /**
+     * @brief Commun interface for the different optimization solvers.
+     *
+     * @tparam Derived Optimization solver.
+     * @tparam problem_t Problem to be solved.
+     */
     template <class Derived, class problem_t>
     class OptimBase : protected problem_t
     {
+
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param cSize [in] Size of the vector \f$ \c \f$ (depends on the problem).
+         * @param c_dec [in] For some solvers (mostly OptimMosek), the vector \f$ \c \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
+         * @param optim_params [in] Parameters for the optimization solver.
+         * @param problem_params [in] Parameters for the problem.
+         */
         OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params);
 
+        /**
+         * @brief Build the vectors and matrices necessary to solve the optimization problem and solve it.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles.
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         * @param nite [in] Current time step.
+         */
         template<std::size_t dim>
         void run(const scopi_container<dim>& particles,
                  const std::vector<neighbor<dim>>& contacts,
                  const std::vector<neighbor<dim>>& contacts_worms,
                  const std::size_t nite);
 
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         *
+         * \pre Call \c run before calling this function.
+         *
+         * @return \f$ \N \times 3 \f$ array.
+         */
         auto get_uadapt();
+        /**
+         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         *
+         * \pre Call \c run before calling this function.
+         *
+         * @return \f$ \N \times 3 \f$ array.
+         */
         auto get_wadapt();
+        /**
+         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         *
+         * \pre Call \c run before calling this function.
+         * \todo Fix dimensions depending on the problem.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contatcs.
+         *
+         * @return 
+         */
         template<std::size_t dim>
         xt::xtensor<double, 2> get_constraint(const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Returns the Lagrange multipliers (solution of the dual problem) when the optimization is solved.
+         *
+         * \pre Call \c run before calling this function.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return \f$ \Nc \f$ array.
+         */
         template<std::size_t dim>
         auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
     protected:
+        /**
+         * @brief Parameters for the optimization solver.
+         */
         OptimParams<Derived> m_params;
+        /**
+         * @brief Number of particles.
+         */
         std::size_t m_nparts;
+        /**
+         * @brief Vector \f$ \c \f$.
+         */
         xt::xtensor<double, 1> m_c;
 
     private:
+        /**
+         * @brief Build the vector \f$ \c \f$.
+         *
+         * \f$ \c = \P \mathbf{v}^d \f$, where \f$ \mathbf{v}^d \f$ is the a priori velocity (see ProblemBase for the notations).
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for a priori velocities, masses, and moments of inertia).
+         */
         template<std::size_t dim>
         void create_vector_c(const scopi_container<dim>& particles);
+        /**
+         * @brief Solve the optimization problem.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for a priori velocities, masses, and moments of inertia).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return Number of iterations needed by the solver to converge.
+         */
         template<std::size_t dim>
         int solve_optimization_problem(const scopi_container<dim>& particles,
                                        const std::vector<neighbor<dim>>& contacts,
                                        const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Number of Lagrange multipliers > 0 (active constraints).
+         */
         int get_nb_active_contacts() const;
 
+        /**
+         * @brief For some solvers (mostly OptimMosek), the vector \f$ \c \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
+         */
         std::size_t m_c_dec;
     };
 

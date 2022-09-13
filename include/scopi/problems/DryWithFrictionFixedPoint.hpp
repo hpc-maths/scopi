@@ -20,45 +20,178 @@ namespace scopi
 {
     class DryWithFrictionFixedPoint;
 
+    /**
+     * @brief Parameters for \c DryWithoutFriction.
+     *
+     * Specialization of ProblemParams in params.hpp.
+     */
     template<>
     struct ProblemParams<DryWithFrictionFixedPoint>
     {
+        /**
+         * @brief Default constructor.
+         */
         ProblemParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         ProblemParams(const ProblemParams<DryWithFrictionFixedPoint>& params);
 
+        /**
+         * @brief Friction coefficient.
+         *
+         * Default value is 0.
+         * \note \c mu > 0
+         */
         double mu;
+        /**
+         * @brief Tolerance for the fixed point algorithm.
+         *
+         * Default value is \f$ 10^{-2} \f$.
+         * \note \c tol_fixed_point > 0
+         */
         double tol_fixed_point;
+        /**
+         * @brief Maximum number of iterations for the fixed point algorithm.
+         *
+         * Default value is 20.
+         * \note \c max_iter_fixed_point > 0
+         */
         std::size_t max_iter_fixed_point;
     };
 
+    /**
+     * @brief Problem that models contacts with friction and without viscosity. A fixed point algorithm is used to ensure \f$ D = 0 \f$.
+     *
+     * See ProblemBase.hpp for the notations.
+     * The constraint is 
+     * \f[ 
+     *      \d_{\ij} + \B \u_{\ij} \ge \left( \norm{\T \u_{\ij}} - \mu \Delta t \s_{\ij} \right),
+     * \f]
+     * for all contacts \f$ (\ij) \f$, with \f$ \s \in \R^{\Nc} \f$.
+     * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
+     * \f[
+     *      \begin{aligned}
+     *          \F : & \R^{\Nc} \to \R^{\Nc} \\
+     *               & \s_{\ij} \mapsto \norm{\T \us_{\ij}},
+     *      \end{aligned}
+     * \f]
+     * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \R^{\Nc} \f$ such that \f$ \F(\s) = \s \f$.
+     *
+     * This leads to the following algorithm:
+     * - \f$ \sWithIndex{0} \f$;
+     * - \f$ \indexFixedPoint = 0 \f$;
+     * - While \f$ \frac{\norm{\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}}}{\norm{\sWithIndex{\indexFixedPoint}} + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
+     *   - Compute \f$ \usWithIndex{\indexFixedPoint} \f$ as the solution of the optimization problem under the constraint written above;
+     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{\ij} = \norm{\T \usWithIndex{\indexFixedPoint}_{\ij}} \f$ for all contacts \f$ \ij \f$;
+     *   - \f$ \indexFixedPoint ++ \f$.
+     * 
+     * Only one matrix is built.
+     * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
+     * A contact \f$ (\ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
+     * Therefore, the matrix is in \f$ \R^{4\Nc \times 6N} \f$ and \f$ \d \in \R^{4\Nc} \f$.
+     */
     class DryWithFrictionFixedPoint : protected ProblemBase
     {
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparticles [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param problem_params [in] Parameters.
+         */
         DryWithFrictionFixedPoint(std::size_t nparticles, double dt, const ProblemParams<DryWithFrictionFixedPoint>& problem_params);
 
+        /**
+         * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
+         *
+         * \todo It should be the same function as in DryWithFriction.hpp
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other problems).
+         * @param firstCol [in] Index of the first column (solver-dependent).
+         */
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
+        /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * See \c create_vector_distances for the order of the rows of the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
+         *
+         * @return Number of rows in the matrix.
+         */
         template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contact,
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Create vector \f$ \d \f$.
+         *
+         * \f$ \d \in \R^{4\Nc} \f$ can be seen as a block vector, each block has the form
+         * \f$ (d_{\ij} + \mu \Delta t \s_{\ij}, 0, 0, 0) \f$,
+         * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
+         */
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
+        /**
+         * @brief Initialize variables for fixed-point algorithm.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         */
         template<std::size_t dim>
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        /**
+         * @brief Compute \f$ \sWithIndex{\indexFixedPoint+1} \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param lambda [in] Lagrange multipliers.
+         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
+        /**
+         * @brief Stop criterion for the fixed point algorithm.
+         *
+         * @return Whether the fixed point algorithm has converged. 
+         */
         bool should_solve_optimization_problem();
 
     private:
+        /**
+         * @brief Parameters.
+         */
         ProblemParams<DryWithFrictionFixedPoint> m_params;
+        /**
+         * @brief \f$ \sWithIndex{\indexFixedPoint+1} \f$.
+         */
         xt::xtensor<double, 1> m_s;
+        /**
+         * @brief \f$ \sWithIndex{\indexFixedPoint} \f$.
+         */
         xt::xtensor<double, 1> m_s_old;
+        /**
+         * @brief Number of iterations in the fixed point algorithm (\f$ \indexFixedPoint \f$).
+         */
         std::size_t m_nb_iter;
     };
 

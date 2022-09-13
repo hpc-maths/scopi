@@ -19,37 +19,139 @@ namespace scopi
     template<std::size_t dim>
     class ViscousWithoutFriction;
 
+    /**
+     * @brief Parameters for ViscousWithoutFriction<dim>.
+     *
+     * Specialization of ProblemParams in params.hpp
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     struct ProblemParams<ViscousWithoutFriction<dim>>
     {
+        /**
+         * @brief Default constructor.
+         */
         ProblemParams();
+        /**
+         * @brief Copy constructor.
+         *
+         * @param params Parameters to by copied.
+         */
         ProblemParams(const ProblemParams<ViscousWithoutFriction<dim>>& params);
 
+        /**
+         * @brief Tolerance to consider \f$ \g < 0 \f$ .
+         *
+         * Default value is \f$ 10^{-6} \f$.
+         * \note \c tol > 0
+         */
         double tol;
     };
 
+    /**
+     * @brief Problem that models contacts without friction and with viscosity.
+     *
+     * See ProblemBase.hpp for the notations.
+     * The constraint is 
+     * \f[
+     *      \d + \B \u \ge 0,
+     * \f]
+     * with \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, and \f$ \B \in \R^{\Nc \times 6 \N} \f$.
+     * We impose that the distance between all the particles should be non-negative.
+     * We also consider the variable \f$ \g \f$, such that we impose
+     * - \f$ D_{\ij} > 0 \f$ if \f$ \g_{\ij} = 0 \f$;
+     * - \f$ D_{\ij} = 0 \f$ if \f$ \g_{\ij} < 0 \f$.
+     *
+     * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
+     * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
+     * - \f$ \frac{\diff \g_{\ij}}{\diff t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
+     *
+     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
+     * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
+     *
+     * @tparam dim Dimension (2 or 3).
+     */
     template<std::size_t dim>
     class ViscousWithoutFriction: protected ProblemBase
                                 , protected ViscousBase<dim>
     {
     protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of particles.
+         * @param dt [in] Time step.
+         * @param problem_params [in] Parameters.
+         */
         ViscousWithoutFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
 
+        /**
+         * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
+         *
+         * See \c create_vector_distances for the order of the rows of the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
+         * @param firstCol [in] Index of the first column (solver-dependent).
+         */
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
                                           const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
+        /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
+         *
+         * @return Number of rows in the matrix.
+         */
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
+        /**
+         * @brief Create vector \f$ \d \f$.
+         *
+         * \f$ \d \f$ contains all the distances associated with the constraint \f$ D > 0 \f$, then the distances associated with the constraint \f$ D < 0 \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         */
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
+        /**
+         * @brief Matrix-free product \f$ \r = \r - \B \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param c [in] Contact of the computed row \c row.
+         * @param particles [in] Array of particles (to get positions).
+         * @param U [in] Vector \f$ \u \f$.
+         * @param R [in/out] Vector \f$ \r \f$.
+         * @param active_offset [in] Index of the first active particle.
+         * @param row [in] Index of the computed row.
+         */
         void matrix_free_gemv_A(const neighbor<dim>& c,
                                 const scopi_container<dim>& particles,
                                 const xt::xtensor<double, 1>& U,
                                 xt::xtensor<double, 1>& R,
                                 std::size_t active_offset,
                                 std::size_t row);
+        /**
+         * @brief Matrix-free product \f$ \u = \transpose{\B} \l + \u \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param c [in] Contact of the computed row \c row.
+         * @param particles [in] Array of particles (to get positions).
+         * @param L [in] Vector \f$ \l \f$.
+         * @param U [in/out] Vector \f$ \u \f$.
+         * @param active_offset [in] Index of the first active particle.
+         * @param row [in] Index of the computed row.
+         */
         void matrix_free_gemv_transpose_A(const neighbor<dim>& c,
                                           const scopi_container<dim>& particles,
                                           const xt::xtensor<double, 1>& L,
@@ -57,15 +159,48 @@ namespace scopi
                                           std::size_t active_offset,
                                           std::size_t row);
 
+        /**
+         * @brief Set \f$ \g_{\ij}^n \f$ from the previous time step and compute the number of contacts with \f$ \g_{\ij} < 0 \f$.
+         *
+         * Look if particles \c i and \c j were already in contact.
+         *
+         * @param contacts_new
+         */
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
+        /**
+         * @brief Compute the value of \f$ \g^{n+1} \f$.
+         *
+         * \f[
+         *      \g^{n+1}_{\ij} = \max \left( \gm, \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \right).
+         * \f]
+         *
+         * @param contacts [in] Array of contacts.
+         * @param lambda [in] Lagrange multipliers.
+         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         */
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
+        /**
+         * @brief Whether the optimization problem should be solved.
+         *
+         * For compatibility with the other problems.
+         */
         bool should_solve_optimization_problem();
 
     private:
+        /**
+         * @brief 
+         *
+         * \todo Is it necessary or is a rest from a previous attempt?
+         *
+         * @return 
+         */
         std::size_t get_nb_gamma_min();
 
+        /**
+         * @brief Parameters.
+         */
         ProblemParams<ViscousWithoutFriction<dim>> m_params;
     };
 

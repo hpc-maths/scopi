@@ -13,12 +13,12 @@ namespace scopi
     }
 
     ContactsParams<contact_kdtree>::ContactsParams()
-    : ContactsParamsBase()
+    : dmax(2.)
     , kd_tree_radius(17.)
     {}
 
     ContactsParams<contact_kdtree>::ContactsParams(const ContactsParams<contact_kdtree>& params)
-    : ContactsParamsBase(params)
+    : dmax(params.dmax)
     , kd_tree_radius(params.kd_tree_radius)
     {}
 
