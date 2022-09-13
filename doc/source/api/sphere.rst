@@ -1,6 +1,6 @@
 sphere class
 ============
 
-.. doxygenclass:: scopi::property
+.. doxygenclass:: scopi::sphere
    :project: scopi
    :members:
