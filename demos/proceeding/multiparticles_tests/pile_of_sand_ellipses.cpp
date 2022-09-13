@@ -25,7 +25,7 @@ int main()
     double PI = xt::numeric_constants<double>::PI;
     std::size_t total_it = 1000;
     double width_box = 10.;
-    std::size_t n = 100; // n^2 ellipses
+    std::size_t n = 20; // n^2 ellipses
     double g = 1.;
 
     double r = width_box/2./(n+1);
@@ -33,18 +33,18 @@ int main()
     double dt = 0.2*r/(std::sqrt(2.*width_box*g));
 
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
-    params.optim_params.tol_l = 1e-6;
+    params.optim_params.tol_l = 1e-3;
     params.scopi_params.output_frequency = 20;
     params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_ellipses/scopi_objects_";
     params.contacts_params.dmax = r;
-    params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*1.5*r;
+    params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g}});
 
     // obstacles
-    double dist_obs = - width_box;
-    while (dist_obs < 2.*width_box)
+    double dist_obs = - 2.*width_box;
+    while (dist_obs < 4.*width_box)
     {
         add_obstacle(particles, dist_obs, r_obs);
         dist_obs += 2*r_obs;

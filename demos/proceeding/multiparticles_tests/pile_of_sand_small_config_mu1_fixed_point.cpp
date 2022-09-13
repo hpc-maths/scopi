@@ -30,6 +30,7 @@ int main()
     scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::DryWithFrictionFixedPoint, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 1.;
+    params.problem_params.tol_fixed_point = 1e-2;
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
     params.scopi_params.output_frequency = 2000;

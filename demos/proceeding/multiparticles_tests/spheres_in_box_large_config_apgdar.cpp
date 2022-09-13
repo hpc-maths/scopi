@@ -18,7 +18,8 @@ int main()
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
 
-    std::size_t total_it = 1000;
+    // std::size_t total_it = 1000; // For the number of contacts, like the  other solvers
+    std::size_t total_it = 2000; // For output of stationary state
     double width_box = 10.;
     std::size_t n = 50; // n^3 spheres
     double g = 1.;
@@ -29,6 +30,7 @@ int main()
 
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.scopi_params.output_frequency = 100;
+    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220910_spheres_in_box";
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = rho;
     params.contacts_params.dmax = 0.9*r0;
