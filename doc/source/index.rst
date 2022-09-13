@@ -11,6 +11,7 @@ Welcome to scopi's documentation!
    :caption: Contents:
 
    api/sphere
+   api/property
 
 
 Indices and tables
