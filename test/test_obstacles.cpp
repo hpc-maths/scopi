@@ -221,7 +221,6 @@ namespace scopi
         REQUIRE(error_pos == doctest::Approx(std::get<1>(data)));
         REQUIRE(error_q == doctest::Approx(std::get<2>(data)));
         REQUIRE(error_v == doctest::Approx(std::get<3>(data)).epsilon(1e-4));
-        std::cout << error_v << std::endl;
         REQUIRE(omega(1) == doctest::Approx(0.));
     }
 }
