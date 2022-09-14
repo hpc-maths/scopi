@@ -41,27 +41,7 @@ namespace scopi
     template <std::size_t dim>
     std::vector<neighbor<dim>> contact_base<D>::run(scopi_container<dim>& particles, std::size_t active_ptr)
     {
-        auto contacts = this->derived_cast().run_impl(particles, active_ptr);
-
-        // obstacles
-        tic();
-        for (std::size_t i = 0; i < active_ptr; ++i)
-        {
-            for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
-            {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
-            }
-        }
-        auto duration = toc();
-        PLOG_INFO << "----> CPUTIME : compute contacts with obstacles = " << duration;
-
-        // sort
-        tic();
-        sort_contacts(contacts);
-        duration = toc();
-        PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
-
-        return contacts;
+        return this->derived_cast().run_impl(particles, active_ptr);
     }
 
     /**
