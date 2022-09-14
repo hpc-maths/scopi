@@ -14,7 +14,7 @@
 #include "../objects/neighbor.hpp"
 #include "../utils.hpp"
 #include "../params.hpp"
-#include "ProblemBase.hpp"
+#include "DryWithFrictionBase.hpp"
 
 namespace scopi
 {
@@ -93,7 +93,7 @@ namespace scopi
      * A contact \f$ (\ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
      * Therefore, the matrix is in \f$ \R^{4\Nc \times 6N} \f$ and \f$ \d \in \R^{4\Nc} \f$.
      */
-    class DryWithFrictionFixedPoint : protected ProblemBase
+    class DryWithFrictionFixedPoint : protected DryWithFrictionBase
     {
     protected:
         /**
@@ -105,36 +105,6 @@ namespace scopi
          */
         DryWithFrictionFixedPoint(std::size_t nparticles, double dt, const ProblemParams<DryWithFrictionFixedPoint>& problem_params);
 
-        /**
-         * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
-         *
-         * \todo It should be the same function as in DryWithFriction.hpp
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param particles [in] Array of particles (for positions).
-         * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other problems).
-         * @param firstCol [in] Index of the first column (solver-dependent).
-         */
-        template <std::size_t dim>
-        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts,
-                                          const std::vector<neighbor<dim>>& contacts_worms,
-                                          std::size_t firstCol);
-        /**
-         * @brief Get the number of rows in the matrix.
-         *
-         * See \c create_vector_distances for the order of the rows of the matrix.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
-         *
-         * @return Number of rows in the matrix.
-         */
-        template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                      const std::vector<neighbor<dim>>& contacts_worms);
         /**
          * @brief Create vector \f$ \d \f$.
          *
@@ -194,95 +164,6 @@ namespace scopi
          */
         std::size_t m_nb_iter;
     };
-
-    template<std::size_t dim>
-    void DryWithFrictionFixedPoint::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                                 const std::vector<neighbor<dim>>& contacts,
-                                                                 const std::vector<neighbor<dim>>& contacts_worms,
-                                                                 std::size_t firstCol)
-    {
-        matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 4);
-        std::size_t active_offset = particles.nb_inactive();
-        std::size_t ic = 0;
-        for (auto &c: contacts)
-        {
-            if (c.i >= active_offset)
-            {
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(-this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col]);
-                        if(ind_row == ind_col)
-                        {
-                            this->m_A_values[this->m_A_values.size()-1] += this->m_dt*m_params.mu;
-                        }
-                    }
-                }
-            }
-
-            if (c.j >= active_offset)
-            {
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(this->m_dt*m_params.mu*c.nij[ind_row]*c.nij[ind_col]);
-                        if(ind_row == ind_col)
-                        {
-                            this->m_A_values[this->m_A_values.size()-1] -= this->m_dt*m_params.mu;
-                        }
-                    }
-                }
-            }
-
-            auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
-            auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
-            auto Ri = rotation_matrix<3>(particles.q()(c.i));
-            auto Rj = rotation_matrix<3>(particles.q()(c.j));
-
-            if (c.i >= active_offset)
-            {
-                std::size_t ind_part = c.i - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(-m_params.mu*this->m_dt*dot(ind_row, ind_col) + m_params.mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
-                    }
-                }
-            }
-
-            if (c.j >= active_offset)
-            {
-                std::size_t ind_part = c.j - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(m_params.mu*this->m_dt*dot(ind_row, ind_col) - m_params.mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
-                    }
-                }
-            }
-            ++ic;
-        }
-    }
-    template <std::size_t dim>
-    std::size_t DryWithFrictionFixedPoint::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                                             const std::vector<neighbor<dim>>&)
-    {
-        return 4*contacts.size();
-    }
 
     template<std::size_t dim>
     void DryWithFrictionFixedPoint::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
