@@ -90,7 +90,7 @@ namespace scopi{
         /**
          * @brief Vector \f$ \l^{\indexUzawa-1} \f$.
          */
-        xt::xtensor<double, 1> m_lambda_prev;
+        xt::xtensor<double, 1> m_l_old;
     };
 
     template<class problem_t>
@@ -110,7 +110,7 @@ namespace scopi{
         std::size_t iter = 0;
         while (iter < m_max_iter)
         {
-            xt::noalias(m_lambda_prev) = l;
+            xt::noalias(m_l_old) = l;
 
             // dg = Al+c
             xt::noalias(m_dg) = c;
@@ -121,7 +121,7 @@ namespace scopi{
             // double norm_dg = xt::amax(xt::abs(m_dg))(0);
             // double norm_l = xt::amax(xt::abs(l))(0);
             // double cmax = double((xt::amin(m_dg))(0));
-            double diff_lambda = xt::amax(xt::abs(l - m_lambda_prev))(0) / (xt::amax(xt::abs(m_lambda_prev))(0) + 1.);
+            double diff_lambda = xt::amax(xt::abs(l - m_l_old))(0) / (xt::amax(xt::abs(m_l_old))(0) + 1.);
 
             if (m_verbose)
             {

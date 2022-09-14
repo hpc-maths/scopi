@@ -119,10 +119,6 @@ namespace scopi{
          * @brief Temporary vector used to compute \f$ \transpose{\l} \cdot \A \l \f$ and \f$ \transpose{\y} \cdot \A \y \f$.
          */
         xt::xtensor<double, 1> m_tmp;
-        /**
-         * @brief Vector \f$ \l^{\indexUzawa} \f$.
-         */
-        xt::xtensor<double, 1> m_lambda_prev;
     };
 
     template<class problem_t>
@@ -143,13 +139,12 @@ namespace scopi{
         std::size_t iter = 0;
         double theta_old = 1.;
         m_y = l;
-        m_l_old = l;
         m_rho = m_rho_init;
         double lipsch = 1./m_rho;
         m_tmp.resize({l.size()});
         while (iter < m_max_iter)
         {
-            xt::noalias(m_lambda_prev) = l;
+            xt::noalias(m_l_old) = l;
             // dg = A*y+c
             xt::noalias(m_dg) = c;
             m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 1., m_dg.data());
@@ -192,7 +187,7 @@ namespace scopi{
             // double norm_dg = xt::amax(xt::abs(m_dg))(0);
             // double norm_l = xt::amax(xt::abs(l))(0);
             // double cmax = double((xt::amin(m_dg))(0));
-            double diff_lambda = xt::amax(xt::abs(l - m_lambda_prev))(0) / (xt::amax(xt::abs(m_lambda_prev))(0) + 1.);
+            double diff_lambda = xt::amax(xt::abs(l - m_l_old))(0) / (xt::amax(xt::abs(m_l_old))(0) + 1.);
 
             if (m_verbose)
             {
@@ -220,7 +215,6 @@ namespace scopi{
                 theta = 1.;
             }
 
-            m_l_old = l;
             theta_old = theta;
             lipsch *= 0.97; // 0.9 in the paper
             m_rho = 1./lipsch;
