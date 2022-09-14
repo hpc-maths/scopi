@@ -35,11 +35,11 @@ namespace scopi
     ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimScs<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMkl<DryWithoutFriction>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, uzawa<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_restart<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho_restart<>>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, uzawa>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_restart>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho_restart>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeTbb<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeOmp<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap> // friction with mu = 0
@@ -56,11 +56,11 @@ namespace scopi
 #define SOLVER_WORMS(dim, contact, vap) \
     ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMkl<DryWithoutFriction>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, uzawa<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_restart<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho_restart<>>, contact, vap>
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, uzawa>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_restart>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho_restart>, contact, vap>
 #else
 #define SOLVER_WORMS(dim, contact, vap) \
     ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>
@@ -73,11 +73,11 @@ namespace scopi
 #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
     ScopiSolver<dim, OptimMosek<ViscousWithoutFriction<dim>>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMkl<ViscousWithoutFriction<dim>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, uzawa<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_restart<>>, contact, vap>, \
-    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho_restart<>>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, uzawa>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_restart>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, nesterov_dynrho_restart>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<dim>>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<dim>>, contact, vap>
 #else
@@ -109,7 +109,7 @@ namespace scopi
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_brute_force, vap_fpd);
 
 #define TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact, vap) \
-    TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::solver<scopi::problem, scopi::projection<>>, scopi::contact, scopi::vap>)
+    TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::solver<scopi::problem, scopi::projection>, scopi::contact, scopi::vap>)
 #define TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(solver, problem, projection, dim)\
     TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_kdtree, vap_fixed); \
     TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_kdtree, vap_fpd); \
