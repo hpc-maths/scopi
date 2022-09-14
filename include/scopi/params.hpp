@@ -95,8 +95,8 @@ namespace scopi
          * @brief Frequency to write the output files.
          *
          * Write output files with the current iteration is a multiple of \c output_frequency.
-         * If \c output_frequency is <tt> std::size_t(-1) </tt>, then write the output files at each time steps.
-         * Default value is <tt> std::size_t(-1) </tt>.
+         * If \c output_frequency is <tt> std::size_t(-1) </tt>, then no output is written.
+         * Default value is 1.
          * \note \c output_frequency > 0
          */
         std::size_t output_frequency;

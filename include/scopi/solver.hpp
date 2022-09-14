@@ -191,7 +191,7 @@ namespace scopi
             displacement_obstacles();
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
-            if (nite % m_params.output_frequency == 0 || m_params.output_frequency == std::size_t(-1))
+            if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
                 write_output_files(contacts, nite);
             this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
             this->extra_steps_before_solve(contacts);
