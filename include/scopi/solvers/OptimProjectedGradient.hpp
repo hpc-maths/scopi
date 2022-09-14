@@ -15,7 +15,7 @@
 #include "gradient/uzawa.hpp"
 
 namespace scopi{
-    template<class problem_t, template <class problem_t> class gradient_t>
+    template<class problem_t, template <class> class gradient_t>
     class OptimProjectedGradient;
 
     /**
@@ -26,7 +26,7 @@ namespace scopi{
      * @tparam problem_t Problem to be solved.
      * @tparam gradient_t Gradient descent algorithm.
      */
-    template<class problem_t, template <class problem_t> class gradient_t>
+    template<class problem_t, template <class> class gradient_t>
     class OptimParams<OptimProjectedGradient<problem_t, gradient_t>>
     {
     public:
@@ -102,9 +102,9 @@ namespace scopi{
      * @tparam problem_t Problem to be solved.
      * @tparam gradient_t Gradient algorithm.
      */
-    template<class problem_t = DryWithoutFriction, template <class problem_t> class gradient_t = uzawa>
+    template<class problem_t = DryWithoutFriction, template <class> class gradient_t = uzawa>
     class OptimProjectedGradient: public OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>
-                                , public gradient_t
+                                , public gradient_t<problem_t>
     {
     public:
         /**
@@ -282,7 +282,7 @@ namespace scopi{
         sparse_status_t m_status;
     };
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template <class> class gradient_t>
     template<std::size_t dim>
     OptimProjectedGradient<problem_t, gradient_t>::OptimProjectedGradient(std::size_t nparts,
                                                                           double dt,
@@ -290,7 +290,7 @@ namespace scopi{
                                                                           const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params,
                                                                           const ProblemParams<problem_t>& problem_params)
     : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
-    , gradient_t(optim_params.max_iter, optim_params.rho, optim_params.tol_dg, optim_params.tol_l, optim_params.verbose)
+    , gradient_t<problem_t>(optim_params.max_iter, optim_params.rho, optim_params.tol_dg, optim_params.tol_l, optim_params.verbose)
     , m_u(xt::zeros<double>({6*nparts}))
     , m_bl(xt::zeros<double>({6*nparts}))
     {
@@ -333,7 +333,7 @@ namespace scopi{
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix invP: " << m_status;
     }
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     template <std::size_t dim>
     std::size_t OptimProjectedGradient<problem_t, gradient_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
                                                                                                const std::vector<neighbor<dim>>& contacts,
@@ -381,37 +381,37 @@ namespace scopi{
         return nb_iter;
     }
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     auto OptimProjectedGradient<problem_t, gradient_t>::uadapt_data()
     {
         return m_u.data();
     }
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     auto OptimProjectedGradient<problem_t, gradient_t>::wadapt_data()
     {
         return m_u.data() + 3*this->m_nparts;
     }
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     auto OptimProjectedGradient<problem_t, gradient_t>::lagrange_multiplier_data()
     {
         return m_l.data();
     }
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     double* OptimProjectedGradient<problem_t, gradient_t>::constraint_data()
     {
         return NULL;
     }
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     int OptimProjectedGradient<problem_t, gradient_t>::get_nb_active_contacts_impl() const
     {
         return xt::sum(xt::where(m_l > 0., xt::ones_like(m_l), xt::zeros_like(m_l)))();
     }
 
-    template <class problem_t, class gradient_t>
+    template <class problem_t, template<class> class gradient_t>
     template <std::size_t dim>
     void OptimProjectedGradient<problem_t, gradient_t>::create_matrix_B(const scopi_container<dim>& particles,
                                                                         const std::vector<neighbor<dim>>& contacts,
@@ -460,7 +460,7 @@ namespace scopi{
         PLOG_INFO << "----> CPUTIME : projected gradient : create_matrix_B : mkl_sparse_optimize = " << duration;
     }
 
-    template <class problem_t, class gradient_t>
+    template <class problem_t, template<class> class gradient_t>
     void OptimProjectedGradient<problem_t, gradient_t>::create_matrix_A()
     {
         m_descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
@@ -488,7 +488,7 @@ namespace scopi{
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_optimize for matrix A: " << m_status;
     }
 
-    template <class problem_t, class gradient_t>
+    template <class problem_t, template<class> class gradient_t>
     void OptimProjectedGradient<problem_t, gradient_t>::set_moment_matrix(std::size_t nparts,
                                                                           std::vector<MKL_INT>& invP_csr_row,
                                                                           std::vector<MKL_INT>& invP_csr_col,
@@ -510,7 +510,7 @@ namespace scopi{
         }
     }
 
-    template <class problem_t, class gradient_t>
+    template <class problem_t, template<class> class gradient_t>
     void OptimProjectedGradient<problem_t, gradient_t>::set_moment_matrix(std::size_t nparts,
                                                                          std::vector<MKL_INT>& invP_csr_row,
                                                                          std::vector<MKL_INT>& invP_csr_col,
@@ -529,7 +529,7 @@ namespace scopi{
         }
     }
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     OptimParams<OptimProjectedGradient<problem_t, gradient_t>>::OptimParams(const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& params)
     : tol_dg(params.tol_dg)
     , tol_l(params.tol_l)
@@ -538,7 +538,7 @@ namespace scopi{
     , verbose(params.verbose)
     {}
 
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template<class> class gradient_t>
     OptimParams<OptimProjectedGradient<problem_t, gradient_t>>::OptimParams()
     : tol_dg(1e-9)
     , tol_l(1e-9)

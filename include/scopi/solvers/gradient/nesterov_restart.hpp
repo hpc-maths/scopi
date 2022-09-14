@@ -108,9 +108,9 @@ namespace scopi{
         xt::xtensor<double, 1> m_lambda_prev;
     };
 
-    template<class projection_t>
-    nesterov_restart<projection_t>::nesterov_restart(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
-    : projection_t()
+    template<class problem_t>
+    nesterov_restart<problem_t>::nesterov_restart(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
+    : projection<problem_t>()
     , m_max_iter(max_iter)
     , m_rho(rho)
     , m_tol_dg(tol_dg)
@@ -118,8 +118,8 @@ namespace scopi{
     , m_verbose(verbose)
     {}
 
-    template<class projection_t>
-    std::size_t nesterov_restart<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
+    template<class problem_t>
+    std::size_t nesterov_restart<problem_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
         PLOG_INFO << "Projection: Nesterov with restart";
         std::size_t iter = 0;
