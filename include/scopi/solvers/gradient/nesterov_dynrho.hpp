@@ -122,11 +122,11 @@ namespace scopi{
     nesterov_dynrho<projection_t>::nesterov_dynrho(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
     : projection_t()
     , m_max_iter(max_iter)
+    , m_rho_init(rho)
     , m_rho(rho)
     , m_tol_dg(tol_dg)
     , m_tol_l(tol_l)
     , m_verbose(verbose)
-    , m_rho_init(rho)
     {}
 
     template<class projection_t>

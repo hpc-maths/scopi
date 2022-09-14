@@ -108,6 +108,7 @@ set(SCOPI_SRC
     src/problems/ProblemBase.cpp
     src/solvers/ConstraintMosek.cpp
     src/solvers/OptimUzawaBase.cpp
+    src/solvers/OptimProjectedGradient.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/vap/vap_projection.cpp
