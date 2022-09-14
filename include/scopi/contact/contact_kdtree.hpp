@@ -240,34 +240,9 @@ namespace scopi
             }
         }
 
-        // obstacles
-        for (std::size_t i = 0; i < active_ptr; ++i)
-        {
-            for (std::size_t j = active_ptr; j < particles.size(); ++j)
-            {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
-            }
-        }
-
         duration = toc();
         PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << " compute " << m_nMatches << " distances" << std::endl;
 
-
-
-        tic();
-        sort_contacts(contacts);
-        duration = toc();
-        PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
-
-        /*
-        for (std::size_t ic=0; ic<contacts.size(); ++ic)
-        {
-            std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
-            // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
-        }
-        */
-
         return contacts;
-
     }
 }

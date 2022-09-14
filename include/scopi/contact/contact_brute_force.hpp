@@ -99,22 +99,8 @@ namespace scopi
             }
         }
 
-        // obstacles
-        for (std::size_t i = 0; i < active_ptr; ++i)
-        {
-            for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
-            {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
-            }
-        }
-
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration;
-
-        tic();
-        sort_contacts(contacts);
-        duration = toc();
-        PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
 
         return contacts;
 
