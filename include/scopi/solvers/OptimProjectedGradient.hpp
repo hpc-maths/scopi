@@ -12,7 +12,7 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
 #include "../problems/DryWithoutFriction.hpp"
-#include "gradient/uzawa.hpp"
+#include "gradient/pgd.hpp"
 
 namespace scopi{
     template<class problem_t, template <class> class gradient_t>
@@ -99,7 +99,7 @@ namespace scopi{
      * @tparam problem_t Problem to be solved.
      * @tparam gradient_t Gradient algorithm.
      */
-    template<class problem_t = DryWithoutFriction, template <class> class gradient_t = uzawa>
+    template<class problem_t = DryWithoutFriction, template <class> class gradient_t = pgd>
     class OptimProjectedGradient: public OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>
                                 , public gradient_t<problem_t>
     {
