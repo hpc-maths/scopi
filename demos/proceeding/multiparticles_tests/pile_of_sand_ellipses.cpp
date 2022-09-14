@@ -34,7 +34,8 @@ int main()
 
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-3;
-    params.scopi_params.output_frequency = 20;
+    params.optim_params.rho = 0.2/dt/dt;
+    // params.scopi_params.output_frequency = 20;
     params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_ellipses/scopi_objects_";
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
@@ -43,8 +44,8 @@ int main()
     auto prop = scopi::property<dim>().force({{0., -g}});
 
     // obstacles
-    double dist_obs = - 2.*width_box;
-    while (dist_obs < 4.*width_box)
+    double dist_obs = - width_box;
+    while (dist_obs < 2.*width_box)
     {
         add_obstacle(particles, dist_obs, r_obs);
         dist_obs += 2*r_obs;
