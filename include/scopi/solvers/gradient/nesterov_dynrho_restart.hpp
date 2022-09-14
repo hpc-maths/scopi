@@ -2,13 +2,14 @@
 
 #ifdef SCOPI_USE_MKL
 #include <mkl_spblas.h>
-
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xnoalias.hpp>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
-#include "projection_max.hpp"
+
+#include "../projection.hpp"
+#include "../../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
     /**
@@ -41,8 +42,8 @@ namespace scopi{
      *
      * @tparam projection_t Projection on admissible velocities.
      */
-    template<class projection_t = projection_max>
-    class nesterov_dynrho_restart: public projection_t
+    template<class problem_t = DryWithoutFriction>
+    class nesterov_dynrho_restart: public projection<problem_t>
     {
     protected:
         /**

@@ -15,7 +15,7 @@
 #include "gradient/uzawa.hpp"
 
 namespace scopi{
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template <class problem_t> class gradient_t>
     class OptimProjectedGradient;
 
     /**
@@ -26,7 +26,7 @@ namespace scopi{
      * @tparam problem_t Problem to be solved.
      * @tparam gradient_t Gradient descent algorithm.
      */
-    template<class problem_t, class gradient_t>
+    template<class problem_t, template <class problem_t> class gradient_t>
     class OptimParams<OptimProjectedGradient<problem_t, gradient_t>>
     {
     public:
@@ -102,7 +102,7 @@ namespace scopi{
      * @tparam problem_t Problem to be solved.
      * @tparam gradient_t Gradient algorithm.
      */
-    template<class problem_t = DryWithoutFriction, class gradient_t = uzawa<projection_max>>
+    template<class problem_t = DryWithoutFriction, template <class problem_t> class gradient_t = uzawa>
     class OptimProjectedGradient: public OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>
                                 , public gradient_t
     {
