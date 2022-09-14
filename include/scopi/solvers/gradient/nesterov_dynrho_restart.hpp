@@ -25,7 +25,7 @@ namespace scopi{
      *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
      *  - While (\f$ \convergenceCriterion \f$)
      *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho^{\indexUzawa} \dg^{\indexUzawa}, 0 \right) \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \y^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
      *      - While (\f$ \frac{1}{2} \l^{\indexUzawa+1} \cdot \A \l^{\indexUzawa+1} + \e \cdot \l^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \e \cdot \y^{\indexUzawa+1} + \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
      *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
      *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
@@ -40,7 +40,9 @@ namespace scopi{
      *
      *      - \f$ \indexUzawa++ \f$.
      *
-     * @tparam projection_t Projection on admissible velocities.
+     * The projection depends on the problem.
+     *
+     * @tparam problem_t Problem to be solved.
      */
     template<class problem_t = DryWithoutFriction>
     class nesterov_dynrho_restart: public projection<problem_t>
