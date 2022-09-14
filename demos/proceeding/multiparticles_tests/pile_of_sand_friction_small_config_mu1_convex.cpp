@@ -12,16 +12,16 @@
 
 int main()
 {
-    // Table 4 and figure 9: 13^3 spheres falling on a plane with friction.
+    // Table 4: 8^3 spheres falling on a plane with friction.
     // mu = 1, convex scheme.
-    plog::init(plog::info, "pile_of_sand_spheres_large_config_mu1_convex.log");
+    plog::init(plog::info, "pile_of_sand_spheres_small_config_mu1_convex.log");
 
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
 
     double width_box = 10.;
-    std::size_t n = 12; // n^3 spheres
-    std::size_t total_it = 1000;
+    std::size_t n = 8; // n^3 spheres
+    std::size_t total_it = 200;
     double g = 1.;
 
     double r = width_box/2./(n+1);
@@ -32,8 +32,7 @@ int main()
     params.problem_params.mu = 1.;
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
-    params.scopi_params.output_frequency = 20;
-    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_pile_sand_friction/mu1_convex_";
+    params.scopi_params.output_frequency = 2000;
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
