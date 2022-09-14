@@ -29,7 +29,7 @@ int main()
     double rho = 0.2/(dt*dt);
     std::cout << "dt = " << dt << "  rho = " << rho << std::endl;
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.scopi_params.output_frequency = 99;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = rho;
@@ -75,7 +75,7 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
     solver.run(total_it);
 
     return 0;
