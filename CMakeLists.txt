@@ -104,6 +104,7 @@ set(SCOPI_SRC
     src/contact/contact_kdtree.cpp
     src/problems/DryWithoutFriction.cpp
     src/problems/DryWithFriction.cpp
+    src/problems/DryWithFrictionBase.cpp
     src/problems/DryWithFrictionFixedPoint.cpp
     src/problems/ProblemBase.cpp
     src/solvers/ConstraintMosek.cpp
