@@ -317,6 +317,7 @@ namespace scopi
         auto uadapt = this->get_uadapt();
         auto wadapt = this->get_wadapt();
 
+        #pragma omp parallel for
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
             xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, wadapt(i, 2)});
@@ -350,6 +351,7 @@ namespace scopi
         auto uadapt = this->get_uadapt();
         auto wadapt = this->get_wadapt();
 
+        #pragma omp parallel for
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
             for (std::size_t d = 0; d < dim; ++d)

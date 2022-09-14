@@ -77,6 +77,7 @@ namespace scopi
     template <std::size_t dim>
     void vap_projection::set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>&, const std::vector<neighbor<dim>>&)
     {
+        #pragma omp parallel for
         for (std::size_t i=0; i< this->m_Nactive; ++i)
         {
             for (std::size_t d=0; d<dim; ++d)
