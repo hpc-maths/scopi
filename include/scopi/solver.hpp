@@ -84,14 +84,14 @@ namespace scopi
     {
     private:
         /**
-         * @brief Shortcut for problem type. 
+         * @brief Alias for problem type. 
          */
         using problem_t = typename optim_solver_t::problem_type;
     public:
         /**
-         * @brief Shortcut for the type of parameters class.
+         * @brief Alias for the type of parameters class.
          */
-        using params_t = Params<optim_solver_t, problem_t, contact_t, vap_t>;
+        using params_t = Params<optim_solver_t, contact_t, vap_t>;
 
         /**
          * @brief Constructor.
@@ -102,7 +102,7 @@ namespace scopi
          */
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
-                    const Params<optim_solver_t, problem_t, contact_t, vap_t>& params = Params<optim_solver_t, problem_t, contact_t, vap_t>());
+                    const Params<optim_solver_t, contact_t, vap_t>& params = Params<optim_solver_t, contact_t, vap_t>());
 
         /**
          * @brief Run the simulation.
@@ -171,7 +171,7 @@ namespace scopi
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles,
                                                                     double dt,
-                                                                    const Params<optim_solver_t, problem_t, contact_t, vap_t>& params)
+                                                                    const Params<optim_solver_t, contact_t, vap_t>& params)
     : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
     , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
     , contact_t(params.contacts_params)
