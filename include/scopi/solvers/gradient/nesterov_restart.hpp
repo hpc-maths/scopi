@@ -23,7 +23,7 @@ namespace scopi{
      *  - \f$ \theta^{\indexUzawa} = 1 \f$.
      *  - While (\f$ \convergenceCriterion \f$)
      *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho \dg^{\indexUzawa}, 0 \right) \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \y^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
      *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
      *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
      *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
@@ -33,7 +33,9 @@ namespace scopi{
      *
      *      - \f$ \indexUzawa++ \f$.
      *
-     * @tparam projection_t Projection on admissible velocities.
+     * The projection depends on the problem.
+     *
+     * @tparam problem_t Problem to be solved.
      */
     template<class problem_t = DryWithoutFriction>
     class nesterov_restart: public projection<problem_t>

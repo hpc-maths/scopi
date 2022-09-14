@@ -21,11 +21,12 @@ namespace scopi{
      *  - \f$ \l^{\indexUzawa} = 0 \f$;
      *  - While (\f$ \convergenceCriterion \f$)
      *      - \f$ \dg^{\indexUzawa} = \A \l^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \max \left (\l^{\indexUzawa} - \rho \dg^{\indexUzawa}, 0 \right) \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \l^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
      *      - \f$ \indexUzawa++ \f$.
      *
+     * The projection depends on the problem.
      *
-     * @tparam projection_t Projection on admissible velocities.
+     * @tparam problem_t Problem to be solved.
      */
     template<class problem_t = DryWithoutFriction>
     class uzawa: public projection<problem_t>

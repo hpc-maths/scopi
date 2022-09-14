@@ -14,17 +14,26 @@
 namespace scopi{
     /**
      * @brief Projection on the linear cone for gradients-like algorithm.
+     *
+     * The projection depends on the problem, template specializations of this class help manage the dependance on the problem.
+     *
+     * @tparam problem_t Problem to be solved.
      */
     template <class problem_t>
     class projection
     {};
 
+    /**
+     * @brief Specialization of \c projection for \c DryWithoutFriction.
+     *
+     * Projection on \f$ \R^+ \f$.
+     */
     template <>
     class projection<DryWithoutFriction>
     {
     protected:
         /**
-         * @brief Projection.
+         * @brief Projection on \f$ \R^+ \f$.
          *
          * @param l [in] Vector to project.
          *
@@ -33,12 +42,17 @@ namespace scopi{
         xt::xtensor<double, 1> projection_cone(const xt::xtensor<double, 1>& l);
     };
 
+    /**
+     * @brief Specialization of \c projection for \c ViscousWithoutFriction.
+     *
+     * Projection on \f$ \R^+ \f$.
+     */
     template <std::size_t dim>
     class projection<ViscousWithoutFriction<dim>>
     {
     protected:
         /**
-         * @brief Projection.
+         * @brief Projection on \f$ \R^+.
          *
          * @param l [in] Vector to project.
          *

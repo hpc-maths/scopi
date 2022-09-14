@@ -84,7 +84,7 @@ namespace scopi{
     void print_csr_matrix(const sparse_matrix_t A);
 
     /**
-     * @brief Solve the optimization problem with gradients-like algorithm.
+     * @brief Solve the optimization problem with gradients-like algorithms.
      *
      * See ProblemBase for the notations.
      * The implemented algorithm is:
@@ -93,9 +93,6 @@ namespace scopi{
      *  - \f$ \u = \P^{-1} \left( \c - \transpose{\B} \l \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
-     *  \c gradient_t depends on \c projection_t, which should be used with the appropriate problem.
-     *
-     *  \todo Use template specialization with \c problem_t to determine wich projection to use, instead of letting the user decide which \c projection_t use.
      *
      *  All matrices and matrix-vector products use the MKL.
      *
