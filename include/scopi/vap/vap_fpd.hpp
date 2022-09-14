@@ -79,6 +79,7 @@ namespace scopi
     template <std::size_t dim>
     void vap_fpd::set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>&, const std::vector<neighbor<dim>>&)
     {
+        #pragma omp parallel for
         for (std::size_t i=0; i<m_Nactive; ++i)
         {
             particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*particles.f()(m_active_ptr + i)/particles.m()(m_active_ptr + i);
