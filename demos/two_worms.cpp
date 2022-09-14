@@ -16,14 +16,14 @@ int main()
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
-    scopi::worm<dim> g1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
+    scopi::worm<dim> w1({{1., 0.7}, {3., 0.7}, {5., 0.7}, {7., 0.7}, {9., 0.7}, {11., 0.7}},
             {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
             1., 6);
-    scopi::worm<dim> g2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
+    scopi::worm<dim> w2({{-1., -0.7}, {-3., -0.7}, {-5., -0.7}, {-7., -0.7}, {-9., -0.7}, {-11., -0.7}},
             {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
             1., 6);
-    particles.push_back(g1, prop.desired_velocity({-1., 0.}));
-    particles.push_back(g2, prop.desired_velocity({1., 0.}));
+    particles.push_back(w1, prop.desired_velocity({-1., 0.}));
+    particles.push_back(w2, prop.desired_velocity({1., 0.}));
 
     scopi::Params<scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::contact_kdtree, scopi::vap_fixed> params;
     params.optim_params.change_default_tol_mosek = false;
