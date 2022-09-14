@@ -4,7 +4,6 @@
 #include <scopi/solver.hpp>
 #include <scopi/property.hpp>
 #include <scopi/solvers/OptimMosek.hpp>
-#include <scopi/problems/ViscousGlobule.hpp>
 
 int main()
 {
@@ -28,27 +27,27 @@ int main()
         double r = distrib_r(generator);
         double x0 =  2. + distrib_move_x(generator);
         double y = 2.*(i + 0.5);;
-        scopi::worm<dim> g1({{x0, y}, {x0 + 2.*r, y}, {x0 + 4.*r, y}, {x0 + 6.*r, y}, {x0 + 8.*r, y}, {x0 + 10.*r, y}},
+        scopi::worm<dim> w1({{x0, y}, {x0 + 2.*r, y}, {x0 + 4.*r, y}, {x0 + 6.*r, y}, {x0 + 8.*r, y}, {x0 + 10.*r, y}},
                 {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
-                r);
+                r, 6);
         double v_x = distrib_velocity(generator);
         double v_y = distrib_velocity(generator);
-        particles.push_back(g1, prop.desired_velocity({{-1.+v_x, v_y}}));
+        particles.push_back(w1, prop.desired_velocity({{-1.+v_x, v_y}}));
 
         r = distrib_r(generator);
         x0 = -2. + distrib_move_x(generator);
         y = 2.*i;
-        scopi::worm<dim> g2({{x0, y}, {x0 - 2.*r, y}, {x0 - 4.*r, y}, {x0 - 6.*r, y}, {x0 - 8.*r, y}, {x0 - 10.*r, y}},
+        scopi::worm<dim> w2({{x0, y}, {x0 - 2.*r, y}, {x0 - 4.*r, y}, {x0 - 6.*r, y}, {x0 - 8.*r, y}, {x0 - 10.*r, y}},
                 {{scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}, {scopi::quaternion(0.)}},
-                r);
+                r, 6);
         v_x = distrib_velocity(generator);
         v_y = distrib_velocity(generator);
-        particles.push_back(g2, prop.desired_velocity({{1.+v_x, v_y}}));
+        particles.push_back(w2, prop.desired_velocity({{1.+v_x, v_y}}));
     }
 
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousGlobule>> solver(particles, dt);
-    solver.solve(total_it);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<>> solver(particles, dt);
+    solver.run(total_it);
 
     return 0;
 }
