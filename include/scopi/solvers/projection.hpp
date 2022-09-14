@@ -30,7 +30,7 @@ namespace scopi{
          *
          * @return max (\c l, 0).
          */
-        auto projection_cone(const xt::xtensor<double, 1>& l);
+        xt::xtensor<double, 1> projection_cone(const xt::xtensor<double, 1>& l);
     };
 
     template <std::size_t dim>
@@ -44,11 +44,11 @@ namespace scopi{
          *
          * @return max (\c l, 0).
          */
-        auto projection_cone(const xt::xtensor<double, 1>& l);
+        xt::xtensor<double, 1> projection_cone(const xt::xtensor<double, 1>& l);
     };
 
     template <std::size_t dim>
-    auto projection<ViscousWithoutFriction<dim>>::projection_cone(const xt::xtensor<double, 1>& l)
+    xt::xtensor<double, 1> projection<ViscousWithoutFriction<dim>>::projection_cone(const xt::xtensor<double, 1>& l)
     {
         return xt::maximum( l, 0);
     }
