@@ -33,7 +33,7 @@ int main()
     std::size_t n = 10; // n^2 ellipses
     double g = 1.;
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction>, scopi::DryWithoutFriction, scopi::contact_brute_force, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction>, scopi::contact_brute_force, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-6;
     // params.optim_params.rho = 2.;
     // params.scopi_params.output_frequency = 2;

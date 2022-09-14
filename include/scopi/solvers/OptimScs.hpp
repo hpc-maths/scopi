@@ -62,7 +62,7 @@ namespace scopi
     template <class problem_t = DryWithoutFriction>
     class OptimScs: public OptimBase<OptimScs<problem_t>, problem_t>
     {
-    protected:
+    public:
         /**
          * @brief Alias for the problem.
          */

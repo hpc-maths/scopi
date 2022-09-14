@@ -128,11 +128,15 @@ namespace scopi
      * @tparam vap_t Type of a priori velocity.
      */
     template<class solver_t,
-             class problem_t,
              class contact_t,
              class vap_t>
     struct Params
     {
+        /**
+         * @brief Alias for problem type. 
+         */
+        using problem_t = typename solver_t::problem_type;
+
         /**
          * @brief Default constructor.
          */
@@ -142,7 +146,7 @@ namespace scopi
          *
          * @param params Parameters to be copied.
          */
-        Params(const Params<solver_t, problem_t, contact_t, vap_t>& params);
+        Params(const Params<solver_t, contact_t, vap_t>& params);
 
         /**
          * @brief Parameters for the optimization solver.
@@ -166,8 +170,8 @@ namespace scopi
         ScopiParams scopi_params;
     };
 
-    template<class solver_t, class problem_t, class contact_t, class vap_t> 
-    Params<solver_t, problem_t, contact_t, vap_t>::Params()
+    template<class solver_t, class contact_t, class vap_t> 
+    Params<solver_t, contact_t, vap_t>::Params()
     : optim_params()
     , problem_params()
     , contacts_params()
@@ -175,8 +179,8 @@ namespace scopi
     , scopi_params()
     {}
 
-    template<class solver_t, class problem_t, class contact_t, class vap_t>
-    Params<solver_t, problem_t, contact_t, vap_t>::Params(const Params<solver_t, problem_t, contact_t, vap_t>& params)
+    template<class solver_t, class contact_t, class vap_t>
+    Params<solver_t, contact_t, vap_t>::Params(const Params<solver_t, contact_t, vap_t>& params)
     : optim_params(params.optim_params)
     , problem_params(params.problem_params)
     , contacts_params(params.contacts_params)

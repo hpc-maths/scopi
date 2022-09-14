@@ -79,7 +79,7 @@ namespace scopi{
     template<class problem_t = DryWithoutFriction>
     class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
     {
-    protected:
+    public:
         /**
          * @brief Alias for the problem.
          */
