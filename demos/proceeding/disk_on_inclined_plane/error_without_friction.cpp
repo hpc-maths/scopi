@@ -47,7 +47,7 @@ int main()
         for (std::size_t n = 1; n < total_it[i]; ++n)
         {
             scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_dynrho_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt[i], params);
-            solver.solve(n, n-1);
+            solver.run(n, n-1);
 
             auto tmp = scopi::analytical_solution_sphere_plan(alpha, 0., dt[i]*n, radius, g, h);
 

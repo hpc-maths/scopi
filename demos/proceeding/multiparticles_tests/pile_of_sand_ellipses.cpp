@@ -83,7 +83,7 @@ int main()
     }
 
     scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
-    solver.solve(total_it);
+    solver.run(total_it);
 
     return 0;
 }

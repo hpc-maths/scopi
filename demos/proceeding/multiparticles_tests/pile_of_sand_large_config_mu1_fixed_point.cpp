@@ -72,7 +72,7 @@ int main()
     }
 
     scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
-    solver.solve(total_it);
+    solver.run(total_it);
 
     return 0;
 }
