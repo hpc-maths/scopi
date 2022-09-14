@@ -29,7 +29,7 @@ namespace scopi{
      * @tparam problem_t Problem to be solved.
      */
     template<class problem_t = DryWithoutFriction>
-    class uzawa: public projection<problem_t>
+    class pgd: public projection<problem_t>
     {
     protected:
         /**
@@ -41,7 +41,7 @@ namespace scopi{
          * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
-        uzawa(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
+        pgd(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
         /**
          * @brief Gradient descent algorithm.
          *
@@ -94,7 +94,7 @@ namespace scopi{
     };
 
     template<class problem_t>
-    uzawa<problem_t>::uzawa(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
+    pgd<problem_t>::pgd(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
     : projection<problem_t>()
     , m_max_iter(max_iter)
     , m_rho(rho)
@@ -104,9 +104,9 @@ namespace scopi{
     {}
 
     template<class problem_t>
-    std::size_t uzawa<problem_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
+    std::size_t pgd<problem_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
-        PLOG_INFO << "Projection: Uzawa";
+        PLOG_INFO << "Projection: PGD";
         std::size_t iter = 0;
         while (iter < m_max_iter)
         {
@@ -144,7 +144,7 @@ namespace scopi{
             }
             iter++;
         }
-        PLOG_ERROR << "Uzawa does not converge";
+        PLOG_ERROR << "PGD algorithm does not converge";
         return iter;
     }
 }

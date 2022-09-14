@@ -13,7 +13,7 @@
 
 namespace scopi{
     /**
-     * @brief Accelerated Projected Gradient Descent algorithm with Adaptive Step.
+     * @brief Accelerated Projected Gradient Descent algorithm with Adaptive Restart.
      *
      * See OptimProjectedGradient for the notations.
      * The algorithm is
@@ -21,19 +21,16 @@ namespace scopi{
      *  - \f$ \l^{\indexUzawa} = 0 \f$;
      *  - \f$ \y^{\indexUzawa} = 0 \f$;
      *  - \f$ \theta^{\indexUzawa} = 1 \f$.
-     *  - \f$ \rho^{\indexUzawa} \f$ given;
-     *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
      *  - While (\f$ \convergenceCriterion \f$)
      *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
      *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \y^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
-     *      - While (\f$ \frac{1}{2} \l^{\indexUzawa+1} \cdot \A \l^{\indexUzawa+1} + \e \cdot \l^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \e \cdot \y^{\indexUzawa+1} + \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
-     *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
-     *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
-     *          - \f$ \l^{\indexUzawa+1} = \max \left( \y^{\indexUzawa} - \rho^{\indexUzawa} \dg^{\indexUzawa}, 0 \right) \f$;
-     *
      *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
      *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
      *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
+     *      - If (\f$ \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) > 0 \f$ )
+     *          - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} \f$;
+     *          - \f$ \theta^{\indexUzawa+1} = 1 \f$;
+     *
      *      - \f$ \indexUzawa++ \f$.
      *
      * The projection depends on the problem.
@@ -41,7 +38,7 @@ namespace scopi{
      * @tparam problem_t Problem to be solved.
      */
     template<class problem_t = DryWithoutFriction>
-    class nesterov_dynrho: public projection<problem_t>
+    class apgd_ar: public projection<problem_t>
     {
     protected:
         /**
@@ -53,7 +50,7 @@ namespace scopi{
          * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
-        nesterov_dynrho(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
+        apgd_ar(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
         /**
          * @brief Gradient descent algorithm.
          *
@@ -70,10 +67,6 @@ namespace scopi{
          * @brief Maximal number of iterations.
          */
         std::size_t m_max_iter;
-        /**
-         * @brief Initial guess for the step for the gradient descent.
-         */
-        double m_rho_init;
         /**
          * @brief Step for the gradient descent.
          */
@@ -112,20 +105,15 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l_old;
         /**
-         * @brief Temporary vector used to compute \f$ \transpose{\l} \cdot \A \l \f$ and \f$ \transpose{\y} \cdot \A \y \f$.
-         */
-        xt::xtensor<double, 1> m_tmp;
-        /**
          * @brief Vector \f$ \l^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_lambda_prev;
     };
 
     template<class problem_t>
-    nesterov_dynrho<problem_t>::nesterov_dynrho(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
+    apgd_ar<problem_t>::apgd_ar(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
     : projection<problem_t>()
     , m_max_iter(max_iter)
-    , m_rho_init(rho)
     , m_rho(rho)
     , m_tol_dg(tol_dg)
     , m_tol_l(tol_l)
@@ -133,16 +121,13 @@ namespace scopi{
     {}
 
     template<class problem_t>
-    std::size_t nesterov_dynrho<problem_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
+    std::size_t apgd_ar<problem_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
-        PLOG_INFO << "Projection: Nesterov with adaptive step size";
+        PLOG_INFO << "Projection: APGD-AR";
         std::size_t iter = 0;
         double theta_old = 1.;
         m_y = l;
         m_l_old = l;
-        m_rho = m_rho_init;
-        double lipsch = 1./m_rho;
-        m_tmp.resize({l.size()});
         while (iter < m_max_iter)
         {
             xt::noalias(m_lambda_prev) = l;
@@ -152,36 +137,6 @@ namespace scopi{
             PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for dg = A*y+dg: " << m_status;
 
             xt::noalias(l) = this->projection_cone(m_y - m_rho * m_dg);
-
-            std::size_t cc = 0;
-            // lAl = l^T*A*l
-            double lAl;
-            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 0., m_tmp.data(), &lAl);
-            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for lAl = l^T*A*l: " << m_status;
-            double cl = xt::linalg::dot(c, l)(0);
-            // yAy = y^T*A*y
-            double yAy;
-            m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 0., m_tmp.data(), &yAy);
-            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for yAy = y^T*A*y: " << m_status;
-            double cy = xt::linalg::dot(c, m_y)(0);
-            double dgly = xt::linalg::dot(m_dg, l - m_y)(0);
-            double lyly = xt::linalg::dot(l - m_y, l - m_y)(0);
-
-            while ((0.5*lAl + cl > 0.5*yAy + cy + dgly + lipsch/2.*lyly) && (cc < 10))
-            {
-                lipsch *= 2.;
-                m_rho = 1./lipsch;
-                xt::noalias(l) = this->projection_cone(m_y - m_rho * m_dg);
-
-                cc++;
-                // lAl = l^T*A*l
-                m_status = mkl_sparse_d_dotmv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 0., m_tmp.data(), &lAl);
-                PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_dotmv for lAl = l^TA*l: " << m_status;
-                cl = xt::linalg::dot(c, l)(0);
-                dgly = xt::linalg::dot(m_dg, l - m_y)(0);
-                lyly = xt::linalg::dot(l - m_y, l - m_y)(0);
-            }
-
             double theta = 0.5*(theta_old*std::sqrt(4.+theta_old*theta_old) - theta_old*theta_old);
             double beta = theta_old*(1. - theta_old)/(theta_old*theta_old + theta);
             m_y = l + beta*(l - m_l_old);
@@ -204,16 +159,20 @@ namespace scopi{
                 PLOG_VERBOSE << constraint << "  " << cout + xt::linalg::dot(c, l)(0);
             }
 
-            if (diff_lambda < m_tol_l)
             // if (norm_dg < m_tol_dg || norm_l < m_tol_l || cmax > -m_tol_dg)
+            if (diff_lambda < m_tol_l)
             {
                 return iter+1;
             }
 
+            if (xt::linalg::dot(m_dg, l - m_l_old)(0) > 0.)
+            {
+                m_y = l;
+                theta = 1.;
+            }
+
             m_l_old = l;
             theta_old = theta;
-            lipsch *= 0.97; // 0.9 in the paper
-            m_rho = 1./lipsch;
             iter++;
         }
         PLOG_ERROR << "Uzawa does not converge";
