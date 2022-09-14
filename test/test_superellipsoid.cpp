@@ -403,6 +403,7 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("two ellispsoids symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 200;
@@ -426,6 +427,7 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("two ellispsoids spheres symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 50;
