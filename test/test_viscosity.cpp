@@ -61,6 +61,7 @@ namespace scopi {
 
         params_t params;
         set_params_test(params.optim_params);
+        params.scopi_params.output_frequency = total_it-1;
 
         SolverType solver(particles, dt, params);
         solver.run(total_it);
@@ -92,6 +93,7 @@ namespace scopi {
 
         params_t params;
         params.problem_params.mu = 0.1;
+        params.scopi_params.output_frequency = total_it-1;
         SolverType solver(particles, dt, params);
         solver.run(total_it);
         particles.f()(1)(1) *= -1.;
