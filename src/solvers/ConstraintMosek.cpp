@@ -46,7 +46,6 @@ namespace scopi
     void ConstraintMosek<DryWithFriction>::update_dual(std::size_t,
                                                        std::size_t  nb_contacts)
     {
-        // m_dual = m_qc1->dual();
         using namespace mosek::fusion;
         using namespace monty;
         m_dual = std::make_shared<monty::ndarray<double, 1>>(m_qc1->dual()->raw(), shape_t<1>(nb_contacts));
