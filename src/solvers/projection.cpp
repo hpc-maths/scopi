@@ -2,7 +2,7 @@
 
 namespace scopi
 {
-    auto projection<DryWithoutFriction>::projection_cone(const xt::xtensor<double, 1>& l)
+    xt::xtensor<double, 1> projection<DryWithoutFriction>::projection_cone(const xt::xtensor<double, 1>& l)
     {
         return xt::maximum( l, 0);
     }
