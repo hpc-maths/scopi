@@ -1,5 +1,6 @@
 #include "scopi/solvers/OptimProjectedGradient.hpp"
 
+#ifdef SCOPI_USE_MKL
 namespace scopi
 {
     void print_csr_matrix(const sparse_matrix_t A)
@@ -38,3 +39,4 @@ namespace scopi
         std::cout << "_____________________________________________________________________  \n" ;
     }
 }
+#endif

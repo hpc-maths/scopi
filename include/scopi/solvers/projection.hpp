@@ -1,6 +1,5 @@
 #pragma once
 
-#ifdef SCOPI_USE_MKL
 #include <mkl_spblas.h>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
@@ -67,4 +66,3 @@ namespace scopi{
         return xt::maximum( l, 0);
     }
 }
-#endif
