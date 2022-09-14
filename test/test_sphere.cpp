@@ -306,6 +306,7 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("two spheres asymetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -318,7 +319,10 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        SolverType solver(particles, dt);
+        params_t params;
+        params.scopi_params.output_frequency = total_it-1;
+
+        SolverType solver(particles, dt, params);
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance));
@@ -326,6 +330,7 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("two spheres symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -338,7 +343,10 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        SolverType solver(particles, dt);
+        params_t params;
+        params.scopi_params.output_frequency = total_it-1;
+
+        SolverType solver(particles, dt, params);
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance));
@@ -346,6 +354,7 @@ namespace scopi
 
     TEST_CASE_TEMPLATE("critical 2d spheres", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
     {
+        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .01;
         std::size_t total_it = 20;
@@ -379,7 +388,10 @@ namespace scopi
             }
         }
 
-        SolverType solver(particles, dt);
+        params_t params;
+        params.scopi_params.output_frequency = total_it-1;
+
+        SolverType solver(particles, dt, params);
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0019.json", "../test/references/2d_case_spheres.json", tolerance));

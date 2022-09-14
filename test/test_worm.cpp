@@ -454,6 +454,7 @@ namespace scopi
         params_t params;
         set_params_test(params.optim_params);
         params.contacts_params.dmax = 1.;
+        params.scopi_params.output_frequency = total_it-1;
         SolverType solver(particles, dt, params);
         solver.run(total_it);
 
