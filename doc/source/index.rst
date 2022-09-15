@@ -12,6 +12,7 @@ Welcome to scopi's documentation!
 
    api/sphere
    api/property
+   api/ProblemBase
 
 
 Indices and tables
