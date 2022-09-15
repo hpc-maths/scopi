@@ -21,11 +21,11 @@ int main()
 
     double width_box = 10.;
     std::size_t n = 12; // n^3 spheres
-    std::size_t total_it = 200;
+    std::size_t total_it = 2000;
     double g = 1.;
 
     double r = width_box/2./(n+1);
-    double dt = 0.2*r/(std::sqrt(2.*width_box*g));
+    double dt = 0.1*r/(std::sqrt(2.*width_box*g));
 
     scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
