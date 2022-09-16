@@ -22,12 +22,12 @@ namespace scopi{
      *  - \f$ \y^{\indexUzawa} = 0 \f$;
      *  - \f$ \theta^{\indexUzawa} = 1 \f$.
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \y^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
+     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
      *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
      *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
      *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
-     *      - If (\f$ \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) > 0 \f$ )
+     *      - If (\f$ \mathbf{dg}^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) > 0 \f$ )
      *          - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} \f$;
      *          - \f$ \theta^{\indexUzawa+1} = 1 \f$;
      *
@@ -46,7 +46,7 @@ namespace scopi{
          *
          * @param max_iter [in] Maximal number of iterations.
          * @param rho [in] Step for the gradient descent.
-         * @param tol_dg [in] Tolerance for \f$ \dg \f$ criterion.
+         * @param tol_dg [in] Tolerance for \f$ \mathbf{dg} \f$ criterion.
          * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
@@ -72,7 +72,7 @@ namespace scopi{
          */
         double m_rho;
         /**
-         * @brief Tolerance for \f$ \dg \f$ criterion (unused).
+         * @brief Tolerance for \f$ \mathbf{dg} \f$ criterion (unused).
          */
         double m_tol_dg;
         /**
@@ -89,7 +89,7 @@ namespace scopi{
          */
         sparse_status_t m_status;
         /**
-         * @brief Vector \f$ \dg^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{dg}^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_dg;
         /**

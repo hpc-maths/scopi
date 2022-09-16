@@ -42,7 +42,7 @@ namespace scopi{
         OptimParams(const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& params);
 
         /**
-         * @brief Tolerance for \f$ \dg \f$ criterion.
+         * @brief Tolerance for \f$ \mathbf{dg} \f$ criterion.
          *
          * Default value is \f$ 10^{-9} \f$.
          * \note \c tol_dg > 0

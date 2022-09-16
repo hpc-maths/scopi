@@ -20,8 +20,8 @@ namespace scopi{
      *  - \f$ \indexUzawa = 0 \f$;
      *  - \f$ \l^{\indexUzawa} = 0 \f$;
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \dg^{\indexUzawa} = \A \l^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \l^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
+     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \l^{\indexUzawa} + \e \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \max \left (\l^{\indexUzawa} - \rho \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
      *      - \f$ \indexUzawa++ \f$.
      *
      * The projection depends on the problem.
@@ -37,7 +37,7 @@ namespace scopi{
          *
          * @param max_iter [in] Maximal number of iterations.
          * @param rho [in] Step for the gradient descent.
-         * @param tol_dg [in] Tolerance for \f$ \dg \f$ criterion.
+         * @param tol_dg [in] Tolerance for \f$ \mathbf{dg} \f$ criterion.
          * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
@@ -63,7 +63,7 @@ namespace scopi{
          */
         double m_rho;
         /**
-         * @brief Tolerance for \f$ \dg \f$ criterion (unused).
+         * @brief Tolerance for \f$ \mathbf{dg} \f$ criterion (unused).
          */
         double m_tol_dg;
         /**
@@ -80,7 +80,7 @@ namespace scopi{
          */
         sparse_status_t m_status;
         /**
-         * @brief Vector \f$ \dg^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{dg}^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_dg;
         /**
