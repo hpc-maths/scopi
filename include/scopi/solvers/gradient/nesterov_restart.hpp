@@ -18,16 +18,16 @@ namespace scopi{
      * The algorithm is
      *  - \f$ \indexUzawa = 0 \f$;
      *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
-     *  - \f$ \y^{\indexUzawa} = 0 \f$;
+     *  - \f$ \mathbf{y}^{\indexUzawa} = 0 \f$;
      *  - \f$ \theta^{\indexUzawa} = 1 \f$.
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \y^{\indexUzawa} + \mathbf{e} \f$;
-     *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
+     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \mathbf{y}^{\indexUzawa} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\mathbf{y}^{\indexUzawa} - \rho \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
      *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
      *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
-     *      - \f$ \y^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) \f$;
+     *      - \f$ \mathbf{y}^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) \f$;
      *      - If (\f$ \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) > 0 \f$ )
-     *          - \f$ \y^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} \f$;
+     *          - \f$ \mathbf{y}^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} \f$;
      *          - \f$ \theta^{\indexUzawa+1} = 1 \f$;
      *
      *      - \f$ \indexUzawa++ \f$.
@@ -94,7 +94,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_uu;
         /**
-         * @brief Vector \f$ \y^{\indexUzawa+1} \f$.
+         * @brief Vector \f$ \mathbf{y}^{\indexUzawa+1} \f$.
          */
         xt::xtensor<double, 1> m_y;
         /**

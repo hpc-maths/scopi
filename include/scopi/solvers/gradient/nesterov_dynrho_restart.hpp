@@ -18,23 +18,23 @@ namespace scopi{
      * The algorithm is
      *  - \f$ \indexUzawa = 0 \f$;
      *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
-     *  - \f$ \y^{\indexUzawa} = 0 \f$;
+     *  - \f$ \mathbf{y}^{\indexUzawa} = 0 \f$;
      *  - \f$ \theta^{\indexUzawa} = 1 \f$.
      *  - \f$ \rho^{\indexUzawa} \f$ given;
      *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \y^{\indexUzawa} + \mathbf{e} \f$;
-     *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
-     *      - While (\f$ \frac{1}{2} \mathbf{l}^{\indexUzawa+1} \cdot \A \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{l}^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \mathbf{e} \cdot \y^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
+     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \mathbf{y}^{\indexUzawa} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\mathbf{y}^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
+     *      - While (\f$ \frac{1}{2} \mathbf{l}^{\indexUzawa+1} \cdot \A \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{l}^{\indexUzawa+1} > \frac{1}{2} \mathbf{y}^{\indexUzawa+1} \cdot \A \mathbf{y}{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{y}^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) \f$)
      *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
      *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
-     *          - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left( \y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
+     *          - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left( \mathbf{y}^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
      *
      *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
      *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
-     *      - \f$ \y^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) \f$;
+     *      - \f$ \mathbf{y}^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) \f$;
      *      - If (\f$ \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) > 0 \f$ )
-     *          - \f$ \y^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} \f$;
+     *          - \f$ \mathbf{y}^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} \f$;
      *          - \f$ \theta^{\indexUzawa+1} = 1 \f$;
      *
      *      - \f$ \indexUzawa++ \f$.
@@ -105,7 +105,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_uu;
         /**
-         * @brief Vector \f$ \y^{\indexUzawa+1} \f$.
+         * @brief Vector \f$ \mathbf{y}^{\indexUzawa+1} \f$.
          */
         xt::xtensor<double, 1> m_y;
         /**
@@ -113,7 +113,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l_old;
         /**
-         * @brief Temporary vector used to compute \f$ \mathbf{l}^T \cdot \A \mathbf{l} \f$ and \f$ \y^T \cdot \A \y \f$.
+         * @brief Temporary vector used to compute \f$ \mathbf{l}^T \cdot \A \mathbf{l} \f$ and \f$ \mathbf{y}^T \cdot \A \mathbf{y} \f$.
          */
         xt::xtensor<double, 1> m_tmp;
         /**
