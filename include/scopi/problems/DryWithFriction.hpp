@@ -90,6 +90,7 @@ namespace scopi
     class DryWithFriction;
 
     /**
+     * @class ProblemParams<DryWithFriction>
      * @brief Parameters for \c DryWithFriction
      *
      * Specialization of ProblemParams in params.hpp
@@ -118,19 +119,20 @@ namespace scopi
     };
 
     /**
+     * @class DryWithFriction
      * @brief Problem that models contacts with friction and without viscosity.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * The constraint is 
      * \f[
      *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}||
      * \f]
-     * for all contacts \f$ (ij) \f$.
+     * for all contacts \f$ ij \f$.
      * \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
      *
      * Only one matrix is built.
-     * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ T \f$.
-     * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ T \f$.
+     * It contains both matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
+     * A contact \f$ ij \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ \mathbb{T} \f$.
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      *
      */

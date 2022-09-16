@@ -20,6 +20,7 @@ namespace scopi
     class ViscousWithFriction;
 
     /**
+     * @class ProblemParams<ViscousWithFriction>
      * @brief Parameters for ViscousWithFriction<dim>.
      *
      * Specialization of ProblemParams in params.hpp
@@ -64,6 +65,7 @@ namespace scopi
     };
 
     /**
+     * @class ViscousWithFriction
      * @brief Problem that models contacts without friction and with viscosity.
      *
      * See ProblemBase.hpp for the notations.

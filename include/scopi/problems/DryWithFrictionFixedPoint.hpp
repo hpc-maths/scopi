@@ -21,9 +21,10 @@ namespace scopi
     class DryWithFrictionFixedPoint;
 
     /**
-     * @brief Parameters for \c DryWithoutFriction.
+     * @class ProblemParams<DryWithFrictionFixedPoint>
+     * @brief Parameters for \c DryWithFrictionFixedPoint.
      *
-     * Specialization of ProblemParams in params.hpp.
+     * Specialization of ProblemParams.
      */
     template<>
     struct ProblemParams<DryWithFrictionFixedPoint>
@@ -63,14 +64,15 @@ namespace scopi
     };
 
     /**
+     * @class DryWithFrictionFixedPoint
      * @brief Problem that models contacts with friction and without viscosity. A fixed point algorithm is used to ensure \f$ D = 0 \f$.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * The constraint is 
      * \f[ 
      *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge \left( ||\mathbb{T} \mathbf{u}_{ij}|| - \mu \Delta t \mathbf{s}_{ij} \right),
      * \f]
-     * for all contacts \f$ (ij) \f$, with \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$.
+     * for all contacts \f$ ij \f$, with \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$.
      * If \f$ \mathbf{u}^{\mathbf{s}} \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
@@ -89,8 +91,8 @@ namespace scopi
      *   - \f$ k ++ \f$.
      * 
      * Only one matrix is built.
-     * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
-     * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ \mathbb{T} \f$.
+     * It contains both matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
+     * A contact \f$ ij \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ \mathbb{T} \f$.
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      */
     class DryWithFrictionFixedPoint : protected ProblemBase
@@ -108,7 +110,7 @@ namespace scopi
         /**
          * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
          *
-         * \todo It should be the same function as in DryWithFriction.hpp
+         * \todo It should be the same function as in DryWithFriction
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
