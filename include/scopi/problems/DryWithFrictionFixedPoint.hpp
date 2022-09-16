@@ -82,11 +82,11 @@ namespace scopi
      *
      * This leads to the following algorithm:
      * - \f$ \sWithIndex{0} \f$;
-     * - \f$ \indexFixedPoint = 0 \f$;
-     * - While \f$ \frac{||\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}||}{||\sWithIndex{\indexFixedPoint}|| + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
-     *   - Compute \f$ \usWithIndex{\indexFixedPoint} \f$ as the solution of the optimization problem under the constraint written above;
-     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{ij} = ||\mathbb{T} \usWithIndex{\indexFixedPoint}_{ij}|| \f$ for all contacts \f$ ij \f$;
-     *   - \f$ \indexFixedPoint ++ \f$.
+     * - \f$ k = 0 \f$;
+     * - While \f$ \frac{||\sWithIndex{k-1} - \sWithIndex{k}||}{||\sWithIndex{k}|| + 1} > \f$ \c tol_fixed_point and \f$ k < \f$ \c max_iter_fixed_point
+     *   - Compute \f$ \usWithIndex{k} \f$ as the solution of the optimization problem under the constraint written above;
+     *   - \f$ \sWithIndex{k+1}_{ij} = ||\mathbb{T} \usWithIndex{k}_{ij}|| \f$ for all contacts \f$ ij \f$;
+     *   - \f$ k ++ \f$.
      * 
      * Only one matrix is built.
      * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
@@ -158,7 +158,7 @@ namespace scopi
         template<std::size_t dim>
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
         /**
-         * @brief Compute \f$ \sWithIndex{\indexFixedPoint+1} \f$.
+         * @brief Compute \f$ \sWithIndex{k+1} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
@@ -182,15 +182,15 @@ namespace scopi
          */
         ProblemParams<DryWithFrictionFixedPoint> m_params;
         /**
-         * @brief \f$ \sWithIndex{\indexFixedPoint+1} \f$.
+         * @brief \f$ \sWithIndex{k+1} \f$.
          */
         xt::xtensor<double, 1> m_s;
         /**
-         * @brief \f$ \sWithIndex{\indexFixedPoint} \f$.
+         * @brief \f$ \sWithIndex{k} \f$.
          */
         xt::xtensor<double, 1> m_s_old;
         /**
-         * @brief Number of iterations in the fixed point algorithm (\f$ \indexFixedPoint \f$).
+         * @brief Number of iterations in the fixed point algorithm (\f$ k \f$).
          */
         std::size_t m_nb_iter;
     };
