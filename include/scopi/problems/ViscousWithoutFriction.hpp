@@ -60,12 +60,12 @@ namespace scopi
      * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, and \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$.
      * We impose that the distance between all the particles should be non-negative.
      * We also consider the variable \f$ \g \f$, such that we impose
-     * - \f$ D_{\ij} > 0 \f$ if \f$ \g_{\ij} = 0 \f$;
-     * - \f$ D_{\ij} = 0 \f$ if \f$ \g_{\ij} < 0 \f$.
+     * - \f$ D_{ij} > 0 \f$ if \f$ \g_{ij} = 0 \f$;
+     * - \f$ D_{ij} = 0 \f$ if \f$ \g_{ij} < 0 \f$.
      *
-     * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
-     * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\mathrm{d} \g_{\ij}}{\mathrm{d} t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
+     * For each contact \f$ ij \f$, \f$ \g_{ij} \f$ verifies
+     * - \f$ \g_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
+     * - \f$ \frac{\mathrm{d} \g_{ij}}{\mathrm{d} t} = - \left( \lm_{ij}^+ - \lm_{ij}^- \right) \f$ else. 
      *
      * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
      * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
@@ -160,7 +160,7 @@ namespace scopi
                                           std::size_t row);
 
         /**
-         * @brief Set \f$ \g_{\ij}^n \f$ from the previous time step and compute the number of contacts with \f$ \g_{\ij} < 0 \f$.
+         * @brief Set \f$ \g_{ij}^n \f$ from the previous time step and compute the number of contacts with \f$ \g_{ij} < 0 \f$.
          *
          * Look if particles \c i and \c j were already in contact.
          *
@@ -171,7 +171,7 @@ namespace scopi
          * @brief Compute the value of \f$ \g^{n+1} \f$.
          *
          * \f[
-         *      \g^{n+1}_{\ij} = \max \left( \gm, \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \right).
+         *      \g^{n+1}_{ij} = \max \left( \gm, \g^n_{ij} - \Delta t \left( \lm_{ij}^+ - \lm_{ij}^- \right) \right).
          * \f]
          *
          * @param contacts [in] Array of contacts.
