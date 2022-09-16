@@ -28,8 +28,8 @@ namespace scopi{
          *
          * @param nparts [in] Number of particles.
          * @param dt [in] Time step.
-         * @param cSize [in] Size of the vector \f$ \c \f$ (depends on the problem).
-         * @param c_dec [in] For some solvers (mostly OptimMosek), the vector \f$ \c \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
+         * @param cSize [in] Size of the vector \f$ \mathbf{c} \f$ (depends on the problem).
+         * @param c_dec [in] For some solvers (mostly OptimMosek), the vector \f$ \mathbf{c} \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
          * @param optim_params [in] Parameters for the optimization solver.
          * @param problem_params [in] Parameters for the problem.
          */
@@ -103,15 +103,15 @@ namespace scopi{
          */
         std::size_t m_nparts;
         /**
-         * @brief Vector \f$ \c \f$.
+         * @brief Vector \f$ \mathbf{c} \f$.
          */
         xt::xtensor<double, 1> m_c;
 
     private:
         /**
-         * @brief Build the vector \f$ \c \f$.
+         * @brief Build the vector \f$ \mathbf{c} \f$.
          *
-         * \f$ \c = \mathbb{P} \mathbf{v}^d \f$, where \f$ \mathbf{v}^d \f$ is the a priori velocity (see ProblemBase for the notations).
+         * \f$ \mathbf{c} = \mathbb{P} \mathbf{v}^d \f$, where \f$ \mathbf{v}^d \f$ is the a priori velocity (see ProblemBase for the notations).
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for a priori velocities, masses, and moments of inertia).
@@ -138,7 +138,7 @@ namespace scopi{
         int get_nb_active_contacts() const;
 
         /**
-         * @brief For some solvers (mostly OptimMosek), the vector \f$ \c \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
+         * @brief For some solvers (mostly OptimMosek), the vector \f$ \mathbf{c} \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
          */
         std::size_t m_c_dec;
     };

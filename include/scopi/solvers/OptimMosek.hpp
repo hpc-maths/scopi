@@ -52,9 +52,9 @@ namespace scopi{
      * @brief Solve optimization problem using Mosek.
      *
      * See ProblemBase.hpp for the notations.
-     * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \c \f$, 
+     * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$, 
      * minimize \f$ \uMosek \cdot \cMosek \f$, with
-     * \f$ \uMosek = (\sMosek, \mathbf{u}, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
+     * \f$ \uMosek = (\sMosek, \mathbf{u}, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \mathbf{c}, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
      * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \uMosek \le \mathbf{d} \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
      * \f[

@@ -67,7 +67,7 @@ namespace scopi{
      *  - \f$ \l^{\indexUzawa} = 0 \f$;
      *  - \f$ cmax = - \infty \f$;
      *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
-     *      - \f$ \mathbf{u}^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \c - B^T \l^{\indexUzawa} \right) \f$;
+     *      - \f$ \mathbf{u}^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \mathbf{c} - B^T \l^{\indexUzawa} \right) \f$;
      *      - \f$ \r^{\indexUzawa+1} = \mathbb{B} \mathbf{u}^{\indexUzawa+1} - \mathbf{d} \f$;
      *      - \f$ \l^{\indexUzawa+1}_{ij} = \max \left( \l_{ij}^{\indexUzawa} - \rho \r_{ij}^{\indexUzawa+1}, 0 \right) \f$;
      *      - \f$ cmax = \min_{ij} \left( \r_{ij}^{\indexUzawa+1} \right) \f$;
