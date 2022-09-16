@@ -76,7 +76,7 @@ namespace scopi
      *
      * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
      * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\diff \g_{\ij}}{\diff t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
+     * - \f$ \frac{\mathrm{d} \g_{\ij}}{\mathrm{d} t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
      *
      * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
      * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
