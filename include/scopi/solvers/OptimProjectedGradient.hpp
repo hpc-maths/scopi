@@ -170,7 +170,7 @@ namespace scopi{
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         auto lagrange_multiplier_data();
         /**
@@ -178,7 +178,7 @@ namespace scopi{
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* constraint_data();
         /**

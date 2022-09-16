@@ -88,7 +88,7 @@ namespace scopi{
          * @param contacts [in] Array of contacts.
          * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
-         * @return \f$ \Nc \f$ array.
+         * @return \f$ N_c \f$ array.
          */
         template<std::size_t dim>
         auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);

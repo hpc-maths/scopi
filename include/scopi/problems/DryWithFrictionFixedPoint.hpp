@@ -70,15 +70,15 @@ namespace scopi
      * \f[ 
      *      \d_{\ij} + \B \u_{\ij} \ge \left( ||\T \u_{\ij}|| - \mu \Delta t \s_{\ij} \right),
      * \f]
-     * for all contacts \f$ (\ij) \f$, with \f$ \s \in \mathbb{R}^{\Nc} \f$.
+     * for all contacts \f$ (\ij) \f$, with \f$ \s \in \mathbb{R}^{N_c} \f$.
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
-     *          \F : & \mathbb{R}^{\Nc} \to \mathbb{R}^{\Nc} \\
+     *          \F : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
      *               & \s_{\ij} \mapsto ||\T \us_{\ij}||,
      *      \end{aligned}
      * \f]
-     * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \mathbb{R}^{\Nc} \f$ such that \f$ \F(\s) = \s \f$.
+     * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \mathbb{R}^{N_c} \f$ such that \f$ \F(\s) = \s \f$.
      *
      * This leads to the following algorithm:
      * - \f$ \sWithIndex{0} \f$;
@@ -91,7 +91,7 @@ namespace scopi
      * Only one matrix is built.
      * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
      * A contact \f$ (\ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
-     * Therefore, the matrix is in \f$ \mathbb{R}^{4\Nc \times 6N} \f$ and \f$ \d \in \mathbb{R}^{4\Nc} \f$.
+     * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \d \in \mathbb{R}^{4N_c} \f$.
      */
     class DryWithFrictionFixedPoint : protected DryWithFrictionBase
     {
@@ -108,7 +108,7 @@ namespace scopi
         /**
          * @brief Create vector \f$ \d \f$.
          *
-         * \f$ \d \in \mathbb{R}^{4\Nc} \f$ can be seen as a block vector, each block has the form
+         * \f$ \d \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
          * \f$ (d_{\ij} + \mu \Delta t \s_{\ij}, 0, 0, 0) \f$,
          * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
          *

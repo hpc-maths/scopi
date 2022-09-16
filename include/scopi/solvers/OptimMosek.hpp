@@ -59,15 +59,15 @@ namespace scopi{
      * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \BMosek \uMosek \le \d \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6\N} \f$, with 
      * \f[
      *      \begin{aligned}
-     *          \BMosek &= \left. (\underbrace{0}_{1} | \underbrace{\B}_{6\N} | \underbrace{0}_{6\N}) \right\} \Nc,\\
+     *          \BMosek &= \left. (\underbrace{0}_{1} | \underbrace{\B}_{6\N} | \underbrace{0}_{6\N}) \right\} N_c,\\
      *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6\N} | \underbrace{-\mathbb{Id}}_{6\N}) \right\} 6\N.
      *      \end{aligned}
      * \f]
      * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
-     * Here, \f$ \Nc \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
+     * Here, \f$ N_c \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
      * \f$ \mathbb{Id} \f$ is the identity matrix.
      *
-     * With friction, the constraint is written as \f$ \d \B \u \in \left( Q^4 \right)^{\Nc} \f$,
+     * With friction, the constraint is written as \f$ \d \B \u \in \left( Q^4 \right)^{N_c} \f$,
      * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
      * Each component of \f$ \B \u \f$ is seen as \f$ (\d_{\ij} + \B \u_{\ij}, \T \u_{\ij}^1, \T \u_{\ij}^2, \T \u_{\ij}^3 ) \f$.
      * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{\ij} = ||\T \u_{\ij} \f$, but this resulted in poor performances.
@@ -146,7 +146,7 @@ namespace scopi{
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* constraint_data();
         /**
@@ -154,7 +154,7 @@ namespace scopi{
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* lagrange_multiplier_data();
         /**
