@@ -17,22 +17,22 @@ namespace scopi{
      * See OptimProjectedGradient for the notations.
      * The algorithm is
      *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \l^{\indexUzawa} = 0 \f$;
+     *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
      *  - \f$ \y^{\indexUzawa} = 0 \f$;
      *  - \f$ \theta^{\indexUzawa} = 1 \f$.
      *  - \f$ \rho^{\indexUzawa} \f$ given;
      *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
      *  - While (\f$ \convergenceCriterion \f$)
      *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
-     *      - While (\f$ \frac{1}{2} \l^{\indexUzawa+1} \cdot \A \l^{\indexUzawa+1} + \e \cdot \l^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \e \cdot \y^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
+     *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
+     *      - While (\f$ \frac{1}{2} \mathbf{l}^{\indexUzawa+1} \cdot \A \mathbf{l}^{\indexUzawa+1} + \e \cdot \mathbf{l}^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \e \cdot \y^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
      *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
      *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
-     *          - \f$ \l^{\indexUzawa+1} = \max \left( \y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
+     *          - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left( \y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
      *
      *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
      *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
-     *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
+     *      - \f$ \y^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) \f$;
      *      - \f$ \indexUzawa++ \f$.
      *
      * @tparam projection_t Projection on admissible velocities.
@@ -47,7 +47,7 @@ namespace scopi{
          * @param max_iter [in] Maximal number of iterations.
          * @param rho [in] Step for the gradient descent.
          * @param tol_dg [in] Tolerance for \f$ \mathbf{dg} \f$ criterion.
-         * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
+         * @param tol_l [in] Tolerance for \f$ \mathbf{l} \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
         nesterov_dynrho(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
@@ -57,7 +57,7 @@ namespace scopi{
          * @param A [in] Matrix \f$ \A \f$.
          * @param descr [in] Structure specifying \f$ \A \f$ properties. 
          * @param c [in] Vector \f$ \e \f$.
-         * @param l [out] vector \f$ \l \f$.
+         * @param l [out] vector \f$ \mathbf{l} \f$.
          *
          * @return Number of iterations the algorithm needed to converge.
          */
@@ -80,7 +80,7 @@ namespace scopi{
          */
         double m_tol_dg;
         /**
-         * @brief Tolerance for \f$ \l \f$ criterion.
+         * @brief Tolerance for \f$ \mathbf{l} \f$ criterion.
          */
         double m_tol_l;
         /**
@@ -97,7 +97,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \A \l^{\indexUzawa+1} + \e \f$.
+         * @brief Vector \f$ \A \mathbf{l}^{\indexUzawa+1} + \e \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**
@@ -105,15 +105,15 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_y;
         /**
-         * @brief Vector \f$ \l^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{l}^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
         /**
-         * @brief Temporary vector used to compute \f$ \l^T \cdot \A \l \f$ and \f$ \y^T \cdot \A \y \f$.
+         * @brief Temporary vector used to compute \f$ \mathbf{l}^T \cdot \A \mathbf{l} \f$ and \f$ \y^T \cdot \A \y \f$.
          */
         xt::xtensor<double, 1> m_tmp;
         /**
-         * @brief Vector \f$ \l^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{l}^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_lambda_prev;
     };
