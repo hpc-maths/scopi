@@ -20,7 +20,7 @@ namespace scopi{
      *  - \f$ \indexUzawa = 0 \f$;
      *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \mathbf{l}^{\indexUzawa} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{dg}^{\indexUzawa} = \mathbb{A} \mathbf{l}^{\indexUzawa} + \mathbf{e} \f$;
      *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\mathbf{l}^{\indexUzawa} - \rho \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
      *      - \f$ \indexUzawa++ \f$.
      *
@@ -45,8 +45,8 @@ namespace scopi{
         /**
          * @brief Gradient descent algorithm.
          *
-         * @param A [in] Matrix \f$ \A \f$.
-         * @param descr [in] Structure specifying \f$ \A \f$ properties. 
+         * @param A [in] Matrix \f$ \mathbb{A} \f$.
+         * @param descr [in] Structure specifying \f$ \mathbb{A} \f$ properties. 
          * @param c [in] Vector \f$ \mathbf{e} \f$.
          * @param l [out] vector \f$ \mathbf{l} \f$.
          *
@@ -84,7 +84,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \A \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \f$.
+         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**

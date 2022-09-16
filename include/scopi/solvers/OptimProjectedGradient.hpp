@@ -88,8 +88,8 @@ namespace scopi{
      *
      * See ProblemBase for the notations.
      * The implemented algorithm is:
-     *  - \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
-     *  - \f$ \mathbf{l} = \text{ gradient algorithm } \left( \A, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
+     *  - \f$ \mathbb{A} = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
+     *  - \f$ \mathbf{l} = \text{ gradient algorithm } \left( \mathbb{A}, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
      *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \mathbf{c} - \mathbb{B}^T \mathbf{l} \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
@@ -118,7 +118,7 @@ namespace scopi{
         /**
          * @brief Constructor.
          *
-         * Build the matrix \f$ \A \f$.
+         * Build the matrix \f$ \mathbb{A} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -228,7 +228,7 @@ namespace scopi{
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Build matrix \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$.
+         * @brief Build matrix \f$ \mathbb{A} = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$.
          */
         void create_matrix_A();
 
@@ -250,11 +250,11 @@ namespace scopi{
         xt::xtensor<double, 1> m_bl;
 
         /**
-         * @brief Matrix \f$ \A \f$.
+         * @brief Matrix \f$ \mathbb{A} \f$.
          */
         sparse_matrix_t m_A;
         /**
-         * @brief Structure specifying \f$ \A \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{A} \f$ properties. 
          */
         struct matrix_descr m_descrA;
         /**
