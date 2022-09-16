@@ -17,12 +17,12 @@ namespace scopi{
      *
      * See OptimProjectedGradient for the notations.
      * The algorithm is
-     *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
+     *  - \f$ k = 0 \f$;
+     *  - \f$ \mathbf{l}^{k} = 0 \f$;
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \mathbf{dg}^{\indexUzawa} = \mathbb{A} \mathbf{l}^{\indexUzawa} + \mathbf{e} \f$;
-     *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\mathbf{l}^{\indexUzawa} - \rho \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
-     *      - \f$ \indexUzawa++ \f$.
+     *      - \f$ \mathbf{dg}^{k} = \mathbb{A} \mathbf{l}^{k} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{l}^{k+1} = \max \left (\mathbf{l}^{k} - \rho \mathbf{dg}^{k}, 0 \right) \f$;
+     *      - \f$ k++ \f$.
      *
      * The projection depends on the problem.
      *
@@ -80,15 +80,15 @@ namespace scopi{
          */
         sparse_status_t m_status;
         /**
-         * @brief Vector \f$ \mathbf{dg}^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{dg}^{k} \f$.
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \f$.
+         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{k+1} + \mathbf{e} \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**
-         * @brief Vector \f$ \mathbf{l}^{\indexUzawa-1} \f$.
+         * @brief Vector \f$ \mathbf{l}^{k-1} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
     };

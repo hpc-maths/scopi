@@ -17,21 +17,21 @@ namespace scopi{
      *
      * See OptimProjectedGradient for the notations.
      * The algorithm is
-     *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
-     *  - \f$ \mathbf{y}^{\indexUzawa} = 0 \f$;
-     *  - \f$ \theta^{\indexUzawa} = 1 \f$.
+     *  - \f$ k = 0 \f$;
+     *  - \f$ \mathbf{l}^{k} = 0 \f$;
+     *  - \f$ \mathbf{y}^{k} = 0 \f$;
+     *  - \f$ \theta^{k} = 1 \f$.
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \mathbf{dg}^{\indexUzawa} = \mathbb{A} \mathbf{y}^{\indexUzawa} + \mathbf{e} \f$;
-     *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\mathbf{y}^{\indexUzawa} - \rho \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
-     *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
-     *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
-     *      - \f$ \mathbf{y}^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) \f$;
-     *      - If (\f$ \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{l}^{\indexUzawa} \right) > 0 \f$ )
-     *          - \f$ \mathbf{y}^{\indexUzawa+1} = \mathbf{l}^{\indexUzawa+1} \f$;
-     *          - \f$ \theta^{\indexUzawa+1} = 1 \f$;
+     *      - \f$ \mathbf{dg}^{k} = \mathbb{A} \mathbf{y}^{k} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{l}^{k+1} = \max \left (\mathbf{y}^{k} - \rho \mathbf{dg}^{k}, 0 \right) \f$;
+     *      - \f$ \theta^{k+1} = \frac{1}{2} \theta^{k} \sqrt{4 + \left( \theta^{k} \right)^2} - \left( \theta^{k} \right)^2 \f$;
+     *      - \f$ \beta^{k+1} = \theta^{k} \frac{1 - \theta^{k}}{\left( \theta^{k} \right)^2 + \theta^{k+1}} \f$;
+     *      - \f$ \mathbf{y}^{k+1} = \mathbf{l}^{k+1} + \beta^{k+1} \left( \mathbf{l}^{k+1} - \mathbf{l}^{k} \right) \f$;
+     *      - If (\f$ \mathbf{dg}^{k} \cdot \left( \mathbf{l}^{k+1} - \mathbf{l}^{k} \right) > 0 \f$ )
+     *          - \f$ \mathbf{y}^{k+1} = \mathbf{l}^{k+1} \f$;
+     *          - \f$ \theta^{k+1} = 1 \f$;
      *
-     *      - \f$ \indexUzawa++ \f$.
+     *      - \f$ k++ \f$.
      *
      * The projection depends on the problem.
      *
@@ -89,23 +89,23 @@ namespace scopi{
          */
         sparse_status_t m_status;
         /**
-         * @brief Vector \f$ \mathbf{dg}^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{dg}^{k} \f$.
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \f$.
+         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{k+1} + \mathbf{e} \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**
-         * @brief Vector \f$ \mathbf{y}^{\indexUzawa+1} \f$.
+         * @brief Vector \f$ \mathbf{y}^{k+1} \f$.
          */
         xt::xtensor<double, 1> m_y;
         /**
-         * @brief Vector \f$ \mathbf{l}^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{l}^{k} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
         /**
-         * @brief Vector \f$ \mathbf{l}^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{l}^{k} \f$.
          */
         xt::xtensor<double, 1> m_lambda_prev;
     };

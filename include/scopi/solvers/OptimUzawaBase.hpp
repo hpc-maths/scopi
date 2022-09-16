@@ -63,15 +63,15 @@ namespace scopi{
      * Several methods are implemented.
      *
      * The algorithm is:
-     *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
+     *  - \f$ k = 0 \f$;
+     *  - \f$ \mathbf{l}^{k} = 0 \f$;
      *  - \f$ cmax = - \infty \f$;
-     *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
-     *      - \f$ \mathbf{u}^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \mathbf{c} - B^T \mathbf{l}^{\indexUzawa} \right) \f$;
-     *      - \f$ \mathbf{r}^{\indexUzawa+1} = \mathbb{B} \mathbf{u}^{\indexUzawa+1} - \mathbf{d} \f$;
-     *      - \f$ \mathbf{l}^{\indexUzawa+1}_{ij} = \max \left( \mathbf{l}_{ij}^{\indexUzawa} - \rho \mathbf{r}_{ij}^{\indexUzawa+1}, 0 \right) \f$;
-     *      - \f$ cmax = \min_{ij} \left( \mathbf{r}_{ij}^{\indexUzawa+1} \right) \f$;
-     *      - \f$ \indexUzawa++\f$.
+     *  - While (\f$ cmax < tol \f$ and \f$ k < max\_iter \f$)
+     *      - \f$ \mathbf{u}^{k+1} = \mathbb{P}^{-1} \left( \mathbf{c} - B^T \mathbf{l}^{k} \right) \f$;
+     *      - \f$ \mathbf{r}^{k+1} = \mathbb{B} \mathbf{u}^{k+1} - \mathbf{d} \f$;
+     *      - \f$ \mathbf{l}^{k+1}_{ij} = \max \left( \mathbf{l}_{ij}^{k} - \rho \mathbf{r}_{ij}^{k+1}, 0 \right) \f$;
+     *      - \f$ cmax = \min_{ij} \left( \mathbf{r}_{ij}^{k+1} \right) \f$;
+     *      - \f$ k++\f$.
      *
      * @tparam Derived Class that implements matrix-vector products.
      * @tparam problem_t Problem to be solved.
