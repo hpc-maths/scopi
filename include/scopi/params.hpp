@@ -8,6 +8,7 @@
 namespace scopi
 {
     /**
+     * @class OptimParams
      * @brief Parameters for the optimization solver.
      *
      * To be specialized.
@@ -25,6 +26,7 @@ namespace scopi
     };
 
     /**
+     * @class ProblemParams
      * @brief Parameters for the problem.
      *
      * To be specialized.
@@ -42,6 +44,7 @@ namespace scopi
     };
 
     /**
+     * @class ContactsParams
      * @brief Parameters for the contacts.
      *
      * To be specialized.
@@ -59,6 +62,7 @@ namespace scopi
     };
 
     /**
+     * @class VapParams
      * @brief Parameters for the a priori velocity.
      *
      * To be specialized.
@@ -76,6 +80,7 @@ namespace scopi
     };
 
     /**
+     * @class ScopiParams
      * @brief Parameters for the main solver.
      */
     struct ScopiParams
@@ -120,6 +125,7 @@ namespace scopi
     //          class contact_t = contact_kdtree,
     //          class vap_t = vap_fixed>
     /**
+     * @class Params
      * @brief Global struct for the parameters.
      *
      * @tparam solver_t Type of the optimization solver.

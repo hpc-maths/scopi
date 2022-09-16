@@ -10,9 +10,14 @@ Welcome to scopi's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   api/property
+   api/params
+
    api/objects/types/sphere
    api/objects/types/plan
-   api/property
+
+   api/problems/ProblemBase
+   api/problems/DryWithoutFriction
 
 
 Indices and tables
