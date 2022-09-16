@@ -54,9 +54,9 @@ namespace scopi{
      * See ProblemBase.hpp for the notations.
      * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$, 
      * minimize \f$ \tilde{\mathbf{u}} \cdot \tilde{\mathbf{c}} \f$, with
-     * \f$ \tilde{\mathbf{u}} = (\sMosek, \mathbf{u}, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
+     * \f$ \tilde{\mathbf{u}} = (\sMosek, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
+     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, \sMosek, \mathbf{z}) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
