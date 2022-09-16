@@ -68,17 +68,17 @@ namespace scopi
      *
      * See ProblemBase.hpp for the notations.
      * We introduce the variable \f$ \g \f$ such that, for each contact \f$ ij \f$,  we impose
-     * - \f$ \d_{ij} + \B \u_{ij} \ge 0 \f$ if \f$ \g_{ij} = 0 \f$;
-     * - \f$ \d_{ij} + \B \u_{ij} = 0 \f$ if \f$ \gm < \g_{ij} < 0 \f$;
-     * - \f$ \d_{ij} + \B \u_{ij} \ge ||\T \u_{ij}|| \f$ if \f$ \g_{ij} < \gm \f$.
+     * - \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge 0 \f$ if \f$ \g_{ij} = 0 \f$;
+     * - \f$ \d_{ij} + \mathbb{B} \u_{ij} = 0 \f$ if \f$ \gm < \g_{ij} < 0 \f$;
+     * - \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$ if \f$ \g_{ij} < \gm \f$.
      *
-     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
+     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
      *
      * For each contact \f$ ij \f$, \f$ \g_{ij} \f$ verifies
      * - \f$ \g_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
      * - \f$ \frac{\mathrm{d} \g_{ij}}{\mathrm{d} t} = - \left( \lm_{ij}^+ - \lm_{ij}^- \right) \f$ else. 
      *
-     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
+     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$ (resp. \f$ -\d - \mathbb{B} \u \ge 0 \f$).
      * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
      *
      * Only one matrix is built.
@@ -109,7 +109,7 @@ namespace scopi
         ViscousWithFriction(std::size_t nparts);
 
         /**
-         * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
+         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$.
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
          *
@@ -175,7 +175,7 @@ namespace scopi
          *
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \d + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
          */
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,

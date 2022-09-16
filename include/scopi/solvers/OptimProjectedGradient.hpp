@@ -88,9 +88,9 @@ namespace scopi{
      *
      * See ProblemBase for the notations.
      * The implemented algorithm is:
-     *  - \f$ \A = \B^T \P^{-1} \B \f$;
-     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \d - \B \u \right) \f$;
-     *  - \f$ \u = \P^{-1} \left( \c - \B^T \l \right) \f$.
+     *  - \f$ \A = \mathbb{B}^T \P^{-1} \mathbb{B} \f$;
+     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \d - \mathbb{B} \u \right) \f$;
+     *  - \f$ \u = \P^{-1} \left( \c - \mathbb{B}^T \l \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
      *
@@ -174,7 +174,7 @@ namespace scopi{
          */
         auto lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \d + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -216,7 +216,7 @@ namespace scopi{
                                std::vector<double>& invP_csr_val,
                                const scopi_container<3>& particles);
         /**
-         * @brief Build the matrix \f$ \B \f$.
+         * @brief Build the matrix \f$ \mathbb{B} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -228,7 +228,7 @@ namespace scopi{
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Build matrix \f$ \A = \B^T \P^{-1} \B \f$.
+         * @brief Build matrix \f$ \A = \mathbb{B}^T \P^{-1} \mathbb{B} \f$.
          */
         void create_matrix_A();
 
@@ -237,7 +237,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l;
         /**
-         * @brief Vector \f$ \e = \d - \B \u \f$.
+         * @brief Vector \f$ \e = \d - \mathbb{B} \u \f$.
          */
         xt::xtensor<double, 1> m_e; // vector c in 220517_PbDual_MiniForces.pdf
         /**
@@ -245,7 +245,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_u;
         /**
-         * @brief Vecotr \f$ \B \l \f$.
+         * @brief Vecotr \f$ \mathbb{B} \l \f$.
          */
         xt::xtensor<double, 1> m_bl;
 
@@ -258,11 +258,11 @@ namespace scopi{
          */
         struct matrix_descr m_descrA;
         /**
-         * @brief Matrix \f$ \B \f$.
+         * @brief Matrix \f$ \mathbb{B} \f$.
          */
         sparse_matrix_t m_B;
         /**
-         * @brief Structure specifying \f$ \B \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{B} \f$ properties. 
          */
         struct matrix_descr m_descrB;
         /**

@@ -82,7 +82,7 @@ namespace scopi
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
         /**
-         * @brief Implements the product \f$ \r = \r - \B \u \f$.
+         * @brief Implements the product \f$ \r = \r - \mathbb{B} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -93,7 +93,7 @@ namespace scopi
                          const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Implements the product \f$ \u = \B^T \l + \u \f$.
+         * @brief Implements the product \f$ \u = \mathbb{B}^T \l + \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.

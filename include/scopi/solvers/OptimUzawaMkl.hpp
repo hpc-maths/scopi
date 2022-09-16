@@ -80,7 +80,7 @@ namespace scopi
         /**
          * @brief Initialize the matrices for matrix-vector products with stored matrix.
          *
-         * Builds the matrix \f$ \B \f$.
+         * Builds the matrix \f$ \mathbb{B} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
@@ -92,7 +92,7 @@ namespace scopi
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Free the memory allocated for the matrix \f$ \B \f$..
+         * @brief Free the memory allocated for the matrix \f$ \mathbb{B} \f$..
          */
         void finalize_uzawa_impl();
 
@@ -106,7 +106,7 @@ namespace scopi
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
         /**
-         * @brief Implements the product \f$ \r = \r - \B \u \f$.
+         * @brief Implements the product \f$ \r = \r - \mathbb{B} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -117,7 +117,7 @@ namespace scopi
                          const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Implements the product \f$ \u = \B^T \l + \u \f$.
+         * @brief Implements the product \f$ \u = \mathbb{B}^T \l + \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -165,11 +165,11 @@ namespace scopi
                                const scopi_container<3>& particles);
 
         /**
-         * @brief MKL's data structure for the matrix \f$ \B \f$.
+         * @brief MKL's data structure for the matrix \f$ \mathbb{B} \f$.
          */
         sparse_matrix_t m_A;
         /**
-         * @brief Structure specifying \f$ \B \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{B} \f$ properties. 
          */
         struct matrix_descr m_descrA;
         /**
