@@ -171,7 +171,7 @@ namespace scopi
          * @brief Compute the value of \f$ \gamma^{n+1} \f$.
          *
          * \f[
-         *      \gamma^{n+1}_{ij} = \max \left( \gm, \gamma^n_{ij} - \Delta t \left( \mathbf{ambda}_{ij}^+ - \mathbf{ambda}_{ij}^- \right) \right).
+         *      \gamma^{n+1}_{ij} = \max \left( \gamma_{\min}, \gamma^n_{ij} - \Delta t \left( \mathbf{ambda}_{ij}^+ - \mathbf{ambda}_{ij}^- \right) \right).
          * \f]
          *
          * @param contacts [in] Array of contacts.
