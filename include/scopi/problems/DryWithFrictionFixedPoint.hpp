@@ -68,14 +68,14 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[ 
-     *      \d_{\ij} + \B \u_{\ij} \ge \left( \norm{\T \u_{\ij}} - \mu \Delta t \s_{\ij} \right),
+     *      \d_{\ij} + \B \u_{\ij} \ge \left( ||\T \u_{\ij}|| - \mu \Delta t \s_{\ij} \right),
      * \f]
      * for all contacts \f$ (\ij) \f$, with \f$ \s \in \R^{\Nc} \f$.
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
      *          \F : & \R^{\Nc} \to \R^{\Nc} \\
-     *               & \s_{\ij} \mapsto \norm{\T \us_{\ij}},
+     *               & \s_{\ij} \mapsto ||\T \us_{\ij}||,
      *      \end{aligned}
      * \f]
      * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \R^{\Nc} \f$ such that \f$ \F(\s) = \s \f$.
@@ -83,9 +83,9 @@ namespace scopi
      * This leads to the following algorithm:
      * - \f$ \sWithIndex{0} \f$;
      * - \f$ \indexFixedPoint = 0 \f$;
-     * - While \f$ \frac{\norm{\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}}}{\norm{\sWithIndex{\indexFixedPoint}} + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
+     * - While \f$ \frac{||\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}||}{||\sWithIndex{\indexFixedPoint}|| + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
      *   - Compute \f$ \usWithIndex{\indexFixedPoint} \f$ as the solution of the optimization problem under the constraint written above;
-     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{\ij} = \norm{\T \usWithIndex{\indexFixedPoint}_{\ij}} \f$ for all contacts \f$ \ij \f$;
+     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{\ij} = ||\T \usWithIndex{\indexFixedPoint}_{\ij}|| \f$ for all contacts \f$ \ij \f$;
      *   - \f$ \indexFixedPoint ++ \f$.
      * 
      * Only one matrix is built.

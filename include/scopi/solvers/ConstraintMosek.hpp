@@ -130,7 +130,7 @@ namespace scopi
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
@@ -214,7 +214,7 @@ namespace scopi
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge \T \u_{\ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
@@ -412,7 +412,7 @@ namespace scopi
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraints \f$ \d + \B \u \ge 0 \f$ and \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ in Mosek's solver.
+         * @brief Add the constraints \f$ \d + \B \u \ge 0 \f$ and \f$ \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
@@ -452,7 +452,7 @@ namespace scopi
          */
         mosek::fusion::Constraint::t m_qc1;
         /**
-         * @brief Mosek's data structure for the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$.
+         * @brief Mosek's data structure for the constraint \f$ \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}|| \f$.
          */
         mosek::fusion::Constraint::t m_qc4;
     };
