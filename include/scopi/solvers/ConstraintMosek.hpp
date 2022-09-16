@@ -124,13 +124,13 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
          *
          * @return 0.
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
@@ -208,13 +208,13 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
          *
          * @return 0.
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge \T \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge \mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
@@ -405,14 +405,14 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
          *
          * @return 0.
          */
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraints \f$ \d + \mathbb{B} \u \ge 0 \f$ and \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraints \f$ \d + \mathbb{B} \u \ge 0 \f$ and \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
@@ -452,7 +452,7 @@ namespace scopi
          */
         mosek::fusion::Constraint::t m_qc1;
         /**
-         * @brief Mosek's data structure for the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$.
+         * @brief Mosek's data structure for the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$.
          */
         mosek::fusion::Constraint::t m_qc4;
     };

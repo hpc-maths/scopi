@@ -123,10 +123,10 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[
-     *      \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}||
+     *      \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}||
      * \f]
      * for all contacts \f$ (ij) \f$.
-     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
+     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
      *
      * Only one matrix is built.
      * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ T \f$.
@@ -147,7 +147,7 @@ namespace scopi
         DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
 
         /**
-         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$.
+         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).

@@ -70,9 +70,9 @@ namespace scopi
      * We introduce the variable \f$ \g \f$ such that, for each contact \f$ ij \f$,  we impose
      * - \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge 0 \f$ if \f$ \g_{ij} = 0 \f$;
      * - \f$ \d_{ij} + \mathbb{B} \u_{ij} = 0 \f$ if \f$ \gm < \g_{ij} < 0 \f$;
-     * - \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$ if \f$ \g_{ij} < \gm \f$.
+     * - \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$ if \f$ \g_{ij} < \gm \f$.
      *
-     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
+     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
      *
      * For each contact \f$ ij \f$, \f$ \g_{ij} \f$ verifies
      * - \f$ \g_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
@@ -109,7 +109,7 @@ namespace scopi
         ViscousWithFriction(std::size_t nparts);
 
         /**
-         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$.
+         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
          *

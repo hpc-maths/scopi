@@ -69,8 +69,8 @@ namespace scopi{
      *
      * With friction, the constraint is written as \f$ \d \mathbb{B} \u \in \left( Q^4 \right)^{N_c} \f$,
      * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
-     * Each component of \f$ \mathbb{B} \u \f$ is seen as \f$ (\d_{ij} + \mathbb{B} \u_{ij}, \T \u_{ij}^1, \T \u_{ij}^2, \T \u_{ij}^3 ) \f$.
-     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\T \u_{ij} \f$, but this resulted in poor performances.
+     * Each component of \f$ \mathbb{B} \u \f$ is seen as \f$ (\d_{ij} + \mathbb{B} \u_{ij}, \mathbb{T} \u_{ij}^1, \mathbb{T} \u_{ij}^2, \mathbb{T} \u_{ij}^3 ) \f$.
+     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \u_{ij} \f$, but this resulted in poor performances.
      * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \uMosek \in Q \f$ with appropriate reshape.
      * Currently, only a part of the matrix is used.
      *

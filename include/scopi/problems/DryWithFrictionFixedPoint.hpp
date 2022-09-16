@@ -68,14 +68,14 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[ 
-     *      \d_{ij} + \mathbb{B} \u_{ij} \ge \left( ||\T \u_{ij}|| - \mu \Delta t \s_{ij} \right),
+     *      \d_{ij} + \mathbb{B} \u_{ij} \ge \left( ||\mathbb{T} \u_{ij}|| - \mu \Delta t \s_{ij} \right),
      * \f]
      * for all contacts \f$ (ij) \f$, with \f$ \s \in \mathbb{R}^{N_c} \f$.
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
      *          \F : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
-     *               & \s_{ij} \mapsto ||\T \us_{ij}||,
+     *               & \s_{ij} \mapsto ||\mathbb{T} \us_{ij}||,
      *      \end{aligned}
      * \f]
      * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \mathbb{R}^{N_c} \f$ such that \f$ \F(\s) = \s \f$.
@@ -85,7 +85,7 @@ namespace scopi
      * - \f$ \indexFixedPoint = 0 \f$;
      * - While \f$ \frac{||\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}||}{||\sWithIndex{\indexFixedPoint}|| + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
      *   - Compute \f$ \usWithIndex{\indexFixedPoint} \f$ as the solution of the optimization problem under the constraint written above;
-     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{ij} = ||\T \usWithIndex{\indexFixedPoint}_{ij}|| \f$ for all contacts \f$ ij \f$;
+     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{ij} = ||\mathbb{T} \usWithIndex{\indexFixedPoint}_{ij}|| \f$ for all contacts \f$ ij \f$;
      *   - \f$ \indexFixedPoint ++ \f$.
      * 
      * Only one matrix is built.
@@ -106,7 +106,7 @@ namespace scopi
         DryWithFrictionFixedPoint(std::size_t nparticles, double dt, const ProblemParams<DryWithFrictionFixedPoint>& problem_params);
 
         /**
-         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$.
+         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
          *
          * \todo It should be the same function as in DryWithFriction.hpp
          *
