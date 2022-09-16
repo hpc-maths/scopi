@@ -23,9 +23,9 @@ namespace scopi{
      *  - \f$ \rho^{\indexUzawa} \f$ given;
      *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
+     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \y^{\indexUzawa} + \mathbf{e} \f$;
      *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
-     *      - While (\f$ \frac{1}{2} \mathbf{l}^{\indexUzawa+1} \cdot \A \mathbf{l}^{\indexUzawa+1} + \e \cdot \mathbf{l}^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \e \cdot \y^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
+     *      - While (\f$ \frac{1}{2} \mathbf{l}^{\indexUzawa+1} \cdot \A \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{l}^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \mathbf{e} \cdot \y^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \mathbf{l}^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
      *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
      *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
      *          - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left( \y^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
@@ -60,7 +60,7 @@ namespace scopi{
          *
          * @param A [in] Matrix \f$ \A \f$.
          * @param descr [in] Structure specifying \f$ \A \f$ properties. 
-         * @param c [in] Vector \f$ \e \f$.
+         * @param c [in] Vector \f$ \mathbf{e} \f$.
          * @param l [out] vector \f$ \mathbf{l} \f$.
          *
          * @return Number of iterations the algorithm needed to converge.
@@ -101,7 +101,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \A \mathbf{l}^{\indexUzawa+1} + \e \f$.
+         * @brief Vector \f$ \A \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**

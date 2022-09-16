@@ -274,7 +274,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l;
         /**
-         * @brief Vector \f$ \e = \mathbf{d} - \mathbb{B} \mathbf{u} \f$.
+         * @brief Vector \f$ \mathbf{e} = \mathbf{d} - \mathbb{B} \mathbf{u} \f$.
          */
         xt::xtensor<double, 1> m_e; // vector c in 220517_PbDual_MiniForces.pdf
         /**
