@@ -67,7 +67,7 @@ namespace scopi{
          */
         auto get_wadapt();
         /**
-         * @brief Returns \f$ \d + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
          *
          * \pre Call \c run before calling this function.
          * \todo Fix dimensions depending on the problem.

@@ -68,7 +68,7 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[ 
-     *      \d_{ij} + \mathbb{B} \u_{ij} \ge \left( ||\mathbb{T} \u_{ij}|| - \mu \Delta t \s_{ij} \right),
+     *      \mathbf{d}_{ij} + \mathbb{B} \u_{ij} \ge \left( ||\mathbb{T} \u_{ij}|| - \mu \Delta t \s_{ij} \right),
      * \f]
      * for all contacts \f$ (ij) \f$, with \f$ \s \in \mathbb{R}^{N_c} \f$.
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
@@ -91,7 +91,7 @@ namespace scopi
      * Only one matrix is built.
      * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ T \f$.
      * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ T \f$.
-     * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \d \in \mathbb{R}^{4N_c} \f$.
+     * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      */
     class DryWithFrictionFixedPoint : protected ProblemBase
     {
@@ -136,9 +136,9 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Create vector \f$ \d \f$.
+         * @brief Create vector \f$ \mathbf{d} \f$.
          *
-         * \f$ \d \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
+         * \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
          * \f$ (d_{ij} + \mu \Delta t \s_{ij}, 0, 0, 0) \f$,
          * where \f$ d_{ij} \f$ is the distance between particles \c i and \c j.
          *
@@ -163,7 +163,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,

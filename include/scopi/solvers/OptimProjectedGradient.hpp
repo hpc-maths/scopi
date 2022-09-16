@@ -123,7 +123,7 @@ namespace scopi{
      * See ProblemBase for the notations.
      * The implemented algorithm is:
      *  - \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
-     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \d - \mathbb{B} \u \right) \f$;
+     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \mathbf{d} - \mathbb{B} \u \right) \f$;
      *  - \f$ \u = \mathbb{P}^{-1} \left( \c - \mathbb{B}^T \l \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
@@ -211,7 +211,7 @@ namespace scopi{
          */
         auto lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \d + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -274,7 +274,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l;
         /**
-         * @brief Vector \f$ \e = \d - \mathbb{B} \u \f$.
+         * @brief Vector \f$ \e = \mathbf{d} - \mathbb{B} \u \f$.
          */
         xt::xtensor<double, 1> m_e; // vector c in 220517_PbDual_MiniForces.pdf
         /**

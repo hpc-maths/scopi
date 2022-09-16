@@ -48,10 +48,10 @@ namespace scopi
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \mathbf{d} + \mathbb{B} \u \ge 0 \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param D [in] Array \f$ \d \f$.
+         * @param D [in] Array \f$ \mathbf{d} \f$.
          * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
@@ -130,10 +130,10 @@ namespace scopi
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \mathbf{d}_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param D [in] Array \f$ \d \f$.
+         * @param D [in] Array \f$ \mathbf{d} \f$.
          * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
@@ -214,10 +214,10 @@ namespace scopi
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge \mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \mathbf{d}_{ij} + \mathbb{B} \u_{ij} \ge \mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param D [in] Array \f$ \d \f$.
+         * @param D [in] Array \f$ \mathbf{d} \f$.
          * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
@@ -301,10 +301,10 @@ namespace scopi
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \mathbf{d} + \mathbb{B} \u \ge 0 \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param D [in] Array \f$ \d \f$.
+         * @param D [in] Array \f$ \mathbf{d} \f$.
          * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
@@ -412,10 +412,10 @@ namespace scopi
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraints \f$ \d + \mathbb{B} \u \ge 0 \f$ and \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraints \f$ \mathbf{d} + \mathbb{B} \u \ge 0 \f$ and \f$ \mathbf{d}_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
-         * @param D [in] Array \f$ \d \f$.
+         * @param D [in] Array \f$ \mathbf{d} \f$.
          * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
@@ -448,11 +448,11 @@ namespace scopi
          */
         std::size_t m_nparticles;
         /**
-         * @brief Mosek's data structure for the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$.
+         * @brief Mosek's data structure for the constraint \f$ \mathbf{d} + \mathbb{B} \u \ge 0 \f$.
          */
         mosek::fusion::Constraint::t m_qc1;
         /**
-         * @brief Mosek's data structure for the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$.
+         * @brief Mosek's data structure for the constraint \f$ \mathbf{d}_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}|| \f$.
          */
         mosek::fusion::Constraint::t m_qc4;
     };
