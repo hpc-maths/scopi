@@ -17,13 +17,13 @@ namespace scopi
      *
      * All problems (models) solve 
      * \f[
-     *      \min \frac{1}{2} \mathbf{u} \cdot \mathbb{P} \mathbf{u} + \mathbf{u} \cdot \c
+     *      \min \frac{1}{2} \mathbf{u} \cdot \mathbb{P} \mathbf{u} + \mathbf{u} \cdot \mathbf{c}
      * \f]
      * under constraint
      * \f[
      *      \mathbf{d} + \mathbb{B} \mathbbf{u} \ge \constraintFunction (\mathbbf{u}).
      * \f]
-     * The vector \f$ \c \f$ is known and does not depends on the problem.
+     * The vector \f$ \mathbf{c} \f$ is known and does not depends on the problem.
      * The function \f$ \constraintFunction \f$ differs with the problem.
      * So does the implentation of the vector \f$ \mathbf{d} \f$ and the matrix \f$ \mathbb{B} \f$.
      * However, they share some elements, thay are set by this class.

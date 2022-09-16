@@ -124,7 +124,7 @@ namespace scopi{
      * The implemented algorithm is:
      *  - \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
      *  - \f$ \l = \text{ gradient algorithm } \left( \A, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
-     *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \c - \mathbb{B}^T \l \right) \f$.
+     *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \mathbf{c} - \mathbb{B}^T \l \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
      *  \c gradient_t depends on \c projection_t, which should be used with the appropriate problem.
