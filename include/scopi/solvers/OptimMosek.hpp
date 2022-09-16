@@ -56,7 +56,7 @@ namespace scopi{
      * minimize \f$ \uMosek \cdot \cMosek \f$, with
      * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \uMosek \le \d \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
+     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \uMosek \le \mathbf{d} \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
@@ -67,9 +67,9 @@ namespace scopi{
      * Here, \f$ N_c \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
      * \f$ \mathbb{Id} \f$ is the identity matrix.
      *
-     * With friction, the constraint is written as \f$ \d \mathbb{B} \u \in \left( Q^4 \right)^{N_c} \f$,
+     * With friction, the constraint is written as \f$ \mathbf{d} \mathbb{B} \u \in \left( Q^4 \right)^{N_c} \f$,
      * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
-     * Each component of \f$ \mathbb{B} \u \f$ is seen as \f$ (\d_{ij} + \mathbb{B} \u_{ij}, \mathbb{T} \u_{ij}^1, \mathbb{T} \u_{ij}^2, \mathbb{T} \u_{ij}^3 ) \f$.
+     * Each component of \f$ \mathbb{B} \u \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B} \u_{ij}, \mathbb{T} \u_{ij}^1, \mathbb{T} \u_{ij}^2, \mathbb{T} \u_{ij}^3 ) \f$.
      * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \u_{ij} \f$, but this resulted in poor performances.
      * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \uMosek \in Q \f$ with appropriate reshape.
      * Currently, only a part of the matrix is used.
@@ -142,7 +142,7 @@ namespace scopi{
          */
         double* wadapt_data();
         /**
-         * @brief Returns \f$ \d + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -211,7 +211,7 @@ namespace scopi{
          */
         ConstraintMosek<problem_t> m_constraint;
         /**
-         * @brief Mosek's data structure for \f$ \d \f$.
+         * @brief Mosek's data structure for \f$ \mathbf{d} \f$.
          */
         std::shared_ptr<monty::ndarray<double, 1>> m_D_mosek;
         /**

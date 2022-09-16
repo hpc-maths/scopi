@@ -21,11 +21,11 @@ namespace scopi
      * \f]
      * under constraint
      * \f[
-     *      \d + \mathbb{B} \mathbbf{u} \ge \constraintFunction (\mathbbf{u}).
+     *      \mathbf{d} + \mathbb{B} \mathbbf{u} \ge \constraintFunction (\mathbbf{u}).
      * \f]
      * The vector \f$ \c \f$ is known and does not depends on the problem.
      * The function \f$ \constraintFunction \f$ differs with the problem.
-     * So does the implentation of the vector \f$ \d \f$ and the matrix \f$ \mathbb{B} \f$.
+     * So does the implentation of the vector \f$ \mathbf{d} \f$ and the matrix \f$ \mathbb{B} \f$.
      * However, they share some elements, thay are set by this class.
      *
      * In the documentation of other classes, \f$ N \f$ is the number of particles and \f$ N_c \f$ is the number of contacts.
@@ -135,7 +135,7 @@ namespace scopi
          */
         std::vector<double> m_A_values;
         /**
-         * @brief Vector \f$ \d \f$.
+         * @brief Vector \f$ \mathbf{d} \f$.
          *
          * Modified by the problem.
          */
