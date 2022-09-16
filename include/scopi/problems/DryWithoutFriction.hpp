@@ -18,9 +18,10 @@ namespace scopi
     class DryWithoutFriction;
 
     /**
-     * @brief Parameters for \c DryWithoutFrixion..
+     * @class ProblemParams<DryWithoutFriction>
+     * @brief Parameters for \c DryWithoutFriction.
      *
-     * Specialization of ProblemParams in params.hpp
+     * Specialization of ProblemParam.
      *
      * Defined for compatibility.
      */
@@ -29,9 +30,10 @@ namespace scopi
     {};
 
     /**
+     * @class DryWithoutFriction.
      * @brief Problem that models contacts without friction and without viscosity.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * The constraint is 
      * \f[
      *      \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0,

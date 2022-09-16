@@ -13,6 +13,7 @@
 namespace scopi
 {
     /**
+     * @class ProblemBase
      * @brief Shared methods for problems.
      *
      * All problems (models) solve 
@@ -21,12 +22,12 @@ namespace scopi
      * \f]
      * under constraint
      * \f[
-     *      \mathbf{d} + \mathbb{B} \mathbbf{u} \ge \mathbf{f} (\mathbbf{u}).
+     *      \mathbf{d} + \mathbb{B} \mathbf{u} \ge \mathbf{f} (\mathbf{u}).
      * \f]
      * The vector \f$ \mathbf{c} \f$ is known and does not depends on the problem.
      * The function \f$ \mathbf{f} \f$ differs with the problem.
      * So does the implentation of the vector \f$ \mathbf{d} \f$ and the matrix \f$ \mathbb{B} \f$.
-     * However, they share some elements, thay are set by this class.
+     * However, they share some elements, they are set by this class.
      *
      * In the documentation of other classes, \f$ N \f$ is the number of particles and \f$ N_c \f$ is the number of contacts.
      *
@@ -44,13 +45,13 @@ namespace scopi
         ProblemBase(std::size_t nparts, double dt);
 
         /**
-         * @brief Matrix-free product \f$ \mathbbf{u} = \mathbb{P}^{-1} \mathbbf{u} \f$.
+         * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (to get masses and moments of inertia).
-         * @param U [in/out] Vector \f$ \mathbbf{u} \f$.
+         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
          * @param active_offset [in] Index of the first active particle.
-         * @param row [in] Row of \f$ \mathbbf{u} \f$ to compute.
+         * @param row [in] Row of \f$ \mathbf{u} \f$ to compute.
          */
         template<std::size_t dim>
         void matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
@@ -77,30 +78,30 @@ namespace scopi
 
     private:
         /**
-         * @brief 2D implementation of rows in matrix-free product \f$ \mathbbf{u} = \mathbb{P}^{-1} \mathbbf{u} \f$ that involve moments of inertia.
+         * @brief 2D implementation of rows in matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$ that involve moments of inertia.
          *
          * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
          * The implentation is different in 2D or in 3D.
          *
          * @param particles [in] Array of particles (for the moments of inertia).
-         * @param U [in/out] Vector \f$ \mathbbf{u} \f$.
+         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
          * @param active_offset [in] Index of the first active particle.
-         * @param row [in] Row of \f$ \mathbbf{u} \f$ to compute.
+         * @param row [in] Row of \f$ \mathbf{u} \f$ to compute.
          */
         void matrix_free_gemv_inv_P_moment(const scopi_container<2>& particles,
                                            xt::xtensor<double, 1>& U,
                                            std::size_t active_offset,
                                            std::size_t row);
         /**
-         * @brief 3D implementation of rows in matrix-free product \f$ \mathbbf{u} = \mathbb{P}^{-1} \mathbbf{u} \f$ that involve moments of inertia.
+         * @brief 3D implementation of rows in matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$ that involve moments of inertia.
          *
          * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
          * The implentation is different in 2D or in 3D.
          *
          * @param particles [in] Array of particles (for the moments of inertia).
-         * @param U [in/out] Vector \f$ \mathbbf{u} \f$.
+         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
          * @param active_offset [in] Index of the first active particle.
-         * @param row [in] Row of \f$ \mathbbf{u} \f$ to compute.
+         * @param row [in] Row of \f$ \mathbf{u} \f$ to compute.
          */
         void matrix_free_gemv_inv_P_moment(const scopi_container<3>& particles,
                                            xt::xtensor<double, 1>& U,
