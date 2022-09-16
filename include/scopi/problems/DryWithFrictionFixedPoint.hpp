@@ -81,11 +81,11 @@ namespace scopi
      * and search for a fixed point of \f$ \mathbf{F} \f$ : \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$ such that \f$ \mathbf{F}(\mathbf{s}) = \mathbf{s} \f$.
      *
      * This leads to the following algorithm:
-     * - \f$ \sWithIndex{0} \f$;
+     * - \f$ \mathbf{s}^{0} \f$;
      * - \f$ k = 0 \f$;
-     * - While \f$ \frac{||\sWithIndex{k-1} - \sWithIndex{k}||}{||\sWithIndex{k}|| + 1} > \f$ \c tol_fixed_point and \f$ k < \f$ \c max_iter_fixed_point
+     * - While \f$ \frac{||\mathbf{s}^{k-1} - \mathbf{s}^{k}||}{||\mathbf{s}^{k}|| + 1} > \f$ \c tol_fixed_point and \f$ k < \f$ \c max_iter_fixed_point
      *   - Compute \f$ \mathbf{u}^{\mathbf{s}^{k}} \f$ as the solution of the optimization problem under the constraint written above;
-     *   - \f$ \sWithIndex{k+1}_{ij} = ||\mathbb{T} \mathbf{u}^{\mathbf{s}^{k}}_{ij}|| \f$ for all contacts \f$ ij \f$;
+     *   - \f$ \mathbf{s}^{k+1}_{ij} = ||\mathbb{T} \mathbf{u}^{\mathbf{s}^{k}}_{ij}|| \f$ for all contacts \f$ ij \f$;
      *   - \f$ k ++ \f$.
      * 
      * Only one matrix is built.
@@ -158,7 +158,7 @@ namespace scopi
         template<std::size_t dim>
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
         /**
-         * @brief Compute \f$ \sWithIndex{k+1} \f$.
+         * @brief Compute \f$ \mathbf{s}^{k+1} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
@@ -182,11 +182,11 @@ namespace scopi
          */
         ProblemParams<DryWithFrictionFixedPoint> m_params;
         /**
-         * @brief \f$ \sWithIndex{k+1} \f$.
+         * @brief \f$ \mathbf{s}^{k+1} \f$.
          */
         xt::xtensor<double, 1> m_s;
         /**
-         * @brief \f$ \sWithIndex{k} \f$.
+         * @brief \f$ \mathbf{s}^{k} \f$.
          */
         xt::xtensor<double, 1> m_s_old;
         /**
