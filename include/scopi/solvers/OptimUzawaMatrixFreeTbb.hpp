@@ -93,7 +93,7 @@ namespace scopi
                          const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Implements the product \f$ \u = \transpose{\B} \l + \u \f$.
+         * @brief Implements the product \f$ \u = \B^T \l + \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
