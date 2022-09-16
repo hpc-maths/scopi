@@ -65,10 +65,10 @@ namespace scopi
      *
      * For each contact \f$ ij \f$, \f$ \gamma_{ij} \f$ verifies
      * - \f$ \gamma_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \lm_{ij}^+ - \lm_{ij}^- \right) \f$ else. 
+     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \mathbf{ambda}_{ij}^+ - \mathbf{ambda}_{ij}^- \right) \f$ else. 
      *
-     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0 \f$ (resp. \f$ -\mathbf{d} - \mathbb{B} \mathbf{u} \ge 0 \f$).
-     * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
+     * \f$ \mathbf{ambda}^+ \f$ (resp. \f$ \mathbf{ambda}^- \f$) is the Lagrange multiplier associated with the constraint \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0 \f$ (resp. \f$ -\mathbf{d} - \mathbb{B} \mathbf{u} \ge 0 \f$).
+     * By convention, \f$ \mathbf{ambda}^+ \ge 0 \f$ and \f$ \mathbf{ambda}^- \ge 0 \f$. 
      *
      * @tparam dim Dimension (2 or 3).
      */
@@ -171,7 +171,7 @@ namespace scopi
          * @brief Compute the value of \f$ \gamma^{n+1} \f$.
          *
          * \f[
-         *      \gamma^{n+1}_{ij} = \max \left( \gm, \gamma^n_{ij} - \Delta t \left( \lm_{ij}^+ - \lm_{ij}^- \right) \right).
+         *      \gamma^{n+1}_{ij} = \max \left( \gm, \gamma^n_{ij} - \Delta t \left( \mathbf{ambda}_{ij}^+ - \mathbf{ambda}_{ij}^- \right) \right).
          * \f]
          *
          * @param contacts [in] Array of contacts.
