@@ -97,7 +97,7 @@ namespace scopi
         void finalize_uzawa_impl();
 
         /**
-         * @brief Implements the product \f$ \mathbb{P}^{-1} \u \f$.
+         * @brief Implements the product \f$ \mathbb{P}^{-1} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for masses and moments of inertia).
@@ -106,7 +106,7 @@ namespace scopi
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
         /**
-         * @brief Implements the product \f$ \r = \r - \mathbb{B} \u \f$.
+         * @brief Implements the product \f$ \r = \r - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -117,7 +117,7 @@ namespace scopi
                          const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Implements the product \f$ \u = \mathbb{B}^T \l + \u \f$.
+         * @brief Implements the product \f$ \mathbf{u} = \mathbb{B}^T \l + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.

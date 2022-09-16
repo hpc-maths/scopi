@@ -89,8 +89,8 @@ namespace scopi{
      * See ProblemBase for the notations.
      * The implemented algorithm is:
      *  - \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
-     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \mathbf{d} - \mathbb{B} \u \right) \f$;
-     *  - \f$ \u = \mathbb{P}^{-1} \left( \c - \mathbb{B}^T \l \right) \f$.
+     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
+     *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \c - \mathbb{B}^T \l \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
      *
@@ -150,7 +150,7 @@ namespace scopi{
                                                     const std::vector<neighbor<dim>>& contacts,
                                                     const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -158,7 +158,7 @@ namespace scopi{
          */
         auto uadapt_data();
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -174,7 +174,7 @@ namespace scopi{
          */
         auto lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -237,11 +237,11 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l;
         /**
-         * @brief Vector \f$ \e = \mathbf{d} - \mathbb{B} \u \f$.
+         * @brief Vector \f$ \e = \mathbf{d} - \mathbb{B} \mathbf{u} \f$.
          */
         xt::xtensor<double, 1> m_e; // vector c in 220517_PbDual_MiniForces.pdf
         /**
-         * @brief Vector \f$ \u \f$.
+         * @brief Vector \f$ \mathbf{u} \f$.
          */
         xt::xtensor<double, 1> m_u;
         /**

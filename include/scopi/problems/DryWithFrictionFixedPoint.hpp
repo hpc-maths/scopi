@@ -68,7 +68,7 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[ 
-     *      \mathbf{d}_{ij} + \mathbb{B} \u_{ij} \ge \left( ||\mathbb{T} \u_{ij}|| - \mu \Delta t \s_{ij} \right),
+     *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge \left( ||\mathbb{T} \mathbf{u}_{ij}|| - \mu \Delta t \s_{ij} \right),
      * \f]
      * for all contacts \f$ (ij) \f$, with \f$ \s \in \mathbb{R}^{N_c} \f$.
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
@@ -163,7 +163,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \constraintFunction(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
