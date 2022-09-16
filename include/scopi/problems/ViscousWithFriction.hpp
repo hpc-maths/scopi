@@ -72,7 +72,7 @@ namespace scopi
      * - \f$ \d_{\ij} + \B \u_{\ij} = 0 \f$ if \f$ \gm < \g_{\ij} < 0 \f$;
      * - \f$ \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}|| \f$ if \f$ \g_{\ij} < \gm \f$.
      *
-     * \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, \f$ \B \in \R^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.
+     * \f$ \d \in \mathbb{R}^{\Nc} \f$, \f$ \u \in \mathbb{R}^{6\N} \f$, \f$ \B \in \mathbb{R}^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.
      *
      * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
      * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
