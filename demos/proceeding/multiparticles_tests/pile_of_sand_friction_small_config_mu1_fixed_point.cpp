@@ -21,11 +21,11 @@ int main()
 
     double width_box = 10.;
     std::size_t n = 8; // n^3 spheres
-    std::size_t total_it = 200;
+    std::size_t total_it = 2000;
     double g = 1.;
 
     double r = width_box/2./(n+1);
-    double dt = 0.2*r/(std::sqrt(2.*width_box*g));
+    double dt = 0.1*r/(std::sqrt(2.*width_box*g));
 
     scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::DryWithFrictionFixedPoint, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
@@ -34,7 +34,7 @@ int main()
     params.problem_params.max_iter_fixed_point = 100;
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
-    params.scopi_params.output_frequency = 2000;
+    params.scopi_params.output_frequency = 3000;
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
