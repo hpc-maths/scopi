@@ -17,6 +17,10 @@ set(SCOPI_PROCEEDING_MULTIPARTICLES
     pile_of_sand_friction_large_config_mu01_fixed_point.cpp
     pile_of_sand_friction_large_config_mu1_convex.cpp
     pile_of_sand_friction_large_config_mu1_fixed_point.cpp
+    pile_of_sand_friction_figure_mu01_convex.cpp
+    pile_of_sand_friction_figure_mu01_fixed_point.cpp
+    pile_of_sand_friction_figure_mu1_convex.cpp
+    pile_of_sand_friction_figure_mu1_fixed_point.cpp
     pile_of_sand_ellipses.cpp
 )
 

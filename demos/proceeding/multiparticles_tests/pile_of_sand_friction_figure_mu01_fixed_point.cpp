@@ -12,15 +12,15 @@
 
 int main()
 {
-    // Table 3: 12^3 spheres falling on a plane with friction.
+    // Figure 9: spheres falling on a plane with friction.
     // mu = 0.1, fixed point algorithm.
-    plog::init(plog::info, "pile_of_sand_spheres_large_config_mu01_fixed_point.log");
+    plog::init(plog::info, "pile_of_sand_spheres_figure_config_mu01_fixed_point.log");
 
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
 
     double width_box = 10.;
-    std::size_t n = 12; // n^3 spheres
+    std::size_t n = 10; // n^3 spheres
     std::size_t total_it = 1000;
     double g = 1.;
 

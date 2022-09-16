@@ -13,7 +13,6 @@
 int main()
 {
     // Table 3: 12^3 spheres falling on a plane with friction.
-    // Figure 9: spheres falling on a plane with friction.
     // mu = 1, fixed point algorithm.
     plog::init(plog::info, "pile_of_sand_spheres_large_config_mu1_fixed_point.log");
 
