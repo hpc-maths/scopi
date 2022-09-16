@@ -155,7 +155,7 @@ namespace scopi{
         /**
          * @brief Constructor.
          *
-         * Build the matrix \f$ \AzMosek \f$.
+         * Build the matrix \f$ \A \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
