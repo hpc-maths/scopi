@@ -71,11 +71,11 @@ namespace scopi
      *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge \left( ||\mathbb{T} \mathbf{u}_{ij}|| - \mu \Delta t \mathbf{s}_{ij} \right),
      * \f]
      * for all contacts \f$ (ij) \f$, with \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$.
-     * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
+     * If \f$ \mathbf{u}^{\mathbf{s}} \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
      *          \mathbf{F} : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
-     *               & \mathbf{s}_{ij} \mapsto ||\mathbb{T} \us_{ij}||,
+     *               & \mathbf{s}_{ij} \mapsto ||\mathbb{T} \mathbf{u}^{\mathbf{s}}_{ij}||,
      *      \end{aligned}
      * \f]
      * and search for a fixed point of \f$ \mathbf{F} \f$ : \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$ such that \f$ \mathbf{F}(\mathbf{s}) = \mathbf{s} \f$.
