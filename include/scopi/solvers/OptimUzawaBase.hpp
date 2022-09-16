@@ -68,9 +68,9 @@ namespace scopi{
      *  - \f$ cmax = - \infty \f$;
      *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
      *      - \f$ \mathbf{u}^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \mathbf{c} - B^T \l^{\indexUzawa} \right) \f$;
-     *      - \f$ \r^{\indexUzawa+1} = \mathbb{B} \mathbf{u}^{\indexUzawa+1} - \mathbf{d} \f$;
-     *      - \f$ \l^{\indexUzawa+1}_{ij} = \max \left( \l_{ij}^{\indexUzawa} - \rho \r_{ij}^{\indexUzawa+1}, 0 \right) \f$;
-     *      - \f$ cmax = \min_{ij} \left( \r_{ij}^{\indexUzawa+1} \right) \f$;
+     *      - \f$ \mathbf{r}^{\indexUzawa+1} = \mathbb{B} \mathbf{u}^{\indexUzawa+1} - \mathbf{d} \f$;
+     *      - \f$ \l^{\indexUzawa+1}_{ij} = \max \left( \l_{ij}^{\indexUzawa} - \rho \mathbf{r}_{ij}^{\indexUzawa+1}, 0 \right) \f$;
+     *      - \f$ cmax = \min_{ij} \left( \mathbf{r}_{ij}^{\indexUzawa+1} \right) \f$;
      *      - \f$ \indexUzawa++\f$.
      *
      * @tparam Derived Class that implements matrix-vector products.
@@ -168,7 +168,7 @@ namespace scopi{
         void gemv_inv_P(const scopi_container<dim>& particles);
 
         /**
-         * @brief Computes \f$ \r = \r - \mathbb{B} \mathbf{u} \f$.
+         * @brief Computes \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
