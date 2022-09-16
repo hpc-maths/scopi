@@ -31,7 +31,7 @@ namespace scopi
      *
      * In the documentation of other classes, \f$ N \f$ is the number of particles and \f$ N_c \f$ is the number of contacts.
      *
-     * Different solvers can be used to solve the problem, see solvers/OptimBase.hpp.
+     * Different solvers can be used to solve the problem, see OptimBase.
      */
     class ProblemBase
     {
