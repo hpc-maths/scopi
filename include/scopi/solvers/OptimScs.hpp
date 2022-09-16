@@ -77,7 +77,7 @@ namespace scopi
         /**
          * @brief Constructor.
          *
-         * Build the matrix \f$ \P \f$ with SCS' data structure.
+         * Build the matrix \f$ \mathbb{P} \f$ with SCS' data structure.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -164,9 +164,9 @@ namespace scopi
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{P} \f$.
          *
-         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, 0, \dots, m_{N}, m_{N}, 0, 0, 0, J_0, \dots, 0, 0, J_{N}) \f$,
+         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, 0, \dots, m_{N}, m_{N}, 0, 0, 0, J_0, \dots, 0, 0, J_{N}) \f$,
          * where \f$ m_i \f$ (resp. \f$ J_i \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
          * This function set the second part of the matrix.
          *
@@ -176,9 +176,9 @@ namespace scopi
          */
         void set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{P} \f$.
          *
-         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, m_0, \dots, m_{N}, m_{N}, m_{N}, J_0^x, J_0^y, J_0^z, \dots, J_{N}^x, J_{N}^y, J_{N}^z) \f$,
+         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, m_0, \dots, m_{N}, m_{N}, m_{N}, J_0^x, J_0^y, J_0^z, \dots, J_{N}^x, J_{N}^y, J_{N}^z) \f$,
          * where \f$ m_i \f$ (resp. \f$ \mathbf{J}_i = (J_i^x, J_i^y, J_i^z) \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
          * This function set the second part of the matrix.
          *
@@ -190,19 +190,19 @@ namespace scopi
         
 
         /**
-         * @brief SCS' data structure for the matrix \f$ \P \f$.
+         * @brief SCS' data structure for the matrix \f$ \mathbb{P} \f$.
          */
         ScsMatrix m_P;
         /**
-         * @brief Values of \f$ \P \f$ in CSC storage.
+         * @brief Values of \f$ \mathbb{P} \f$ in CSC storage.
          */
         std::vector<scs_float> m_P_x;
         /**
-         * @brief Row indices of \f$ \P \f$ in CSC storage.
+         * @brief Row indices of \f$ \mathbb{P} \f$ in CSC storage.
          */
         std::vector<scs_int> m_P_i;
         /**
-         * @brief Column indices of \f$ \P \f$ in CSC storage.
+         * @brief Column indices of \f$ \mathbb{P} \f$ in CSC storage.
          */
         std::vector<scs_int> m_P_p;
 

@@ -88,9 +88,9 @@ namespace scopi{
      *
      * See ProblemBase for the notations.
      * The implemented algorithm is:
-     *  - \f$ \A = \mathbb{B}^T \P^{-1} \mathbb{B} \f$;
+     *  - \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
      *  - \f$ \l = \text{ gradient algorithm } \left( \A, \d - \mathbb{B} \u \right) \f$;
-     *  - \f$ \u = \P^{-1} \left( \c - \mathbb{B}^T \l \right) \f$.
+     *  - \f$ \u = \mathbb{P}^{-1} \left( \c - \mathbb{B}^T \l \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
      *
@@ -188,12 +188,12 @@ namespace scopi{
 
     private:
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -202,12 +202,12 @@ namespace scopi{
                                std::vector<double>& invP_csr_val,
                                const scopi_container<2>& particles);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -228,7 +228,7 @@ namespace scopi{
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Build matrix \f$ \A = \mathbb{B}^T \P^{-1} \mathbb{B} \f$.
+         * @brief Build matrix \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$.
          */
         void create_matrix_A();
 
@@ -266,11 +266,11 @@ namespace scopi{
          */
         struct matrix_descr m_descrB;
         /**
-         * @brief Matrix \f$ \P^{-1} \f$.
+         * @brief Matrix \f$ \mathbb{P}^{-1} \f$.
          */
         sparse_matrix_t m_inv_P;
         /**
-         * @brief Structure specifying \f$ \P^{-1} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties. 
          */
         struct matrix_descr m_descr_inv_P;
         /**

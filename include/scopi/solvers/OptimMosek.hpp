@@ -52,7 +52,7 @@ namespace scopi{
      * @brief Solve optimization problem using Mosek.
      *
      * See ProblemBase.hpp for the notations.
-     * Instead of minimizing \f$ \frac{1}{2} \u \P \cdot \u + \u \cdot \c \f$, 
+     * Instead of minimizing \f$ \frac{1}{2} \u \mathbb{P} \cdot \u + \u \cdot \c \f$, 
      * minimize \f$ \uMosek \cdot \cMosek \f$, with
      * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
@@ -60,7 +60,7 @@ namespace scopi{
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
-     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\} 6N.
+     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\mathbb{P}}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\} 6N.
      *      \end{aligned}
      * \f]
      * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
