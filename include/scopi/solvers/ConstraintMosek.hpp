@@ -37,7 +37,7 @@ namespace scopi
          */
         ConstraintMosek(std::size_t nparts);
         /**
-         * @brief Number of columns in the matrix (\f$ 1 + 6\N + 6\N \f$).
+         * @brief Number of columns in the matrix (\f$ 1 + 6N + 6N \f$).
          */
         std::size_t number_col_matrix() const;
         /**
@@ -120,7 +120,7 @@ namespace scopi
          */
         ConstraintMosek(std::size_t nparts);
         /**
-         * @brief Number of columns in the matrix (\f$ 6 \N \f$).
+         * @brief Number of columns in the matrix (\f$ 6 N \f$).
          */
         std::size_t number_col_matrix() const;
         /**
@@ -204,7 +204,7 @@ namespace scopi
          */
         ConstraintMosek(std::size_t nparts);
         /**
-         * @brief Number of columns in the matrix (\f$ 6 \N \f$).
+         * @brief Number of columns in the matrix (\f$ 6 N \f$).
          */
         std::size_t number_col_matrix() const;
         /**
@@ -290,7 +290,7 @@ namespace scopi
          */
         ConstraintMosek(std::size_t nparts);
         /**
-         * @brief Number of columns in the matrix (\f$ 1 + 6\N + 6\N \f$).
+         * @brief Number of columns in the matrix (\f$ 1 + 6N + 6N \f$).
          */
         std::size_t number_col_matrix() const;
         /**
@@ -401,7 +401,7 @@ namespace scopi
          */
         ConstraintMosek(std::size_t nparts);
         /**
-         * @brief Number of columns in the matrix (\f$ 6 \N \f$).
+         * @brief Number of columns in the matrix (\f$ 6 N \f$).
          */
         std::size_t number_col_matrix() const;
         /**

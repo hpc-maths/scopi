@@ -54,13 +54,13 @@ namespace scopi{
      * See ProblemBase.hpp for the notations.
      * Instead of minimizing \f$ \frac{1}{2} \u \P \cdot \u + \u \cdot \c \f$, 
      * minimize \f$ \uMosek \cdot \cMosek \f$, with
-     * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \mathbb{R}^{1+6\N+6\N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6\N}}) \in \mathbb{R}^{1+6\N+6\N} \f$.
+     * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \BMosek \uMosek \le \d \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6\N} \f$, with 
+     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \BMosek \uMosek \le \d \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
-     *          \BMosek &= \left. (\underbrace{0}_{1} | \underbrace{\B}_{6\N} | \underbrace{0}_{6\N}) \right\} N_c,\\
-     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6\N} | \underbrace{-\mathbb{Id}}_{6\N}) \right\} 6\N.
+     *          \BMosek &= \left. (\underbrace{0}_{1} | \underbrace{\B}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
+     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\} 6N.
      *      \end{aligned}
      * \f]
      * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
@@ -126,19 +126,19 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* wadapt_data();
         /**

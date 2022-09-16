@@ -36,7 +36,7 @@ namespace scopi
      * \f[
      *      \d + \B \u \ge 0,
      * \f]
-     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6\N} \f$, and \f$ \B \in \mathbb{R}^{N_c \times 6 \N} \f$.
+     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, and \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$.
      * We impose that the distance between all the particles should be non-negative.
      * For worms, we also impose that the distance between spheres in a worm is non-positive.
      * More exactly, we impose that minus the distance is non-negative.

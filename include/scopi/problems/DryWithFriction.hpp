@@ -126,7 +126,7 @@ namespace scopi
      *      \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}||
      * \f]
      * for all contacts \f$ (\ij) \f$.
-     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6\N} \f$, \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6\N} \f$.
+     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
      *
      * Only one matrix is built.
      * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
