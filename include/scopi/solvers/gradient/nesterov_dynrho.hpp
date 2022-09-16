@@ -23,9 +23,9 @@ namespace scopi{
      *  - \f$ \rho^{\indexUzawa} \f$ given;
      *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \mathbf{dg}^{\indexUzawa} = \A \mathbf{y}^{\indexUzawa} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{dg}^{\indexUzawa} = \mathbb{A} \mathbf{y}^{\indexUzawa} + \mathbf{e} \f$;
      *      - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left (\mathbf{y}^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
-     *      - While (\f$ \frac{1}{2} \mathbf{l}^{\indexUzawa+1} \cdot \A \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{l}^{\indexUzawa+1} > \frac{1}{2} \mathbf{y}^{\indexUzawa+1} \cdot \A \mathbf{y}{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{y}^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) \f$)
+     *      - While (\f$ \frac{1}{2} \mathbf{l}^{\indexUzawa+1} \cdot \mathbb{A} \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{l}^{\indexUzawa+1} > \frac{1}{2} \mathbf{y}^{\indexUzawa+1} \cdot \mathbb{A} \mathbf{y}{\indexUzawa+1} + \mathbf{e} \cdot \mathbf{y}^{\indexUzawa+1} + \mathbf{dg}^{\indexUzawa} \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) \cdot \left( \mathbf{l}^{\indexUzawa+1} - \mathbf{y}^{\indexUzawa+1} \right) \f$)
      *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
      *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
      *          - \f$ \mathbf{l}^{\indexUzawa+1} = \max \left( \mathbf{y}^{\indexUzawa} - \rho^{\indexUzawa} \mathbf{dg}^{\indexUzawa}, 0 \right) \f$;
@@ -54,8 +54,8 @@ namespace scopi{
         /**
          * @brief Gradient descent algorithm.
          *
-         * @param A [in] Matrix \f$ \A \f$.
-         * @param descr [in] Structure specifying \f$ \A \f$ properties. 
+         * @param A [in] Matrix \f$ \mathbb{A} \f$.
+         * @param descr [in] Structure specifying \f$ \mathbb{A} \f$ properties. 
          * @param c [in] Vector \f$ \mathbf{e} \f$.
          * @param l [out] vector \f$ \mathbf{l} \f$.
          *
@@ -97,7 +97,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \A \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \f$.
+         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{\indexUzawa+1} + \mathbf{e} \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**
@@ -109,7 +109,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l_old;
         /**
-         * @brief Temporary vector used to compute \f$ \mathbf{l}^T \cdot \A \mathbf{l} \f$ and \f$ \mathbf{y}^T \cdot \A \mathbf{y} \f$.
+         * @brief Temporary vector used to compute \f$ \mathbf{l}^T \cdot \mathbb{A} \mathbf{l} \f$ and \f$ \mathbf{y}^T \cdot \mathbb{A} \mathbf{y} \f$.
          */
         xt::xtensor<double, 1> m_tmp;
         /**
