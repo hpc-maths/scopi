@@ -14,6 +14,7 @@
 namespace scopi
 {
     /**
+     * @class ViscousBase
      * @brief Shared methods for models with viscosity.
      *
      * For each contact \f$ ij \f$, there is a new variable \f$ \gamma_{ij} \f$.

@@ -18,6 +18,11 @@ Welcome to scopi's documentation!
 
    api/problems/ProblemBase
    api/problems/DryWithoutFriction
+   api/problems/DryWithFriction
+   api/problems/DryWithFrictionFixedPoint
+   api/problems/ViscousBase
+   api/problems/ViscousWithoutFriction
+   api/problems/ViscousWithFriction
 
 
 Indices and tables
