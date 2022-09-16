@@ -14,6 +14,7 @@ namespace scopi
     // plan definition //
     /////////////////////
     /**
+     * @class plan
      * @brief Plane.
      *
      * @tparam dim Dimension (2 or 3).

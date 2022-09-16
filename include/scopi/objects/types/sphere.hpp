@@ -9,6 +9,7 @@ namespace scopi
     // sphere definition //
     ///////////////////////
     /**
+     * @class sphere
      * @brief Sphere.
      *
      * @tparam dim Dimension (2 or 3).
