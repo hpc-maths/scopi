@@ -122,9 +122,9 @@ namespace scopi{
      *
      * See ProblemBase for the notations.
      * The implemented algorithm is:
-     *  - \f$ \A = \transpose{\B} \P^{-1} \B \f$;
+     *  - \f$ \A = \B^T \P^{-1} \B \f$;
      *  - \f$ \l = \text{ gradient algorithm } \left( \A, \d - \B \u \right) \f$;
-     *  - \f$ \u = \P^{-1} \left( \c - \transpose{\B} \l \right) \f$.
+     *  - \f$ \u = \P^{-1} \left( \c - \B^T \l \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
      *  \c gradient_t depends on \c projection_t, which should be used with the appropriate problem.
@@ -265,7 +265,7 @@ namespace scopi{
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Build matrix \f$ \A = \transpose{\B} \P^{-1} \B \f$.
+         * @brief Build matrix \f$ \A = \B^T \P^{-1} \B \f$.
          */
         void create_matrix_A();
 

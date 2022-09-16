@@ -109,7 +109,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_l_old;
         /**
-         * @brief Temporary vector used to compute \f$ \transpose{\l} \cdot \A \l \f$ and \f$ \transpose{\y} \cdot \A \y \f$.
+         * @brief Temporary vector used to compute \f$ \l^T \cdot \A \l \f$ and \f$ \y^T \cdot \A \y \f$.
          */
         xt::xtensor<double, 1> m_tmp;
         /**

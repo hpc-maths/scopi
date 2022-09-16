@@ -142,7 +142,7 @@ namespace scopi
                                 std::size_t active_offset,
                                 std::size_t row);
         /**
-         * @brief Matrix-free product \f$ \u = \transpose{\B} \l + \u \f$.
+         * @brief Matrix-free product \f$ \u = \B^T \l + \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
