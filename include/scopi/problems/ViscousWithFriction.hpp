@@ -67,16 +67,16 @@ namespace scopi
      * @brief Problem that models contacts without friction and with viscosity.
      *
      * See ProblemBase.hpp for the notations.
-     * We introduce the variable \f$ \g \f$ such that, for each contact \f$ \ij \f$,  we impose
-     * - \f$ \d_{\ij} + \B \u_{\ij} \ge 0 \f$ if \f$ \g_{\ij} = 0 \f$;
-     * - \f$ \d_{\ij} + \B \u_{\ij} = 0 \f$ if \f$ \gm < \g_{\ij} < 0 \f$;
-     * - \f$ \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}|| \f$ if \f$ \g_{\ij} < \gm \f$.
+     * We introduce the variable \f$ \g \f$ such that, for each contact \f$ ij \f$,  we impose
+     * - \f$ \d_{ij} + \B \u_{ij} \ge 0 \f$ if \f$ \g_{ij} = 0 \f$;
+     * - \f$ \d_{ij} + \B \u_{ij} = 0 \f$ if \f$ \gm < \g_{ij} < 0 \f$;
+     * - \f$ \d_{ij} + \B \u_{ij} \ge ||\T \u_{ij}|| \f$ if \f$ \g_{ij} < \gm \f$.
      *
      * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
      *
-     * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
-     * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\mathrm{d} \g_{\ij}}{\mathrm{d} t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
+     * For each contact \f$ ij \f$, \f$ \g_{ij} \f$ verifies
+     * - \f$ \g_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
+     * - \f$ \frac{\mathrm{d} \g_{ij}}{\mathrm{d} t} = - \left( \lm_{ij}^+ - \lm_{ij}^- \right) \f$ else. 
      *
      * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
      * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
@@ -137,10 +137,10 @@ namespace scopi
         /**
          * @brief Create vector \f$ \d \f$.
          *
-         * For each contact \f$ \ij \f$, depending on the constraint, \f$ \d_{\ij} \f$ can be of the form:
-         *  - one element if \f$ \g_{\ij} = 0 \f$;
-         *  - four elements if \f$ \g_{\ij} < \gm \f$;
-         *  - one element corresponding to \f$ D > 0 \f$ and a second element corresponding to \f$ D < 0 \f$, after all the other constraints, if \f$ \gm < \g_{\ij} < 0 \f$.
+         * For each contact \f$ ij \f$, depending on the constraint, \f$ \d_{ij} \f$ can be of the form:
+         *  - one element if \f$ \g_{ij} = 0 \f$;
+         *  - four elements if \f$ \g_{ij} < \gm \f$;
+         *  - one element corresponding to \f$ D > 0 \f$ and a second element corresponding to \f$ D < 0 \f$, after all the other constraints, if \f$ \gm < \g_{ij} < 0 \f$.
          *
          *  In other words, \f$ d \f$ is a block vector like
          *  \f[
@@ -155,11 +155,11 @@ namespace scopi
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
         /**
-         * @brief Returns the number of contacts \f$ \ij \f$ with \f$ \g_{\ij} < \gm \f$.
+         * @brief Returns the number of contacts \f$ ij \f$ with \f$ \g_{ij} < \gm \f$.
          */
         std::size_t get_nb_gamma_min();
         /**
-         * @brief Set \f$ \g_{\ij}^n \f$ from the previous time step, compute the number of contacts with \f$ \g_{\ij} < 0 \f$ and \f$ \g_{\ij} < \gm \f$.
+         * @brief Set \f$ \g_{ij}^n \f$ from the previous time step, compute the number of contacts with \f$ \g_{ij} < 0 \f$ and \f$ \g_{ij} < \gm \f$.
          *
          * Look if particles \c i and \c j were already in contact.
          *
@@ -170,7 +170,7 @@ namespace scopi
          * @brief Compute the value of \f$ \g^{n+1} \f$.
          *
          * \f[
-         *      \g^{n+1}_{\ij} = \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right).
+         *      \g^{n+1}_{ij} = \g^n_{ij} - \Delta t \left( \lm_{ij}^+ - \lm_{ij}^- \right).
          * \f]
          *
          * @param contacts [in] Array of contacts.
@@ -216,7 +216,7 @@ namespace scopi
         void setup_projection();
 
         /**
-         * @brief Number of contacts \f$ \ij \f$ with \f$ \g_{\ij} < \gm \f$.
+         * @brief Number of contacts \f$ ij \f$ with \f$ \g_{ij} < \gm \f$.
          */
         std::size_t m_nb_gamma_min;
         /**

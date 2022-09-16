@@ -68,14 +68,14 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[ 
-     *      \d_{\ij} + \B \u_{\ij} \ge \left( ||\T \u_{\ij}|| - \mu \Delta t \s_{\ij} \right),
+     *      \d_{ij} + \B \u_{ij} \ge \left( ||\T \u_{ij}|| - \mu \Delta t \s_{ij} \right),
      * \f]
-     * for all contacts \f$ (\ij) \f$, with \f$ \s \in \mathbb{R}^{N_c} \f$.
+     * for all contacts \f$ (ij) \f$, with \f$ \s \in \mathbb{R}^{N_c} \f$.
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
      *          \F : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
-     *               & \s_{\ij} \mapsto ||\T \us_{\ij}||,
+     *               & \s_{ij} \mapsto ||\T \us_{ij}||,
      *      \end{aligned}
      * \f]
      * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \mathbb{R}^{N_c} \f$ such that \f$ \F(\s) = \s \f$.
@@ -85,12 +85,12 @@ namespace scopi
      * - \f$ \indexFixedPoint = 0 \f$;
      * - While \f$ \frac{||\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}||}{||\sWithIndex{\indexFixedPoint}|| + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
      *   - Compute \f$ \usWithIndex{\indexFixedPoint} \f$ as the solution of the optimization problem under the constraint written above;
-     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{\ij} = ||\T \usWithIndex{\indexFixedPoint}_{\ij}|| \f$ for all contacts \f$ \ij \f$;
+     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{ij} = ||\T \usWithIndex{\indexFixedPoint}_{ij}|| \f$ for all contacts \f$ ij \f$;
      *   - \f$ \indexFixedPoint ++ \f$.
      * 
      * Only one matrix is built.
      * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
-     * A contact \f$ (\ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
+     * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \d \in \mathbb{R}^{4N_c} \f$.
      */
     class DryWithFrictionFixedPoint : protected DryWithFrictionBase
@@ -109,8 +109,8 @@ namespace scopi
          * @brief Create vector \f$ \d \f$.
          *
          * \f$ \d \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
-         * \f$ (d_{\ij} + \mu \Delta t \s_{\ij}, 0, 0, 0) \f$,
-         * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
+         * \f$ (d_{ij} + \mu \Delta t \s_{ij}, 0, 0, 0) \f$,
+         * where \f$ d_{ij} \f$ is the distance between particles \c i and \c j.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
