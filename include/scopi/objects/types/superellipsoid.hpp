@@ -14,14 +14,14 @@ namespace scopi
      *
      * In 2D, for \f$ b \in[-\pi, \pi] \f$, the parametric representation of a superellipsoid is
      * \f[
-     *      r_x \sgn (\cos b ) |\cos b|^{e_0}\\
-     *      r_y \sgn (\sin b ) |\sin b|^{e_0}.
+     *      r_x \mathrm{sign} (\cos b ) |\cos b|^{e_0}\\
+     *      r_y \mathrm{sign} (\sin b ) |\sin b|^{e_0}.
      * \f]
      * In 3D, for \f$ a \in [-\frac{\pi}{2}, \frac{\pi}{2}] \f$ and \f$ b \in[-\pi, \pi] \f$, the parametric representation of a superellipsoid is
      * \f[
-     *      r_x \sgn (\cos b ) |\cos b|^{e_0} \sgn (\cos a ) |\cos a|^{e_1}
-     *      r_y \sgn (\cos b ) |\cos b|^{e_0} \sgn (\sin a ) |\sin a|^{e_1}
-     *      r_z \sgn (\sin b ) |\sin b|^{e_0}.
+     *      r_x \mathrm{sign} (\cos b ) |\cos b|^{e_0} \mathrm{sign} (\cos a ) |\cos a|^{e_1}
+     *      r_y \mathrm{sign} (\cos b ) |\cos b|^{e_0} \mathrm{sign} (\sin a ) |\sin a|^{e_1}
+     *      r_z \mathrm{sign} (\sin b ) |\sin b|^{e_0}.
      * \f]
      * \f$ (r_x, r_y, r_z) \f$ are the radiuses of the superllipsoid and \f$ (e_0, e_1 ) \f$ is its squareness.
      * See https://en.wikipedia.org/wiki/Superellipsoid for more details.
