@@ -55,9 +55,9 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[
-     *      \d + \B \u \ge 0,
+     *      \d + \mathbb{B} \u \ge 0,
      * \f]
-     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, and \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$.
+     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, and \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$.
      * We impose that the distance between all the particles should be non-negative.
      * We also consider the variable \f$ \g \f$, such that we impose
      * - \f$ D_{ij} > 0 \f$ if \f$ \g_{ij} = 0 \f$;
@@ -67,7 +67,7 @@ namespace scopi
      * - \f$ \g_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
      * - \f$ \frac{\mathrm{d} \g_{ij}}{\mathrm{d} t} = - \left( \lm_{ij}^+ - \lm_{ij}^- \right) \f$ else. 
      *
-     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
+     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$ (resp. \f$ -\d - \mathbb{B} \u \ge 0 \f$).
      * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
      *
      * @tparam dim Dimension (2 or 3).
@@ -87,7 +87,7 @@ namespace scopi
         ViscousWithoutFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
 
         /**
-         * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
+         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
          *
@@ -125,7 +125,7 @@ namespace scopi
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
         /**
-         * @brief Matrix-free product \f$ \r = \r - \B \u \f$.
+         * @brief Matrix-free product \f$ \r = \r - \mathbb{B} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
@@ -142,7 +142,7 @@ namespace scopi
                                 std::size_t active_offset,
                                 std::size_t row);
         /**
-         * @brief Matrix-free product \f$ \u = \B^T \l + \u \f$.
+         * @brief Matrix-free product \f$ \u = \mathbb{B}^T \l + \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
@@ -176,7 +176,7 @@ namespace scopi
          *
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \d + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
          */
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,

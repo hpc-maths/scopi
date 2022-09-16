@@ -133,7 +133,7 @@ namespace scopi
          */
         double* lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \d + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          * \warning The method is not implemented, it is defined so all solvers have the same interface.
@@ -207,19 +207,19 @@ namespace scopi
         std::vector<scs_int> m_P_p;
 
         /**
-         * @brief SCS' data structure for the matrix \f$ \B \f$.
+         * @brief SCS' data structure for the matrix \f$ \mathbb{B} \f$.
          */
         ScsMatrix m_A;
         /**
-         * @brief Values of \f$ \B \f$ in CSC storage.
+         * @brief Values of \f$ \mathbb{B} \f$ in CSC storage.
          */
         std::vector<scs_float> m_A_x;
         /**
-         * @brief Row indices of \f$ \B \f$ in CSC storage.
+         * @brief Row indices of \f$ \mathbb{B} \f$ in CSC storage.
          */
         std::vector<scs_int> m_A_i;
         /**
-         * @brief Column indices of \f$ \B \f$ in CSC storage.
+         * @brief Column indices of \f$ \mathbb{B} \f$ in CSC storage.
          */
         std::vector<scs_int> m_A_p;
 

@@ -41,18 +41,18 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief A matrix larger than \f$ \B \f$ is built (see OptimMosek), the function returns the index of the first column of \f$ \B \f$ in \f$ \BMosek \f$.
+         * @brief A matrix larger than \f$ \mathbb{B} \f$ is built (see OptimMosek), the function returns the index of the first column of \f$ \mathbb{B} \f$ in \f$ \tilde{\mathbb{B}} \f$.
          *
          * @return 1.
          */
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraint \f$ \d + \B \u \ge 0 \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
-         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
          * @param contacts [in] Array of contatcs (for compatibility with other problems).
@@ -68,7 +68,7 @@ namespace scopi
          *
          * Call \pre <tt> model->solve() </tt> before this function.
          *
-         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \tilde{\mathbb{B}} \f$ (for compatibility with other problems).
          * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
          */
         void update_dual(std::size_t nb_row_matrix,
@@ -124,17 +124,17 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \BMosek \f$ contains the matrices \f$ \B \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
          *
          * @return 0.
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{ij} + \B \u_{ij} \ge ||\T \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
-         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
          * @param contacts [in] Array of contatcs.
@@ -150,7 +150,7 @@ namespace scopi
          *
          * Call \pre <tt> model->solve() </tt> before this function.
          *
-         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \tilde{\mathbb{B}} \f$ (for compatibility with other problems).
          * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
          */
         void update_dual(std::size_t nb_row_matrix,
@@ -208,17 +208,17 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \BMosek \f$ contains the matrices \f$ \B \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
          *
          * @return 0.
          */
         std::size_t index_first_col_matrix() const;
         /**
-         * @brief Add the constraint \f$ \d_{ij} + \B \u_{ij} \ge \T \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge \T \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
-         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
          * @param contacts [in] Array of contatcs.
@@ -234,7 +234,7 @@ namespace scopi
          *
          * Call \pre <tt> model->solve() </tt> before this function.
          *
-         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \tilde{\mathbb{B}} \f$ (for compatibility with other problems).
          * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
          */
         void update_dual(std::size_t nb_row_matrix,
@@ -294,18 +294,18 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief A matrix larger than \f$ \B \f$ is built (see OptimMosek), the function returns the index of the first column of \f$ \B \f$ in \f$ \BMosek \f$.
+         * @brief A matrix larger than \f$ \mathbb{B} \f$ is built (see OptimMosek), the function returns the index of the first column of \f$ \mathbb{B} \f$ in \f$ \tilde{\mathbb{B}} \f$.
          *
          * @return 1.
          */
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraint \f$ \d + \B \u \ge 0 \f$ in Mosek's solver.
+         * @brief Add the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
-         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
          * @param contacts [in] Array of contatcs (for compatibility with other problems).
@@ -320,7 +320,7 @@ namespace scopi
          *
          * Call \pre <tt> model->solve() </tt> before this function.
          *
-         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$ (for compatibility with other problems).
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \tilde{\mathbb{B}} \f$ (for compatibility with other problems).
          * @param nb_contacts [in] Number of contacts (for compatibility with other problems).
          */
         void update_dual(std::size_t nb_row_matrix,
@@ -405,18 +405,18 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \BMosek \f$ contains the matrices \f$ \B \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
          *
          * @return 0.
          */
         std::size_t index_first_col_matrix() const;
 
         /**
-         * @brief Add the constraints \f$ \d + \B \u \ge 0 \f$ and \f$ \d_{ij} + \B \u_{ij} \ge ||\T \u_{ij}|| \f$ in Mosek's solver.
+         * @brief Add the constraints \f$ \d + \mathbb{B} \u \ge 0 \f$ and \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$ in Mosek's solver.
          *
          * @tparam dim Dimension (2 or 3).
          * @param D [in] Array \f$ \d \f$.
-         * @param A [in] Matrix \f$ \BMosek \f$.
+         * @param A [in] Matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param X [in] Unknown \f$ \u \f$.
          * @param model [in] Mosek's solver.
          * @param contacts [in] Array of contatcs.
@@ -431,7 +431,7 @@ namespace scopi
          *
          * Call \pre <tt> model->solve() </tt> before this function.
          *
-         * @param nb_row_matrix [in] Number of row of the matrix \f$ \BMosek \f$.
+         * @param nb_row_matrix [in] Number of row of the matrix \f$ \tilde{\mathbb{B}} \f$.
          * @param nb_contacts [in] Number of contacts.
          */
         void update_dual(std::size_t nb_row_matrix,
@@ -448,11 +448,11 @@ namespace scopi
          */
         std::size_t m_nparticles;
         /**
-         * @brief Mosek's data structure for the constraint \f$ \d + \B \u \ge 0 \f$.
+         * @brief Mosek's data structure for the constraint \f$ \d + \mathbb{B} \u \ge 0 \f$.
          */
         mosek::fusion::Constraint::t m_qc1;
         /**
-         * @brief Mosek's data structure for the constraint \f$ \d_{ij} + \B \u_{ij} \ge ||\T \u_{ij}|| \f$.
+         * @brief Mosek's data structure for the constraint \f$ \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}|| \f$.
          */
         mosek::fusion::Constraint::t m_qc4;
     };

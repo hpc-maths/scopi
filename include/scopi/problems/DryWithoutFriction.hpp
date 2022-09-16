@@ -34,9 +34,9 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[
-     *      \d + \B \u \ge 0,
+     *      \d + \mathbb{B} \u \ge 0,
      * \f]
-     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, and \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$.
+     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, and \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$.
      * We impose that the distance between all the particles should be non-negative.
      * For worms, we also impose that the distance between spheres in a worm is non-positive.
      * More exactly, we impose that minus the distance is non-negative.
@@ -55,7 +55,7 @@ namespace scopi
 
     protected:
         /**
-         * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
+         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
@@ -91,7 +91,7 @@ namespace scopi
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
         /**
-         * @brief Matrix-free product \f$ \r = \r - \B \u \f$.
+         * @brief Matrix-free product \f$ \r = \r - \mathbb{B} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
@@ -109,7 +109,7 @@ namespace scopi
                                 std::size_t active_offset,
                                 std::size_t row);
         /**
-         * @brief Matrix-free product \f$ \u = \B^T \l + \u \f$.
+         * @brief Matrix-free product \f$ \u = \mathbb{B}^T \l + \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
@@ -145,7 +145,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \d + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,

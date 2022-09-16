@@ -123,14 +123,14 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[
-     *      \d_{ij} + \B \u_{ij} \ge ||\T \u_{ij}||
+     *      \d_{ij} + \mathbb{B} \u_{ij} \ge ||\T \u_{ij}||
      * \f]
      * for all contacts \f$ (ij) \f$.
-     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
+     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6N} \f$.
      *
      * Only one matrix is built.
-     * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
-     * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
+     * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ T \f$.
+     * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ T \f$.
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \d \in \mathbb{R}^{4N_c} \f$.
      *
      */
@@ -147,7 +147,7 @@ namespace scopi
         DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
 
         /**
-         * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
+         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \T \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
@@ -206,7 +206,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \d + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,

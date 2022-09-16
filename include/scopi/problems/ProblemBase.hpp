@@ -21,11 +21,11 @@ namespace scopi
      * \f]
      * under constraint
      * \f[
-     *      \d + \B \mathbbf{u} \ge \constraintFunction (\mathbbf{u}).
+     *      \d + \mathbb{B} \mathbbf{u} \ge \constraintFunction (\mathbbf{u}).
      * \f]
      * The vector \f$ \c \f$ is known and does not depends on the problem.
      * The function \f$ \constraintFunction \f$ differs with the problem.
-     * So does the implentation of the vector \f$ \d \f$ and the matrix \f$ \B \f$.
+     * So does the implentation of the vector \f$ \d \f$ and the matrix \f$ \mathbb{B} \f$.
      * However, they share some elements, thay are set by this class.
      *
      * In the documentation of other classes, \f$ N \f$ is the number of particles and \f$ N_c \f$ is the number of contacts.
@@ -59,7 +59,7 @@ namespace scopi
                                     std::size_t row);
 
         /**
-         * @brief COO storage of the shared row of \f$ \B \f$.
+         * @brief COO storage of the shared row of \f$ \mathbb{B} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (to get the position).
@@ -117,19 +117,19 @@ namespace scopi
          */
         double m_dt;
         /**
-         * @brief Rows' indices of \f$ \B \f$ in COO storage.
+         * @brief Rows' indices of \f$ \mathbb{B} \f$ in COO storage.
          *
          * Modified by the problem.
          */
         std::vector<int> m_A_rows;
         /**
-         * @brief Columns' indices of \f$ \B \f$ in COO storage.
+         * @brief Columns' indices of \f$ \mathbb{B} \f$ in COO storage.
          *
          * Modified by the problem.
          */
         std::vector<int> m_A_cols;
         /**
-         * @brief Values of \f$ \B \f$ in COO storage.
+         * @brief Values of \f$ \mathbb{B} \f$ in COO storage.
          *
          * Modified by the problem.
          */
