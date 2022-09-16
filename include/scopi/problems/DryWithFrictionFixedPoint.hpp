@@ -84,8 +84,8 @@ namespace scopi
      * - \f$ \sWithIndex{0} \f$;
      * - \f$ k = 0 \f$;
      * - While \f$ \frac{||\sWithIndex{k-1} - \sWithIndex{k}||}{||\sWithIndex{k}|| + 1} > \f$ \c tol_fixed_point and \f$ k < \f$ \c max_iter_fixed_point
-     *   - Compute \f$ \usWithIndex{k} \f$ as the solution of the optimization problem under the constraint written above;
-     *   - \f$ \sWithIndex{k+1}_{ij} = ||\mathbb{T} \usWithIndex{k}_{ij}|| \f$ for all contacts \f$ ij \f$;
+     *   - Compute \f$ \mathbf{u}^{\mathbf{s}^{k}} \f$ as the solution of the optimization problem under the constraint written above;
+     *   - \f$ \sWithIndex{k+1}_{ij} = ||\mathbb{T} \mathbf{u}^{\mathbf{s}^{k}}_{ij}|| \f$ for all contacts \f$ ij \f$;
      *   - \f$ k ++ \f$.
      * 
      * Only one matrix is built.
