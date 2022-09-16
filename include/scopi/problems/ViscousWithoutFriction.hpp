@@ -125,13 +125,13 @@ namespace scopi
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
         /**
-         * @brief Matrix-free product \f$ \r = \r - \mathbb{B} \mathbf{u} \f$.
+         * @brief Matrix-free product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
          * @param particles [in] Array of particles (to get positions).
          * @param U [in] Vector \f$ \mathbf{u} \f$.
-         * @param R [in/out] Vector \f$ \r \f$.
+         * @param R [in/out] Vector \f$ \mathbf{r} \f$.
          * @param active_offset [in] Index of the first active particle.
          * @param row [in] Index of the computed row.
          */

@@ -81,7 +81,7 @@ namespace scopi{
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
         /**
-         * @brief Implements the product \f$ \r = \r - \mathbb{B} \mathbf{u} \f$.
+         * @brief Implements the product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
