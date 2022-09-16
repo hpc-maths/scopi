@@ -68,17 +68,17 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[ 
-     *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge \left( ||\mathbb{T} \mathbf{u}_{ij}|| - \mu \Delta t \s_{ij} \right),
+     *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge \left( ||\mathbb{T} \mathbf{u}_{ij}|| - \mu \Delta t \mathbf{f}_{ij} \right),
      * \f]
-     * for all contacts \f$ (ij) \f$, with \f$ \s \in \mathbb{R}^{N_c} \f$.
+     * for all contacts \f$ (ij) \f$, with \f$ \mathbf{f} \in \mathbb{R}^{N_c} \f$.
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
      *          \F : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
-     *               & \s_{ij} \mapsto ||\mathbb{T} \us_{ij}||,
+     *               & \mathbf{f}_{ij} \mapsto ||\mathbb{T} \us_{ij}||,
      *      \end{aligned}
      * \f]
-     * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \mathbb{R}^{N_c} \f$ such that \f$ \F(\s) = \s \f$.
+     * and search for a fixed point of \f$ \F \f$ : \f$ \mathbf{f} \in \mathbb{R}^{N_c} \f$ such that \f$ \F(\mathbf{f}) = \mathbf{f} \f$.
      *
      * This leads to the following algorithm:
      * - \f$ \sWithIndex{0} \f$;
@@ -139,7 +139,7 @@ namespace scopi
          * @brief Create vector \f$ \mathbf{d} \f$.
          *
          * \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
-         * \f$ (d_{ij} + \mu \Delta t \s_{ij}, 0, 0, 0) \f$,
+         * \f$ (d_{ij} + \mu \Delta t \mathbf{f}_{ij}, 0, 0, 0) \f$,
          * where \f$ d_{ij} \f$ is the distance between particles \c i and \c j.
          *
          * @tparam dim Dimension (2 or 3).
