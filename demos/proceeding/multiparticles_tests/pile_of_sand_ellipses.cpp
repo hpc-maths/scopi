@@ -26,7 +26,7 @@ int main()
     std::size_t total_it = 1000;
     double width_box = 10.;
     std::size_t n = 10; // n^2 ellipses
-    double g = 1.;
+    double g = 5.;
 
     double r = width_box/2./(n+1);
     double r_obs = r/10.;
