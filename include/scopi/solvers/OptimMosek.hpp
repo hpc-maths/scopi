@@ -53,10 +53,10 @@ namespace scopi{
      *
      * See ProblemBase.hpp for the notations.
      * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$, 
-     * minimize \f$ \uMosek \cdot \cMosek \f$, with
-     * \f$ \uMosek = (\sMosek, \mathbf{u}, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \mathbf{c}, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
+     * minimize \f$ \tilde{\mathbf{u}} \cdot \cMosek \f$, with
+     * \f$ \tilde{\mathbf{u}} = (\sMosek, \mathbf{u}, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \mathbf{c}, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \uMosek \le \mathbf{d} \f$, \f$ \mathbb{A}_z \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
+     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
@@ -71,7 +71,7 @@ namespace scopi{
      * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
      * Each component of \f$ \mathbb{B} \mathbf{u} \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij}, \mathbb{T} \mathbf{u}_{ij}^1, \mathbb{T} \mathbf{u}_{ij}^2, \mathbb{T} \mathbf{u}_{ij}^3 ) \f$.
      * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \mathbf{u}_{ij} \f$, but this resulted in poor performances.
-     * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \uMosek \in Q \f$ with appropriate reshape.
+     * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \in Q \f$ with appropriate reshape.
      * Currently, only a part of the matrix is used.
      *
      * @tparam problem_t Problem to be solved.
