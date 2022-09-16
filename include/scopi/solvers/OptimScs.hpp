@@ -109,19 +109,19 @@ namespace scopi
                                             const std::vector<neighbor<dim>>& contacts, 
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* wadapt_data();
         /**
@@ -166,7 +166,7 @@ namespace scopi
         /**
          * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P \f$.
          *
-         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, 0, \dots, m_{\N}, m_{\N}, 0, 0, 0, J_0, \dots, 0, 0, J_{\N}) \f$,
+         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, 0, \dots, m_{N}, m_{N}, 0, 0, 0, J_0, \dots, 0, 0, J_{N}) \f$,
          * where \f$ m_i \f$ (resp. \f$ J_i \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
          * This function set the second part of the matrix.
          *
@@ -178,7 +178,7 @@ namespace scopi
         /**
          * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P \f$.
          *
-         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, m_0, \dots, m_{\N}, m_{\N}, m_{\N}, J_0^x, J_0^y, J_0^z, \dots, J_{\N}^x, J_{\N}^y, J_{\N}^z) \f$,
+         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, m_0, \dots, m_{N}, m_{N}, m_{N}, J_0^x, J_0^y, J_0^z, \dots, J_{N}^x, J_{N}^y, J_{N}^z) \f$,
          * where \f$ m_i \f$ (resp. \f$ \mathbf{J}_i = (J_i^x, J_i^y, J_i^z) \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
          * This function set the second part of the matrix.
          *

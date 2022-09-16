@@ -28,7 +28,7 @@ namespace scopi
      * So does the implentation of the vector \f$ \d \f$ and the matrix \f$ \B \f$.
      * However, they share some elements, thay are set by this class.
      *
-     * In the documentation of other classes, \f$ \N \f$ is the number of particles and \f$ N_c \f$ is the number of contacts.
+     * In the documentation of other classes, \f$ N \f$ is the number of particles and \f$ N_c \f$ is the number of contacts.
      *
      * Different solvers can be used to solve the problem, see solvers/OptimBase.hpp.
      */

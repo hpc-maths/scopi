@@ -57,7 +57,7 @@ namespace scopi
      * \f[
      *      \d + \B \u \ge 0,
      * \f]
-     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6\N} \f$, and \f$ \B \in \mathbb{R}^{N_c \times 6 \N} \f$.
+     * with \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, and \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$.
      * We impose that the distance between all the particles should be non-negative.
      * We also consider the variable \f$ \g \f$, such that we impose
      * - \f$ D_{\ij} > 0 \f$ if \f$ \g_{\ij} = 0 \f$;
