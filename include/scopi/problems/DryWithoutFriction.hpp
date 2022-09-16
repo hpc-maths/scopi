@@ -109,12 +109,12 @@ namespace scopi
                                 std::size_t active_offset,
                                 std::size_t row);
         /**
-         * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{B}^T \l + \mathbf{u} \f$.
+         * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{B}^T \mathbf{l} + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
          * @param particles [in] Array of particles (to get positions).
-         * @param L [in] Vector \f$ \l \f$.
+         * @param L [in] Vector \f$ \mathbf{l} \f$.
          * @param U [in/out] Vector \f$ \mathbf{u} \f$.
          * @param active_offset [in] Index of the first active particle.
          * @param row [in] Index of the computed row.

@@ -64,12 +64,12 @@ namespace scopi{
      *
      * The algorithm is:
      *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \l^{\indexUzawa} = 0 \f$;
+     *  - \f$ \mathbf{l}^{\indexUzawa} = 0 \f$;
      *  - \f$ cmax = - \infty \f$;
      *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
-     *      - \f$ \mathbf{u}^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \mathbf{c} - B^T \l^{\indexUzawa} \right) \f$;
+     *      - \f$ \mathbf{u}^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \mathbf{c} - B^T \mathbf{l}^{\indexUzawa} \right) \f$;
      *      - \f$ \mathbf{r}^{\indexUzawa+1} = \mathbb{B} \mathbf{u}^{\indexUzawa+1} - \mathbf{d} \f$;
-     *      - \f$ \l^{\indexUzawa+1}_{ij} = \max \left( \l_{ij}^{\indexUzawa} - \rho \mathbf{r}_{ij}^{\indexUzawa+1}, 0 \right) \f$;
+     *      - \f$ \mathbf{l}^{\indexUzawa+1}_{ij} = \max \left( \mathbf{l}_{ij}^{\indexUzawa} - \rho \mathbf{r}_{ij}^{\indexUzawa+1}, 0 \right) \f$;
      *      - \f$ cmax = \min_{ij} \left( \mathbf{r}_{ij}^{\indexUzawa+1} \right) \f$;
      *      - \f$ \indexUzawa++\f$.
      *
@@ -179,7 +179,7 @@ namespace scopi{
                     const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Computes \f$ \mathbf{u} = \mathbb{B}^T \l + \mathbf{u} \f$.
+         * @brief Computes \f$ \mathbf{u} = \mathbb{B}^T \mathbf{l} + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -212,11 +212,11 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_U;
         /**
-         * @brief Vector \f$ \l \f$.
+         * @brief Vector \f$ \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_L;
         /**
-         * @brief Vector \f$ \l \f$.
+         * @brief Vector \f$ \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_R;
 

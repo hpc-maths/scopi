@@ -49,7 +49,7 @@ namespace scopi{
          */
         double tol_dg;
         /**
-         * @brief Tolerance for \f$ \l \f$ criterion.
+         * @brief Tolerance for \f$ \mathbf{l} \f$ criterion.
          *
          * Default value is \f$ 10^{-9} \f$.
          * \note \c tol_l > 0
@@ -89,8 +89,8 @@ namespace scopi{
      * See ProblemBase for the notations.
      * The implemented algorithm is:
      *  - \f$ \A = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
-     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
-     *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \mathbf{c} - \mathbb{B}^T \l \right) \f$.
+     *  - \f$ \mathbf{l} = \text{ gradient algorithm } \left( \A, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
+     *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \mathbf{c} - \mathbb{B}^T \mathbf{l} \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
      *
@@ -233,7 +233,7 @@ namespace scopi{
         void create_matrix_A();
 
         /**
-         * @brief Vector \f$ \l \f$.
+         * @brief Vector \f$ \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_l;
         /**
@@ -245,7 +245,7 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_u;
         /**
-         * @brief Vecotr \f$ \mathbb{B} \l \f$.
+         * @brief Vecotr \f$ \mathbb{B} \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_bl;
 
