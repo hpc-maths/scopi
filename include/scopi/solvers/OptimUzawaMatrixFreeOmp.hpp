@@ -72,7 +72,7 @@ namespace scopi{
 
     public:
         /**
-         * @brief Implements the product \f$ \P^{-1} \u \f$.
+         * @brief Implements the product \f$ \mathbb{P}^{-1} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for masses and moments of inertia).

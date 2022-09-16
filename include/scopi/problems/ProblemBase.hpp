@@ -17,7 +17,7 @@ namespace scopi
      *
      * All problems (models) solve 
      * \f[
-     *      \min \frac{1}{2} \mathbf{u} \cdot \P \mathbf{u} + \mathbf{u} \cdot \c
+     *      \min \frac{1}{2} \mathbf{u} \cdot \mathbb{P} \mathbf{u} + \mathbf{u} \cdot \c
      * \f]
      * under constraint
      * \f[
@@ -44,7 +44,7 @@ namespace scopi
         ProblemBase(std::size_t nparts, double dt);
 
         /**
-         * @brief Matrix-free product \f$ \mathbbf{u} = \P^{-1} \mathbbf{u} \f$.
+         * @brief Matrix-free product \f$ \mathbbf{u} = \mathbb{P}^{-1} \mathbbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (to get masses and moments of inertia).
@@ -77,7 +77,7 @@ namespace scopi
 
     private:
         /**
-         * @brief 2D implementation of rows in matrix-free product \f$ \mathbbf{u} = \P^{-1} \mathbbf{u} \f$ that involve moments of inertia.
+         * @brief 2D implementation of rows in matrix-free product \f$ \mathbbf{u} = \mathbb{P}^{-1} \mathbbf{u} \f$ that involve moments of inertia.
          *
          * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
          * The implentation is different in 2D or in 3D.
@@ -92,7 +92,7 @@ namespace scopi
                                            std::size_t active_offset,
                                            std::size_t row);
         /**
-         * @brief 3D implementation of rows in matrix-free product \f$ \mathbbf{u} = \P^{-1} \mathbbf{u} \f$ that involve moments of inertia.
+         * @brief 3D implementation of rows in matrix-free product \f$ \mathbbf{u} = \mathbb{P}^{-1} \mathbbf{u} \f$ that involve moments of inertia.
          *
          * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
          * The implentation is different in 2D or in 3D.

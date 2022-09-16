@@ -111,7 +111,7 @@ namespace scopi{
         /**
          * @brief Build the vector \f$ \c \f$.
          *
-         * \f$ \c = \P \mathbf{v}^d \f$, where \f$ \mathbf{v}^d \f$ is the a priori velocity (see ProblemBase for the notations).
+         * \f$ \c = \mathbb{P} \mathbf{v}^d \f$, where \f$ \mathbf{v}^d \f$ is the a priori velocity (see ProblemBase for the notations).
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for a priori velocities, masses, and moments of inertia).

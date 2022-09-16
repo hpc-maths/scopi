@@ -67,7 +67,7 @@ namespace scopi{
      *  - \f$ \l^{\indexUzawa} = 0 \f$;
      *  - \f$ cmax = - \infty \f$;
      *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
-     *      - \f$ \u^{\indexUzawa+1} = \P^{-1} \left( \c - B^T \l^{\indexUzawa} \right) \f$;
+     *      - \f$ \u^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \c - B^T \l^{\indexUzawa} \right) \f$;
      *      - \f$ \r^{\indexUzawa+1} = \mathbb{B} \u^{\indexUzawa+1} - \d \f$;
      *      - \f$ \l^{\indexUzawa+1}_{ij} = \max \left( \l_{ij}^{\indexUzawa} - \rho \r_{ij}^{\indexUzawa+1}, 0 \right) \f$;
      *      - \f$ cmax = \min_{ij} \left( \r_{ij}^{\indexUzawa+1} \right) \f$;
@@ -159,7 +159,7 @@ namespace scopi{
 
     private:
         /**
-         * @brief Computes \f$ \P^{-1} \u \f$.
+         * @brief Computes \f$ \mathbb{P}^{-1} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.

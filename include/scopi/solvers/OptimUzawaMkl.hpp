@@ -56,7 +56,7 @@ namespace scopi
         /**
          * @brief Constructor.
          *
-         * Buils the matrix \f$ \P^{-1} \f$.
+         * Buils the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -72,7 +72,7 @@ namespace scopi
                       const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
                       const ProblemParams<problem_t>& problem_params);
         /**
-         * @brief Free the memory allocated for the matrix \f$ \P^{-1} \f$..
+         * @brief Free the memory allocated for the matrix \f$ \mathbb{P}^{-1} \f$..
          */
         ~OptimUzawaMkl();
 
@@ -97,7 +97,7 @@ namespace scopi
         void finalize_uzawa_impl();
 
         /**
-         * @brief Implements the product \f$ \P^{-1} \u \f$.
+         * @brief Implements the product \f$ \mathbb{P}^{-1} \u \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for masses and moments of inertia).
@@ -136,12 +136,12 @@ namespace scopi
         void print_csr_matrix(const sparse_matrix_t A);
 
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -150,12 +150,12 @@ namespace scopi
                                std::vector<double>& invP_csr_val,
                                const scopi_container<2>& particles);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -173,11 +173,11 @@ namespace scopi
          */
         struct matrix_descr m_descrA;
         /**
-         * @brief MKL's data structure for the matrix \f$ \P^{-1} \f$.
+         * @brief MKL's data structure for the matrix \f$ \mathbb{P}^{-1} \f$.
          */
         sparse_matrix_t m_inv_P;
         /**
-         * @brief Structure specifying \f$ \P^{-1} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties. 
          */
         struct matrix_descr m_descr_inv_P;
         /**
