@@ -12,7 +12,8 @@
 
 int main()
 {
-    // Figure 8 and table 3: spheres falling in a box with PGD solver and 8^3 spheres.
+    // Table 2: 8^3 spheres falling in a box.
+    // PGD algorithm.
     plog::init(plog::info, "spheres_in_box_small_config_pgd.log");
 
     constexpr std::size_t dim = 3;

@@ -15,7 +15,6 @@
 int main()
 {
     // Figure 6: Disk falling on a plane with friction. L^2 error on the position of the center and the rotation of the disk as a function of dt.
-    // Table 2: Mean number of iterations of fixed point scheme as a function of dt.
     // mu = 0.1, fixed point algorithm
     plog::init(plog::warning, "error_with_friction_mu01_fixedPoint.log");
 

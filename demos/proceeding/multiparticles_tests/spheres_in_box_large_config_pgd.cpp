@@ -12,7 +12,9 @@
 
 int main()
 {
-    // Figure 8 and table 3: spheres falling in a box with PGD solver and 50^3 spheres.
+    // Figure 8: number of iterations vs number of active contatcs for spheres falling in a box.
+    // Table 2: 50^3 spheres falling in a box.
+    // PGD algorithm.
     plog::init(plog::info, "spheres_in_box_large_config_pgd.log");
 
     constexpr std::size_t dim = 3;

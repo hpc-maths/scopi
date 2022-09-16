@@ -12,7 +12,10 @@
 
 int main()
 {
-    // Figures 7, 8 and table 3: spheres falling in a box with APGD-AR solver and 50^3 spheres.
+    // Figure 7: spheres falling in a box.
+    // Figure 8: number of iterations vs number of active contatcs for spheres falling in a box.
+    // Table 2: 50^3 spheres falling in a box.
+    // APGD-AR algorithm.
     plog::init(plog::info, "spheres_in_box_large_config_apgdar.log");
 
     constexpr std::size_t dim = 3;

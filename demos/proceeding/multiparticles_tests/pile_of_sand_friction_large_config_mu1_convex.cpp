@@ -12,7 +12,8 @@
 
 int main()
 {
-    // Table 4 and figure 9: 13^3 spheres falling on a plane with friction.
+    // Table 3: 12^3 spheres falling on a plane with friction.
+    // Figure 9: spheres falling on a plane with friction.
     // mu = 1, convex scheme.
     plog::init(plog::info, "pile_of_sand_spheres_large_config_mu1_convex.log");
 
@@ -21,7 +22,7 @@ int main()
 
     double width_box = 10.;
     std::size_t n = 12; // n^3 spheres
-    std::size_t total_it = 2000;
+    std::size_t total_it = 1000;
     double g = 1.;
 
     double r = width_box/2./(n+1);

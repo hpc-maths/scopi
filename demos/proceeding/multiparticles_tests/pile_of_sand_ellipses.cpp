@@ -18,7 +18,7 @@ void add_obstacle(scopi::scopi_container<dim>& particles, double x, double r)
 
 int main()
 {
-    // Figure 10: pile of sand with ellipses.
+    // Figure 10: ellipses falling on a plane.
     plog::init(plog::info, "pile_of_sand_ellipses.log");
 
     constexpr std::size_t dim = 2;
@@ -35,7 +35,6 @@ int main()
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = 0.2/dt/dt;
-    // params.scopi_params.output_frequency = 20;
     params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_ellipses/scopi_objects_";
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
