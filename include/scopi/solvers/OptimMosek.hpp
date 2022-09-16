@@ -60,12 +60,12 @@ namespace scopi{
      * \f[
      *      \begin{aligned}
      *          \BMosek &= \left. (\underbrace{0}_{1} | \underbrace{\B}_{6\N} | \underbrace{0}_{6\N}) \right\} \Nc,\\
-     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6\N} | \underbrace{-\Id}_{6\N}) \right\} 6\N.
+     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6\N} | \underbrace{-\mathbb{Id}}_{6\N}) \right\} 6\N.
      *      \end{aligned}
      * \f]
      * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
      * Here, \f$ \Nc \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
-     * \f$ \Id \f$ is the identity matrix.
+     * \f$ \mathbb{Id} \f$ is the identity matrix.
      *
      * With friction, the constraint is written as \f$ \d \B \u \in \left( Q^4 \right)^{\Nc} \f$,
      * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
