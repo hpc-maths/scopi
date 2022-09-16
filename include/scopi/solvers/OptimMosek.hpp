@@ -56,11 +56,11 @@ namespace scopi{
      * minimize \f$ \uMosek \cdot \cMosek \f$, with
      * \f$ \uMosek = (\sMosek, \mathbf{u}, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \mathbf{c}, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \uMosek \le \mathbf{d} \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
+     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \uMosek \le \mathbf{d} \f$, \f$ \mathbf{A}_z \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
-     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\mathbb{P}}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\} 6N.
+     *          \mathbf{A}_z &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\mathbb{P}}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\} 6N.
      *      \end{aligned}
      * \f]
      * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
@@ -94,7 +94,7 @@ namespace scopi{
         /**
          * @brief Constructor.
          *
-         * Build the matrix \f$ \AzMosek \f$.
+         * Build the matrix \f$ \mathbf{A}_z \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -164,12 +164,12 @@ namespace scopi{
 
     private:
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \AzMosek \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbf{A}_z \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param Az_rows [out] Rows' indicies of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_cols [out] Columns' indices of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_values [out] Values of \f$ \AzMosek \f$ in COO storage.
+         * @param Az_rows [out] Rows' indicies of \f$ \mathbf{A}_z \f$ in COO storage.
+         * @param Az_cols [out] Columns' indices of \f$ \mathbf{A}_z \f$ in COO storage.
+         * @param Az_values [out] Values of \f$ \mathbf{A}_z \f$ in COO storage.
          * @param particles [in] Array of particles (for the moments of interia).
          */
         void set_moment_mass_matrix(std::size_t nparts,
@@ -178,12 +178,12 @@ namespace scopi{
                                     std::vector<double>& Az_values,
                                     const scopi_container<2>& particles);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \AzMosek \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbf{A}_z \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param Az_rows [out] Rows' indicies of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_cols [out] Columns' indices of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_values [out] Values of \f$ \AzMosek \f$ in COO storage.
+         * @param Az_rows [out] Rows' indicies of \f$ \mathbf{A}_z \f$ in COO storage.
+         * @param Az_cols [out] Columns' indices of \f$ \mathbf{A}_z \f$ in COO storage.
+         * @param Az_values [out] Values of \f$ \mathbf{A}_z \f$ in COO storage.
          * @param particles [in] Array of particles (for the moments of interia).
          */
         void set_moment_mass_matrix(std::size_t nparts,
@@ -193,7 +193,7 @@ namespace scopi{
                                     const scopi_container<3>& particles);
 
         /**
-         * @brief Mosek's data structure (pointer) for the matrix \f$ \AzMosek \f$.
+         * @brief Mosek's data structure (pointer) for the matrix \f$ \mathbf{A}_z \f$.
          */
         mosek::fusion::Matrix::t m_Az;
         /**
