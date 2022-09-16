@@ -52,7 +52,7 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[
-     *      \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}}
+     *      \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}||
      * \f]
      * for all contacts \f$ (\ij) \f$.
      * \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, \f$ \B \in \R^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.

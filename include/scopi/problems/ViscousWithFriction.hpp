@@ -70,7 +70,7 @@ namespace scopi
      * We introduce the variable \f$ \g \f$ such that, for each contact \f$ \ij \f$,  we impose
      * - \f$ \d_{\ij} + \B \u_{\ij} \ge 0 \f$ if \f$ \g_{\ij} = 0 \f$;
      * - \f$ \d_{\ij} + \B \u_{\ij} = 0 \f$ if \f$ \gm < \g_{\ij} < 0 \f$;
-     * - \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ if \f$ \g_{\ij} < \gm \f$.
+     * - \f$ \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}|| \f$ if \f$ \g_{\ij} < \gm \f$.
      *
      * \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, \f$ \B \in \R^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.
      *
