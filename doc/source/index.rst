@@ -24,6 +24,8 @@ Welcome to scopi's documentation!
    api/problems/ViscousWithoutFriction
    api/problems/ViscousWithFriction
 
+   api/solvers/OptimBase
+
 
 Indices and tables
 ==================

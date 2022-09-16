@@ -13,6 +13,7 @@
 
 namespace scopi{
     /**
+     * @class OptimBase
      * @brief Commun interface for the different optimization solvers.
      *
      * @tparam Derived Optimization solver.
