@@ -67,8 +67,8 @@ namespace scopi{
      *  - \f$ \l^{\indexUzawa} = 0 \f$;
      *  - \f$ cmax = - \infty \f$;
      *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
-     *      - \f$ \u^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \c - B^T \l^{\indexUzawa} \right) \f$;
-     *      - \f$ \r^{\indexUzawa+1} = \mathbb{B} \u^{\indexUzawa+1} - \mathbf{d} \f$;
+     *      - \f$ \mathbf{u}^{\indexUzawa+1} = \mathbb{P}^{-1} \left( \c - B^T \l^{\indexUzawa} \right) \f$;
+     *      - \f$ \r^{\indexUzawa+1} = \mathbb{B} \mathbf{u}^{\indexUzawa+1} - \mathbf{d} \f$;
      *      - \f$ \l^{\indexUzawa+1}_{ij} = \max \left( \l_{ij}^{\indexUzawa} - \rho \r_{ij}^{\indexUzawa+1}, 0 \right) \f$;
      *      - \f$ cmax = \min_{ij} \left( \r_{ij}^{\indexUzawa+1} \right) \f$;
      *      - \f$ \indexUzawa++\f$.
@@ -121,7 +121,7 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -129,7 +129,7 @@ namespace scopi{
          */
         auto uadapt_data();
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -145,7 +145,7 @@ namespace scopi{
          */
         auto lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -159,7 +159,7 @@ namespace scopi{
 
     private:
         /**
-         * @brief Computes \f$ \mathbb{P}^{-1} \u \f$.
+         * @brief Computes \f$ \mathbb{P}^{-1} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -168,7 +168,7 @@ namespace scopi{
         void gemv_inv_P(const scopi_container<dim>& particles);
 
         /**
-         * @brief Computes \f$ \r = \r - \mathbb{B} \u \f$.
+         * @brief Computes \f$ \r = \r - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -179,7 +179,7 @@ namespace scopi{
                     const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Computes \f$ \u = \mathbb{B}^T \l + \u \f$.
+         * @brief Computes \f$ \mathbf{u} = \mathbb{B}^T \l + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -208,7 +208,7 @@ namespace scopi{
 
     protected:
         /**
-         * @brief Vector \f$ \u \f$.
+         * @brief Vector \f$ \mathbf{u} \f$.
          */
         xt::xtensor<double, 1> m_U;
         /**

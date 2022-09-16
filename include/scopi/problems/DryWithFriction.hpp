@@ -123,10 +123,10 @@ namespace scopi
      * See ProblemBase.hpp for the notations.
      * The constraint is 
      * \f[
-     *      \mathbf{d}_{ij} + \mathbb{B} \u_{ij} \ge ||\mathbb{T} \u_{ij}||
+     *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}||
      * \f]
      * for all contacts \f$ (ij) \f$.
-     * \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
+     * \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
      *
      * Only one matrix is built.
      * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ T \f$.
@@ -206,7 +206,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \constraintFunction(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,

@@ -52,9 +52,9 @@ namespace scopi{
      * @brief Solve optimization problem using Mosek.
      *
      * See ProblemBase.hpp for the notations.
-     * Instead of minimizing \f$ \frac{1}{2} \u \mathbb{P} \cdot \u + \u \cdot \c \f$, 
+     * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \c \f$, 
      * minimize \f$ \uMosek \cdot \cMosek \f$, with
-     * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
+     * \f$ \uMosek = (\sMosek, \mathbf{u}, \zMosek) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
      *
      * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \uMosek \le \mathbf{d} \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6N} \f$, with 
      * \f[
@@ -67,10 +67,10 @@ namespace scopi{
      * Here, \f$ N_c \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
      * \f$ \mathbb{Id} \f$ is the identity matrix.
      *
-     * With friction, the constraint is written as \f$ \mathbf{d} \mathbb{B} \u \in \left( Q^4 \right)^{N_c} \f$,
+     * With friction, the constraint is written as \f$ \mathbf{d} \mathbb{B} \mathbf{u} \in \left( Q^4 \right)^{N_c} \f$,
      * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
-     * Each component of \f$ \mathbb{B} \u \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B} \u_{ij}, \mathbb{T} \u_{ij}^1, \mathbb{T} \u_{ij}^2, \mathbb{T} \u_{ij}^3 ) \f$.
-     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \u_{ij} \f$, but this resulted in poor performances.
+     * Each component of \f$ \mathbb{B} \mathbf{u} \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij}, \mathbb{T} \mathbf{u}_{ij}^1, \mathbb{T} \mathbf{u}_{ij}^2, \mathbb{T} \mathbf{u}_{ij}^3 ) \f$.
+     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \mathbf{u}_{ij} \f$, but this resulted in poor performances.
      * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \uMosek \in Q \f$ with appropriate reshape.
      * Currently, only a part of the matrix is used.
      *
@@ -126,7 +126,7 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -134,7 +134,7 @@ namespace scopi{
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \u \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -142,7 +142,7 @@ namespace scopi{
          */
         double* wadapt_data();
         /**
-         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
