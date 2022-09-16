@@ -126,12 +126,12 @@ namespace scopi
      *      \d_{\ij} + \B \u_{\ij} \ge ||\T \u_{\ij}||
      * \f]
      * for all contacts \f$ (\ij) \f$.
-     * \f$ \d \in \mathbb{R}^{\Nc} \f$, \f$ \u \in \mathbb{R}^{6\N} \f$, \f$ \B \in \mathbb{R}^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.
+     * \f$ \d \in \mathbb{R}^{N_c} \f$, \f$ \u \in \mathbb{R}^{6\N} \f$, \f$ \B \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \T \in R^{3 N_c \times 6\N} \f$.
      *
      * Only one matrix is built.
      * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
      * A contact \f$ (\ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
-     * Therefore, the matrix is in \f$ \mathbb{R}^{4\Nc \times 6N} \f$ and \f$ \d \in \mathbb{R}^{4\Nc} \f$.
+     * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \d \in \mathbb{R}^{4N_c} \f$.
      *
      */
     class DryWithFriction : protected ProblemBase
@@ -177,7 +177,7 @@ namespace scopi
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
          *
-         * \f$ \d \in \mathbb{R}^{4\Nc} \f$ can be seen as a block vector, each block has the form
+         * \f$ \d \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
          * \f$ (d_{\ij}, 0, 0, 0) \f$,
          * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
          *

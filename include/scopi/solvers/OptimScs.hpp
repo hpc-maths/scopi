@@ -129,7 +129,7 @@ namespace scopi
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* lagrange_multiplier_data();
         /**
@@ -138,7 +138,7 @@ namespace scopi
          * \pre \c solve_optimization_problem has to be called before this function.
          * \warning The method is not implemented, it is defined so all solvers have the same interface.
          *
-         * @return Null pointer instead of \f$ \Nc \f$ elements.
+         * @return Null pointer instead of \f$ N_c \f$ elements.
          */
         double* constraint_data();
         /**
