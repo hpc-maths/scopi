@@ -74,11 +74,11 @@ namespace scopi
      * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
-     *          \F : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
+     *          \mathbf{F} : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
      *               & \mathbf{s}_{ij} \mapsto ||\mathbb{T} \us_{ij}||,
      *      \end{aligned}
      * \f]
-     * and search for a fixed point of \f$ \F \f$ : \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$ such that \f$ \F(\mathbf{s}) = \mathbf{s} \f$.
+     * and search for a fixed point of \f$ \mathbf{F} \f$ : \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$ such that \f$ \mathbf{F}(\mathbf{s}) = \mathbf{s} \f$.
      *
      * This leads to the following algorithm:
      * - \f$ \sWithIndex{0} \f$;
@@ -89,8 +89,8 @@ namespace scopi
      *   - \f$ \indexFixedPoint ++ \f$.
      * 
      * Only one matrix is built.
-     * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ T \f$.
-     * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ T \f$.
+     * It contains both matrices $\f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
+     * A contact \f$ (ij) \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ \mathbb{T} \f$.
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      */
     class DryWithFrictionFixedPoint : protected DryWithFrictionBase
