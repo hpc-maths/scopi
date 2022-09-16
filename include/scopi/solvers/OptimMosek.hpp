@@ -54,7 +54,7 @@ namespace scopi{
      * See ProblemBase.hpp for the notations.
      * Instead of minimizing \f$ \frac{1}{2} \u \P \cdot \u + \u \cdot \c \f$, 
      * minimize \f$ \uMosek \cdot \cMosek \f$, with
-     * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \R^{1+6\N+6\N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\R^{6\N}}) \in \R^{1+6\N+6\N} \f$.
+     * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \mathbb{R}^{1+6\N+6\N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\mathbb{R}^{6\N}}) \in \mathbb{R}^{1+6\N+6\N} \f$.
      *
      * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \BMosek \uMosek \le \d \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6\N} \f$, with 
      * \f[
@@ -63,12 +63,12 @@ namespace scopi{
      *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6\N} | \underbrace{-\Id}_{6\N}) \right\} 6\N.
      *      \end{aligned}
      * \f]
-     * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \R^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
+     * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
      * Here, \f$ \Nc \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
      * \f$ \Id \f$ is the identity matrix.
      *
      * With friction, the constraint is written as \f$ \d \B \u \in \left( Q^4 \right)^{\Nc} \f$,
-     * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \R^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
+     * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
      * Each component of \f$ \B \u \f$ is seen as \f$ (\d_{\ij} + \B \u_{\ij}, \T \u_{\ij}^1, \T \u_{\ij}^2, \T \u_{\ij}^3 ) \f$.
      * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{\ij} = ||\T \u_{\ij} \f$, but this resulted in poor performances.
      * \todo The constraint should be written as \f$ \BMosek \uMosek \in Q \f$ with appropriate reshape.
@@ -126,7 +126,7 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \u \in \mathbb{R}^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -134,7 +134,7 @@ namespace scopi{
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \u \in \mathbb{R}^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
