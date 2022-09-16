@@ -21,10 +21,10 @@ namespace scopi
      * \f]
      * under constraint
      * \f[
-     *      \mathbf{d} + \mathbb{B} \mathbbf{u} \ge \constraintFunction (\mathbbf{u}).
+     *      \mathbf{d} + \mathbb{B} \mathbbf{u} \ge \mathbf{f} (\mathbbf{u}).
      * \f]
      * The vector \f$ \mathbf{c} \f$ is known and does not depends on the problem.
-     * The function \f$ \constraintFunction \f$ differs with the problem.
+     * The function \f$ \mathbf{f} \f$ differs with the problem.
      * So does the implentation of the vector \f$ \mathbf{d} \f$ and the matrix \f$ \mathbb{B} \f$.
      * However, they share some elements, thay are set by this class.
      *
