@@ -130,6 +130,7 @@ namespace scopi{
      *  \c gradient_t depends on \c projection_t, which should be used with the appropriate problem.
      *
      *  \todo Use template specialization with problem_t to determine wich projection to use, instead of letting the user decide which \c projection_t use.
+     * \warning Only the cases  \c problem_t = DryWithoutFriction and \c problem_t = ViscousWithoutFriction are implemented.
      *
      *  All matrices and matrix-vector products use the MKL.
      *
