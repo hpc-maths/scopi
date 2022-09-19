@@ -20,3 +20,4 @@ include(generator)
 generate_executable(${SCOPI_EXAMPLES})
 
 add_subdirectory(critical)
+add_subdirectory(proceeding)

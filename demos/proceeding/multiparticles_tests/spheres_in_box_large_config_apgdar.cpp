@@ -8,29 +8,32 @@
 
 #include <scopi/solvers/OptimProjectedGradient.hpp>
 #include <scopi/solvers/gradient/nesterov_restart.hpp>
-#include <scopi/solvers/OptimMosek.hpp>
 #include <scopi/vap/vap_fpd.hpp>
-#include <scopi/contact/contact_brute_force.hpp>
 
 int main()
 {
-    plog::init(plog::info, "box_spheres_3d_very_large_nesterov_restart.log");
+    // Figure 7: spheres falling in a box.
+    // Figure 8: number of iterations vs number of active contatcs for spheres falling in a box.
+    // Table 2: 50^3 spheres falling in a box.
+    // APGD-AR algorithm.
+    plog::init(plog::info, "spheres_in_box_large_config_apgdar.log");
 
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
 
-    std::size_t total_it = 100;
+    // std::size_t total_it = 1000; // For the number of contacts, like the  other solvers
+    std::size_t total_it = 2000; // For output of stationary state
     double width_box = 10.;
     std::size_t n = 50; // n^3 spheres
     double g = 1.;
 
     double r0 = width_box/n/2.;
-    double dt = 0.2*0.9*r0/(2.*g); ////// dt = 0.2*r/(sqrt(2*width_box*g))
+    double dt = 0.2*0.9*r0/(std::sqrt(2.*width_box*g));
     double rho = 0.2/(dt*dt);
-    std::cout << "dt = " << dt << "  rho = " << rho << std::endl;
 
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
-    params.scopi_params.output_frequency = 99;
+    params.scopi_params.output_frequency = 100;
+    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220910_spheres_in_box";
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = rho;
     params.contacts_params.dmax = 0.9*r0;
@@ -56,7 +59,7 @@ int main()
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distrib_r(0.8*r0, 0.9*r0);
     std::uniform_real_distribution<double> distrib_m(1., 2.);
-    std::uniform_real_distribution<double> distrib_mouve_center(-0.05, 0.05); ////////////
+    std::uniform_real_distribution<double> distrib_mouve_center(-0.05*r0, 0.05*r0);
 
     for (std::size_t i = 0; i < n; ++i)
     {
