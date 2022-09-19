@@ -126,10 +126,10 @@ namespace scopi{
      *  - \f$ \mathbf{l} = \text{ gradient algorithm } \left( \mathbb{A}, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
      *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \mathbf{c} - \mathbb{B}^T \mathbf{l} \right) \f$.
      *
-     *  The gradient algorithm is given by gradient_t.
-     *  gradient_t depends on projection_t, which should be used with the appropriate problem.
+     *  The gradient algorithm is given by \c gradient_t.
+     *  \c gradient_t depends on \c projection_t, which should be used with the appropriate problem.
      *
-     *  \todo Use template specialization with problem_t to determine wich projection to use, instead of letting the user decide which projection_t use.
+     *  \todo Use template specialization with problem_t to determine wich projection to use, instead of letting the user decide which \c projection_t use.
      *
      *  All matrices and matrix-vector products use the MKL.
      *
@@ -214,6 +214,7 @@ namespace scopi{
          * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
+         * \warning The method is not implemented, it is defined so all solvers have the same interface.
          *
          * @return \f$ N_c \f$ elements.
          */
