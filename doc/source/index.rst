@@ -45,6 +45,10 @@ Welcome to scopi's documentation!
    api/vap/vap_fpd
    api/vap/vap_projection
 
+   api/contact/base
+   api/contact/contact_brute_force
+   api/contact/contact_kdtree
+
 Test
 ====
 
