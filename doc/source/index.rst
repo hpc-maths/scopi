@@ -26,6 +26,7 @@ Welcome to scopi's documentation!
 
    api/solvers/OptimBase
    api/solvers/OptimMosek
+   api/solvers/ConstraintMosek
    api/solvers/OptimScs
 
 Test

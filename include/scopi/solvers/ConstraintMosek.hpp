@@ -124,7 +124,7 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> DryWithFriction </tt> for the difference).  
          *
          * @return 0.
          */
@@ -208,7 +208,7 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see DryWithFrictionFixedPoint for the difference).  
          *
          * @return 0.
          */
@@ -275,7 +275,7 @@ namespace scopi
 
 
     /**
-     * @brief Specialization of \c ConstraintMosek for \c ViscousWithoutFriction<dim>.
+     * @brief Specialization of \c ConstraintMosek for \c ViscousWithoutFriction.
      *
      * @tparam dim Dimension(2 or 3).
      */
@@ -386,7 +386,7 @@ namespace scopi
 
 
     /**
-     * @brief Specialization of \c ConstraintMosek for \c ViscousWithFriction<dim>.
+     * @brief Specialization of \c ConstraintMosek for \c ViscousWithFriction.
      *
      * @tparam dim Dimension(2 or 3).
      */
@@ -405,7 +405,7 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> ConstraintMosek<DryWithFriction> </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see ViscousWithFriction for the difference).  
          *
          * @return 0.
          */
