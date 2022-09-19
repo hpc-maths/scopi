@@ -17,6 +17,7 @@ Welcome to scopi's documentation!
    api/minpack
    api/container
    api/utils
+   api/solver
 
    api/objects/neighbor
    api/objects/types/sphere
