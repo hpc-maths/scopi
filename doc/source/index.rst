@@ -33,6 +33,7 @@ Welcome to scopi's documentation!
    api/solvers/gradient/nesterov_dynrho
    api/solvers/gradient/nesterov_restart
    api/solvers/gradient/nesterov_dynrho_restart
+   api/solvers/gradient/projection_max
    api/solvers/OptimScs
    api/solvers/OptimUzawaBase
    api/solvers/OptimUzawaMatrixFreeOmp
