@@ -9,6 +9,6 @@ ViscousWithoutFriction class
 ProblemParams<ViscousWithoutFriction> class
 ===========================================
 
-.. doxygenclass:: scopi::ProblemParams< ViscousWithoutFriction< dim > >
+.. doxygenstruct:: scopi::ProblemParams< ViscousWithoutFriction< dim > >
    :project: scopi
    :members:
