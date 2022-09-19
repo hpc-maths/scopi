@@ -11,3 +11,10 @@ ProblemParams class
 .. doxygenclass:: scopi::ProblemParams
    :project: scopi
    :members:
+
+OptimParams class
+=================
+
+.. doxygenstruct:: scopi::OptimParams
+   :project: scopi
+   :members:

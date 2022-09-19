@@ -27,6 +27,7 @@ Welcome to scopi's documentation!
    api/solvers/OptimBase
    api/solvers/OptimMosek
    api/solvers/ConstraintMosek
+   api/solvers/OptimProjectedGradient.rst
    api/solvers/OptimScs
    api/solvers/OptimUzawaBase
    api/solvers/OptimUzawaMatrixFreeOmp

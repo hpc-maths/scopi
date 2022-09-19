@@ -148,6 +148,7 @@ namespace scopi{
          * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
+         * \warning The method is not implemented, it is defined so all solvers have the same interface.
          *
          * @return \f$ N_c \f$ elements.
          */
