@@ -19,7 +19,7 @@ namespace scopi{
     class OptimProjectedGradient;
 
     /**
-     * @brief Parameters for \c OptimProjectedGradient<problem_t, gradient_t>
+     * @brief Parameters for OptimProjectedGradient<problem_t, gradient_t>
      *
      * Specialization of ProblemParams in params.hpp
      *
@@ -110,7 +110,7 @@ namespace scopi{
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimBase.
+         * @brief Alias for the base class OptimBase.
          */
         using base_type = OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>;
 

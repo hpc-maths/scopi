@@ -9,7 +9,7 @@ namespace scopi
     class vap_projection;
      
     /**
-     * @brief Parameters for \c vap_projection.
+     * @brief Parameters for vap_projection.
      *
      * Defined for compatibility.
      */
@@ -25,7 +25,7 @@ namespace scopi
     {
     public:
         /**
-         * @brief Alias for the base class \c vap_base.
+         * @brief Alias for the base class vap_base.
          */
         using base_type = vap_base<vap_projection>;
         /**

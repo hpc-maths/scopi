@@ -20,7 +20,7 @@ namespace scopi
 
     /**
      * @class ProblemParams<DryWithFriction>
-     * @brief Parameters for \c DryWithFriction
+     * @brief Parameters for DryWithFriction
      *
      * Specialization of ProblemParams in params.hpp
      */

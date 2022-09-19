@@ -9,7 +9,7 @@ namespace scopi
     class vap_fpd;
      
     /**
-     * @brief Parameters for \c vap_fpd.
+     * @brief Parameters for vap_fpd.
      *
      * Defined for compatibility.
      */
