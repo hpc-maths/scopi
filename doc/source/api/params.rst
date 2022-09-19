@@ -18,3 +18,10 @@ OptimParams class
 .. doxygenstruct:: scopi::OptimParams
    :project: scopi
    :members:
+
+VapParams class
+===============
+
+.. doxygenclass:: scopi::VapParams
+   :project: scopi
+   :members:
