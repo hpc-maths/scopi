@@ -6,6 +6,14 @@ contact_kdtree class
    :members:
    :protected-members:
 
+KdTree class
+============
+
+.. doxygenclass:: scopi::KdTree
+   :project: scopi
+   :members:
+   :protected-members:
+
 ContactsParams<contact_kdtree> class
 ====================================
 
