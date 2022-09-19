@@ -29,6 +29,9 @@ Welcome to scopi's documentation!
    api/solvers/ConstraintMosek
    api/solvers/OptimScs
    api/solvers/OptimUzawaBase
+   api/solvers/OptimUzawaMatrixFreeOmp
+   api/solvers/OptimUzawaMatrixFreeTbb
+   api/solvers/OptimUzawaMkl
 
 Test
 ====
