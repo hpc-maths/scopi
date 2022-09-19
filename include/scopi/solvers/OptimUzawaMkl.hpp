@@ -34,7 +34,7 @@ namespace scopi
      * @brief Uzawa algorithm where the matrices are stored and matrix-vector products are computed with the MKL.
      *
      * See OptimUzawaBase for the algorithm.
-     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     * \warning Only the cases \c problem_t = DryWithoutFriction and \c problem_t = ViscousWithoutFriction are implemented.
      *
      * @tparam problem_t Problem to be solved.
      */

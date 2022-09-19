@@ -124,7 +124,7 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see <tt> DryWithFriction </tt> for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see DryWithFriction for the difference).  
          *
          * @return 0.
          */

@@ -152,7 +152,7 @@ namespace scopi
 
     private:
         /**
-         * @brief Parameters, see <tt> ProblemParams<DryWithFriction> </tt>.
+         * @brief Parameters.
          */
         ProblemParams<DryWithFriction> m_params;
     };

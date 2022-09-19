@@ -56,7 +56,7 @@ namespace scopi
         /**
          * @brief Constructor.
          *
-         * @param params [in] Parameters, see <tt>ContactsParams<contact_brute_force></tt>.
+         * @param params [in] Parameters.
          */
         contact_brute_force(const ContactsParams<contact_brute_force>& params = ContactsParams<contact_brute_force>());
 
