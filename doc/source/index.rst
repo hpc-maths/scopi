@@ -40,6 +40,11 @@ Welcome to scopi's documentation!
    api/solvers/OptimUzawaMatrixFreeTbb
    api/solvers/OptimUzawaMkl
 
+   api/vap/base
+   api/vap/vap_fixed
+   api/vap/vap_fpd
+   api/vap/vap_projection
+
 Test
 ====
 

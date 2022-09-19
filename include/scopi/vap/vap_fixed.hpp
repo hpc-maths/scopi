@@ -21,7 +21,7 @@ namespace scopi
     /**
      * @brief Fixed a priori velocity.
      *
-     * The a priori velocity (direction an norm) is fixed at the begining of the simulation and does not change.
+     * The a priori velocity (direction and norm) is fixed at the begining of the simulation and does not change.
      */
     class vap_fixed: public vap_base<vap_fixed>
     {
