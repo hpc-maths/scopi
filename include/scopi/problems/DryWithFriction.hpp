@@ -22,7 +22,7 @@ namespace scopi
      * - Notations:
      *      - We consider two referentials:
      *          - \f$ (x, y) \f$, the usual cartesian referential;
-     *          - \f$ (x', y') \f$ the referential where \f$ x' \f$ is aligned with the plane (rotation of angle \f$ \alpha \f$ of \f$ (x, y) \f$.
+     *          - \f$ (x', y') \f$ the referential where \f$ x' \f$ is aligned with the plane (rotation of angle \f$ - \alpha \f$ of \f$ (x, y) \f$.
      *      - \f$ t_i = \sqrt{\frac{2 \left( y_0-r \right)}{g \cos \alpha}} \f$ is the time of the impact between the sphere and the plane.
      *      - \f$ v_t^- \f$ is the tangential velocity just before the impact, \f$ v_t^- = g \sin \alpha t_i \f$.
      *      - \f$ v_n^- \f$ is the normal velocity just before the impact, \f$ v_n^- = - g \cos \alpha t_i \f$.
@@ -34,7 +34,7 @@ namespace scopi
      *           \begin{aligned}
      *              x(t) &= \frac{g}{2} \sin \alpha t^2\\
      *              y(t) &= y_0 - \frac{g}{2} \cos \alpha t^2\\
-     *              \omega(t) &= 0.
+     *              \theta(t) &= 0.
      *         \end{aligned}
      *      \right.
      * \f]
@@ -55,7 +55,7 @@ namespace scopi
      *          \left\{
      *              \begin{aligned}
      *                  x'(t) &= \frac{1}{2} g \left( \sin \alpha - \mu \cos \alpha \right) \left( t - t_i \right)^2 + \left( v_t^- + \mu v_n^- \right) \left( t - t_i \right)  x_i'\\
-     *                  y'(t) &= R\\
+     *                  y'(t) &= r\\
      *                  \theta (t) &= - \frac{\mu g \cos \alpha}{r} \left( t - t_i \right)^2 + \frac{2}{r} \mu v_n^- \left( t - t_i \right)
      *              \end{aligned}
      *          \right.
@@ -66,7 +66,7 @@ namespace scopi
      * @param t [in] Time.
      * @param r [in] Radius of the spheres.
      * @param g [in] Gravity.
-     * @param y0 [in] Iniital height of the center of the sphere.
+     * @param y0 [in] Initial height of the center of the sphere.
      *
      * @return Position of the sphere (x and y coordinates) and angle of rotation.
      */
@@ -81,7 +81,7 @@ namespace scopi
      * @param t [in] Time.
      * @param r [in] Radius of the spheres.
      * @param g [in] Gravity.
-     * @param y0 [in] Iniital height of the center of the sphere.
+     * @param y0 [in] Initial height of the center of the sphere.
      *
      * @return Velocity of the sphere (x and y coordinates) and rotation (\f$ \omega \f$).
      */

@@ -6,6 +6,12 @@ OptimProjectedGradient class
    :members:
    :protected-members:
 
+print_csr_matrix function
+=========================
+   
+.. doxygenfunction:: scopi::print_csr_matrix
+   :project: scopi
+
 OptimParams<OptimProjectedGradient> class
 =========================================
 
