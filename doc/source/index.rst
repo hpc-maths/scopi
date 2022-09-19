@@ -13,6 +13,7 @@ Welcome to scopi's documentation!
    api/property
    api/params
    api/types
+   api/quaternion
 
    api/objects/types/sphere
    api/objects/types/plan
