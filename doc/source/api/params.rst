@@ -32,3 +32,10 @@ ContactsParams class
 .. doxygenclass:: scopi::ContactsParams
    :project: scopi
    :members:
+
+ScopiParams class
+=================
+
+.. doxygenclass:: scopi::ScopiParams
+   :project: scopi
+   :members:
