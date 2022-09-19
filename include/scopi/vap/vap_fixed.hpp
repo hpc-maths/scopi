@@ -9,7 +9,7 @@ namespace scopi
     class vap_fixed;
      
     /**
-     * @brief Parameters for \c vap_fixed.
+     * @brief Parameters for vap_fixed.
      *
      * Defined for compatibility.
      */
@@ -27,7 +27,7 @@ namespace scopi
     {
     public:
         /**
-         * @brief Alias for the base class \c vap_base.
+         * @brief Alias for the base class vap_base.
          */
         using base_type = vap_base<vap_fixed>;
         /**

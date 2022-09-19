@@ -85,7 +85,7 @@ namespace scopi{
          */
         using problem_type = problem_t; 
         /**
-         * @brief Alias for the base class \c OptimBase.
+         * @brief Alias for the base class OptimBase.
          */
         using base_type = OptimBase<Derived, problem_t>;
 

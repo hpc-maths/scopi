@@ -19,7 +19,7 @@ namespace scopi
     class OptimUzawaMatrixFreeTbb;
 
     /**
-     * @brief Parameters for \c OptimUzawaMatrixFreeTbb<problem_t>
+     * @brief Parameters for OptimUzawaMatrixFreeTbb<problem_t>
      *
      * Specialization of ProblemParams.
      * See OptimParamsUzawaBase.
@@ -49,7 +49,7 @@ namespace scopi
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimUzawaBase.
+         * @brief Alias for the base class OptimUzawaBase.
          */
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeTbb<problem_t>, problem_t>;
 

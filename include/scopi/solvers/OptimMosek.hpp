@@ -16,7 +16,7 @@ namespace scopi{
 
     /**
      * @struct OptimParams<OptimMosek>
-     * @brief Parameters for \c OptimMosek
+     * @brief Parameters for OptimMosek
      *
      * Specialization of OptimParams.
      *
@@ -58,7 +58,7 @@ namespace scopi{
      * minimize \f$ \tilde{\mathbf{u}} \cdot \tilde{\mathbf{c}} \f$, with
      * \f$ \tilde{\mathbf{u}} = (s_0, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, 0) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with 
+     * Without friction (DryWithoutFriction and ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
@@ -88,7 +88,7 @@ namespace scopi{
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimBase
+         * @brief Alias for the base class OptimBase
          */
         using base_type = OptimBase<OptimMosek<problem_t>, problem_t>;
 

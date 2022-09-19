@@ -22,7 +22,7 @@ namespace scopi
 
     /**
      * @class ProblemParams<DryWithFrictionFixedPoint>
-     * @brief Parameters for \c DryWithFrictionFixedPoint.
+     * @brief Parameters for DryWithFrictionFixedPoint.
      *
      * Specialization of ProblemParams.
      */

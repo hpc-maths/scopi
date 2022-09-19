@@ -24,7 +24,7 @@ namespace scopi
     };
 
     /**
-     * @brief Specialization of \c ConstraintMosek for \c DryWithoutFriction.
+     * @brief Specialization of ConstraintMosek for DryWithoutFriction.
      */
     template<>
     class ConstraintMosek<DryWithoutFriction>
@@ -107,7 +107,7 @@ namespace scopi
 
 
     /**
-     * @brief Specialization of \c ConstraintMosek for \c DryWithFriction.
+     * @brief Specialization of ConstraintMosek for DryWithFriction.
      */
     template<>
     class ConstraintMosek<DryWithFriction>
@@ -191,7 +191,7 @@ namespace scopi
 
 
     /**
-     * @brief Specialization of \c ConstraintMosek for \c DryWithFrictionFixedPoint.
+     * @brief Specialization of ConstraintMosek for DryWithFrictionFixedPoint.
      */
     template<>
     class ConstraintMosek<DryWithFrictionFixedPoint>
@@ -275,7 +275,7 @@ namespace scopi
 
 
     /**
-     * @brief Specialization of \c ConstraintMosek for \c ViscousWithoutFriction.
+     * @brief Specialization of ConstraintMosek for ViscousWithoutFriction.
      *
      * @tparam dim Dimension(2 or 3).
      */
@@ -386,7 +386,7 @@ namespace scopi
 
 
     /**
-     * @brief Specialization of \c ConstraintMosek for \c ViscousWithFriction.
+     * @brief Specialization of ConstraintMosek for ViscousWithFriction.
      *
      * @tparam dim Dimension(2 or 3).
      */

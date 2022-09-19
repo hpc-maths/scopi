@@ -39,7 +39,7 @@ namespace scopi
     public:
 
         /**
-         * @brief Alias for the base class \c object.
+         * @brief Alias for the base class object.
          */
         using base_type = object<dim, owner>;
         /**

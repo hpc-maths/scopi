@@ -49,7 +49,7 @@ namespace scopi
     {
     public:
         /**
-         * @brief Alias for the base class \c contact_base.
+         * @brief Alias for the base class contact_base.
          */
         using base_type = contact_base<contact_brute_force>;
 

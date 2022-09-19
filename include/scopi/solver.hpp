@@ -23,11 +23,9 @@
 #include "quaternion.hpp"
 
 #include "solvers/OptimUzawaMatrixFreeOmp.hpp"
-#include "solvers/OptimMosek.hpp"
 #include "problems/DryWithoutFriction.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
-#include "vap/vap_projection.hpp"
 #include "params.hpp"
 
 namespace nl = nlohmann;
@@ -69,8 +67,8 @@ namespace scopi
      * <li> Store the computed velocities.
      * </ul>
      *
-     * The optimization solver \c optim_solver_t describes which algorithm is used to solve the optimization problem.
-     * It is itself templated by a \c problem_t that describes which model is used.
+     * The optimization solver optim_solver_t describes which algorithm is used to solve the optimization problem.
+     * It is itself templated by a problem_t that describes which model is used.
      *
      */
     template<std::size_t dim,

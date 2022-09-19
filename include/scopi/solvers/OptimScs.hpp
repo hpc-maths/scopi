@@ -13,7 +13,7 @@ namespace scopi
 
     /**
      * @struct OptimParams
-     * @brief Parameters for \c OptimScs
+     * @brief Parameters for OptimScs
      *
      * Specialization of ProblemParams.
      *
@@ -71,7 +71,7 @@ namespace scopi
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimBase
+         * @brief Alias for the base class OptimBase
          */
         using base_type = OptimBase<OptimScs<problem_t>, problem_t>;
 

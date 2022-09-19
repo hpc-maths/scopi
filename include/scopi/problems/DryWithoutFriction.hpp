@@ -19,7 +19,7 @@ namespace scopi
 
     /**
      * @class ProblemParams<DryWithoutFriction>
-     * @brief Parameters for \c DryWithoutFriction.
+     * @brief Parameters for DryWithoutFriction.
      *
      * Specialization of ProblemParam.
      *

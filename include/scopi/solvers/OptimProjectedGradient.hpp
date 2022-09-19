@@ -19,7 +19,7 @@ namespace scopi{
     class OptimProjectedGradient;
 
     /**
-     * @brief Parameters for \c OptimProjectedGradient<problem_t, gradient_t>
+     * @brief Parameters for OptimProjectedGradient<problem_t, gradient_t>
      *
      * Specialization of ProblemParams in params.hpp
      *
@@ -126,10 +126,10 @@ namespace scopi{
      *  - \f$ \mathbf{l} = \text{ gradient algorithm } \left( \mathbb{A}, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
      *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \mathbf{c} - \mathbb{B}^T \mathbf{l} \right) \f$.
      *
-     *  The gradient algorithm is given by \c gradient_t.
-     *  \c gradient_t depends on \c projection_t, which should be used with the appropriate problem.
+     *  The gradient algorithm is given by gradient_t.
+     *  gradient_t depends on projection_t, which should be used with the appropriate problem.
      *
-     *  \todo Use template specialization with \c problem_t to determine wich projection to use, instead of letting the user decide which \c projection_t use.
+     *  \todo Use template specialization with problem_t to determine wich projection to use, instead of letting the user decide which projection_t use.
      *
      *  All matrices and matrix-vector products use the MKL.
      *
@@ -147,7 +147,7 @@ namespace scopi{
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimBase.
+         * @brief Alias for the base class OptimBase.
          */
         using base_type = OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>;
 
