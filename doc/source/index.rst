@@ -28,6 +28,7 @@ Welcome to scopi's documentation!
    api/solvers/OptimMosek
    api/solvers/ConstraintMosek
    api/solvers/OptimScs
+   api/solvers/OptimUzawaBase
 
 Test
 ====
