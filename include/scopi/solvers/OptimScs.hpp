@@ -12,8 +12,8 @@ namespace scopi
     class OptimScs;
 
     /**
-     * @class OptimParams>
-     * @brief Parameters for \c OptimScs<problem_t>
+     * @struct OptimParams
+     * @brief Parameters for \c OptimScs
      *
      * Specialization of ProblemParams.
      *
@@ -51,11 +51,11 @@ namespace scopi
 
     /**
      * @class OptimScs
-     * @brief Solve optimization problem using Mosek.
+     * @brief Solve optimization problem using SCS.
      *
      * See ProblemBase for the notations.
      *
-     * The documentation of SCS is available here: https://www.cvxgrp.org/scs/.
+     * SCS' documentation is available here: https://www.cvxgrp.org/scs/.
      * Matrices are stored using CSC storage.
      * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction </tt> are implemented.
      *
