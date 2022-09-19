@@ -16,6 +16,7 @@ Welcome to scopi's documentation!
    api/quaternion
    api/minpack
    api/container
+   api/utils
 
    api/objects/neighbor
    api/objects/types/sphere
