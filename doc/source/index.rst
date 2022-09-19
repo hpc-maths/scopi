@@ -21,6 +21,7 @@ Welcome to scopi's documentation!
    api/objects/types/sphere
    api/objects/types/superellipsoid
    api/objects/types/plan
+   api/objects/types/worm
 
    api/problems/ProblemBase
    api/problems/DryWithoutFriction

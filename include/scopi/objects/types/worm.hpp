@@ -97,7 +97,7 @@ namespace scopi
         /**
          * @brief Get a sphere in the worm.
          *
-         * @param i [in] Index of the sphere in the worm. 0 <= i < this->size.
+         * @param i [in] Index of the sphere in the worm. 0 <= \c i < <tt> this->size() </tt>.
          *
          * @return Pointer to the i-th sphere in the worm.
          */
