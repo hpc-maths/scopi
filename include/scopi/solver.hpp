@@ -80,12 +80,12 @@ namespace scopi
     {
     private:
         /**
-         * @brief Shortcut for problem type. 
+         * @brief Alias for problem type. 
          */
         using problem_t = typename optim_solver_t::problem_type;
     public:
         /**
-         * @brief Shortcut for the type of parameters class.
+         * @brief Alias for the type of parameters class.
          */
         using params_t = Params<optim_solver_t, problem_t, contact_t, vap_t>;
 
