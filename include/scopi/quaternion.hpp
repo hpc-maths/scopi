@@ -43,7 +43,7 @@ namespace scopi
     type::quaternion_t quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<2>>& axes);
 
     /**
-     * @brief Rotation of angle "angle" around the axis (0, 0, 1)..
+     * @brief Rotation of angle "angle" around the axis (0, 0, 1).
      *
      * @param angle [in] Angle of the rotation.
      *

@@ -72,7 +72,7 @@ namespace scopi
                       const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
                       const ProblemParams<problem_t>& problem_params);
         /**
-         * @brief Free the memory allocated for the matrix \f$ \mathbb{P}^{-1} \f$..
+         * @brief Free the memory allocated for the matrix \f$ \mathbb{P}^{-1} \f$.
          */
         ~OptimUzawaMkl();
 
@@ -92,7 +92,7 @@ namespace scopi
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Free the memory allocated for the matrix \f$ \mathbb{B} \f$..
+         * @brief Free the memory allocated for the matrix \f$ \mathbb{B} \f$.
          */
         void finalize_uzawa_impl();
 

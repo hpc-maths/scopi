@@ -19,7 +19,7 @@ namespace scopi
     };
 
     /**
-     * @brief A priori velocity for projection used in viscous and friction problem..
+     * @brief A priori velocity for projection used in viscous and friction problem.
      */
     class vap_projection: public vap_base<vap_projection>
     {

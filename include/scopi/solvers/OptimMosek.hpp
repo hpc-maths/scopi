@@ -128,7 +128,7 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -136,7 +136,7 @@ namespace scopi{
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *

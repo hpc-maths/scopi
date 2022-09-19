@@ -52,7 +52,7 @@ namespace scopi{
                  const std::size_t nite);
 
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
          * \pre Call \c run before calling this function.
          *
@@ -60,7 +60,7 @@ namespace scopi{
          */
         auto get_uadapt();
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
          *
          * \pre Call \c run before calling this function.
          *
