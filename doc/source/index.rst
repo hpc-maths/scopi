@@ -25,6 +25,7 @@ Welcome to scopi's documentation!
    api/problems/ViscousWithFriction
 
    api/solvers/OptimBase
+   api/solvers/OptimMosek
    api/solvers/OptimScs
 
 Test

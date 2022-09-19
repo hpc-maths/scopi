@@ -15,9 +15,10 @@ namespace scopi{
     class OptimMosek;
 
     /**
-     * @brief Parameters for \c OptimMosek<problem_t>
+     * @struct OptimParams<OptimMosek>
+     * @brief Parameters for \c OptimMosek
      *
-     * Specialization of ProblemParams in params.hpp
+     * Specialization of OptimParams.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -49,14 +50,15 @@ namespace scopi{
     };
 
     /**
+     * @class OptimMosek
      * @brief Solve optimization problem using Mosek.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$, 
      * minimize \f$ \tilde{\mathbf{u}} \cdot \tilde{\mathbf{c}} \f$, with
-     * \f$ \tilde{\mathbf{u}} = (\s_0, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, \underbrace{0}_{\mathbb{R}^{6N}}) \in \mathbb{R}^{1+6N+6N} \f$.
+     * \f$ \tilde{\mathbf{u}} = (s_0, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, 0) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, \s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with 
+     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
@@ -67,10 +69,10 @@ namespace scopi{
      * Here, \f$ N_c \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
      * \f$ \mathbb{Id} \f$ is the identity matrix.
      *
-     * With friction, the constraint is written as \f$ \mathbf{d} \mathbb{B} \mathbf{u} \in \left( Q^4 \right)^{N_c} \f$,
+     * With friction, the constraint is written as \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \in \left( Q^4 \right)^{N_c} \f$,
      * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
      * Each component of \f$ \mathbb{B} \mathbf{u} \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij}, \mathbb{T} \mathbf{u}_{ij}^1, \mathbb{T} \mathbf{u}_{ij}^2, \mathbb{T} \mathbf{u}_{ij}^3 ) \f$.
-     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \mathbf{u}_{ij} \f$, but this resulted in poor performances.
+     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \mathbf{u}_{ij}|| \f$, but this resulted in poor performances.
      * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \in Q \f$ with appropriate reshape.
      * Currently, only a part of the matrix is used.
      *
