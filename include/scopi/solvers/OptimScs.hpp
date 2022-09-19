@@ -57,7 +57,7 @@ namespace scopi
      *
      * SCS' documentation is available here: https://www.cvxgrp.org/scs/.
      * Matrices are stored using CSC storage.
-     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction </tt> are implemented.
+     * \warning Only the cases  \c problem_t = DryWithoutFriction and \c problem_t = ViscousWithoutFriction are implemented.
      *
      * @tparam problem_t Problem to be solved.
      */

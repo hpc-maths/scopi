@@ -132,7 +132,7 @@ namespace scopi
         /**
          * @brief Constructor.
          *
-         * @param params [in] Parameters, see <tt>ContactsParams<contact_kdtree></tt>.
+         * @param params [in] Parameters.
          */
         contact_kdtree(const ContactsParams<contact_kdtree>& params = ContactsParams<contact_kdtree>());
         /**
