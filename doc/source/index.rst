@@ -14,6 +14,7 @@ Welcome to scopi's documentation!
    api/params
    api/types
    api/quaternion
+   api/minpack
 
    api/objects/types/sphere
    api/objects/types/plan
