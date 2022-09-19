@@ -12,6 +12,7 @@ namespace scopi
     class OptimScs;
 
     /**
+     * @class OptimParams>
      * @brief Parameters for \c OptimScs<problem_t>
      *
      * Specialization of ProblemParams.
@@ -36,7 +37,7 @@ namespace scopi
          * @brief Tolerance of the solver.
          *
          * Default value is \f$ 10^{-7} \f$.
-         * \note \c tol_infeas > 0
+         * \note \c tol > 0
          */
         double tol;
         /**
@@ -49,13 +50,14 @@ namespace scopi
     };
 
     /**
+     * @class OptimScs
      * @brief Solve optimization problem using Mosek.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      *
-     * The documentation of SCS is available here: https://www.cvxgrp.org/scs/
+     * The documentation of SCS is available here: https://www.cvxgrp.org/scs/.
      * Matrices are stored using CSC storage.
-     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction </tt> are implemented.
      *
      * @tparam problem_t Problem to be solved.
      */

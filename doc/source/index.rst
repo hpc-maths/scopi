@@ -25,6 +25,13 @@ Welcome to scopi's documentation!
    api/problems/ViscousWithFriction
 
    api/solvers/OptimBase
+   api/solvers/OptimScs
+
+Test
+====
+
+Reference to :doc:`api/problems/ProblemBase`
+Reference to :doc:`api/solvers/OptimScs`
 
 
 Indices and tables
