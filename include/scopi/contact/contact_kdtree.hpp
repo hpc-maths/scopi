@@ -14,7 +14,7 @@ namespace scopi
     /**
      * @brief Parameters for contact_kdtree.
      *
-     * Specialization of ContactsParams in params.hpp.
+     * Specialization of ContactsParams.
      */
     template<>
     struct ContactsParams<contact_kdtree>
@@ -149,7 +149,7 @@ namespace scopi
          * Only the contact between particles \c i and \c j is computed, not the contact between \c j and \c i, with \c i < \c j.
          *
          * The returned array of neighbors is sorted.
-         * See sort_contacts in contact/base.hpp.
+         * See sort_contacts.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -162,7 +162,7 @@ namespace scopi
 
     protected:
         /**
-         * @brief Parameters, see ContactsParams<contact_kdtree>.
+         * @brief Parameters.
          */
         ContactsParams<contact_kdtree> m_params;
 

@@ -25,3 +25,10 @@ VapParams class
 .. doxygenclass:: scopi::VapParams
    :project: scopi
    :members:
+
+ContactsParams class
+====================
+
+.. doxygenclass:: scopi::ContactsParams
+   :project: scopi
+   :members:
