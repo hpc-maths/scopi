@@ -21,7 +21,7 @@ namespace scopi{
      *  - \f$ \mathbf{l}^{k} = 0 \f$;
      *  - \f$ \mathbf{y}^{k} = 0 \f$;
      *  - \f$ \theta^{k} = 1 \f$.
-     *  - While (\f$  \frac{||\mathbf{l}^{k} - \mathbf{l}^{k-1}||}{||\\mathbf{l}^{k}||+1} \le tol\_l \f$)
+     *  - While (\f$  \frac{||\mathbf{l}^{k} - \mathbf{l}^{k-1}||}{||\mathbf{l}^{k}||+1} \le tol\_l \f$)
      *      - \f$ \mathbf{dg}^{k} = \mathbb{A} \mathbf{y}^{k} + \mathbf{e} \f$;
      *      - \f$ \mathbf{l}^{k+1} = \max \left (\mathbf{y}^{k} - \rho \mathbf{dg}^{k}, 0 \right) \f$;
      *      - \f$ \theta^{k+1} = \frac{1}{2} \theta^{k} \sqrt{4 + \left( \theta^{k} \right)^2} - \left( \theta^{k} \right)^2 \f$;
