@@ -24,7 +24,7 @@ int main()
     double mass = 1.;
     double h = radius;
     auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-9;
     params.optim_params.rho = 2.;
     params.optim_params.verbose = true;

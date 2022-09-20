@@ -28,7 +28,7 @@ int main()
     double dt = 0.2*0.9*r0/(std::sqrt(2.*width_box*g));
     double rho = 0.2/(dt*dt);
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.scopi_params.output_frequency = std::size_t(-1);
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = rho;

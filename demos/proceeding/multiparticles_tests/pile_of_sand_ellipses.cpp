@@ -32,7 +32,7 @@ int main()
     double r_obs = r/10.;
     double dt = 0.2*r/(std::sqrt(2.*width_box*g));
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = 0.2/dt/dt;
     params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_ellipses/scopi_objects_";
