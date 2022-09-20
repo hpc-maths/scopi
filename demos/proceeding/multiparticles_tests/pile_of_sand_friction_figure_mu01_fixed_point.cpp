@@ -14,7 +14,7 @@ int main()
 {
     // Figure 9: spheres falling on a plane with friction.
     // mu = 0.1, fixed point algorithm.
-    plog::init(plog::info, "pile_of_sand_spheres_figure_config_mu01_fixed_point.log");
+    plog::init(plog::info, "pile_of_sand_spheres_figure_mu01_fixed_point.log");
 
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
