@@ -27,13 +27,13 @@ int main()
     double r = width_box/2./(n+1);
     double dt = 0.1*r/(std::sqrt(2.*width_box*g));
 
-    scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::DryWithFrictionFixedPoint, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 0.1;
     params.problem_params.tol_fixed_point = 1e-2;
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
-    params.scopi_params.output_frequency = 3000;
+    params.scopi_params.output_frequency = std::size_t(-1);
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});

@@ -6,7 +6,7 @@
 #include <scopi/property.hpp>
 
 #include <scopi/solvers/OptimProjectedGradient.hpp>
-#include <scopi/solvers/gradient/nesterov_restart.hpp>
+#include <scopi/solvers/gradient/apgd_ar.hpp>
 #include <scopi/vap/vap_fpd.hpp>
 
 template <std::size_t dim>
@@ -32,7 +32,7 @@ int main()
     double r_obs = r/10.;
     double dt = 0.2*r/(std::sqrt(2.*width_box*g));
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = 0.2/dt/dt;
     params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_ellipses/scopi_objects_";
@@ -82,7 +82,7 @@ int main()
         particles.push_back(s, prop.mass(m).moment_inertia(m*PI/4.*2.*rx*r*r*r));
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
     solver.run(total_it);
 
     return 0;

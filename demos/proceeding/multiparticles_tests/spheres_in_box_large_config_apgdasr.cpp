@@ -7,7 +7,7 @@
 #include <scopi/property.hpp>
 
 #include <scopi/solvers/OptimProjectedGradient.hpp>
-#include <scopi/solvers/gradient/nesterov_dynrho_restart.hpp>
+#include <scopi/solvers/gradient/apgd_asr.hpp>
 #include <scopi/vap/vap_fpd.hpp>
 
 int main()
@@ -29,7 +29,7 @@ int main()
     double dt = 0.2*0.9*r0/(std::sqrt(2.*width_box*g));
     double rho = 0.2/(dt*dt);
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_dynrho_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.scopi_params.output_frequency = 2000;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = rho;
@@ -75,7 +75,7 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_dynrho_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
     solver.run(total_it);
 
     return 0;

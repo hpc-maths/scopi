@@ -56,5 +56,5 @@ int main()
     }
 
     scopi::ScopiSolver<dim> solver(particles, dt);
-    solver.solve(total_it);
+    solver.run(total_it);
 }

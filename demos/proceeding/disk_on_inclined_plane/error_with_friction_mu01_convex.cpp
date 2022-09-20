@@ -27,9 +27,9 @@ int main()
     double h = 2.*radius;
     double alpha = PI/6.;
     auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
-    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.problem_params.mu = 0.1;
-    params.scopi_params.output_frequency = 100000;
+    params.scopi_params.output_frequency = std::size_t(-1);
 
     std::vector<double> dt({0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05});
     std::vector<std::size_t> total_it({100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200});

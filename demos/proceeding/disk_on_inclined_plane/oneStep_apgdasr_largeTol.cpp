@@ -6,7 +6,7 @@
 #include <scopi/property.hpp>
 
 #include <scopi/solvers/OptimProjectedGradient.hpp>
-#include <scopi/solvers/gradient/nesterov_dynrho_restart.hpp>
+#include <scopi/solvers/gradient/apgd_asr.hpp>
 #include <scopi/vap/vap_fpd.hpp>
 
 int main()
@@ -22,7 +22,7 @@ int main()
     double mass = 1.;
     double h = radius;
     auto prop = scopi::property<dim>().mass(mass).moment_inertia(mass*radius*radius/2.);
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_dynrho_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = 2.;
 
@@ -36,7 +36,7 @@ int main()
     particles.push_back(p, scopi::property<dim>().deactivate());
     particles.push_back(s, prop.force({{0., -g}}));
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_dynrho_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
     solver.run(total_it);
 
     return 0;
