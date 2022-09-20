@@ -35,9 +35,9 @@ int main()
     scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = 0.2/dt/dt;
-    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_ellipses/scopi_objects_";
-    params.contacts_params.dmax = r;
-    params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
+    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220917_ellipses/scopi_objects_";
+    params.contacts_params.dmax = 2.*r;
+    params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 3.*r;
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g}});
