@@ -15,25 +15,25 @@ Solvers vs problems
 Not all solvers are implemented to solve all problems.
 The table below summarizes the different combinations.
 
-+-------------------------------+------------+----------+-------------------+------------------------------+
-|                               | OptimMosek | OptimScs |  OptimUzawa [#0]_ | OptimProjectedGradient [#1]_ |
-+===============================+============+==========+===================+==============================+
-| DryWithoutFriction            | YES        | YES      | YES               | YES                          |
-+-------------------------------+------------+----------+-------------------+------------------------------+
-| DryWithFriction               | YES        + NO [#2]_ + NO                | NO [#2]_                     |      
-+-------------------------------+------------+----------+-------------------+------------------------------+
-| DryWithFrictionFixedPoint     | YES        + NO [#2]_ + NO                | NO [#2]_                     |      
-+-------------------------------+------------+----------+-------------------+------------------------------+
-| ViscousWithoutFriction        | YES        | YES      | YES               | YES                          |
-+-------------------------------+------------+----------+-------------------+------------------------------+
-| ViscousWithFriction           | YES        + NO [#2]_ + NO                | NO [#2]_                     |      
-+-------------------------------+------------+----------+-------------------+------------------------------+
-| ViscousWithFrictionFixedPoint | YES        + NO [#2]_ + NO                | NO [#2]_                     |      
-+-------------------------------+------------+----------+-------------------+------------------------------+
++-------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
+|                               | OptimMosek | OptimScs        |  OptimUzawa [#OptimUzawa]_ | OptimProjectedGradient [#OptimProjectedGradient]_ |
++===============================+============+=================+============================+===================================================+
+| DryWithoutFriction            | YES        | YES             | YES                        | YES                                               |
++-------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
+| DryWithFriction               | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
++-------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
+| DryWithFrictionFixedPoint     | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
++-------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
+| ViscousWithoutFriction        | YES        | YES             | YES                        | YES                                               |
++-------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
+| ViscousWithFriction           | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
++-------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
+| ViscousWithFrictionFixedPoint | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
++-------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
 
-.. [#0] OptimUzawaMkl, OptimUzawaMatrixFreeOmp, and OptimUzawaMatrixFreeTbb.
-.. [#1] Template parameter to choose PGD, APGD, APGD-AS, APGD-AR, or APDG-ASR solvers.
-.. [#2] Could be implemented.
+.. [#OptimUzawa] OptimUzawaMkl, OptimUzawaMatrixFreeOmp, and OptimUzawaMatrixFreeTbb.
+.. [#OptimProjectedGradient] Template parameter to choose PGD, APGD, APGD-AS, APGD-AR, or APDG-ASR solvers.
+.. [#Friction] Could be implemented.
 
 Contents
 ========
