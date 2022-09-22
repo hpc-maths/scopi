@@ -23,7 +23,7 @@ int main()
     std::size_t n = 3; // n^3 spheres
     double g = 1.;
 
-    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_brute_force, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_brute_force, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 0.1;
 

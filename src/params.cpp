@@ -9,7 +9,7 @@ namespace scopi
     {}
 
     ScopiParams::ScopiParams()
-    : output_frequency(std::size_t(-1))
+    : output_frequency(1)
     , filename("./Results/scopi_objects_")
     , write_velocity(false)
     {}

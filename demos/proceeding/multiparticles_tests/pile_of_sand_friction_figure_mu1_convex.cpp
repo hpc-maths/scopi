@@ -12,15 +12,15 @@
 
 int main()
 {
-    // Table 3: 8^3 spheres falling on a plane with friction.
-    // mu = 0.1, convex scheme.
-    plog::init(plog::info, "pile_of_sand_spheres_small_config_mu01_convex.log");
+    // Figure 9: spheres falling on a plane with friction.
+    // mu = 1, convex scheme.
+    plog::init(plog::info, "pile_of_sand_spheres_figure_mu1_convex.log");
 
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
 
     double width_box = 10.;
-    std::size_t n = 8; // n^3 spheres
+    std::size_t n = 10; // n^3 spheres
     std::size_t total_it = 1000;
     double g = 1.;
 
@@ -29,10 +29,11 @@ int main()
 
     scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
-    params.problem_params.mu = 0.1;
+    params.problem_params.mu = 1.;
     params.contacts_params.dmax = r;
     params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
-    params.scopi_params.output_frequency = std::size_t(-1);
+    params.scopi_params.output_frequency = 20;
+    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_pile_sand_friction/mu1_convex_";
 
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});

@@ -10,20 +10,6 @@
 
 namespace scopi
 {
-    /////////////////////
-    // worm definition //
-    /////////////////////
-    template<class position_type, std::size_t dim>
-    position_type worm_construction(const std::array<double, dim>& pos)
-    {
-        position_type p(6);
-        for(std::size_t i = 0; i < 6; ++i)
-        {
-            p[i] = pos;
-        }
-        return p;
-    }
-
     /**
      * @brief Worm.
      *

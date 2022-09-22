@@ -13,7 +13,6 @@
 int main()
 {
     // Table 3: 12^3 spheres falling on a plane with friction.
-    // Figure 9: spheres falling on a plane with friction.
     // mu = 1, convex scheme.
     plog::init(plog::info, "pile_of_sand_spheres_large_config_mu1_convex.log");
 
@@ -28,7 +27,7 @@ int main()
     double r = width_box/2./(n+1);
     double dt = 0.1*r/(std::sqrt(2.*width_box*g));
 
-    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::DryWithFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 1.;
     params.contacts_params.dmax = r;

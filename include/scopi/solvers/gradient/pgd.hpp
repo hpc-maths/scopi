@@ -2,40 +2,34 @@
 
 #ifdef SCOPI_USE_MKL
 #include <mkl_spblas.h>
-
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xnoalias.hpp>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
-#include "projection_max.hpp"
+
+#include "../projection.hpp"
+#include "../../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
     /**
-     * @brief Accelerated Projected Gradient Descent algorithm with Adaptive Restart.
+     * @brief Fixed-step Projected Gradient Descent.
      *
      * See OptimProjectedGradient for the notations.
      * The algorithm is
      *  - \f$ \indexUzawa = 0 \f$;
      *  - \f$ \l^{\indexUzawa} = 0 \f$;
-     *  - \f$ \y^{\indexUzawa} = 0 \f$;
-     *  - \f$ \theta^{\indexUzawa} = 1 \f$.
      *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho \dg^{\indexUzawa}, 0 \right) \f$;
-     *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
-     *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
-     *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
-     *      - If (\f$ \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) > 0 \f$ )
-     *          - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} \f$;
-     *          - \f$ \theta^{\indexUzawa+1} = 1 \f$;
-     *
+     *      - \f$ \dg^{\indexUzawa} = \A \l^{\indexUzawa} + \e \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \l^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
      *      - \f$ \indexUzawa++ \f$.
      *
-     * @tparam projection_t Projection on admissible velocities.
+     * The projection depends on the problem.
+     *
+     * @tparam problem_t Problem to be solved.
      */
-    template<class projection_t = projection_max>
-    class nesterov_restart: public projection_t
+    template<class problem_t = DryWithoutFriction>
+    class pgd: public projection<problem_t>
     {
     protected:
         /**
@@ -47,7 +41,7 @@ namespace scopi{
          * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
-        nesterov_restart(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
+        pgd(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
         /**
          * @brief Gradient descent algorithm.
          *
@@ -94,22 +88,14 @@ namespace scopi{
          */
         xt::xtensor<double, 1> m_uu;
         /**
-         * @brief Vector \f$ \y^{\indexUzawa+1} \f$.
-         */
-        xt::xtensor<double, 1> m_y;
-        /**
-         * @brief Vector \f$ \l^{\indexUzawa} \f$.
+         * @brief Vector \f$ \l^{\indexUzawa-1} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
-        /**
-         * @brief Vector \f$ \l^{\indexUzawa} \f$.
-         */
-        xt::xtensor<double, 1> m_lambda_prev;
     };
 
-    template<class projection_t>
-    nesterov_restart<projection_t>::nesterov_restart(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
-    : projection_t()
+    template<class problem_t>
+    pgd<problem_t>::pgd(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
+    : projection<problem_t>()
     , m_max_iter(max_iter)
     , m_rho(rho)
     , m_tol_dg(tol_dg)
@@ -117,30 +103,25 @@ namespace scopi{
     , m_verbose(verbose)
     {}
 
-    template<class projection_t>
-    std::size_t nesterov_restart<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
+    template<class problem_t>
+    std::size_t pgd<problem_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
-        PLOG_INFO << "Projection: Nesterov with restart";
+        PLOG_INFO << "Projection: PGD";
         std::size_t iter = 0;
-        double theta_old = 1.;
-        m_y = l;
-        m_l_old = l;
         while (iter < m_max_iter)
         {
-            xt::noalias(m_lambda_prev) = l;
-            // dg = A*y+c
-            xt::noalias(m_dg) = c;
-            m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 1., m_dg.data());
-            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for dg = A*y+dg: " << m_status;
+            xt::noalias(m_l_old) = l;
 
-            xt::noalias(l) = this->projection_cone(m_y - m_rho * m_dg);
-            double theta = 0.5*(theta_old*std::sqrt(4.+theta_old*theta_old) - theta_old*theta_old);
-            double beta = theta_old*(1. - theta_old)/(theta_old*theta_old + theta);
-            m_y = l + beta*(l - m_l_old);
+            // dg = Al+c
+            xt::noalias(m_dg) = c;
+            m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, l.data(), 1., m_dg.data());
+            PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for dg = A*l+c: " << m_status;
+
+            xt::noalias(l) = this->projection_cone(l - m_rho * m_dg);
             // double norm_dg = xt::amax(xt::abs(m_dg))(0);
             // double norm_l = xt::amax(xt::abs(l))(0);
             // double cmax = double((xt::amin(m_dg))(0));
-            double diff_lambda = xt::amax(xt::abs(l - m_lambda_prev))(0) / (xt::amax(xt::abs(m_lambda_prev))(0) + 1.);
+            double diff_lambda = xt::amax(xt::abs(l - m_l_old))(0) / (xt::amax(xt::abs(m_l_old))(0) + 1.);
 
             if (m_verbose)
             {
@@ -156,23 +137,14 @@ namespace scopi{
                 PLOG_VERBOSE << constraint << "  " << cout + xt::linalg::dot(c, l)(0);
             }
 
-            // if (norm_dg < m_tol_dg || norm_l < m_tol_l || cmax > -m_tol_dg)
             if (diff_lambda < m_tol_l)
+            // if (norm_dg < m_tol_dg || norm_l < m_tol_l || cmax > -m_tol_dg)
             {
                 return iter+1;
             }
-
-            if (xt::linalg::dot(m_dg, l - m_l_old)(0) > 0.)
-            {
-                m_y = l;
-                theta = 1.;
-            }
-
-            m_l_old = l;
-            theta_old = theta;
             iter++;
         }
-        PLOG_ERROR << "Uzawa does not converge";
+        PLOG_ERROR << "PGD algorithm does not converge";
         return iter;
     }
 }

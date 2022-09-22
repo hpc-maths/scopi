@@ -21,7 +21,6 @@ namespace scopi
                     {
                         if (std::abs(static_cast<double>(jsonRef[path]) - static_cast<double>(jsonResult[path])) > tol)
                         {
-                            std::cout << "reference: " << jsonRef[path] << " evaluated: " << jsonResult[path] << std::endl;
                             return false;
                         }
                     }

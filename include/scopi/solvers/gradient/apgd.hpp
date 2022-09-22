@@ -2,13 +2,14 @@
 
 #ifdef SCOPI_USE_MKL
 #include <mkl_spblas.h>
-
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xnoalias.hpp>
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
-#include "projection_max.hpp"
+
+#include "../projection.hpp"
+#include "../../problems/DryWithoutFriction.hpp"
 
 namespace scopi{
     /**
@@ -22,16 +23,18 @@ namespace scopi{
      *  - \f$ \theta^{\indexUzawa} = 1 \f$.
      *  - While (\f$ \convergenceCriterion \f$)
      *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \max \left (\y^{\indexUzawa} - \rho \dg^{\indexUzawa}, 0 \right) \f$;
+     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \y^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
      *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
      *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
      *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
      *      - \f$ \indexUzawa++ \f$.
      *
-     * @tparam projection_t Projection on admissible velocities.
+     * The projection depends on the problem.
+     *
+     * @tparam problem_t Problem to be solved.
      */
-    template<class projection_t = projection_max>
-    class nesterov: public projection_t
+    template<class problem_t = DryWithoutFriction>
+    class apgd: public projection<problem_t>
     {
     protected:
         /**
@@ -43,7 +46,7 @@ namespace scopi{
          * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
-        nesterov(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
+        apgd(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
         /**
          * @brief Gradient descent algorithm.
          *
@@ -97,15 +100,11 @@ namespace scopi{
          * @brief Vector \f$ \l^{\indexUzawa} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
-        /**
-         * @brief Vector \f$ \l^{\indexUzawa} \f$.
-         */
-        xt::xtensor<double, 1> m_lambda_prev;
     };
 
-    template<class projection_t>
-    nesterov<projection_t>::nesterov(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
-    : projection_t()
+    template<class problem_t>
+    apgd<problem_t>::apgd(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose)
+    : projection<problem_t>()
     , m_max_iter(max_iter)
     , m_rho(rho)
     , m_tol_dg(tol_dg)
@@ -113,17 +112,16 @@ namespace scopi{
     , m_verbose(verbose)
     {}
 
-    template<class projection_t>
-    std::size_t nesterov<projection_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
+    template<class problem_t>
+    std::size_t apgd<problem_t>::projection(const sparse_matrix_t& A, const struct matrix_descr& descr, const xt::xtensor<double, 1>& c, xt::xtensor<double, 1>& l)
     {
-        PLOG_INFO << "Projection: Nesterov";
+        PLOG_INFO << "Projection: APGD";
         std::size_t iter = 0;
         double theta_old = 1.;
         m_y = l;
-        m_l_old = l;
         while (iter < m_max_iter)
         {
-            xt::noalias(m_lambda_prev) = l;
+            xt::noalias(m_l_old) = l;
             // dg = A*y+c
             xt::noalias(m_dg) = c;
             m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, 1., A, descr, m_y.data(), 1., m_dg.data());
@@ -136,7 +134,7 @@ namespace scopi{
             // double norm_dg = xt::amax(xt::abs(m_dg))(0);
             // double norm_l = xt::amax(xt::abs(l))(0);
             // double cmax = double((xt::amin(m_dg))(0));
-            double diff_lambda = xt::amax(xt::abs(l - m_lambda_prev))(0) / (xt::amax(xt::abs(m_lambda_prev))(0) + 1.);
+            double diff_lambda = xt::amax(xt::abs(l - m_l_old))(0) / (xt::amax(xt::abs(m_l_old))(0) + 1.);
 
             if (m_verbose)
             {
@@ -158,11 +156,10 @@ namespace scopi{
                 return iter+1;
             }
 
-            m_l_old = l;
             theta_old = theta;
             iter++;
         }
-        PLOG_ERROR << "Uzawa does not converge";
+        PLOG_ERROR << "APGD algorithm does not converge";
         return iter;
     }
 }

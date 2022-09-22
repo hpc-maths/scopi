@@ -7,14 +7,14 @@
 #include <scopi/property.hpp>
 
 #include <scopi/solvers/OptimProjectedGradient.hpp>
-#include <scopi/solvers/gradient/nesterov_restart.hpp>
+#include <scopi/solvers/gradient/apgd_ar.hpp>
 #include <scopi/solvers/OptimMosek.hpp>
 #include <scopi/vap/vap_fpd.hpp>
 #include <scopi/contact/contact_brute_force.hpp>
 
 int main()
 {
-    plog::init(plog::info, "box_spheres_3d_very_large_nesterov_restart.log");
+    plog::init(plog::info, "box_spheres_3d_very_large_apgd_ar.log");
 
     constexpr std::size_t dim = 3;
     double PI = xt::numeric_constants<double>::PI;
@@ -29,7 +29,7 @@ int main()
     double rho = 0.2/(dt*dt);
     std::cout << "dt = " << dt << "  rho = " << rho << std::endl;
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::DryWithoutFriction, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.scopi_params.output_frequency = 99;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = rho;
@@ -75,7 +75,7 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::nesterov_restart<>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
     solver.run(total_it);
 
     return 0;

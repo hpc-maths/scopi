@@ -84,14 +84,14 @@ namespace scopi
     {
     private:
         /**
-         * @brief Shortcut for problem type. 
+         * @brief Alias for problem type. 
          */
         using problem_t = typename optim_solver_t::problem_type;
     public:
         /**
-         * @brief Shortcut for the type of parameters class.
+         * @brief Alias for the type of parameters class.
          */
-        using params_t = Params<optim_solver_t, problem_t, contact_t, vap_t>;
+        using params_t = Params<optim_solver_t, contact_t, vap_t>;
 
         /**
          * @brief Constructor.
@@ -102,7 +102,7 @@ namespace scopi
          */
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
-                    const Params<optim_solver_t, problem_t, contact_t, vap_t>& params = Params<optim_solver_t, problem_t, contact_t, vap_t>());
+                    const Params<optim_solver_t, contact_t, vap_t>& params = Params<optim_solver_t, contact_t, vap_t>());
 
         /**
          * @brief Run the simulation.
@@ -171,7 +171,7 @@ namespace scopi
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles,
                                                                     double dt,
-                                                                    const Params<optim_solver_t, problem_t, contact_t, vap_t>& params)
+                                                                    const Params<optim_solver_t, contact_t, vap_t>& params)
     : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
     , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
     , contact_t(params.contacts_params)
@@ -191,7 +191,7 @@ namespace scopi
             displacement_obstacles();
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
-            if (nite % m_params.output_frequency == 0 || m_params.output_frequency == std::size_t(-1))
+            if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
                 write_output_files(contacts, nite);
             this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
             this->extra_steps_before_solve(contacts);
@@ -317,6 +317,7 @@ namespace scopi
         auto uadapt = this->get_uadapt();
         auto wadapt = this->get_wadapt();
 
+        #pragma omp parallel for
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
             xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, wadapt(i, 2)});
@@ -350,6 +351,7 @@ namespace scopi
         auto uadapt = this->get_uadapt();
         auto wadapt = this->get_wadapt();
 
+        #pragma omp parallel for
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
             for (std::size_t d = 0; d < dim; ++d)
@@ -361,40 +363,5 @@ namespace scopi
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : update velocity = " << duration;
     }
-
-    /**
-     * @brief Store the rotation velocities, solution of the optimization problem.
-     *
-     * 2D specialization
-     *
-     * @param particles Container whose field \c omega is updated.
-     * @param i Index of the particle to update.
-     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
-     */
-    template<>
-    void update_velocity_omega(scopi_container<2>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
-    {
-        particles.omega()(i + particles.nb_inactive()) = wadapt(i, 2);
-    }
-
-    /**
-     * @brief Store the rotation velocities, solution of the optimization problem.
-     *
-     * 3D specialization
-     *
-     * @param particles Container whose field \c omega is updated.
-     * @param i Index of the particle to update.
-     * @param wadapt \f$N \times 3\f$ array that containes the new velocity, where \f$N\f$ is the total number of particles.
-     */
-    template<>
-    void update_velocity_omega(scopi_container<3>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt)
-    {
-        for (std::size_t d = 0; d < 3; ++d)
-        {
-            particles.omega()(i + particles.nb_inactive())(d) = wadapt(i, d);
-        }
-    }
-
-    
 }
 

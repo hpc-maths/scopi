@@ -190,15 +190,6 @@ namespace scopi
 
     private:
         /**
-         * @brief 
-         *
-         * \todo Is it necessary or is a rest from a previous attempt?
-         *
-         * @return 
-         */
-        std::size_t get_nb_gamma_min();
-
-        /**
          * @brief Parameters.
          */
         ProblemParams<ViscousWithoutFriction<dim>> m_params;
@@ -351,12 +342,6 @@ namespace scopi
                 this->m_distances[contacts.size() + i] = -contacts[i].dij;
             }
         }
-    }
-
-    template<std::size_t dim>
-    std::size_t ViscousWithoutFriction<dim>::get_nb_gamma_min()
-    {
-        return 0;
     }
 
     template<std::size_t dim>

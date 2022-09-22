@@ -7,6 +7,12 @@
 #include <scopi/solvers/OptimScs.hpp>
 #ifdef SCOPI_USE_MKL
 #include <scopi/solvers/OptimUzawaMkl.hpp>
+#include <scopi/solvers/OptimProjectedGradient.hpp>
+#include <scopi/solvers/gradient/pgd.hpp>
+#include <scopi/solvers/gradient/apgd.hpp>
+#include <scopi/solvers/gradient/apgd_as.hpp>
+#include <scopi/solvers/gradient/apgd_ar.hpp>
+#include <scopi/solvers/gradient/apgd_asr.hpp>
 #endif
 #include <scopi/solvers/OptimUzawaMatrixFreeOmp.hpp>
 #include <scopi/solvers/OptimUzawaMatrixFreeTbb.hpp>
@@ -29,6 +35,11 @@ namespace scopi
     ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimScs<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMkl<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, pgd>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_as>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_ar>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_asr>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeTbb<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeOmp<DryWithoutFriction>, contact, vap>, \
     ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap> // friction with mu = 0
@@ -44,7 +55,12 @@ namespace scopi
 #ifdef SCOPI_USE_MKL
 #define SOLVER_WORMS(dim, contact, vap) \
     ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>, \
-    ScopiSolver<dim, OptimUzawaMkl<DryWithoutFriction>, contact, vap>
+    ScopiSolver<dim, OptimUzawaMkl<DryWithoutFriction>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, pgd>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_as>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_ar>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_asr>, contact, vap>
 #else
 #define SOLVER_WORMS(dim, contact, vap) \
     ScopiSolver<dim, OptimMosek<DryWithoutFriction>, contact, vap>
@@ -57,6 +73,11 @@ namespace scopi
 #define SOLVER_VISCOUS_WITHOUT_FRICTION(dim, contact, vap) \
     ScopiSolver<dim, OptimMosek<ViscousWithoutFriction<dim>>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMkl<ViscousWithoutFriction<dim>>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, pgd>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_as>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_ar>, contact, vap>, \
+    ScopiSolver<dim, OptimProjectedGradient<DryWithoutFriction, apgd_asr>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<dim>>, contact, vap>, \
     ScopiSolver<dim, OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<dim>>, contact, vap>
 #else
@@ -87,10 +108,23 @@ namespace scopi
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_brute_force, vap_fixed); \
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_brute_force, vap_fpd);
 
+#define TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact, vap) \
+    TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::solver<scopi::problem, scopi::projection>, scopi::contact, scopi::vap>)
+#define TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(solver, problem, projection, dim)\
+    TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_kdtree, vap_fixed); \
+    TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_kdtree, vap_fpd); \
+    TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_brute_force, vap_fixed); \
+    TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_brute_force, vap_fpd);
+
 TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, DryWithoutFriction, 2)
 TYPE_TO_STRING_CONTACTS_VAP(OptimScs, DryWithoutFriction, 2)
 #ifdef SCOPI_USE_MKL
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMkl, DryWithoutFriction, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, DryWithoutFriction, pgd, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, DryWithoutFriction, apgd, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, DryWithoutFriction, apgd_as, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, DryWithoutFriction, apgd_ar, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, DryWithoutFriction, apgd_asr, 2)
 #endif
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeTbb, DryWithoutFriction, 2)
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeOmp, DryWithoutFriction, 2)
@@ -100,6 +134,11 @@ TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, DryWithFriction, 2)
 TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, ViscousWithoutFriction<2>, 2)
 #ifdef SCOPI_USE_MKL
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMkl, ViscousWithoutFriction<2>, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, ViscousWithoutFriction<2>, pgd, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, ViscousWithoutFriction<2>, apgd, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, ViscousWithoutFriction<2>, apgd_as, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, ViscousWithoutFriction<2>, apgd_ar, 2)
+TYPE_TO_STRING_CONTACTS_VAP_PROJECTED_GRADIENT(OptimProjectedGradient, ViscousWithoutFriction<2>, apgd_asr, 2)
 #endif
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeTbb, ViscousWithoutFriction<2>, 2)
 TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMatrixFreeOmp, ViscousWithoutFriction<2>, 2)

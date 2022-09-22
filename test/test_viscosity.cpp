@@ -48,26 +48,27 @@ namespace scopi {
         double radius = 1.;
         double g = radius;
         double h = 1.5*radius;
+        double alpha = PI/4.;
         auto prop = property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
 
         double dt = 0.05;
-        std::size_t total_it = 100;
 
         scopi_container<dim> particles;
-        plan<dim> p({{0., 0.}}, PI/2.);
+        plan<dim> p({{0., 0.}}, PI/2. - alpha);
         sphere<dim> s({{0., h}}, radius);
         particles.push_back(p, property<dim>().deactivate());
-        particles.push_back(s, prop.force({{g, -g}}));
+        particles.push_back(s, prop.force({{g*std::cos(alpha), -g*std::sin(alpha)}}));
 
         params_t params;
         set_params_test(params.optim_params);
+        params.scopi_params.output_frequency = 188;
 
         SolverType solver(particles, dt, params);
-        solver.run(total_it);
+        solver.run(150);
         particles.f()(1)(1) *= -1.;
-        solver.run(2*total_it, total_it);
+        solver.run(189, 150);
 
-        CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity.json", tolerance));
+        CHECK(diffFile("./Results/scopi_objects_0188.json", "../test/references/sphere_plan_viscosity.json", tolerance));
     }
 
     /*
@@ -92,6 +93,7 @@ namespace scopi {
 
         params_t params;
         params.problem_params.mu = 0.1;
+        params.scopi_params.output_frequency = total_it-1;
         SolverType solver(particles, dt, params);
         solver.run(total_it);
         particles.f()(1)(1) *= -1.;

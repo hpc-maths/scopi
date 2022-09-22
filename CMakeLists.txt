@@ -104,15 +104,20 @@ set(SCOPI_SRC
     src/contact/contact_kdtree.cpp
     src/problems/DryWithoutFriction.cpp
     src/problems/DryWithFriction.cpp
+    src/problems/DryWithFrictionBase.cpp
     src/problems/DryWithFrictionFixedPoint.cpp
     src/problems/ProblemBase.cpp
     src/solvers/ConstraintMosek.cpp
+    src/solvers/OptimUzawaBase.cpp
+    src/solvers/OptimProjectedGradient.cpp
+    src/solvers/projection.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/vap/vap_projection.cpp
     src/minpack.cpp
     src/params.cpp
     src/quaternion.cpp
+    src/solver.cpp
     src/utils.cpp
 )
 

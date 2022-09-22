@@ -145,21 +145,21 @@ namespace scopi
      * @brief Write the elements of a worm in json format.
      *
      * @tparam dim Dimension (2 or 3).
-     * @param g [in] Worm.
+     * @param w [in] Worm.
      *
      * @return nlohmann json object.
      */
     template<std::size_t dim>
-    nl::json write_objects(const worm<dim, false> g)
+    nl::json write_objects(const worm<dim, false> w)
     {
         nl::json object;
         object["type"] = "worm";
-        for (std::size_t i = 0; i < g.size(); ++i)
+        for (std::size_t i = 0; i < w.size(); ++i)
         {
             nl::json json_worm;
-            json_worm["position"] = g.pos(i);
-            json_worm["radius"] = g.radius();
-            json_worm["quaternion"] = g.q(i);
+            json_worm["position"] = w.pos(i);
+            json_worm["radius"] = w.radius();
+            json_worm["quaternion"] = w.q(i);
             object["worm"].push_back(json_worm);
         }
         return object;

@@ -13,7 +13,6 @@
 int main()
 {
     // Table 3: 12^3 spheres falling on a plane with friction.
-    // Figure 9: spheres falling on a plane with friction.
     // mu = 0.1, fixed point algorithm.
     plog::init(plog::info, "pile_of_sand_spheres_large_config_mu01_fixed_point.log");
 
@@ -28,7 +27,7 @@ int main()
     double r = width_box/2./(n+1);
     double dt = 0.1*r/(std::sqrt(2.*width_box*g));
 
-    scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::DryWithFrictionFixedPoint, scopi::contact_kdtree, scopi::vap_fpd> params;
+    scopi::Params<scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::contact_kdtree, scopi::vap_fpd> params;
     params.optim_params.change_default_tol_mosek = false;
     params.problem_params.mu = 0.1;
     params.problem_params.tol_fixed_point = 1e-2;

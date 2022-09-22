@@ -41,7 +41,7 @@ namespace scopi{
     template<class problem_t = DryWithoutFriction>
     class OptimUzawaMatrixFreeOmp :public OptimUzawaBase<OptimUzawaMatrixFreeOmp<problem_t>, problem_t>
     {
-    protected:
+    public:
         /**
          * @brief Alias for the problem.
          */
