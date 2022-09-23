@@ -6,242 +6,51 @@ scopi_container class
    :members:
    :protected-members:
 
-.. graphviz::
+Particles and objects
+---------------------
+::
 
-    digraph G {
-        fontname="Helvetica,Arial,sans-serif"
-        node [fontname="Helvetica,Arial,sans-serif"]
-        edge [fontname="Helvetica,Arial,sans-serif"]
+    scopi_container<dim> particles;
 
-        subgraph cluster_0 {
-            style=filled;
-            color=lightgrey;
-            node [style=filled,color=white];
-            a0 -> a1 -> a2 -> a3;
-            label = "process #1";
-        }
 
-        subgraph cluster_1 {
-            node [style=filled];
-            b0 -> b1 -> b2 -> b3;
-            label = "process #2";
-            color=blue
-        }
-        start -> a0;
-        start -> b0;
-        a1 -> b3;
-        b2 -> a3;
-        a3 -> a0;
-        a3 -> end;
-        b3 -> end;
-
-        start [shape=Mdiamond];
-        end [shape=Msquare];
+Loop on positions of particles::
+    
+    for (std::size_t p = 0; p < particles.nb_active(); ++p)
+    {
+       particles.pos()(p) = /* ... */;
     }
 
-.. graphviz::
-
-    digraph G {
-        subgraph cluster_0 {
-            a0 -> a1 -> a2 -> a3;
-            label = "process #1";
-        }
-
-        subgraph cluster_1 {
-            b0 -> b1 -> b2 -> b3;
-            label = "process #2";
-        }
-        start -> a0;
-        start -> b0;
-        a1 -> b3;
-        b2 -> a3;
-        a3 -> a0;
-        a3 -> end;
-        b3 -> end;
-
-        start [shape=Mdiamond];
-        end [shape=Msquare];
+Loop on objects::
+    
+    for (std::size_t o = 0; o < particles.size(); ++o)
+    {
+       particles[o] = /* ... */;
     }
+
+Loop on particles, then access the object::
+
+    for (std::size_t p = 0; p < particles.nb_active(); ++p)
+    {
+        particles[particles.object_index(p)] += /* ... */;
+    }
+
+Loop on positions of particles in object::
+
+    for (std::size_t o = 0; o < particles.size(); ++o)
+    {
+        for (std::size_t p = 0; p < particles[0].size(); ++p)
+        {
+            particles.pos()(particles.offset(o) + p) = /* ... */;
+        }
+    }
+
 
 .. graphviz::
 
     digraph G {
-        subgraph cluster_full {
-            subgraph cluster_0 {
-                particle0 particle1 particle2 particle3;
-                label = "object 0";
-            }
-
-            "object 0" -> particle0;
-
-            subgraph cluster_a {
-                particle4 particle5 particle6;
-                label = "object 1";
-            }
-            label = "scopi_container"
-        }
-   }
-
-
-.. graphviz::
-
-    digraph g {
-        fontname="Helvetica,Arial,sans-serif"
-        node [fontname="Helvetica,Arial,sans-serif"]
-        edge [fontname="Helvetica,Arial,sans-serif"]
-        graph [
-        rankdir = "LR"
-        ];
-        node [
-        fontsize = "16"
-        shape = "ellipse"
-        ];
-        edge [
-        ];
-        "node0" [
-        label = "<f0> 0x10ba8| <f1>"
-        shape = "record"
-        ];
-        "node1" [
-        label = "<f0> 0xf7fc4380| <f1> | <f2> |-1"
-        shape = "record"
-        ];
-        "node2" [
-        label = "<f0> 0xf7fc44b8| | |2"
-        shape = "record"
-        ];
-        "node3" [
-        label = "<f0> 3.43322790286038071e-06|44.79998779296875|0"
-        shape = "record"
-        ];
-        "node4" [
-        label = "<f0> 0xf7fc4380| <f1> | <f2> |2"
-        shape = "record"
-        ];
-        "node5" [
-        label = "<f0> (nil)| | |-1"
-        shape = "record"
-        ];
-        "node6" [
-        label = "<f0> 0xf7fc4380| <f1> | <f2> |1"
-        shape = "record"
-        ];
-        "node7" [
-        label = "<f0> 0xf7fc4380| <f1> | <f2> |2"
-        shape = "record"
-        ];
-        "node8" [
-        label = "<f0> (nil)| | |-1"
-        shape = "record"
-        ];
-        "node9" [
-        label = "<f0> (nil)| | |-1"
-        shape = "record"
-        ];
-        "node10" [
-        label = "<f0> (nil)| <f1> | <f2> |-1"
-        shape = "record"
-        ];
-        "node11" [
-        label = "<f0> (nil)| <f1> | <f2> |-1"
-        shape = "record"
-        ];
-        "node12" [
-        label = "<f0> 0xf7fc43e0| | |1"
-        shape = "record"
-        ];
-        "node0":f0 -> "node1":f0 [
-        id = 0
-        ];
-        "node0":f1 -> "node2":f0 [
-        id = 1
-        ];
-        "node1":f0 -> "node3":f0 [
-        id = 2
-        ];
-        "node1":f1 -> "node4":f0 [
-        id = 3
-        ];
-        "node1":f2 -> "node5":f0 [
-        id = 4
-        ];
-        "node4":f0 -> "node3":f0 [
-        id = 5
-        ];
-        "node4":f1 -> "node6":f0 [
-        id = 6
-        ];
-        "node4":f2 -> "node10":f0 [
-        id = 7
-        ];
-        "node6":f0 -> "node3":f0 [
-        id = 8
-        ];
-        "node6":f1 -> "node7":f0 [
-        id = 9
-        ];
-        "node6":f2 -> "node9":f0 [
-        id = 10
-        ];
-        "node7":f0 -> "node3":f0 [
-        id = 11
-        ];
-        "node7":f1 -> "node1":f0 [
-        id = 12
-        ];
-        "node7":f2 -> "node8":f0 [
-        id = 13
-        ];
-        "node10":f1 -> "node11":f0 [
-        id = 14
-        ];
-        "node10":f2 -> "node12":f0 [
-        id = 15
-        ];
-        "node11":f2 -> "node1":f0 [
-        id = 16
-        ];
+        node [shape=record];
+        container [label="{<particles0>Particles|<objects0>Objects|Particles in an object} | {{0}|{0}|{0}} | {{1}|{}|{1}} | {{2}|{}|{2}} | {{3}|{}|{3}} | {{4}|{1}|{0}} | {{5}|{}|{1}} | {{6}|{}|{2}} | {{7}|{}|{3}} | {{<particles1>8}|{<objects1>}|{4}}"];
+        container:objects0 -> container:particles0 [label="offset "]
+        container:particles1 -> container:objects1 [label=" object_index"]
     }
 
-.. graphviz::
-
-    digraph g {
-        graph [
-        rankdir = "LR"
-        ];
-        "node0" [
-        label = "<f0> 0x10ba8| <f1>"
-        shape = "record"
-        ];
-        "node1" [
-        label = "<f0> 0xf7fc4380| <f1> | <f2> |-1"
-        shape = "record"
-        ];
-        "node2" [
-        label = "<f0> 0xf7fc44b8| | |2"
-        shape = "record"
-        ];
-        "node4" [
-        label = "<f0> 0xf7fc4380| <f1> | <f2> |2"
-        shape = "record"
-        ];
-        "node7" [
-        label = "<f0> 0xf7fc4380| <f1> | <f2> |2"
-        shape = "record"
-        ];
-        "node0":f0 -> "node1":f0 [
-        id = 0
-        ];
-        "node0":f1 -> "node2":f0 [
-        id = 1
-        ];
-        "node1":f1 -> "node4":f0 [
-        id = 3
-        ];
-        "node4":f1 -> "node6":f0 [
-        id = 6
-        ];
-        "node6":f1 -> "node7":f0 [
-        id = 9
-        ];
-    }
