@@ -5,7 +5,6 @@ scopi_container class
    :project: scopi
    :members:
    :protected-members:
-<<<<<<< HEAD
 
 Particles and objects
 ---------------------
