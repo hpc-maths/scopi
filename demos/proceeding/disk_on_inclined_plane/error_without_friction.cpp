@@ -11,6 +11,7 @@
 #include <scopi/solvers/OptimProjectedGradient.hpp>
 #include <scopi/solvers/gradient/apgd_asr.hpp>
 #include <scopi/vap/vap_fpd.hpp>
+#include <scopi/problems/DryWithFrictionBase.hpp>
 
 int main()
 {
