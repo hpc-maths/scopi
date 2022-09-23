@@ -78,32 +78,6 @@ namespace scopi
         DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
 
         /**
-         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param particles [in] Array of particles (for positions).
-         * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other problems).
-         * @param firstCol [in] Index of the first column (solver-dependent).
-         */
-        template <std::size_t dim>
-        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts,
-                                          const std::vector<neighbor<dim>>& contacts_worms,
-                                          std::size_t firstCol);
-        /**
-         * @brief Get the number of rows in the matrix.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
-         *
-         * @return Number of rows in the matrix.
-         */
-        template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                      const std::vector<neighbor<dim>>& contacts_worms);
-        /**
          * @brief Create vector \f$ \mathbf{d} \f$.
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
