@@ -71,7 +71,6 @@ namespace scopi{
          * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre Call \c run before calling this function.
-         * \todo Fix dimensions depending on the problem.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contatcs.
@@ -84,6 +83,8 @@ namespace scopi{
          * @brief Returns the Lagrange multipliers (solution of the dual problem) when the optimization is solved.
          *
          * \pre Call \c run before calling this function.
+         *
+         * \todo Compute the matrix-vector product only for problems that need it.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.

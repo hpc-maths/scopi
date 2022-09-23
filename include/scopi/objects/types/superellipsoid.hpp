@@ -80,7 +80,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @return 
          */
@@ -100,8 +100,6 @@ namespace scopi
         /**
          * @brief Get the coordinates of the point at the surface of the superellipsoid in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point.
          *
          * @return (x, y) coordinates of the point.
@@ -109,8 +107,6 @@ namespace scopi
         auto point(const double b) const; 
         /**
          * @brief Get the coordinates of the point at the surface of the superellispoid in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point.
          * @param b [in] Angle of the point.
@@ -121,8 +117,6 @@ namespace scopi
         /**
          * @brief Get the outer normal of the superellipsoid in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point to compute the normal.
          *
          * @return (x, y) coordinates of the normal.
@@ -130,8 +124,6 @@ namespace scopi
         auto normal(const double b) const;
         /**
          * @brief Get the outer normal of the superellipsoid in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point to compute the normal.
          * @param b [in] Angle of the point to compute the normal.
@@ -142,8 +134,6 @@ namespace scopi
         /**
          * @brief Get the vector included in the straight line tangent to the superellipsoid in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point to compute the tangent straight line.
          *
          * @return (x, y) coordinates of a vector in the tangent straight line.
@@ -151,8 +141,6 @@ namespace scopi
         auto tangent(const double b) const; 
         /**
          * @brief Get the vectors included in the plane tangent to the superellipsoid in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point to compute the tangent plane.
          * @param b [in] Angle of the point to compute the tangent plane.
@@ -163,7 +151,7 @@ namespace scopi
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param n
          *
@@ -173,7 +161,7 @@ namespace scopi
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param n
          *
@@ -183,7 +171,7 @@ namespace scopi
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param n
          *

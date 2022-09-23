@@ -32,7 +32,7 @@ double toc();
 /**
  * @brief Recursive function to initialize 2D newton (superellipsoid)
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param binit
  * @param n
@@ -61,7 +61,7 @@ template<typename F, typename DF, typename U, typename A>
 /**
  * @brief Newton method (with linesearch).
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param u0
  * @param f
@@ -158,7 +158,7 @@ namespace scopi
     /**
      * @brief 
      *
-     * TODO
+     * \todo Write documentation.
      *
      * @tparam dim
      * @tparam E

@@ -172,7 +172,7 @@ namespace scopi
     /**
      * @brief 
      *
-     * TODO
+     * \todo Write documentation.
      *
      * @tparam dim Dimension (2 or 3).
      */
@@ -187,7 +187,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @tparam T1
          * @param obj1
@@ -203,7 +203,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param object
          *
@@ -218,7 +218,7 @@ namespace scopi
     /**
      * @brief 
      *
-     * TODO
+     * \todo Write documentation.
      *
      * @tparam dim Dimension (2 or 3).
      */

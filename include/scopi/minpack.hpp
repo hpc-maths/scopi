@@ -22,7 +22,7 @@ using namespace std;
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @tparam F
  * @tparam A
@@ -66,7 +66,7 @@ void fcn (int n, double x[], double fvec[], int& , F f, A args) {
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @tparam F
  * @tparam DF
@@ -118,7 +118,7 @@ void fdjac_analytic ( F , DF grad_f, A args,
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param i1
  * @param i2
@@ -132,7 +132,7 @@ int i4_max ( int i1, int i2 );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param i1
  * @param i2
@@ -146,7 +146,7 @@ int i4_min ( int i1, int i2 );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param n
  * @param x[]
@@ -160,7 +160,7 @@ double enorm ( int n, double x[] );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @return 
  */
@@ -170,7 +170,7 @@ double r8_epsilon ( );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @return 
  */
@@ -181,7 +181,7 @@ double r8_huge ( );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param x
  * @param y
@@ -195,7 +195,7 @@ double r8_max ( double x, double y );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param x
  * @param y
@@ -209,7 +209,7 @@ double r8_min ( double x, double y );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param n
  * @param r[]
@@ -240,7 +240,7 @@ void qform ( int m, int n, double q[], int ldq );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param m
  * @param n
@@ -256,7 +256,7 @@ void r1mpyq ( int m, int n, double a[], int lda, double v[], double w[] );
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param m
  * @param n
@@ -274,7 +274,7 @@ bool r1updt ( int m, int n, double s[], int , double u[], double v[],
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @param m
  * @param n
@@ -292,7 +292,7 @@ void qrfac ( int m, int n, double a[], int lda, bool pivot, int ipvt[],
 /**
  * @brief 
  *
- * TODO
+ * \todo Write documentation.
  *
  * @tparam F
  * @tparam DF

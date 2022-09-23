@@ -504,7 +504,6 @@ namespace scopi
                                                   const scopi_container<dim>& particles,
                                                   const xt::xtensor<double, 2>& u)
     {
-        // TODO will work only for sphere and plan test
         m_lambda.resize(contacts.size());
         std::size_t ind_gamma_neg = 0;
         std::size_t ind_gamma_min = 0;

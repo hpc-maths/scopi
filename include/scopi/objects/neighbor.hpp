@@ -45,7 +45,7 @@ namespace scopi
     /**
      * @brief 
      *
-     * TODO
+     * \todo Write documentation.
      *
      * @tparam dim
      * @param out

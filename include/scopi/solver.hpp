@@ -194,7 +194,6 @@ namespace scopi
             while (this->should_solve_optimization_problem())
             {
                 optim_solver_t::run(m_particles, contacts, contacts_worms, nite);
-                // TODO get_constraint computes a matrix-vector product, do it only if needed
                 this->extra_steps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
             }
             move_active_particles();

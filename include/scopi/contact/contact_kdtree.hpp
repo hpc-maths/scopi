@@ -51,7 +51,7 @@ namespace scopi
     /**
      * @brief 
      *
-     * TODO
+     * \todo Write documentation.
      *
      * @tparam dim Dimension (2 or 3).
      */
@@ -62,7 +62,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param p [in] Array of particles.
          * @param actptr [in] Index of the first active particle.
@@ -77,7 +77,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param idx
          * @param d
@@ -93,7 +93,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @tparam BBOX
          * @param 

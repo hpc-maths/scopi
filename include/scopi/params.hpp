@@ -119,14 +119,11 @@ namespace scopi
         bool write_velocity;
     };
 
-    // TODO fix compilation with default template parameters
-    // template<class solver_t = OptimUzawaMatrixFreeOmp<DryWithoutFriction>,
-    //          class problem_t = DryWithoutFriction,
-    //          class contact_t = contact_kdtree,
-    //          class vap_t = vap_fixed>
     /**
      * @class Params
      * @brief Global struct for the parameters.
+     *
+     * \todo Interface is not used friendly.
      *
      * @tparam solver_t Type of the optimization solver.
      * @tparam problem_t Type of the problem (redundant with \c solver_t).
