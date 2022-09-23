@@ -100,10 +100,6 @@ namespace scopi{
          * @brief Vector \f$ \mathbf{l}^{k} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
-        /**
-         * @brief Vector \f$ \mathbf{l}^{k} \f$.
-         */
-        xt::xtensor<double, 1> m_lambda_prev;
     };
 
     template<class problem_t>

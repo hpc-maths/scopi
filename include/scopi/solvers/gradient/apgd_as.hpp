@@ -115,10 +115,6 @@ namespace scopi{
          * @brief Temporary vector used to compute \f$ \mathbf{l}^T \cdot \mathbb{A} \mathbf{l} \f$ and \f$ \mathbf{y}^T \cdot \mathbb{A} \mathbf{y} \f$.
          */
         xt::xtensor<double, 1> m_tmp;
-        /**
-         * @brief Vector \f$ \mathbf{l}^{k} \f$.
-         */
-        xt::xtensor<double, 1> m_lambda_prev;
     };
 
     template<class problem_t>
