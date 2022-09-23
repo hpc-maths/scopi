@@ -21,10 +21,10 @@ namespace scopi{
      *  - \f$ \mathbf{l}^{k} = 0 \f$;
      *  - While (\f$  \frac{||\mathbf{l}^{k} - \mathbf{l}^{k-1}||}{||\mathbf{l}^{k}||+1} \le tol\_l \f$)
      *      - \f$ \mathbf{dg}^{k} = \mathbb{A} \mathbf{l}^{k} + \mathbf{e} \f$;
-     *      - \f$ \mathbf{l}^{k+1} = \max \left (\mathbf{l}^{k} - \rho \mathbf{dg}^{k}, 0 \right) \f$;
+     *      - \f$ \mathbf{l}^{k+1} = \Pi \left (\mathbf{l}^{k} - \rho \mathbf{dg}^{k}, 0 \right) \f$;
      *      - \f$ k++ \f$.
      *
-     * The projection depends on the problem.
+     * The projection \f$ \Pi \f$ depends on the problem.
      *
      * @tparam problem_t Problem to be solved.
      */

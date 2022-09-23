@@ -12,7 +12,7 @@
 
 namespace scopi{
     /**
-     * @brief Projection on the linear cone for gradients-like algorithm.
+     * @brief Projection \f$ \Pi \f$ on the linear cone for gradients-like algorithm.
      *
      * The projection depends on the problem, template specializations of this class help manage the dependance on the problem.
      *

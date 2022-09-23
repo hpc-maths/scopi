@@ -25,11 +25,11 @@ namespace scopi{
      *  - \f$ L^{k} = \frac{1}{\rho^{k}} \f$;
      *  - While (\f$  \frac{||\mathbf{l}^{k} - \mathbf{l}^{k-1}||}{||\mathbf{l}^{k}||+1} \le tol\_l \f$)
      *      - \f$ \mathbf{dg}^{k} = \mathbb{A} \mathbf{y}^{k} + \mathbf{e} \f$;
-     *      - \f$ \mathbf{l}^{k+1} = \max \left (\mathbf{y}^{k} - \rho^{k} \mathbf{dg}^{k}, 0 \right) \f$;
+     *      - \f$ \mathbf{l}^{k+1} = \Pi \left (\mathbf{y}^{k} - \rho^{k} \mathbf{dg}^{k}, 0 \right) \f$;
      *      - While (\f$ \frac{1}{2} \mathbf{l}^{k+1} \cdot \mathbb{A} \mathbf{l}^{k+1} + \mathbf{e} \cdot \mathbf{l}^{k+1} > \frac{1}{2} \mathbf{y}^{k+1} \cdot \mathbb{A} \mathbf{y}{k+1} + \mathbf{e} \cdot \mathbf{y}^{k+1} + \mathbf{dg}^{k} \cdot \left( \mathbf{l}^{k+1} - \mathbf{y}^{k+1} \right) + \frac{1}{2} L^{k} \left( \mathbf{l}^{k+1} - \mathbf{y}^{k+1} \right) \cdot \left( \mathbf{l}^{k+1} - \mathbf{y}^{k+1} \right) \f$)
      *          - \f$ L^{k} = 2 L^{k} \f$;
      *          - \f$ \rho^{k} = \frac{1}{L^{k}} \f$;
-     *          - \f$ \mathbf{l}^{k+1} = \max \left( \mathbf{y}^{k} - \rho^{k} \mathbf{dg}^{k}, 0 \right) \f$;
+     *          - \f$ \mathbf{l}^{k+1} = \Pi \left( \mathbf{y}^{k} - \rho^{k} \mathbf{dg}^{k}, 0 \right) \f$;
      *
      *      - \f$ \theta^{k+1} = \frac{1}{2} \theta^{k} \sqrt{4 + \left( \theta^{k} \right)^2} - \left( \theta^{k} \right)^2 \f$;
      *      - \f$ \beta^{k+1} = \theta^{k} \frac{1 - \theta^{k}}{\left( \theta^{k} \right)^2 + \theta^{k+1}} \f$;
@@ -40,7 +40,7 @@ namespace scopi{
      *
      *      - \f$ k++ \f$.
      *
-     * The projection depends on the problem.
+     * The projection \f$ \Pi \f$ depends on the problem.
      *
      * @tparam problem_t Problem to be solved.
      */
