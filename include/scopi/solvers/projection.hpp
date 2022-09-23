@@ -25,14 +25,14 @@ namespace scopi{
     /**
      * @brief Specialization of \c projection for \c DryWithoutFriction.
      *
-     * Projection on \f$ \R^+ \f$.
+     * Projection on \f$ \mathbb{R}^+ \f$.
      */
     template <>
     class projection<DryWithoutFriction>
     {
     protected:
         /**
-         * @brief Projection on \f$ \R^+ \f$.
+         * @brief Projection on \f$ \mathbb{R}^+ \f$.
          *
          * @param l [in] Vector to project.
          *
@@ -44,14 +44,14 @@ namespace scopi{
     /**
      * @brief Specialization of \c projection for \c ViscousWithoutFriction.
      *
-     * Projection on \f$ \R^+ \f$.
+     * Projection on \f$ \mathbb{R}^+ \f$.
      */
     template <std::size_t dim>
     class projection<ViscousWithoutFriction<dim>>
     {
     protected:
         /**
-         * @brief Projection on \f$ \R^+.
+         * @brief Projection on \f$ \mathbb{R}^+ \f$.
          *
          * @param l [in] Vector to project.
          *
