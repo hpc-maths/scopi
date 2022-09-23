@@ -16,6 +16,8 @@ namespace scopi
      * A worm is a collection of spheres that are in contact (the distance between two successive spheres is 0 instead of being positive).
      * All spheres have the same radius.
      *
+     * \warning The only problem that implements worms is DryWithoutFriction.
+     *
      * @tparam dim Dimension (2 or 3).
      * @tparam owner
      */
