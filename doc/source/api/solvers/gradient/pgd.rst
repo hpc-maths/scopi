@@ -1,7 +1,7 @@
-uzawa class
-===========
+pgd class
+=========
 
-.. doxygenclass:: scopi::uzawa
+.. doxygenclass:: scopi::pgd
    :project: scopi
    :members:
    :protected-members:

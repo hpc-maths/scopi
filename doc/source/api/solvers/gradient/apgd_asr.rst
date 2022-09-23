@@ -1,7 +1,7 @@
-nesterov class
+apgd_asr class
 ==============
 
-.. doxygenclass:: scopi::nesterov
+.. doxygenclass:: scopi::apgd_asr
    :project: scopi
    :members:
    :protected-members:
