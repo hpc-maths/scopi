@@ -12,7 +12,7 @@
 
 namespace scopi{
     /**
-     * @brief Projection on the linear cone for gradients-like algorithm.
+     * @brief Projection \f$ \Pi \f$ on the linear cone for gradients-like algorithm.
      *
      * The projection depends on the problem, template specializations of this class help manage the dependance on the problem.
      *
@@ -25,14 +25,14 @@ namespace scopi{
     /**
      * @brief Specialization of \c projection for \c DryWithoutFriction.
      *
-     * Projection on \f$ \R^+ \f$.
+     * Projection on \f$ \mathbb{R}^+ \f$.
      */
     template <>
     class projection<DryWithoutFriction>
     {
     protected:
         /**
-         * @brief Projection on \f$ \R^+ \f$.
+         * @brief Projection on \f$ \mathbb{R}^+ \f$.
          *
          * @param l [in] Vector to project.
          *
@@ -44,14 +44,14 @@ namespace scopi{
     /**
      * @brief Specialization of \c projection for \c ViscousWithoutFriction.
      *
-     * Projection on \f$ \R^+ \f$.
+     * Projection on \f$ \mathbb{R}^+ \f$.
      */
     template <std::size_t dim>
     class projection<ViscousWithoutFriction<dim>>
     {
     protected:
         /**
-         * @brief Projection on \f$ \R^+.
+         * @brief Projection on \f$ \mathbb{R}^+ \f$.
          *
          * @param l [in] Vector to project.
          *

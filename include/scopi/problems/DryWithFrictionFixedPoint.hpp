@@ -21,9 +21,10 @@ namespace scopi
     class DryWithFrictionFixedPoint;
 
     /**
-     * @brief Parameters for \c DryWithoutFriction.
+     * @class ProblemParams<DryWithFrictionFixedPoint>
+     * @brief Parameters for DryWithFrictionFixedPoint.
      *
-     * Specialization of ProblemParams in params.hpp.
+     * Specialization of ProblemParams.
      */
     template<>
     struct ProblemParams<DryWithFrictionFixedPoint>
@@ -63,35 +64,36 @@ namespace scopi
     };
 
     /**
+     * @class DryWithFrictionFixedPoint
      * @brief Problem that models contacts with friction and without viscosity. A fixed point algorithm is used to ensure \f$ D = 0 \f$.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * The constraint is 
      * \f[ 
-     *      \d_{\ij} + \B \u_{\ij} \ge \left( \norm{\T \u_{\ij}} - \mu \Delta t \s_{\ij} \right),
+     *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge \left( ||\mathbb{T} \mathbf{u}_{ij}|| - \mu \Delta t \mathbf{s}_{ij} \right),
      * \f]
-     * for all contacts \f$ (\ij) \f$, with \f$ \s \in \R^{\Nc} \f$.
-     * If \f$ \us \f$ is the solution of the parametrized problem, then we consider
+     * for all contacts \f$ ij \f$, with \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$.
+     * If \f$ \mathbf{u}^{\mathbf{s}} \f$ is the solution of the parametrized problem, then we consider
      * \f[
      *      \begin{aligned}
-     *          \F : & \R^{\Nc} \to \R^{\Nc} \\
-     *               & \s_{\ij} \mapsto \norm{\T \us_{\ij}},
+     *          \mathbf{F} : & \mathbb{R}^{N_c} \to \mathbb{R}^{N_c} \\
+     *               & \mathbf{s}_{ij} \mapsto ||\mathbb{T} \mathbf{u}^{\mathbf{s}}_{ij}||,
      *      \end{aligned}
      * \f]
-     * and search for a fixed point of \f$ \F \f$ : \f$ \s \in \R^{\Nc} \f$ such that \f$ \F(\s) = \s \f$.
+     * and search for a fixed point of \f$ \mathbf{F} \f$ : \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$ such that \f$ \mathbf{F}(\mathbf{s}) = \mathbf{s} \f$.
      *
      * This leads to the following algorithm:
-     * - \f$ \sWithIndex{0} \f$;
-     * - \f$ \indexFixedPoint = 0 \f$;
-     * - While \f$ \frac{\norm{\sWithIndex{\indexFixedPoint-1} - \sWithIndex{\indexFixedPoint}}}{\norm{\sWithIndex{\indexFixedPoint}} + 1} > \f$ \c tol_fixed_point and \f$ \indexFixedPoint < \f$ \c max_iter_fixed_point
-     *   - Compute \f$ \usWithIndex{\indexFixedPoint} \f$ as the solution of the optimization problem under the constraint written above;
-     *   - \f$ \sWithIndex{\indexFixedPoint+1}_{\ij} = \norm{\T \usWithIndex{\indexFixedPoint}_{\ij}} \f$ for all contacts \f$ \ij \f$;
-     *   - \f$ \indexFixedPoint ++ \f$.
+     * - \f$ \mathbf{s}^{0} \f$;
+     * - \f$ k = 0 \f$;
+     * - While \f$ \frac{||\mathbf{s}^{k-1} - \mathbf{s}^{k}||}{||\mathbf{s}^{k}|| + 1} > \f$ \c tol_fixed_point and \f$ k < \f$ \c max_iter_fixed_point
+     *   - Compute \f$ \mathbf{u}^{\mathbf{s}^{k}} \f$ as the solution of the optimization problem under the constraint written above;
+     *   - \f$ \mathbf{s}^{k+1}_{ij} = ||\mathbb{T} \mathbf{u}^{\mathbf{s}^{k}}_{ij}|| \f$ for all contacts \f$ ij \f$;
+     *   - \f$ k ++ \f$.
      * 
      * Only one matrix is built.
-     * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
-     * A contact \f$ (\ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
-     * Therefore, the matrix is in \f$ \R^{4\Nc \times 6N} \f$ and \f$ \d \in \R^{4\Nc} \f$.
+     * It contains both matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
+     * A contact \f$ ij \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ \mathbb{T} \f$.
+     * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      */
     class DryWithFrictionFixedPoint : protected DryWithFrictionBase
     {
@@ -106,11 +108,11 @@ namespace scopi
         DryWithFrictionFixedPoint(std::size_t nparticles, double dt, const ProblemParams<DryWithFrictionFixedPoint>& problem_params);
 
         /**
-         * @brief Create vector \f$ \d \f$.
+         * @brief Create vector \f$ \mathbf{d} \f$.
          *
-         * \f$ \d \in \R^{4\Nc} \f$ can be seen as a block vector, each block has the form
-         * \f$ (d_{\ij} + \mu \Delta t \s_{\ij}, 0, 0, 0) \f$,
-         * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
+         * \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
+         * \f$ (d_{ij} + \mu \Delta t \mathbf{s}_{ij}, 0, 0, 0) \f$,
+         * where \f$ d_{ij} \f$ is the distance between particles \c i and \c j.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
@@ -128,12 +130,12 @@ namespace scopi
         template<std::size_t dim>
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
         /**
-         * @brief Compute \f$ \sWithIndex{\indexFixedPoint+1} \f$.
+         * @brief Compute \f$ \mathbf{s}^{k+1} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
@@ -152,15 +154,15 @@ namespace scopi
          */
         ProblemParams<DryWithFrictionFixedPoint> m_params;
         /**
-         * @brief \f$ \sWithIndex{\indexFixedPoint+1} \f$.
+         * @brief \f$ \mathbf{s}^{k+1} \f$.
          */
         xt::xtensor<double, 1> m_s;
         /**
-         * @brief \f$ \sWithIndex{\indexFixedPoint} \f$.
+         * @brief \f$ \mathbf{s}^{k} \f$.
          */
         xt::xtensor<double, 1> m_s_old;
         /**
-         * @brief Number of iterations in the fixed point algorithm (\f$ \indexFixedPoint \f$).
+         * @brief Number of iterations in the fixed point algorithm (\f$ k \f$).
          */
         std::size_t m_nb_iter;
     };

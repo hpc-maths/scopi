@@ -13,6 +13,7 @@
 
 namespace scopi{
     /**
+     * @class OptimBase
      * @brief Commun interface for the different optimization solvers.
      *
      * @tparam Derived Optimization solver.
@@ -28,8 +29,8 @@ namespace scopi{
          *
          * @param nparts [in] Number of particles.
          * @param dt [in] Time step.
-         * @param cSize [in] Size of the vector \f$ \c \f$ (depends on the problem).
-         * @param c_dec [in] For some solvers (mostly OptimMosek), the vector \f$ \c \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
+         * @param cSize [in] Size of the vector \f$ \mathbf{c} \f$ (depends on the problem).
+         * @param c_dec [in] For some solvers (mostly OptimMosek), the vector \f$ \mathbf{c} \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
          * @param optim_params [in] Parameters for the optimization solver.
          * @param problem_params [in] Parameters for the problem.
          */
@@ -51,26 +52,25 @@ namespace scopi{
                  const std::size_t nite);
 
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
          * \pre Call \c run before calling this function.
          *
-         * @return \f$ \N \times 3 \f$ array.
+         * @return \f$ N \times 3 \f$ array.
          */
         auto get_uadapt();
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
          *
          * \pre Call \c run before calling this function.
          *
-         * @return \f$ \N \times 3 \f$ array.
+         * @return \f$ N \times 3 \f$ array.
          */
         auto get_wadapt();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre Call \c run before calling this function.
-         * \todo Fix dimensions depending on the problem.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contatcs.
@@ -84,11 +84,13 @@ namespace scopi{
          *
          * \pre Call \c run before calling this function.
          *
+         * \todo Compute the matrix-vector product only for problems that need it.
+         *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
-         * @return \f$ \Nc \f$ array.
+         * @return \f$ N_c \f$ array.
          */
         template<std::size_t dim>
         auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
@@ -103,15 +105,15 @@ namespace scopi{
          */
         std::size_t m_nparts;
         /**
-         * @brief Vector \f$ \c \f$.
+         * @brief Vector \f$ \mathbf{c} \f$.
          */
         xt::xtensor<double, 1> m_c;
 
     private:
         /**
-         * @brief Build the vector \f$ \c \f$.
+         * @brief Build the vector \f$ \mathbf{c} \f$.
          *
-         * \f$ \c = \P \mathbf{v}^d \f$, where \f$ \mathbf{v}^d \f$ is the a priori velocity (see ProblemBase for the notations).
+         * \f$ \mathbf{c} = \mathbb{P} \mathbf{v}^d \f$, where \f$ \mathbf{v}^d \f$ is the a priori velocity (see ProblemBase for the notations).
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for a priori velocities, masses, and moments of inertia).
@@ -138,7 +140,7 @@ namespace scopi{
         int get_nb_active_contacts() const;
 
         /**
-         * @brief For some solvers (mostly OptimMosek), the vector \f$ \c \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
+         * @brief For some solvers (mostly OptimMosek), the vector \f$ \mathbf{c} \f$ contains more elements than just the a priori velocities. \c c_dec is the index of the first a priori velocity.
          */
         std::size_t m_c_dec;
     };

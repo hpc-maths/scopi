@@ -18,9 +18,10 @@ namespace scopi
     class DryWithoutFriction;
 
     /**
-     * @brief Parameters for \c DryWithoutFrixion..
+     * @class ProblemParams<DryWithoutFriction>
+     * @brief Parameters for DryWithoutFriction.
      *
-     * Specialization of ProblemParams in params.hpp
+     * Specialization of ProblemParam.
      *
      * Defined for compatibility.
      */
@@ -29,14 +30,15 @@ namespace scopi
     {};
 
     /**
+     * @class DryWithoutFriction.
      * @brief Problem that models contacts without friction and without viscosity.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * The constraint is 
      * \f[
-     *      \d + \B \u \ge 0,
+     *      \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0,
      * \f]
-     * with \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, and \f$ \B \in \R^{\Nc \times 6 \N} \f$.
+     * with \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, and \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$.
      * We impose that the distance between all the particles should be non-negative.
      * For worms, we also impose that the distance between spheres in a worm is non-positive.
      * More exactly, we impose that minus the distance is non-negative.
@@ -55,7 +57,7 @@ namespace scopi
 
     protected:
         /**
-         * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
+         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
@@ -81,7 +83,7 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Create vector \f$ \d \f$.
+         * @brief Create vector \f$ \mathbf{d} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
@@ -91,13 +93,13 @@ namespace scopi
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
 
         /**
-         * @brief Matrix-free product \f$ \r = \r - \B \u \f$.
+         * @brief Matrix-free product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
          * @param particles [in] Array of particles (to get positions).
-         * @param U [in] Vector \f$ \u \f$.
-         * @param R [in/out] Vector \f$ \r \f$.
+         * @param U [in] Vector \f$ \mathbf{u} \f$.
+         * @param R [in/out] Vector \f$ \mathbf{r} \f$.
          * @param active_offset [in] Index of the first active particle.
          * @param row [in] Index of the computed row.
          */
@@ -109,13 +111,13 @@ namespace scopi
                                 std::size_t active_offset,
                                 std::size_t row);
         /**
-         * @brief Matrix-free product \f$ \u = \transpose{\B} \l + \u \f$.
+         * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{B}^T \mathbf{l} + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
          * @param particles [in] Array of particles (to get positions).
-         * @param L [in] Vector \f$ \l \f$.
-         * @param U [in/out] Vector \f$ \u \f$.
+         * @param L [in] Vector \f$ \mathbf{l} \f$.
+         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
          * @param active_offset [in] Index of the first active particle.
          * @param row [in] Index of the computed row.
          */
@@ -145,7 +147,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,

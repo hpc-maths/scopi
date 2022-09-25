@@ -1,5 +1,5 @@
-sphere class
-============
+property class
+==============
 
 .. doxygenclass:: scopi::property
    :project: scopi

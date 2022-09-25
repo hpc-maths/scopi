@@ -12,7 +12,8 @@ namespace scopi
     class OptimScs;
 
     /**
-     * @brief Parameters for \c OptimScs<problem_t>
+     * @struct OptimParams
+     * @brief Parameters for OptimScs
      *
      * Specialization of ProblemParams.
      *
@@ -36,7 +37,7 @@ namespace scopi
          * @brief Tolerance of the solver.
          *
          * Default value is \f$ 10^{-7} \f$.
-         * \note \c tol_infeas > 0
+         * \note \c tol > 0
          */
         double tol;
         /**
@@ -49,13 +50,14 @@ namespace scopi
     };
 
     /**
-     * @brief Solve optimization problem using Mosek.
+     * @class OptimScs
+     * @brief Solve optimization problem using SCS.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      *
-     * The documentation of SCS is available here: https://www.cvxgrp.org/scs/
+     * SCS' documentation is available here: https://www.cvxgrp.org/scs/.
      * Matrices are stored using CSC storage.
-     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     * \warning Only the cases  \c problem_t = DryWithoutFriction and \c problem_t = ViscousWithoutFriction are implemented.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -69,7 +71,7 @@ namespace scopi
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimBase
+         * @brief Alias for the base class OptimBase
          */
         using base_type = OptimBase<OptimScs<problem_t>, problem_t>;
 
@@ -77,7 +79,7 @@ namespace scopi
         /**
          * @brief Constructor.
          *
-         * Build the matrix \f$ \P \f$ with SCS' data structure.
+         * Build the matrix \f$ \mathbb{P} \f$ with SCS' data structure.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -109,19 +111,19 @@ namespace scopi
                                             const std::vector<neighbor<dim>>& contacts, 
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* wadapt_data();
         /**
@@ -129,16 +131,16 @@ namespace scopi
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          * \warning The method is not implemented, it is defined so all solvers have the same interface.
          *
-         * @return Null pointer instead of \f$ \Nc \f$ elements.
+         * @return Null pointer instead of \f$ N_c \f$ elements.
          */
         double* constraint_data();
         /**
@@ -164,9 +166,9 @@ namespace scopi
         void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
 
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{P} \f$.
          *
-         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, 0, \dots, m_{\N}, m_{\N}, 0, 0, 0, J_0, \dots, 0, 0, J_{\N}) \f$,
+         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, 0, \dots, m_{N}, m_{N}, 0, 0, 0, J_0, \dots, 0, 0, J_{N}) \f$,
          * where \f$ m_i \f$ (resp. \f$ J_i \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
          * This function set the second part of the matrix.
          *
@@ -176,9 +178,9 @@ namespace scopi
          */
         void set_moment_matrix(std::size_t nparts, const scopi_container<2>& particles, std::size_t& index);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{P} \f$.
          *
-         * The matrix \f$ \P \f$ is diagonale and \f$ \P = diag(m_0, m_0, m_0, \dots, m_{\N}, m_{\N}, m_{\N}, J_0^x, J_0^y, J_0^z, \dots, J_{\N}^x, J_{\N}^y, J_{\N}^z) \f$,
+         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, m_0, \dots, m_{N}, m_{N}, m_{N}, J_0^x, J_0^y, J_0^z, \dots, J_{N}^x, J_{N}^y, J_{N}^z) \f$,
          * where \f$ m_i \f$ (resp. \f$ \mathbf{J}_i = (J_i^x, J_i^y, J_i^z) \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
          * This function set the second part of the matrix.
          *
@@ -190,41 +192,41 @@ namespace scopi
         
 
         /**
-         * @brief SCS' data structure for the matrix \f$ \P \f$.
+         * @brief SCS' data structure for the matrix \f$ \mathbb{P} \f$.
          */
         ScsMatrix m_P;
         /**
-         * @brief Values of \f$ \P \f$ in CSC storage.
+         * @brief Values of \f$ \mathbb{P} \f$ in CSC storage.
          */
         std::vector<scs_float> m_P_x;
         /**
-         * @brief Row indices of \f$ \P \f$ in CSC storage.
+         * @brief Row indices of \f$ \mathbb{P} \f$ in CSC storage.
          */
         std::vector<scs_int> m_P_i;
         /**
-         * @brief Column indices of \f$ \P \f$ in CSC storage.
+         * @brief Column indices of \f$ \mathbb{P} \f$ in CSC storage.
          */
         std::vector<scs_int> m_P_p;
 
         /**
-         * @brief SCS' data structure for the matrix \f$ \B \f$.
+         * @brief SCS' data structure for the matrix \f$ \mathbb{B} \f$.
          */
         ScsMatrix m_A;
         /**
-         * @brief Values of \f$ \B \f$ in CSC storage.
+         * @brief Values of \f$ \mathbb{B} \f$ in CSC storage.
          */
         std::vector<scs_float> m_A_x;
         /**
-         * @brief Row indices of \f$ \B \f$ in CSC storage.
+         * @brief Row indices of \f$ \mathbb{B} \f$ in CSC storage.
          */
         std::vector<scs_int> m_A_i;
         /**
-         * @brief Column indices of \f$ \B \f$ in CSC storage.
+         * @brief Column indices of \f$ \mathbb{B} \f$ in CSC storage.
          */
         std::vector<scs_int> m_A_p;
 
         /**
-         * @brief SCS' data structure for \f$ \d \f$.
+         * @brief SCS' data structure for \f$ \mathbf{d} \f$.
          */
         ScsData m_d;
         /**

@@ -14,14 +14,14 @@ namespace scopi
      *
      * In 2D, for \f$ b \in[-\pi, \pi] \f$, the parametric representation of a superellipsoid is
      * \f[
-     *      r_x \sgn (\cos b ) \abs{\cos b}^{e_0}\\
-     *      r_y \sgn (\sin b ) \abs{\sin b}^{e_0}.
+     *      r_x \mathrm{sign} (\cos b ) |\cos b|^{e_0}\\
+     *      r_y \mathrm{sign} (\sin b ) |\sin b|^{e_0}.
      * \f]
      * In 3D, for \f$ a \in [-\frac{\pi}{2}, \frac{\pi}{2}] \f$ and \f$ b \in[-\pi, \pi] \f$, the parametric representation of a superellipsoid is
      * \f[
-     *      r_x \sgn (\cos b ) \abs{\cos b}^{e_0} \sgn (\cos a ) \abs{\cos a}^{e_1}
-     *      r_y \sgn (\cos b ) \abs{\cos b}^{e_0} \sgn (\sin a ) \abs{\sin a}^{e_1}
-     *      r_z \sgn (\sin b ) \abs{\sin b}^{e_0}.
+     *      r_x \mathrm{sign} (\cos b ) |\cos b|^{e_0} \mathrm{sign} (\cos a ) |\cos a|^{e_1}
+     *      r_y \mathrm{sign} (\cos b ) |\cos b|^{e_0} \mathrm{sign} (\sin a ) |\sin a|^{e_1}
+     *      r_z \mathrm{sign} (\sin b ) |\sin b|^{e_0}.
      * \f]
      * \f$ (r_x, r_y, r_z) \f$ are the radiuses of the superllipsoid and \f$ (e_0, e_1 ) \f$ is its squareness.
      * See https://en.wikipedia.org/wiki/Superellipsoid for more details.
@@ -36,7 +36,7 @@ namespace scopi
     public:
 
         /**
-         * @brief Alias for the base class \c object.
+         * @brief Alias for the base class object.
          */
         using base_type = object<dim, owner>;
         /**
@@ -80,7 +80,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @return 
          */
@@ -100,8 +100,6 @@ namespace scopi
         /**
          * @brief Get the coordinates of the point at the surface of the superellipsoid in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point.
          *
          * @return (x, y) coordinates of the point.
@@ -109,8 +107,6 @@ namespace scopi
         auto point(const double b) const; 
         /**
          * @brief Get the coordinates of the point at the surface of the superellispoid in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point.
          * @param b [in] Angle of the point.
@@ -121,8 +117,6 @@ namespace scopi
         /**
          * @brief Get the outer normal of the superellipsoid in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point to compute the normal.
          *
          * @return (x, y) coordinates of the normal.
@@ -130,8 +124,6 @@ namespace scopi
         auto normal(const double b) const;
         /**
          * @brief Get the outer normal of the superellipsoid in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point to compute the normal.
          * @param b [in] Angle of the point to compute the normal.
@@ -142,8 +134,6 @@ namespace scopi
         /**
          * @brief Get the vector included in the straight line tangent to the superellipsoid in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point to compute the tangent straight line.
          *
          * @return (x, y) coordinates of a vector in the tangent straight line.
@@ -151,8 +141,6 @@ namespace scopi
         auto tangent(const double b) const; 
         /**
          * @brief Get the vectors included in the plane tangent to the superellipsoid in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point to compute the tangent plane.
          * @param b [in] Angle of the point to compute the tangent plane.
@@ -163,7 +151,7 @@ namespace scopi
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param n
          *
@@ -173,7 +161,7 @@ namespace scopi
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param n
          *
@@ -183,7 +171,7 @@ namespace scopi
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param n
          *

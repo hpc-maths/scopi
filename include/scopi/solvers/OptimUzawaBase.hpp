@@ -63,15 +63,15 @@ namespace scopi{
      * Several methods are implemented.
      *
      * The algorithm is:
-     *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \l^{\indexUzawa} = 0 \f$;
+     *  - \f$ k = 0 \f$;
+     *  - \f$ \mathbf{l}^{k} = 0 \f$;
      *  - \f$ cmax = - \infty \f$;
-     *  - While (\f$ cmax < tol \f$ and \f$ \indexUzawa < max\_iter \f$)
-     *      - \f$ \u^{\indexUzawa+1} = \P^{-1} \left( \c - \transpose{B} \l^{\indexUzawa} \right) \f$;
-     *      - \f$ \r^{\indexUzawa+1} = \B \u^{\indexUzawa+1} - \d \f$;
-     *      - \f$ \l^{\indexUzawa+1}_{\ij} = \max \left( \l_{\ij}^{\indexUzawa} - \rho \r_{\ij}^{\indexUzawa+1}, 0 \right) \f$;
-     *      - \f$ cmax = \min_{\ij} \left( \r_{\ij}^{\indexUzawa+1} \right) \f$;
-     *      - \f$ \indexUzawa++\f$.
+     *  - While (\f$ cmax < tol \f$ and \f$ k < max\_iter \f$)
+     *      - \f$ \mathbf{u}^{k+1} = \mathbb{P}^{-1} \left( \mathbf{c} - B^T \mathbf{l}^{k} \right) \f$;
+     *      - \f$ \mathbf{r}^{k+1} = \mathbb{B} \mathbf{u}^{k+1} - \mathbf{d} \f$;
+     *      - \f$ \mathbf{l}^{k+1}_{ij} = \max \left( \mathbf{l}_{ij}^{k} - \rho \mathbf{r}_{ij}^{k+1}, 0 \right) \f$;
+     *      - \f$ cmax = \min_{ij} \left( \mathbf{r}_{ij}^{k+1} \right) \f$;
+     *      - \f$ k++\f$.
      *
      * @tparam Derived Class that implements matrix-vector products.
      * @tparam problem_t Problem to be solved.
@@ -85,7 +85,7 @@ namespace scopi{
          */
         using problem_type = problem_t; 
         /**
-         * @brief Alias for the base class \c OptimBase.
+         * @brief Alias for the base class OptimBase.
          */
         using base_type = OptimBase<Derived, problem_t>;
 
@@ -121,19 +121,19 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         auto uadapt_data();
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         auto wadapt_data();
         /**
@@ -141,15 +141,16 @@ namespace scopi{
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         auto lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
+         * \warning The method is not implemented, it is defined so all solvers have the same interface.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* constraint_data();
         /**
@@ -159,7 +160,7 @@ namespace scopi{
 
     private:
         /**
-         * @brief Computes \f$ \P^{-1} \u \f$.
+         * @brief Computes \f$ \mathbb{P}^{-1} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -168,7 +169,7 @@ namespace scopi{
         void gemv_inv_P(const scopi_container<dim>& particles);
 
         /**
-         * @brief Computes \f$ \r = \r - \B \u \f$.
+         * @brief Computes \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -179,7 +180,7 @@ namespace scopi{
                     const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Computes \f$ \u = \transpose{\B} \l + \u \f$.
+         * @brief Computes \f$ \mathbf{u} = \mathbb{B}^T \mathbf{l} + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -208,15 +209,15 @@ namespace scopi{
 
     protected:
         /**
-         * @brief Vector \f$ \u \f$.
+         * @brief Vector \f$ \mathbf{u} \f$.
          */
         xt::xtensor<double, 1> m_U;
         /**
-         * @brief Vector \f$ \l \f$.
+         * @brief Vector \f$ \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_L;
         /**
-         * @brief Vector \f$ \l \f$.
+         * @brief Vector \f$ \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_R;
 

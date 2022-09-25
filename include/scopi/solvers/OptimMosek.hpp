@@ -15,9 +15,10 @@ namespace scopi{
     class OptimMosek;
 
     /**
-     * @brief Parameters for \c OptimMosek<problem_t>
+     * @struct OptimParams<OptimMosek>
+     * @brief Parameters for OptimMosek
      *
-     * Specialization of ProblemParams in params.hpp
+     * Specialization of OptimParams.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -49,29 +50,30 @@ namespace scopi{
     };
 
     /**
+     * @class OptimMosek
      * @brief Solve optimization problem using Mosek.
      *
-     * See ProblemBase.hpp for the notations.
-     * Instead of minimizing \f$ \frac{1}{2} \u \P \cdot \u + \u \cdot \c \f$, 
-     * minimize \f$ \uMosek \cdot \cMosek \f$, with
-     * \f$ \uMosek = (\sMosek, \u, \zMosek) \in \R^{1+6\N+6\N} \f$ and \f$ \cMosek = (1, \c, \underbrace{0}_{\R^{6\N}}) \in \R^{1+6\N+6\N} \f$.
+     * See ProblemBase for the notations.
+     * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$, 
+     * minimize \f$ \tilde{\mathbf{u}} \cdot \tilde{\mathbf{c}} \f$, with
+     * \f$ \tilde{\mathbf{u}} = (s_0, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, 0) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (\c DryWithoutFriction and \c ViscousWithoutFriction), the constraint is written as \f$ \BMosek \uMosek \le \d \f$, \f$ \AzMosek \uMosek = 0 \f$,and \f$ (1, \sMosek, \zMosek) \in Q_r^{2+6\N} \f$, with 
+     * Without friction (DryWithoutFriction and ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with 
      * \f[
      *      \begin{aligned}
-     *          \BMosek &= \left. (\underbrace{0}_{1} | \underbrace{\B}_{6\N} | \underbrace{0}_{6\N}) \right\} \Nc,\\
-     *          \AzMosek &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\P}}_{6\N} | \underbrace{-\Id}_{6\N}) \right\} 6\N.
+     *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
+     *          \mathbb{A}_z &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\mathbb{P}}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\} 6N.
      *      \end{aligned}
      * \f]
-     * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \R^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
-     * Here, \f$ \Nc \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
-     * \f$ \Id \f$ is the identity matrix.
+     * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
+     * Here, \f$ N_c \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
+     * \f$ \mathbb{Id} \f$ is the identity matrix.
      *
-     * With friction, the constraint is written as \f$ \d \B \u \in \left( Q^4 \right)^{\Nc} \f$,
-     * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \R^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
-     * Each component of \f$ \B \u \f$ is seen as \f$ (\d_{\ij} + \B \u_{\ij}, \T \u_{\ij}^1, \T \u_{\ij}^2, \T \u_{\ij}^3 ) \f$.
-     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{\ij} = \norm{\T \u_{\ij}} \f$, but this resulted in poor performances.
-     * \todo The constraint should be written as \f$ \BMosek \uMosek \in Q \f$ with appropriate reshape.
+     * With friction, the constraint is written as \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \in \left( Q^4 \right)^{N_c} \f$,
+     * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
+     * Each component of \f$ \mathbb{B} \mathbf{u} \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij}, \mathbb{T} \mathbf{u}_{ij}^1, \mathbb{T} \mathbf{u}_{ij}^2, \mathbb{T} \mathbf{u}_{ij}^3 ) \f$.
+     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \mathbf{u}_{ij}|| \f$, but this resulted in poor performances.
+     * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \in Q \f$ with appropriate reshape.
      * Currently, only a part of the matrix is used.
      *
      * @tparam problem_t Problem to be solved.
@@ -86,7 +88,7 @@ namespace scopi{
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimBase
+         * @brief Alias for the base class OptimBase
          */
         using base_type = OptimBase<OptimMosek<problem_t>, problem_t>;
 
@@ -94,7 +96,7 @@ namespace scopi{
         /**
          * @brief Constructor.
          *
-         * Build the matrix \f$ \AzMosek \f$.
+         * Build the matrix \f$ \mathbb{A}_z \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -126,27 +128,27 @@ namespace scopi{
                                             const std::vector<neighbor<dim>>& contacts,
                                             const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         double* wadapt_data();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* constraint_data();
         /**
@@ -154,7 +156,7 @@ namespace scopi{
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* lagrange_multiplier_data();
         /**
@@ -164,12 +166,12 @@ namespace scopi{
 
     private:
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \AzMosek \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{A}_z \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param Az_rows [out] Rows' indicies of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_cols [out] Columns' indices of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_values [out] Values of \f$ \AzMosek \f$ in COO storage.
+         * @param Az_rows [out] Rows' indicies of \f$ \mathbb{A}_z \f$ in COO storage.
+         * @param Az_cols [out] Columns' indices of \f$ \mathbb{A}_z \f$ in COO storage.
+         * @param Az_values [out] Values of \f$ \mathbb{A}_z \f$ in COO storage.
          * @param particles [in] Array of particles (for the moments of interia).
          */
         void set_moment_mass_matrix(std::size_t nparts,
@@ -178,12 +180,12 @@ namespace scopi{
                                     std::vector<double>& Az_values,
                                     const scopi_container<2>& particles);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \AzMosek \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{A}_z \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param Az_rows [out] Rows' indicies of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_cols [out] Columns' indices of \f$ \AzMosek \f$ in COO storage.
-         * @param Az_values [out] Values of \f$ \AzMosek \f$ in COO storage.
+         * @param Az_rows [out] Rows' indicies of \f$ \mathbb{A}_z \f$ in COO storage.
+         * @param Az_cols [out] Columns' indices of \f$ \mathbb{A}_z \f$ in COO storage.
+         * @param Az_values [out] Values of \f$ \mathbb{A}_z \f$ in COO storage.
          * @param particles [in] Array of particles (for the moments of interia).
          */
         void set_moment_mass_matrix(std::size_t nparts,
@@ -193,11 +195,11 @@ namespace scopi{
                                     const scopi_container<3>& particles);
 
         /**
-         * @brief Mosek's data structure (pointer) for the matrix \f$ \AzMosek \f$.
+         * @brief Mosek's data structure (pointer) for the matrix \f$ \mathbb{A}_z \f$.
          */
         mosek::fusion::Matrix::t m_Az;
         /**
-         * @brief Mosek's data structure (pointer) for the matrix \f$ \B \f$.
+         * @brief Mosek's data structure (pointer) for the matrix \f$ \mathbb{B} \f$.
          */
         mosek::fusion::Matrix::t m_A;
         /**
@@ -211,7 +213,7 @@ namespace scopi{
          */
         ConstraintMosek<problem_t> m_constraint;
         /**
-         * @brief Mosek's data structure for \f$ \d \f$.
+         * @brief Mosek's data structure for \f$ \mathbf{d} \f$.
          */
         std::shared_ptr<monty::ndarray<double, 1>> m_D_mosek;
         /**

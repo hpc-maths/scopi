@@ -9,6 +9,7 @@ namespace scopi
     // sphere definition //
     ///////////////////////
     /**
+     * @class sphere
      * @brief Sphere.
      *
      * @tparam dim Dimension (2 or 3).
@@ -20,7 +21,7 @@ namespace scopi
     public:
 
         /**
-         * @brief Alias for the base class \c object.
+         * @brief Alias for the base class object.
          */
         using base_type = object<dim, owner>;
         /**
@@ -58,7 +59,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @return 
          */
@@ -78,8 +79,6 @@ namespace scopi
         /**
          * @brief Get the coordinates of the point at the surface of the sphere in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point.
          *
          * @return (x, y) coordinates of the point.
@@ -87,8 +86,6 @@ namespace scopi
         auto point(const double b) const;
         /**
          * @brief Get the coordinates of the point at the surface of the sphere in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point.
          * @param b [in] Angle of the point.
@@ -99,8 +96,6 @@ namespace scopi
         /**
          * @brief Get the outer normal of the sphere in 2D.
          *
-         * \todo Add drawing.
-         *
          * @param b [in] Angle of the point to compute the normal.
          *
          * @return (x, y) coordinates of the normal.
@@ -108,8 +103,6 @@ namespace scopi
         auto normal(const double b) const;
         /**
          * @brief Get the outer normal of the sphere in 3D.
-         *
-         * \todo Add drawing.
          *
          * @param a [in] Angle of the point to compute the normal.
          * @param b [in] Angle of the point to compute the normal.

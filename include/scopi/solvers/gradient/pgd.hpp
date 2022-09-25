@@ -17,14 +17,14 @@ namespace scopi{
      *
      * See OptimProjectedGradient for the notations.
      * The algorithm is
-     *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \l^{\indexUzawa} = 0 \f$;
-     *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \dg^{\indexUzawa} = \A \l^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \l^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
-     *      - \f$ \indexUzawa++ \f$.
+     *  - \f$ k = 0 \f$;
+     *  - \f$ \mathbf{l}^{k} = 0 \f$;
+     *  - While (\f$  \frac{||\mathbf{l}^{k} - \mathbf{l}^{k-1}||}{||\mathbf{l}^{k}||+1} \le tol\_l \f$)
+     *      - \f$ \mathbf{dg}^{k} = \mathbb{A} \mathbf{l}^{k} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{l}^{k+1} = \Pi \left (\mathbf{l}^{k} - \rho \mathbf{dg}^{k}, 0 \right) \f$;
+     *      - \f$ k++ \f$.
      *
-     * The projection depends on the problem.
+     * The projection \f$ \Pi \f$ depends on the problem.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -37,18 +37,18 @@ namespace scopi{
          *
          * @param max_iter [in] Maximal number of iterations.
          * @param rho [in] Step for the gradient descent.
-         * @param tol_dg [in] Tolerance for \f$ \dg \f$ criterion.
-         * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
+         * @param tol_dg [in] Tolerance for \f$ \mathbf{dg} \f$ criterion.
+         * @param tol_l [in] Tolerance for \f$ \mathbf{l} \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
         pgd(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
         /**
          * @brief Gradient descent algorithm.
          *
-         * @param A [in] Matrix \f$ \A \f$.
-         * @param descr [in] Structure specifying \f$ \A \f$ properties. 
-         * @param c [in] Vector \f$ \e \f$.
-         * @param l [out] vector \f$ \l \f$.
+         * @param A [in] Matrix \f$ \mathbb{A} \f$.
+         * @param descr [in] Structure specifying \f$ \mathbb{A} \f$ properties. 
+         * @param c [in] Vector \f$ \mathbf{e} \f$.
+         * @param l [out] vector \f$ \mathbf{l} \f$.
          *
          * @return Number of iterations the algorithm needed to converge.
          */
@@ -63,11 +63,11 @@ namespace scopi{
          */
         double m_rho;
         /**
-         * @brief Tolerance for \f$ \dg \f$ criterion (unused).
+         * @brief Tolerance for \f$ \mathbf{dg} \f$ criterion (unused).
          */
         double m_tol_dg;
         /**
-         * @brief Tolerance for \f$ \l \f$ criterion.
+         * @brief Tolerance for \f$ \mathbf{l} \f$ criterion.
          */
         double m_tol_l;
         /**
@@ -80,15 +80,15 @@ namespace scopi{
          */
         sparse_status_t m_status;
         /**
-         * @brief Vector \f$ \dg^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{dg}^{k} \f$.
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \A \l^{\indexUzawa+1} + \e \f$.
+         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{k+1} + \mathbf{e} \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**
-         * @brief Vector \f$ \l^{\indexUzawa-1} \f$.
+         * @brief Vector \f$ \mathbf{l}^{k-1} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
     };

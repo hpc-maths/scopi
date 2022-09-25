@@ -14,7 +14,7 @@ namespace scopi
     /**
      * @brief Parameters for contact_kdtree.
      *
-     * Specialization of ContactsParams in params.hpp.
+     * Specialization of ContactsParams.
      */
     template<>
     struct ContactsParams<contact_kdtree>
@@ -51,7 +51,7 @@ namespace scopi
     /**
      * @brief 
      *
-     * TODO
+     * \todo Write documentation.
      *
      * @tparam dim Dimension (2 or 3).
      */
@@ -62,7 +62,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param p [in] Array of particles.
          * @param actptr [in] Index of the first active particle.
@@ -77,7 +77,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param idx
          * @param d
@@ -93,7 +93,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @tparam BBOX
          * @param 
@@ -125,14 +125,14 @@ namespace scopi
     {
     public:
         /**
-         * @brief Alias for the base class \c contact_base.
+         * @brief Alias for the base class contact_base.
          */
         using base_type = contact_base<contact_kdtree>;
 
         /**
          * @brief Constructor.
          *
-         * @param params [in] Parameters, see <tt>ContactsParams<contact_kdtree></tt>.
+         * @param params [in] Parameters.
          */
         contact_kdtree(const ContactsParams<contact_kdtree>& params = ContactsParams<contact_kdtree>());
         /**
@@ -149,7 +149,7 @@ namespace scopi
          * Only the contact between particles \c i and \c j is computed, not the contact between \c j and \c i, with \c i < \c j.
          *
          * The returned array of neighbors is sorted.
-         * See sort_contacts in contact/base.hpp.
+         * See sort_contacts.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -162,7 +162,7 @@ namespace scopi
 
     protected:
         /**
-         * @brief Parameters, see ContactsParams<contact_kdtree>.
+         * @brief Parameters.
          */
         ContactsParams<contact_kdtree> m_params;
 

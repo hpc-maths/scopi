@@ -19,7 +19,7 @@ namespace scopi{
     class OptimProjectedGradient;
 
     /**
-     * @brief Parameters for \c OptimProjectedGradient<problem_t, gradient_t>
+     * @brief Parameters for OptimProjectedGradient<problem_t, gradient_t>
      *
      * Specialization of ProblemParams in params.hpp
      *
@@ -42,14 +42,14 @@ namespace scopi{
         OptimParams(const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& params);
 
         /**
-         * @brief Tolerance for \f$ \dg \f$ criterion.
+         * @brief Tolerance for \f$ \mathbf{dg} \f$ criterion.
          *
          * Default value is \f$ 10^{-9} \f$.
          * \note \c tol_dg > 0
          */
         double tol_dg;
         /**
-         * @brief Tolerance for \f$ \l \f$ criterion.
+         * @brief Tolerance for \f$ \mathbf{l} \f$ criterion.
          *
          * Default value is \f$ 10^{-9} \f$.
          * \note \c tol_l > 0
@@ -88,9 +88,9 @@ namespace scopi{
      *
      * See ProblemBase for the notations.
      * The implemented algorithm is:
-     *  - \f$ \A = \transpose{\B} \P^{-1} \B \f$;
-     *  - \f$ \l = \text{ gradient algorithm } \left( \A, \d - \B \u \right) \f$;
-     *  - \f$ \u = \P^{-1} \left( \c - \transpose{\B} \l \right) \f$.
+     *  - \f$ \mathbb{A} = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$;
+     *  - \f$ \mathbf{l} = \text{ gradient algorithm } \left( \mathbb{A}, \mathbf{d} - \mathbb{B} \mathbf{u} \right) \f$;
+     *  - \f$ \mathbf{u} = \mathbb{P}^{-1} \left( \mathbf{c} - \mathbb{B}^T \mathbf{l} \right) \f$.
      *
      *  The gradient algorithm is given by \c gradient_t.
      *
@@ -110,7 +110,7 @@ namespace scopi{
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimBase.
+         * @brief Alias for the base class OptimBase.
          */
         using base_type = OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>;
 
@@ -118,7 +118,7 @@ namespace scopi{
         /**
          * @brief Constructor.
          *
-         * Build the matrix \f$ \AzMosek \f$.
+         * Build the matrix \f$ \mathbb{A} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -150,19 +150,19 @@ namespace scopi{
                                                     const std::vector<neighbor<dim>>& contacts,
                                                     const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         auto uadapt_data();
         /**
-         * @brief \f$ \u \in \R^{6\N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem..
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ 3 \N \f$ elements.
+         * @return \f$ 3 N \f$ elements.
          */
         auto wadapt_data();
         /**
@@ -170,15 +170,16 @@ namespace scopi{
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         auto lagrange_multiplier_data();
         /**
-         * @brief Returns \f$ \d + \B \u \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
+         * \warning The method is not implemented, it is defined so all solvers have the same interface.
          *
-         * @return \f$ \Nc \f$ elements.
+         * @return \f$ N_c \f$ elements.
          */
         double* constraint_data();
         /**
@@ -188,12 +189,12 @@ namespace scopi{
 
     private:
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -202,12 +203,12 @@ namespace scopi{
                                std::vector<double>& invP_csr_val,
                                const scopi_container<2>& particles);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -216,7 +217,7 @@ namespace scopi{
                                std::vector<double>& invP_csr_val,
                                const scopi_container<3>& particles);
         /**
-         * @brief Build the matrix \f$ \B \f$.
+         * @brief Build the matrix \f$ \mathbb{B} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -228,49 +229,49 @@ namespace scopi{
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Build matrix \f$ \A = \transpose{\B} \P^{-1} \B \f$.
+         * @brief Build matrix \f$ \mathbb{A} = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$.
          */
         void create_matrix_A();
 
         /**
-         * @brief Vector \f$ \l \f$.
+         * @brief Vector \f$ \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_l;
         /**
-         * @brief Vector \f$ \e = \d - \B \u \f$.
+         * @brief Vector \f$ \mathbf{e} = \mathbf{d} - \mathbb{B} \mathbf{u} \f$.
          */
         xt::xtensor<double, 1> m_e; // vector c in 220517_PbDual_MiniForces.pdf
         /**
-         * @brief Vector \f$ \u \f$.
+         * @brief Vector \f$ \mathbf{u} \f$.
          */
         xt::xtensor<double, 1> m_u;
         /**
-         * @brief Vecotr \f$ \B \l \f$.
+         * @brief Vecotr \f$ \mathbb{B} \mathbf{l} \f$.
          */
         xt::xtensor<double, 1> m_bl;
 
         /**
-         * @brief Matrix \f$ \A \f$.
+         * @brief Matrix \f$ \mathbb{A} \f$.
          */
         sparse_matrix_t m_A;
         /**
-         * @brief Structure specifying \f$ \A \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{A} \f$ properties. 
          */
         struct matrix_descr m_descrA;
         /**
-         * @brief Matrix \f$ \B \f$.
+         * @brief Matrix \f$ \mathbb{B} \f$.
          */
         sparse_matrix_t m_B;
         /**
-         * @brief Structure specifying \f$ \B \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{B} \f$ properties. 
          */
         struct matrix_descr m_descrB;
         /**
-         * @brief Matrix \f$ \P^{-1} \f$.
+         * @brief Matrix \f$ \mathbb{P}^{-1} \f$.
          */
         sparse_matrix_t m_inv_P;
         /**
-         * @brief Structure specifying \f$ \P^{-1} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties. 
          */
         struct matrix_descr m_descr_inv_P;
         /**

@@ -20,6 +20,7 @@ namespace scopi
     class ViscousWithoutFriction;
 
     /**
+     * @class ProblemParams<ViscousWithoutFriction>
      * @brief Parameters for ViscousWithoutFriction<dim>.
      *
      * Specialization of ProblemParams in params.hpp
@@ -41,7 +42,7 @@ namespace scopi
         ProblemParams(const ProblemParams<ViscousWithoutFriction<dim>>& params);
 
         /**
-         * @brief Tolerance to consider \f$ \g < 0 \f$ .
+         * @brief Tolerance to consider \f$ \gamma < 0 \f$ .
          *
          * Default value is \f$ 10^{-6} \f$.
          * \note \c tol > 0
@@ -50,25 +51,26 @@ namespace scopi
     };
 
     /**
+     * @class ViscousWithoutFriction
      * @brief Problem that models contacts without friction and with viscosity.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * The constraint is 
      * \f[
-     *      \d + \B \u \ge 0,
+     *      \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0,
      * \f]
-     * with \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, and \f$ \B \in \R^{\Nc \times 6 \N} \f$.
+     * with \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, and \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$.
      * We impose that the distance between all the particles should be non-negative.
-     * We also consider the variable \f$ \g \f$, such that we impose
-     * - \f$ D_{\ij} > 0 \f$ if \f$ \g_{\ij} = 0 \f$;
-     * - \f$ D_{\ij} = 0 \f$ if \f$ \g_{\ij} < 0 \f$.
+     * We also consider the variable \f$ \gamma \f$, such that we impose
+     * - \f$ D_{ij} > 0 \f$ if \f$ \gamma_{ij} = 0 \f$;
+     * - \f$ D_{ij} = 0 \f$ if \f$ \gamma_{ij} < 0 \f$.
      *
-     * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
-     * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\diff \g_{\ij}}{\diff t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
+     * For each contact \f$ ij \f$, \f$ \gamma_{ij} \f$ verifies
+     * - \f$ \gamma_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
+     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right) \f$ else. 
      *
-     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
-     * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
+     * \f$ \mathbf{\lambda}^+ \f$ (resp. \f$ \mathbf{\lambda}^- \f$) is the Lagrange multiplier associated with the constraint \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0 \f$ (resp. \f$ -\mathbf{d} - \mathbb{B} \mathbf{u} \ge 0 \f$).
+     * By convention, \f$ \mathbf{\lambda}^+ \ge 0 \f$ and \f$ \mathbf{\lambda}^- \ge 0 \f$. 
      *
      * @tparam dim Dimension (2 or 3).
      */
@@ -87,7 +89,7 @@ namespace scopi
         ViscousWithoutFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
 
         /**
-         * @brief Construct the COO storage of the matrix \f$ \B \f$ for the constraint.
+         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
          *
@@ -113,9 +115,9 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Create vector \f$ \d \f$.
+         * @brief Create vector \f$ \mathbf{d} \f$.
          *
-         * \f$ \d \f$ contains all the distances associated with the constraint \f$ D > 0 \f$, then the distances associated with the constraint \f$ D < 0 \f$.
+         * \f$ \mathbf{d} \f$ contains all the distances associated with the constraint \f$ D > 0 \f$, then the distances associated with the constraint \f$ D < 0 \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
@@ -125,13 +127,13 @@ namespace scopi
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
         /**
-         * @brief Matrix-free product \f$ \r = \r - \B \u \f$.
+         * @brief Matrix-free product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
          * @param particles [in] Array of particles (to get positions).
-         * @param U [in] Vector \f$ \u \f$.
-         * @param R [in/out] Vector \f$ \r \f$.
+         * @param U [in] Vector \f$ \mathbf{u} \f$.
+         * @param R [in/out] Vector \f$ \mathbf{r} \f$.
          * @param active_offset [in] Index of the first active particle.
          * @param row [in] Index of the computed row.
          */
@@ -142,13 +144,13 @@ namespace scopi
                                 std::size_t active_offset,
                                 std::size_t row);
         /**
-         * @brief Matrix-free product \f$ \u = \transpose{\B} \l + \u \f$.
+         * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{B}^T \mathbf{l} + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param c [in] Contact of the computed row \c row.
          * @param particles [in] Array of particles (to get positions).
-         * @param L [in] Vector \f$ \l \f$.
-         * @param U [in/out] Vector \f$ \u \f$.
+         * @param L [in] Vector \f$ \mathbf{l} \f$.
+         * @param U [in/out] Vector \f$ \mathbf{u} \f$.
          * @param active_offset [in] Index of the first active particle.
          * @param row [in] Index of the computed row.
          */
@@ -160,7 +162,7 @@ namespace scopi
                                           std::size_t row);
 
         /**
-         * @brief Set \f$ \g_{\ij}^n \f$ from the previous time step and compute the number of contacts with \f$ \g_{\ij} < 0 \f$.
+         * @brief Set \f$ \gamma_{ij}^n \f$ from the previous time step and compute the number of contacts with \f$ \gamma_{ij} < 0 \f$.
          *
          * Look if particles \c i and \c j were already in contact.
          *
@@ -168,15 +170,15 @@ namespace scopi
          */
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
         /**
-         * @brief Compute the value of \f$ \g^{n+1} \f$.
+         * @brief Compute the value of \f$ \gamma^{n+1} \f$.
          *
          * \f[
-         *      \g^{n+1}_{\ij} = \max \left( \gm, \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \right).
+         *      \gamma^{n+1}_{ij} = \gamma^n_{ij} - \Delta t \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right).
          * \f]
          *
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,

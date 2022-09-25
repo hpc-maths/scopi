@@ -5,6 +5,7 @@
 namespace scopi
 {
     /**
+     * @class property
      * @brief Add properties to the particles.
      *
      * All the methods are applied to one particle, when it is pushed back into the container.

@@ -23,11 +23,9 @@
 #include "quaternion.hpp"
 
 #include "solvers/OptimUzawaMatrixFreeOmp.hpp"
-#include "solvers/OptimMosek.hpp"
 #include "problems/DryWithoutFriction.hpp"
 #include "contact/contact_kdtree.hpp"
 #include "vap/vap_fixed.hpp"
-#include "vap/vap_projection.hpp"
 #include "params.hpp"
 
 namespace nl = nlohmann;
@@ -58,16 +56,14 @@ namespace scopi
      * @tparam contact_t Algorithm to search closest contacts (k-d tree, brute force, ...)
      * @tparam vap_t A priori velocity, problem dependant
      *
-     * Solve the contact problem: at eah time step
-     * <ul>
-     * <li> Move obstacles (particles with an imposed velocity);
-     * <li> Compute the list of contacts;
-     * <li> Write output files (json format) for visualization;
-     * <li> Set a priori velocity: describe how the particles would move is they weren't interacting with the other ones;
-     * <li> Compute the effective velocity as the solution of an optimization problem under constraint \f$D > 0\f$;
-     * <li> Use these velocities to move the particles;
-     * <li> Store the computed velocities.
-     * </ul>
+     * Solve the contact problem: at each time step
+     *      - Move obstacles (particles with an imposed velocity);
+     *      - Compute the list of contacts;
+     *      - Write output files (json format) for visualization;
+     *      - Set a priori velocity: describe how the particles would move if they weren't interacting with the other ones;
+     *      - Compute the effective velocity as the solution of an optimization problem under constraint \f$D > 0\f$;
+     *      - Use these velocities to move the particles;
+     *      - Store the computed velocities.
      *
      * The optimization solver \c optim_solver_t describes which algorithm is used to solve the optimization problem.
      * It is itself templated by a \c problem_t that describes which model is used.
@@ -198,7 +194,6 @@ namespace scopi
             while (this->should_solve_optimization_problem())
             {
                 optim_solver_t::run(m_particles, contacts, contacts_worms, nite);
-                // TODO get_constraint computes a matrix-vector product, do it only if needed
                 this->extra_steps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
             }
             move_active_particles();

@@ -17,26 +17,26 @@ namespace scopi{
      *
      * See OptimProjectedGradient for the notations.
      * The algorithm is
-     *  - \f$ \indexUzawa = 0 \f$;
-     *  - \f$ \l^{\indexUzawa} = 0 \f$;
-     *  - \f$ \y^{\indexUzawa} = 0 \f$;
-     *  - \f$ \theta^{\indexUzawa} = 1 \f$.
-     *  - \f$ \rho^{\indexUzawa} \f$ given;
-     *  - \f$ L^{\indexUzawa} = \frac{1}{\rho^{\indexUzawa}} \f$;
-     *  - While (\f$ \convergenceCriterion \f$)
-     *      - \f$ \dg^{\indexUzawa} = \A \y^{\indexUzawa} + \e \f$;
-     *      - \f$ \l^{\indexUzawa+1} = \text{ projection } \left( \y^{\indexUzawa} - \rho \dg^{\indexUzawa} \right) \f$;
-     *      - While (\f$ \frac{1}{2} \l^{\indexUzawa+1} \cdot \A \l^{\indexUzawa+1} + \e \cdot \l^{\indexUzawa+1} > \frac{1}{2} \y^{\indexUzawa+1} \cdot \A \y{\indexUzawa+1} + \e \cdot \y^{\indexUzawa+1} + \dg^{\indexUzawa} \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) + \frac{1}{2} L^{\indexUzawa} \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \cdot \left( \l^{\indexUzawa+1} - \y^{\indexUzawa+1} \right) \f$)
-     *          - \f$ L^{\indexUzawa} = 2 L^{\indexUzawa} \f$;
-     *          - \f$ \rho^{\indexUzawa} = \frac{1}{L^{\indexUzawa}} \f$;
-     *          - \f$ \l^{\indexUzawa+1} = \max \left( \y^{\indexUzawa} - \rho^{\indexUzawa} \dg^{\indexUzawa}, 0 \right) \f$;
+     *  - \f$ k = 0 \f$;
+     *  - \f$ \mathbf{l}^{k} = 0 \f$;
+     *  - \f$ \mathbf{y}^{k} = 0 \f$;
+     *  - \f$ \theta^{k} = 1 \f$.
+     *  - \f$ \rho^{k} \f$ given;
+     *  - \f$ L^{k} = \frac{1}{\rho^{k}} \f$;
+     *  - While (\f$  \frac{||\mathbf{l}^{k} - \mathbf{l}^{k-1}||}{||\mathbf{l}^{k}||+1} \le tol\_l \f$)
+     *      - \f$ \mathbf{dg}^{k} = \mathbb{A} \mathbf{y}^{k} + \mathbf{e} \f$;
+     *      - \f$ \mathbf{l}^{k+1} = \Pi \left (\mathbf{y}^{k} - \rho^{k} \mathbf{dg}^{k}, 0 \right) \f$;
+     *      - While (\f$ \frac{1}{2} \mathbf{l}^{k+1} \cdot \mathbb{A} \mathbf{l}^{k+1} + \mathbf{e} \cdot \mathbf{l}^{k+1} > \frac{1}{2} \mathbf{y}^{k+1} \cdot \mathbb{A} \mathbf{y}{k+1} + \mathbf{e} \cdot \mathbf{y}^{k+1} + \mathbf{dg}^{k} \cdot \left( \mathbf{l}^{k+1} - \mathbf{y}^{k+1} \right) + \frac{1}{2} L^{k} \left( \mathbf{l}^{k+1} - \mathbf{y}^{k+1} \right) \cdot \left( \mathbf{l}^{k+1} - \mathbf{y}^{k+1} \right) \f$)
+     *          - \f$ L^{k} = 2 L^{k} \f$;
+     *          - \f$ \rho^{k} = \frac{1}{L^{k}} \f$;
+     *          - \f$ \mathbf{l}^{k+1} = \Pi \left( \mathbf{y}^{k} - \rho^{k} \mathbf{dg}^{k}, 0 \right) \f$;
      *
-     *      - \f$ \theta^{\indexUzawa+1} = \frac{1}{2} \theta^{\indexUzawa} \sqrt{4 + \left( \theta^{\indexUzawa} \right)^2} - \left( \theta^{\indexUzawa} \right)^2 \f$;
-     *      - \f$ \beta^{\indexUzawa+1} = \theta^{\indexUzawa} \frac{1 - \theta^{\indexUzawa}}{\left( \theta^{\indexUzawa} \right)^2 + \theta^{\indexUzawa+1}} \f$;
-     *      - \f$ \y^{\indexUzawa+1} = \l^{\indexUzawa+1} + \beta^{\indexUzawa+1} \left( \l^{\indexUzawa+1} - \l^{\indexUzawa} \right) \f$;
-     *      - \f$ \indexUzawa++ \f$.
+     *      - \f$ \theta^{k+1} = \frac{1}{2} \theta^{k} \sqrt{4 + \left( \theta^{k} \right)^2} - \left( \theta^{k} \right)^2 \f$;
+     *      - \f$ \beta^{k+1} = \theta^{k} \frac{1 - \theta^{k}}{\left( \theta^{k} \right)^2 + \theta^{k+1}} \f$;
+     *      - \f$ \mathbf{y}^{k+1} = \mathbf{l}^{k+1} + \beta^{k+1} \left( \mathbf{l}^{k+1} - \mathbf{l}^{k} \right) \f$;
+     *      - \f$ k++ \f$.
      *
-     * The projection depends on the problem.
+     * The projection \f$ \Pi \f$ depends on the problem.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -49,18 +49,18 @@ namespace scopi{
          *
          * @param max_iter [in] Maximal number of iterations.
          * @param rho [in] Step for the gradient descent.
-         * @param tol_dg [in] Tolerance for \f$ \dg \f$ criterion.
-         * @param tol_l [in] Tolerance for \f$ \l \f$ criterion.
+         * @param tol_dg [in] Tolerance for \f$ \mathbf{dg} \f$ criterion.
+         * @param tol_l [in] Tolerance for \f$ \mathbf{l} \f$ criterion.
          * @param verbose [in] Whether to compute and print the function cost.
          */
         apgd_as(std::size_t max_iter, double rho, double tol_dg, double tol_l, bool verbose);
         /**
          * @brief Gradient descent algorithm.
          *
-         * @param A [in] Matrix \f$ \A \f$.
-         * @param descr [in] Structure specifying \f$ \A \f$ properties. 
-         * @param c [in] Vector \f$ \e \f$.
-         * @param l [out] vector \f$ \l \f$.
+         * @param A [in] Matrix \f$ \mathbb{A} \f$.
+         * @param descr [in] Structure specifying \f$ \mathbb{A} \f$ properties. 
+         * @param c [in] Vector \f$ \mathbf{e} \f$.
+         * @param l [out] vector \f$ \mathbf{l} \f$.
          *
          * @return Number of iterations the algorithm needed to converge.
          */
@@ -79,11 +79,11 @@ namespace scopi{
          */
         double m_rho;
         /**
-         * @brief Tolerance for \f$ \dg \f$ criterion (unused).
+         * @brief Tolerance for \f$ \mathbf{dg} \f$ criterion (unused).
          */
         double m_tol_dg;
         /**
-         * @brief Tolerance for \f$ \l \f$ criterion.
+         * @brief Tolerance for \f$ \mathbf{l} \f$ criterion.
          */
         double m_tol_l;
         /**
@@ -96,23 +96,23 @@ namespace scopi{
          */
         sparse_status_t m_status;
         /**
-         * @brief Vector \f$ \dg^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{dg}^{k} \f$.
          */
         xt::xtensor<double, 1> m_dg;
         /**
-         * @brief Vector \f$ \A \l^{\indexUzawa+1} + \e \f$.
+         * @brief Vector \f$ \mathbb{A} \mathbf{l}^{k+1} + \mathbf{e} \f$.
          */
         xt::xtensor<double, 1> m_uu;
         /**
-         * @brief Vector \f$ \y^{\indexUzawa+1} \f$.
+         * @brief Vector \f$ \mathbf{y}^{k+1} \f$.
          */
         xt::xtensor<double, 1> m_y;
         /**
-         * @brief Vector \f$ \l^{\indexUzawa} \f$.
+         * @brief Vector \f$ \mathbf{l}^{k} \f$.
          */
         xt::xtensor<double, 1> m_l_old;
         /**
-         * @brief Temporary vector used to compute \f$ \transpose{\l} \cdot \A \l \f$ and \f$ \transpose{\y} \cdot \A \y \f$.
+         * @brief Temporary vector used to compute \f$ \mathbf{l}^T \cdot \mathbb{A} \mathbf{l} \f$ and \f$ \mathbf{y}^T \cdot \mathbb{A} \mathbf{y} \f$.
          */
         xt::xtensor<double, 1> m_tmp;
     };

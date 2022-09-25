@@ -16,6 +16,8 @@ namespace scopi
      * A worm is a collection of spheres that are in contact (the distance between two successive spheres is 0 instead of being positive).
      * All spheres have the same radius.
      *
+     * \warning The only problem that implements worms is DryWithoutFriction.
+     *
      * @tparam dim Dimension (2 or 3).
      * @tparam owner
      */
@@ -25,7 +27,7 @@ namespace scopi
     public:
 
         /**
-         * @brief Alias for the base class \c object.
+         * @brief Alias for the base class object.
          */
         using base_type = object<dim, owner>;
         /**
@@ -62,7 +64,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @return 
          */
@@ -83,7 +85,7 @@ namespace scopi
         /**
          * @brief Get a sphere in the worm.
          *
-         * @param i [in] Index of the sphere in the worm. 0 <= i < this->size.
+         * @param i [in] Index of the sphere in the worm. 0 <= \c i < <tt> this->size() </tt>.
          *
          * @return Pointer to the i-th sphere in the worm.
          */

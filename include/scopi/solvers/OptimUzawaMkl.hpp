@@ -18,7 +18,7 @@ namespace scopi
     class OptimUzawaMkl;
 
     /**
-     * @brief Parameters for \c OptimUzawaMatrixFreeOmp<problem_t>
+     * @brief Parameters for OptimUzawaMatrixFreeOmp<problem_t>
      *
      * Specialization of ProblemParams.
      * See OptimParamsUzawaBase.
@@ -34,7 +34,7 @@ namespace scopi
      * @brief Uzawa algorithm where the matrices are stored and matrix-vector products are computed with the MKL.
      *
      * See OptimUzawaBase for the algorithm.
-     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     * \warning Only the cases \c problem_t = DryWithoutFriction and \c problem_t = ViscousWithoutFriction are implemented.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -48,7 +48,7 @@ namespace scopi
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimUzawaBase.
+         * @brief Alias for the base class OptimUzawaBase.
          */
         using base_type = OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>;
 
@@ -56,7 +56,7 @@ namespace scopi
         /**
          * @brief Constructor.
          *
-         * Buils the matrix \f$ \P^{-1} \f$.
+         * Buils the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param nparts [in] Number of particles.
@@ -72,7 +72,7 @@ namespace scopi
                       const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
                       const ProblemParams<problem_t>& problem_params);
         /**
-         * @brief Free the memory allocated for the matrix \f$ \P^{-1} \f$..
+         * @brief Free the memory allocated for the matrix \f$ \mathbb{P}^{-1} \f$.
          */
         ~OptimUzawaMkl();
 
@@ -80,7 +80,7 @@ namespace scopi
         /**
          * @brief Initialize the matrices for matrix-vector products with stored matrix.
          *
-         * Builds the matrix \f$ \B \f$.
+         * Builds the matrix \f$ \mathbb{B} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
@@ -92,12 +92,12 @@ namespace scopi
                              const std::vector<neighbor<dim>>& contacts,
                              const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Free the memory allocated for the matrix \f$ \B \f$..
+         * @brief Free the memory allocated for the matrix \f$ \mathbb{B} \f$.
          */
         void finalize_uzawa_impl();
 
         /**
-         * @brief Implements the product \f$ \P^{-1} \u \f$.
+         * @brief Implements the product \f$ \mathbb{P}^{-1} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for masses and moments of inertia).
@@ -106,7 +106,7 @@ namespace scopi
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
         /**
-         * @brief Implements the product \f$ \r = \r - \B \u \f$.
+         * @brief Implements the product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -117,7 +117,7 @@ namespace scopi
                          const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Implements the product \f$ \u = \transpose{\B} \l + \u \f$.
+         * @brief Implements the product \f$ \mathbf{u} = \mathbb{B}^T \mathbf{l} + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -136,12 +136,12 @@ namespace scopi
         void print_csr_matrix(const sparse_matrix_t A);
 
         /**
-         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -150,12 +150,12 @@ namespace scopi
                                std::vector<double>& invP_csr_val,
                                const scopi_container<2>& particles);
         /**
-         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \P^{-1} \f$.
+         * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{P}^{-1} \f$.
          *
          * @param nparts [in] Number of particles.
-         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \P^{-1} \f$.
-         * @param invP_csr_val [out] Values of the matrix \f$ \P^{-1} \f$.
+         * @param invP_csr_row [out] Rows' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_col [out] Columns' indicies of the matrix \f$ \mathbb{P}^{-1} \f$.
+         * @param invP_csr_val [out] Values of the matrix \f$ \mathbb{P}^{-1} \f$.
          * @param particles [in] Array for particles (for moments of inertia).
          */
         void set_moment_matrix(std::size_t nparts,
@@ -165,19 +165,19 @@ namespace scopi
                                const scopi_container<3>& particles);
 
         /**
-         * @brief MKL's data structure for the matrix \f$ \B \f$.
+         * @brief MKL's data structure for the matrix \f$ \mathbb{B} \f$.
          */
         sparse_matrix_t m_A;
         /**
-         * @brief Structure specifying \f$ \B \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{B} \f$ properties. 
          */
         struct matrix_descr m_descrA;
         /**
-         * @brief MKL's data structure for the matrix \f$ \P^{-1} \f$.
+         * @brief MKL's data structure for the matrix \f$ \mathbb{P}^{-1} \f$.
          */
         sparse_matrix_t m_inv_P;
         /**
-         * @brief Structure specifying \f$ \P^{-1} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties. 
          */
         struct matrix_descr m_descr_inv_P;
         /**

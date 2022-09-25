@@ -18,7 +18,7 @@ namespace scopi{
     class OptimUzawaMatrixFreeOmp;
 
     /**
-     * @brief Parameters for \c OptimUzawaMatrixFreeOmp<problem_t>
+     * @brief Parameters for OptimUzawaMatrixFreeOmp<problem_t>
      *
      * Specialization of ProblemParams.
      * See OptimParamsUzawaBase.
@@ -34,7 +34,7 @@ namespace scopi{
      * @brief Uzawa algorithm with matrix-free matrix-vector products parallelized with OpenMP.
      *
      * See OptimUzawaBase for the algorithm.
-     * \warning Only the cases <tt> problem_t = DryWithoutFriction </tt> and <tt> problem_t = ViscousWithoutFriction<dim> </tt> are implemented.
+     * \warning Only the cases \c problem_t = DryWithoutFriction and \c problem_t = ViscousWithoutFriction are implemented.
      *
      * @tparam problem_t Problem to be solved.
      */
@@ -48,7 +48,7 @@ namespace scopi{
         using problem_type = problem_t; 
     private:
         /**
-         * @brief Alias for the base class \c OptimUzawaBase.
+         * @brief Alias for the base class OptimUzawaBase.
          */
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeOmp<problem_t>, problem_t>;
 
@@ -72,7 +72,7 @@ namespace scopi{
 
     public:
         /**
-         * @brief Implements the product \f$ \P^{-1} \u \f$.
+         * @brief Implements the product \f$ \mathbb{P}^{-1} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for masses and moments of inertia).
@@ -81,7 +81,7 @@ namespace scopi{
         void gemv_inv_P_impl(const scopi_container<dim>& particles);
 
         /**
-         * @brief Implements the product \f$ \r = \r - \B \u \f$.
+         * @brief Implements the product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
@@ -92,7 +92,7 @@ namespace scopi{
                          const std::vector<neighbor<dim>>& contacts);
 
         /**
-         * @brief Implements the product \f$ \u = \transpose{\B} \l + \u \f$.
+         * @brief Implements the product \f$ \mathbf{u} = \mathbb{B}^T \mathbf{l} + \mathbf{u} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.

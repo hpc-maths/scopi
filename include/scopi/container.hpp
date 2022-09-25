@@ -213,7 +213,6 @@ namespace scopi
          * @brief Convert a particle index into an object index.
          *
          * The particle \c i is part of the object \c j, where \c j is the index of an object.
-         * TODO a diagram would help a lot, but I didn't manage to do it.
          *
          * @param i [in] Index of a particle.
          *
@@ -239,7 +238,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          */
         std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
         /**

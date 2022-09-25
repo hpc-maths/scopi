@@ -14,6 +14,7 @@ namespace scopi
     // plan definition //
     /////////////////////
     /**
+     * @class plan
      * @brief Plane.
      *
      * @tparam dim Dimension (2 or 3).
@@ -25,7 +26,7 @@ namespace scopi
     public:
 
         /**
-         * @brief Alias for the base class \c object.
+         * @brief Alias for the base class object.
          */
         using base_type = object<dim, owner>;
         /**
@@ -59,7 +60,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param b
          *
@@ -69,7 +70,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @param a
          * @param b
@@ -84,7 +85,7 @@ namespace scopi
         /**
          * @brief 
          *
-         * TODO
+         * \todo Write documentation.
          *
          * @return 
          */

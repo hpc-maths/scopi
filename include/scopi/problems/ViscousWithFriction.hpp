@@ -20,6 +20,7 @@ namespace scopi
     class ViscousWithFriction;
 
     /**
+     * @class ProblemParams<ViscousWithFriction>
      * @brief Parameters for ViscousWithFriction<dim>.
      *
      * Specialization of ProblemParams in params.hpp
@@ -48,14 +49,14 @@ namespace scopi
          */
         double mu;
         /**
-         * @brief \f$ \gm \f$
+         * @brief \f$ \gamma_{\min} \f$
          *
          * Default value is -3.
          * \note \c gamma_min < 0
          */
         double gamma_min;
         /**
-         * @brief Tolerance to consider \f$ \g < 0 \f$ .
+         * @brief Tolerance to consider \f$ \gamma < 0 \f$ .
          *
          * Default value is \f$ 10^{-6} \f$.
          * \note \c tol > 0
@@ -64,22 +65,23 @@ namespace scopi
     };
 
     /**
+     * @class ViscousWithFriction
      * @brief Problem that models contacts without friction and with viscosity.
      *
-     * See ProblemBase.hpp for the notations.
-     * We introduce the variable \f$ \g \f$ such that, for each contact \f$ \ij \f$,  we impose
-     * - \f$ \d_{\ij} + \B \u_{\ij} \ge 0 \f$ if \f$ \g_{\ij} = 0 \f$;
-     * - \f$ \d_{\ij} + \B \u_{\ij} = 0 \f$ if \f$ \gm < \g_{\ij} < 0 \f$;
-     * - \f$ \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}} \f$ if \f$ \g_{\ij} < \gm \f$.
+     * See ProblemBase for the notations.
+     * We introduce the variable \f$ \gamma \f$ such that, for each contact \f$ ij \f$,  we impose
+     * - \f$ \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge 0 \f$ if \f$ \gamma_{ij} = 0 \f$;
+     * - \f$ \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} = 0 \f$ if \f$ \gamma_{\min} < \gamma_{ij} < 0 \f$;
+     * - \f$ \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}|| \f$ if \f$ \gamma_{ij} < \gamma_{\min} \f$.
      *
-     * \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, \f$ \B \in \R^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.
+     * \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
      *
-     * For each contact \f$ \ij \f$, \f$ \g_{\ij} \f$ verifies
-     * - \f$ \g_{\ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\diff \g_{\ij}}{\diff t} = - \left( \lm_{\ij}^+ - \lm_{\ij}^- \right) \f$ else. 
+     * For each contact \f$ ij \f$, \f$ \gamma_{ij} \f$ verifies
+     * - \f$ \gamma_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
+     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right) \f$ else. 
      *
-     * \f$ \lm^+ \f$ (resp. \f$ \lm^- \f$) is the Lagrange multiplier associated with the constraint \f$ \d + \B \u \ge 0 \f$ (resp. \f$ -\d - \B \u \ge 0 \f$).
-     * By convention, \f$ \lm^+ \ge 0 \f$ and \f$ \lm^- \ge 0 \f$. 
+     * \f$ \mathbf{\lambda}^+ \f$ (resp. \f$ \mathbf{\lambda}^- \f$) is the Lagrange multiplier associated with the constraint \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0 \f$ (resp. \f$ -\mathbf{d} - \mathbb{B} \mathbf{u} \ge 0 \f$).
+     * By convention, \f$ \mathbf{\lambda}^+ \ge 0 \f$ and \f$ \mathbf{\lambda}^- \ge 0 \f$. 
      *
      * Only one matrix is built.
      * See \c create_vector_distances for the order of the rows of the matrix.
@@ -109,7 +111,7 @@ namespace scopi
         ViscousWithFriction(std::size_t nparts);
 
         /**
-         * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
+         * @brief Construct the COO storage of the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
          *
@@ -135,16 +137,16 @@ namespace scopi
         std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
                                       const std::vector<neighbor<dim>>& contacts_worms);
         /**
-         * @brief Create vector \f$ \d \f$.
+         * @brief Create vector \f$ \mathbf{d} \f$.
          *
-         * For each contact \f$ \ij \f$, depending on the constraint, \f$ \d_{\ij} \f$ can be of the form:
-         *  - one element if \f$ \g_{\ij} = 0 \f$;
-         *  - four elements if \f$ \g_{\ij} < \gm \f$;
-         *  - one element corresponding to \f$ D > 0 \f$ and a second element corresponding to \f$ D < 0 \f$, after all the other constraints, if \f$ \gm < \g_{\ij} < 0 \f$.
+         * For each contact \f$ ij \f$, depending on the constraint, \f$ \mathbf{d}_{ij} \f$ can be of the form:
+         *  - one element if \f$ \gamma_{ij} = 0 \f$;
+         *  - four elements if \f$ \gamma_{ij} < \gamma_{\min} \f$;
+         *  - one element corresponding to \f$ D > 0 \f$ and a second element corresponding to \f$ D < 0 \f$, after all the other constraints, if \f$ \gamma_{\min} < \gamma_{ij} < 0 \f$.
          *
          *  In other words, \f$ d \f$ is a block vector like
          *  \f[
-         *      \d = \left( \text{mix of blocks with one or four elements corresponding to } D > 0  \text{ or to the friction model, blocks of one element corresponding to } D < 0 \right).
+         *      \mathbf{d} = \left( \text{mix of blocks with one or four elements corresponding to } D > 0  \text{ or to the friction model, blocks of one element corresponding to } D < 0 \right).
          * \f]
          *
          * @tparam dim Dimension (2 or 3).
@@ -155,11 +157,11 @@ namespace scopi
                                      const std::vector<neighbor<dim>>& contacts_worms);
 
         /**
-         * @brief Returns the number of contacts \f$ \ij \f$ with \f$ \g_{\ij} < \gm \f$.
+         * @brief Returns the number of contacts \f$ ij \f$ with \f$ \gamma_{ij} < \gamma_{\min} \f$.
          */
         std::size_t get_nb_gamma_min();
         /**
-         * @brief Set \f$ \g_{\ij}^n \f$ from the previous time step, compute the number of contacts with \f$ \g_{\ij} < 0 \f$ and \f$ \g_{\ij} < \gm \f$.
+         * @brief Set \f$ \gamma_{ij}^n \f$ from the previous time step, compute the number of contacts with \f$ \gamma_{ij} < 0 \f$ and \f$ \gamma_{ij} < \gamma_{\min} \f$.
          *
          * Look if particles \c i and \c j were already in contact.
          *
@@ -167,15 +169,15 @@ namespace scopi
          */
         void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
         /**
-         * @brief Compute the value of \f$ \g^{n+1} \f$.
+         * @brief Compute the value of \f$ \gamma^{n+1} \f$.
          *
          * \f[
-         *      \g^{n+1}_{\ij} = \g^n_{\ij} - \Delta t \left( \lm_{\ij}^+ - \lm_{\ij}^- \right).
+         *      \gamma^{n+1}_{ij} = \max \left( \gamma_{\min}, \gamma^n_{ij} - \Delta t \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right) \right).
          * \f]
          *
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
                                      const xt::xtensor<double, 1>& lambda,
@@ -216,7 +218,7 @@ namespace scopi
         void setup_projection();
 
         /**
-         * @brief Number of contacts \f$ \ij \f$ with \f$ \g_{\ij} < \gm \f$.
+         * @brief Number of contacts \f$ ij \f$ with \f$ \gamma_{ij} < \gamma_{\min} \f$.
          */
         std::size_t m_nb_gamma_min;
         /**
@@ -502,7 +504,6 @@ namespace scopi
                                                   const scopi_container<dim>& particles,
                                                   const xt::xtensor<double, 2>& u)
     {
-        // TODO will work only for sphere and plan test
         m_lambda.resize(contacts.size());
         std::size_t ind_gamma_neg = 0;
         std::size_t ind_gamma_min = 0;

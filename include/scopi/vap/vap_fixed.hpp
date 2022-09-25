@@ -9,7 +9,7 @@ namespace scopi
     class vap_fixed;
      
     /**
-     * @brief Parameters for \c vap_fixed.
+     * @brief Parameters for vap_fixed.
      *
      * Defined for compatibility.
      */
@@ -21,13 +21,13 @@ namespace scopi
     /**
      * @brief Fixed a priori velocity.
      *
-     * The a priori velocity (direction an norm) is fixed at the begining of the simulation and does not change.
+     * The a priori velocity (direction and norm) is fixed at the begining of the simulation and does not change.
      */
     class vap_fixed: public vap_base<vap_fixed>
     {
     public:
         /**
-         * @brief Alias for the base class \c vap_base.
+         * @brief Alias for the base class vap_base.
          */
         using base_type = vap_base<vap_fixed>;
         /**

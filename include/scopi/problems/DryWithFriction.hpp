@@ -19,7 +19,8 @@ namespace scopi
     class DryWithFriction;
 
     /**
-     * @brief Parameters for \c DryWithFriction
+     * @class ProblemParams<DryWithFriction>
+     * @brief Parameters for DryWithFriction
      *
      * Specialization of ProblemParams in params.hpp
      */
@@ -47,20 +48,21 @@ namespace scopi
     };
 
     /**
+     * @class DryWithFriction
      * @brief Problem that models contacts with friction and without viscosity.
      *
-     * See ProblemBase.hpp for the notations.
+     * See ProblemBase for the notations.
      * The constraint is 
      * \f[
-     *      \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}}
+     *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}||
      * \f]
-     * for all contacts \f$ (\ij) \f$.
-     * \f$ \d \in \R^{\Nc} \f$, \f$ \u \in \R^{6\N} \f$, \f$ \B \in \R^{\Nc \times 6 N} \f$, and \f$ \T \in R^{3 \Nc \times 6\N} \f$.
+     * for all contacts \f$ ij \f$.
+     * \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
      *
      * Only one matrix is built.
-     * It contains both matrices $\f$ \B \f$ and \f$ T \f$.
-     * A contact \f$ (\ij) \f$ corresponds to four rows in the matrix, one for \f$ \B \f$ and three for \f$ T \f$.
-     * Therefore, the matrix is in \f$ \R^{4\Nc \times 6N} \f$ and \f$ \d \in \R^{4\Nc} \f$.
+     * It contains both matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
+     * A contact \f$ ij \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ \mathbb{T} \f$.
+     * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      *
      */
     class DryWithFriction : protected DryWithFrictionBase
@@ -76,13 +78,13 @@ namespace scopi
         DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
 
         /**
-         * @brief Create vector \f$ \d \f$.
+         * @brief Create vector \f$ \mathbf{d} \f$.
          *
          * See \c create_vector_distances for the order of the rows of the matrix.
          *
-         * \f$ \d \in \R^{4\Nc} \f$ can be seen as a block vector, each block has the form
-         * \f$ (d_{\ij}, 0, 0, 0) \f$,
-         * where \f$ d_{\ij} \f$ is the distance between particles \c i and \c j.
+         * \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
+         * \f$ (d_{ij}, 0, 0, 0) \f$,
+         * where \f$ d_{ij} \f$ is the distance between particles \c i and \c j.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
@@ -109,7 +111,7 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \d + \B \u - \constraintFunction(\u) \f$, where \f$ \u \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
@@ -124,7 +126,7 @@ namespace scopi
 
     private:
         /**
-         * @brief Parameters, see <tt> ProblemParams<DryWithFriction> </tt>.
+         * @brief Parameters.
          */
         ProblemParams<DryWithFriction> m_params;
     };
