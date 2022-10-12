@@ -80,7 +80,7 @@ namespace scopi
     {
     private:
         /**
-         * @brief Alias for problem type. 
+         * @brief Alias for problem type.
          */
         using problem_t = typename optim_solver_t::problem_type;
     public:
@@ -188,7 +188,9 @@ namespace scopi
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
             if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
+            {
                 write_output_files(contacts, nite);
+            }
             this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
             this->extra_steps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
@@ -332,6 +334,18 @@ namespace scopi
 
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
+
+            for (auto& p: m_particles.pos())
+            {
+                if (p[0] > 1.)
+                {
+                    p[0] -= 1.;
+                }
+                else if (p[0] < 0.)
+                {
+                    p[0] += 1.;
+                }
+            }
         }
 
         auto duration = toc();

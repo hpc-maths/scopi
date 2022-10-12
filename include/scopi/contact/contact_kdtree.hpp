@@ -42,14 +42,14 @@ namespace scopi
          *
          * For two particles \c i and \c j, compute the exact distance only if the squared distance between a point in \c i and a point in \c j is less than \c kdtree_radius.
          * For a sphere or a superellipsoid, this point is the center.
-         * For a plan, it is the point used to construct it. 
+         * For a plan, it is the point used to construct it.
          * \note \c kd_tree_radius > 0
          */
         double kd_tree_radius;
     };
 
     /**
-     * @brief 
+     * @brief
      *
      * \todo Write documentation.
      *
@@ -57,10 +57,10 @@ namespace scopi
      */
     template<std::size_t dim>
     class KdTree
-    { 
+    {
     public:
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
@@ -75,14 +75,14 @@ namespace scopi
           // return m_p.pos().size() - m_actptr;
         }
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @param idx
          * @param d
          *
-         * @return 
+         * @return
          */
         inline double kdtree_get_pt(std::size_t idx, const std::size_t d) const
         {
@@ -91,14 +91,14 @@ namespace scopi
           // return m_p.pos()(idx)[d];
         }
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @tparam BBOX
-         * @param 
+         * @param
          *
-         * @return 
+         * @return
          */
         template<class BBOX>
         bool kdtree_get_bbox(BBOX & /* bb */) const
@@ -181,6 +181,20 @@ namespace scopi
         std::vector<neighbor<dim>> contacts;
         // double dmax = 2;
 
+        std::size_t ip = 0;
+        for (auto& p: particles.pos())
+        {
+            if (p[0] + m_params.dmax > 1.)
+            {
+                particles.push_back(ip, {{p[0] - 1, p[1]}});
+            }
+            else if (p[0] - m_params.dmax < 0.)
+            {
+                particles.push_back(ip, {{p[0] + 1, p[1]}});
+            }
+            ip++;
+        }
+
         // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
         tic();
         using my_kd_tree_t = typename nanoflann::KDTreeSingleIndexAdaptor<
@@ -233,7 +247,7 @@ namespace scopi
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
                 std::size_t j = ret_matches[ic].first;
                 if (i < j)
-                { 
+                {
                     compute_exact_distance(particles, i, j, contacts, m_params.dmax);
                     m_nMatches++;
                 }
@@ -248,6 +262,8 @@ namespace scopi
                 compute_exact_distance(particles, i, j, contacts, m_params.dmax);
             }
         }
+
+        particles.reset_periodic();
 
         duration = toc();
         PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << " compute " << m_nMatches << " distances" << std::endl;
