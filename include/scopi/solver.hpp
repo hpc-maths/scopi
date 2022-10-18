@@ -108,6 +108,11 @@ namespace scopi
          */
         void run(std::size_t total_it, std::size_t initial_iter = 0);
 
+        /**
+         * @brief Return the parameters of the solver.
+         */
+        params_t& get_params();
+
     private:
         /**
          * @brief Move obstacles (particles with an imposed velocity).
@@ -201,6 +206,12 @@ namespace scopi
             move_active_particles();
             update_velocity();
         }
+    }
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    auto ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::get_params() -> params_t&
+    {
+        return m_params;
     }
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
