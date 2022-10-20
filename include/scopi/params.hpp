@@ -2,6 +2,10 @@
 
 #include <cstddef>
 #include <iostream>
+#include <filesystem>
+
+#include <CLI/CLI.hpp>
+
 #include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
 
@@ -89,12 +93,8 @@ namespace scopi
          * @brief Default constructor.
          */
         ScopiParams();
-        /**
-         * @brief Copy constructor.
-         *
-         * @param params Parameters to be copied.
-         */
-        ScopiParams(const ScopiParams& params);
+
+        void init_options(CLI::App& app);
 
         /**
          * @brief Frequency to write the output files.
@@ -105,6 +105,8 @@ namespace scopi
          * \note \c output_frequency > 0
          */
         std::size_t output_frequency;
+
+        std::filesystem::path path;
         /**
          * @brief Path to the output files.
          *
@@ -136,7 +138,7 @@ namespace scopi
     struct Params
     {
         /**
-         * @brief Alias for problem type. 
+         * @brief Alias for problem type.
          */
         using problem_t = typename solver_t::problem_type;
 
@@ -173,7 +175,7 @@ namespace scopi
         ScopiParams scopi_params;
     };
 
-    template<class solver_t, class contact_t, class vap_t> 
+    template<class solver_t, class contact_t, class vap_t>
     Params<solver_t, contact_t, vap_t>::Params()
     : optim_params()
     , problem_params()

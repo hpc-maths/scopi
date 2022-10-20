@@ -2,6 +2,7 @@
 
 #include "OptimBase.hpp"
 
+#include <CLI/CLI.hpp>
 #include <cstddef>
 #include <omp.h>
 #include "tbb/tbb.h"
@@ -30,6 +31,8 @@ namespace scopi{
          * @param params Parameters to by copied.
          */
         OptimParamsUzawaBase(const OptimParamsUzawaBase& params);
+
+        void init_options(CLI::App& app);
 
         /**
          * @brief Tolerance.
@@ -83,7 +86,7 @@ namespace scopi{
         /**
          * @brief Alias for the problem.
          */
-        using problem_type = problem_t; 
+        using problem_type = problem_t;
         /**
          * @brief Alias for the base class OptimBase.
          */
@@ -158,6 +161,11 @@ namespace scopi{
          */
         int get_nb_active_contacts_impl() const;
 
+        void init_options(CLI::App& app)
+        {
+            this->m_params.init_options(app);
+        }
+
     private:
         /**
          * @brief Computes \f$ \mathbb{P}^{-1} \mathbf{u} \f$.
@@ -200,7 +208,7 @@ namespace scopi{
          */
         template <std::size_t dim>
         void init_uzawa(const scopi_container<dim>& particles,
-                        const std::vector<neighbor<dim>>& contacts, 
+                        const std::vector<neighbor<dim>>& contacts,
                         const std::vector<neighbor<dim>>& contacts_worms);
         /**
          * @brief Free the memory allocated for the matrices.
@@ -296,6 +304,7 @@ namespace scopi{
 
             tic();
             xt::noalias(m_L) = xt::maximum( m_L-this->m_params.rho*m_R, 0);
+            PLOG_INFO << "m_L " << m_L << std::endl;
             duration = toc();
             time_assign_l += duration;
             time_solve += duration;

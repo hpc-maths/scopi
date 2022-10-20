@@ -18,18 +18,14 @@ namespace scopi
      * Specialization of ContactsParams.
      */
     template<>
-    struct ContactsParams<contact_brute_force> 
+    struct ContactsParams<contact_brute_force>
     {
         /**
          * @brief Default constructor.
          */
         ContactsParams();
-        /**
-         * @brief Copy constructor.
-         *
-         * @param params [in] Parameters to be copied.
-         */
-        ContactsParams(const ContactsParams<contact_brute_force>& params);
+
+        void init_options(CLI::App& app);
 
         /**
          * @brief Maximum distance between two neighboring particles.
@@ -72,16 +68,10 @@ namespace scopi
          * @param particles [in] Array of particles.
          * @param active_ptr [in] Index of the first active particle.
          *
-         * @return Array of neighbors. 
+         * @return Array of neighbors.
          */
         template <std::size_t dim>
         std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
-
-    protected:
-        /**
-         * @brief Parameters.
-         */
-        ContactsParams<contact_brute_force> m_params;
 
     };
 
@@ -95,7 +85,7 @@ namespace scopi
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -104,7 +94,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
             }
         }
 

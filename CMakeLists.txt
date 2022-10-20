@@ -49,6 +49,7 @@ endif()
 find_package(xtensor REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
+find_package(CLI11 REQUIRED)
 # find_package(plog REQUIRED)
 # find_package(nanoflann)
 
@@ -130,6 +131,7 @@ target_include_directories(scopi PUBLIC
 target_link_libraries(scopi PUBLIC xtensor
                       nlohmann_json::nlohmann_json
                       fmt::fmt
+                      CLI11::CLI11
                       # plog::plog
                       #nanoflann::nanoflann
                       ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})

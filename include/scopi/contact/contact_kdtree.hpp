@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base.hpp"
+#include <CLI/CLI.hpp>
 
 #include <cstddef>
 #include <plog/Log.h>
@@ -23,13 +24,8 @@ namespace scopi
          * @brief Default constructor.
          */
         ContactsParams();
-        /**
-         * @brief Copy constructor.
-         *
-         * @param params [in] Parameters to be copied.
-         */
-        ContactsParams(const ContactsParams<contact_kdtree>& params);
 
+        void init_options(CLI::App& app);
         /**
          * @brief Maximum distance between two neighboring particles.
          *
@@ -160,12 +156,6 @@ namespace scopi
         template <std::size_t dim>
         std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
 
-    protected:
-        /**
-         * @brief Parameters.
-         */
-        ContactsParams<contact_kdtree> m_params;
-
     private:
         /**
          * @brief Number of exact distances computed.
@@ -178,17 +168,19 @@ namespace scopi
     {
         // std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
 
+        particles.reset_periodic();
+
         std::vector<neighbor<dim>> contacts;
         // double dmax = 2;
 
         std::size_t ip = 0;
         for (auto& p: particles.pos())
         {
-            if (p[0] + m_params.dmax > 1.)
-            {
-                particles.push_back(ip, {{p[0] - 1, p[1]}});
-            }
-            else if (p[0] - m_params.dmax < 0.)
+            // if (p[0] + this->m_params.dmax > 1.)
+            // {
+            //     particles.push_back(ip, {{p[0] - 1, p[1]}});
+            // }
+            if (p[0] - this->m_params.dmax < 0.)
             {
                 particles.push_back(ip, {{p[0] + 1, p[1]}});
             }
@@ -232,23 +224,23 @@ namespace scopi
                 query_pt[d] = particles.pos()(i)(d);
                 // query_pt[d] = particles.pos()(i)(d);
             }
-            // std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+            PLOG_INFO << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
             std::vector<std::pair<size_t, double>> indices_dists;
 
             nanoflann::RadiusResultSet<double, std::size_t> resultSet(
-                m_params.kd_tree_radius, indices_dists);
+                this->m_params.kd_tree_radius, indices_dists);
 
             std::vector<std::pair<std::size_t, double>> ret_matches;
 
-            auto nMatches_loc = index.radiusSearch(query_pt, m_params.kd_tree_radius, ret_matches,
+            auto nMatches_loc = index.radiusSearch(query_pt, this->m_params.kd_tree_radius, ret_matches,
                 nanoflann::SearchParams());
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
                 std::size_t j = ret_matches[ic].first;
                 if (i < j)
                 {
-                    compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                    compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
                     m_nMatches++;
                 }
             }
@@ -259,11 +251,9 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
             }
         }
-
-        particles.reset_periodic();
 
         duration = toc();
         PLOG_INFO << "----> CPUTIME : compute " << contacts.size() << " contacts = " << duration << " compute " << m_nMatches << " distances" << std::endl;

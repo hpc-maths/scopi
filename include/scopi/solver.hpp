@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 
+#include <CLI/CLI.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xfixed.hpp>
 
@@ -99,6 +100,8 @@ namespace scopi
         ScopiSolver(scopi_container<dim>& particles,
                     double dt,
                     const Params<optim_solver_t, contact_t, vap_t>& params = Params<optim_solver_t, contact_t, vap_t>());
+
+        void init_options(CLI::App& app);
 
         /**
          * @brief Run the simulation.
@@ -209,6 +212,14 @@ namespace scopi
     }
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::init_options(CLI::App& app)
+    {
+        m_params.init_options(app);
+        contact_t::init_options(app);
+        optim_solver_t::init_options(app);
+    }
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     auto ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::get_params() -> params_t&
     {
         return m_params;
@@ -276,6 +287,12 @@ namespace scopi
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         tic();
+
+        if (!std::filesystem::exists(m_params.path))
+        {
+            std::filesystem::create_directories(m_params.path);
+        }
+
         nl::json json_output;
 
         std::ofstream file(fmt::format("{}{:04d}.json", m_params.filename, nite));

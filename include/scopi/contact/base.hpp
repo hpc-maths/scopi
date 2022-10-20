@@ -1,5 +1,6 @@
-#pragma once 
+#pragma once
 
+#include <CLI/CLI.hpp>
 #include "../container.hpp"
 #include "../objects/methods/closest_points.hpp"
 #include "../objects/methods/select.hpp"
@@ -19,11 +20,18 @@ namespace scopi
     class contact_base: public crtp_base<D>
     {
     public:
+        using params_t = ContactsParams<D>;
         /**
          * @brief Default constructor.
          */
-        contact_base() {}
+        contact_base(const params_t& params)
+        : m_params(params)
+        {}
 
+        void init_options(CLI::App& app)
+        {
+            m_params.init_options(app);
+        }
         /**
          * @brief Compute contacts between particles.
          *
@@ -35,6 +43,9 @@ namespace scopi
          */
         template <std::size_t dim>
         std::vector<neighbor<dim>> run(scopi_container<dim>& particles, std::size_t active_ptr);
+
+    protected:
+        params_t m_params;
     };
 
     template <class D>
