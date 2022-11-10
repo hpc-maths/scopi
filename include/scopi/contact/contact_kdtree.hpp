@@ -168,8 +168,6 @@ namespace scopi
     {
         // std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
 
-        particles.reset_periodic();
-
         std::vector<neighbor<dim>> contacts;
         // double dmax = 2;
 
@@ -272,6 +270,8 @@ namespace scopi
             // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
         }
         */
+
+        particles.reset_periodic();
 
         return contacts;
 

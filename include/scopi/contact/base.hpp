@@ -73,8 +73,17 @@ namespace scopi
         auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*particles[o1], index(i-particles.offset(o1))),
                                                               *select_object_dispatcher<dim>::dispatch(*particles[o2], index(j-particles.offset(o2))));
         if (neigh.dij < dmax) {
-            neigh.i = i;
-            neigh.j = j;
+            neigh.i = (i<particles.periodic_ptr())? i: particles.periodic_index(i - particles.periodic_ptr());
+            neigh.j = (j<particles.periodic_ptr())? j: particles.periodic_index(j - particles.periodic_ptr());
+
+            if (neigh.pi(0) > 1)
+            {
+              neigh.pi(0) -= 1;
+            }
+            if (neigh.pj(0) > 1)
+            {
+              neigh.pj(0) -= 1;
+            }
             #pragma omp critical
             contacts.emplace_back(std::move(neigh));
         }

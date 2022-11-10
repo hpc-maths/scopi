@@ -295,18 +295,18 @@ namespace scopi
 
         nl::json json_output;
 
-        std::ofstream file(fmt::format("{}{:04d}.json", m_params.filename, nite));
+        std::ofstream file(fmt::format("{}_{:04d}.json", (m_params.path / m_params.filename).string(), nite));
 
         json_output["objects"] = {};
 
-        for (std::size_t i = 0; i < m_particles.size(); ++i)
+        for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
         {
             json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i]));
         }
 
         if (m_params.write_velocity)
         {
-            for (std::size_t i = 0; i < m_particles.size(); ++i)
+            for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
             {
                 json_output["objects"][i]["velocity"] = m_particles.v()(i);
                 json_output["objects"][i]["rotationvelocity"] = m_particles.omega()(i);

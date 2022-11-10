@@ -1,3 +1,4 @@
+#include <CLI/CLI.hpp>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xnoalias.hpp>
 #include <xtensor/xview.hpp>
@@ -8,59 +9,28 @@
 #include <scopi/property.hpp>
 #include <scopi/solver.hpp>
 
-int main()
+int main(int argc, char **argv)
 {
+    plog::init(plog::info, "two_spheres_periodic.log", 0, 0);
+
+    CLI::App app("two spheres with periodic boundary conditions");
     constexpr std::size_t dim = 2;
     double dt = .005;
     std::size_t total_it = 1000;
 
+    double vel = -0.25;
+
     scopi::scopi_container<dim> particles;
 
-    scopi::sphere<dim> s1({{ 0.4, -0.05}}, 0.1);
-    scopi::sphere<dim> s2({{ 0.6,  0.05}}, 0.1);
-    particles.push_back(s1, scopi::property<dim>().desired_velocity({{-0.25, 0}}).mass(1.).moment_inertia(0.1));
-    particles.push_back(s2, scopi::property<dim>().desired_velocity({{0.25, 0}}).mass(1.).moment_inertia(0.1));
+    scopi::sphere<dim> s1({{ 0.4, 0.45}}, 0.1);
+    scopi::sphere<dim> s2({{ 0.6,  0.55}}, 0.1);
+    particles.push_back(s1, scopi::property<dim>().desired_velocity({{vel, 0}}).mass(1.).moment_inertia(0.1));
+    particles.push_back(s2, scopi::property<dim>().desired_velocity({{-vel, 0}}).mass(1.).moment_inertia(0.1));
 
     scopi::ScopiSolver<dim> solver(particles, dt);
+    solver.init_options(app);
+    CLI11_PARSE(app, argc, argv);
     solver.run(total_it);
-
-    // scopi::sphere<dim> s1({{0.8, 0.}}, 0.1);
-
-    // auto prop1 = scopi::property<dim>().desired_velocity({{0.25, 0}});
-
-    // particles.push_back(s1, prop1);
-
-    // double dt = 0.1;
-    // for(std::size_t nt = 0; nt<100; nt++)
-    // {
-    //     for (auto& p: particles.pos())
-    //     {
-    //         if (p[0] > 1.)
-    //         {
-    //             p[0] -= 1.;
-    //         }
-    //         else if (p[0] < 0.)
-    //         {
-    //             p[0] += 1.;
-    //         }
-    //     }
-    //     xt::noalias(particles.v()) = particles.vd();
-    //     particles.pos() += dt*particles.v();
-    //     std::cout <<  particles.pos() << " " << particles.v() << " " << particles.vd()<< std::endl;
-    // }
-
-
-    // particles.push_back(0, {{1., 1.}});
-    // for(std::size_t i = 0; i < particles.size(); ++i)
-    // {
-    // }
-    // std::cout << std::endl;
-
-    // particles.reset_periodic();
-    // for(std::size_t i = 0; i < particles.size(); ++i)
-    // {
-    //     particles[i]->print();
-    // }
 
     return 0;
 }

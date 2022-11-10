@@ -85,9 +85,9 @@ namespace scopi
         std::unique_ptr<object<dim, false>> operator[](std::size_t i);
 
         /**
-         * @brief Appends the given element value to the end of the container. 
+         * @brief Appends the given element value to the end of the container.
          *
-         * @param s [in] Object to append. 
+         * @param s [in] Object to append.
          * @param p [in] Properties of the object (see property.hpp).
          */
         void push_back(const object<dim>& s, const property<dim>& p = property<dim>());
@@ -199,7 +199,7 @@ namespace scopi
         /**
          * @brief Number of objects in the container.
          */
-        std::size_t size() const;
+        std::size_t size(bool with_periodic=true) const;
         /**
          * @brief Number of active particles in the container.
          */
@@ -233,10 +233,13 @@ namespace scopi
          */
         void reset_periodic();
 
+        std::size_t periodic_ptr() const;
+        std::size_t periodic_index(std::size_t i) const;
+
     private:
 
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          */
@@ -365,7 +368,7 @@ namespace scopi
         }
 
         m_shapes_id.push_back(s.hash());
-        m_periodic_ptr++;
+        m_periodic_ptr += s.size();
     }
 
     template<std::size_t dim>
@@ -408,9 +411,9 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t scopi_container<dim>::size() const
+    std::size_t scopi_container<dim>::size(bool with_periodic) const
     {
-        return m_shapes_id.size();
+        return m_shapes_id.size() - ((with_periodic) ? 0 : m_periodic_indices.size());
     }
 
     template<std::size_t dim>
@@ -570,6 +573,18 @@ namespace scopi
 
         m_periodic_added = false;
         m_periodic_ptr = size;
+    }
+
+    template<std::size_t dim>
+    std::size_t scopi_container<dim>::periodic_ptr() const
+    {
+        return m_periodic_ptr;
+    }
+
+    template<std::size_t dim>
+    std::size_t scopi_container<dim>::periodic_index(std::size_t i) const
+    {
+        return m_periodic_indices[i];
     }
 
     template<std::size_t dim>
