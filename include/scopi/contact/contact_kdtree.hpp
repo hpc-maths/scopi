@@ -1,6 +1,9 @@
 #pragma once
 
 #include "base.hpp"
+#include "../box.hpp"
+#include "../utils.hpp"
+#include <CLI/CLI.hpp>
 
 #include <cstddef>
 #include <plog/Log.h>
@@ -23,13 +26,8 @@ namespace scopi
          * @brief Default constructor.
          */
         ContactsParams();
-        /**
-         * @brief Copy constructor.
-         *
-         * @param params [in] Parameters to be copied.
-         */
-        ContactsParams(const ContactsParams<contact_kdtree>& params);
 
+        void init_options(CLI::App& app);
         /**
          * @brief Maximum distance between two neighboring particles.
          *
@@ -42,14 +40,14 @@ namespace scopi
          *
          * For two particles \c i and \c j, compute the exact distance only if the squared distance between a point in \c i and a point in \c j is less than \c kdtree_radius.
          * For a sphere or a superellipsoid, this point is the center.
-         * For a plan, it is the point used to construct it. 
+         * For a plan, it is the point used to construct it.
          * \note \c kd_tree_radius > 0
          */
         double kd_tree_radius;
     };
 
     /**
-     * @brief 
+     * @brief
      *
      * \todo Write documentation.
      *
@@ -57,10 +55,10 @@ namespace scopi
      */
     template<std::size_t dim>
     class KdTree
-    { 
+    {
     public:
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
@@ -75,14 +73,14 @@ namespace scopi
           // return m_p.pos().size() - m_actptr;
         }
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @param idx
          * @param d
          *
-         * @return 
+         * @return
          */
         inline double kdtree_get_pt(std::size_t idx, const std::size_t d) const
         {
@@ -91,14 +89,14 @@ namespace scopi
           // return m_p.pos()(idx)[d];
         }
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @tparam BBOX
-         * @param 
+         * @param
          *
-         * @return 
+         * @return
          */
         template<class BBOX>
         bool kdtree_get_bbox(BBOX & /* bb */) const
@@ -158,13 +156,7 @@ namespace scopi
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
-
-    protected:
-        /**
-         * @brief Parameters.
-         */
-        ContactsParams<contact_kdtree> m_params;
+        std::vector<neighbor<dim>> run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
 
     private:
         /**
@@ -174,12 +166,13 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    std::vector<neighbor<dim>> contact_kdtree::run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
+    std::vector<neighbor<dim>> contact_kdtree::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
         // std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
 
         std::vector<neighbor<dim>> contacts;
-        // double dmax = 2;
+
+        add_objects_from_periodicity(box, particles, this->m_params.dmax);
 
         // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
         tic();
@@ -201,40 +194,29 @@ namespace scopi
 
         for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
         {
-            // for (std::size_t j = i + 1; j < particles.size(); ++j)
-            // {
-            //     auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-            //     if (neigh.dij < dmax)
-            //     {
-            //         contacts.emplace_back(std::move(neigh));
-            //         contacts.back().i = i;
-            //         contacts.back().j = j;
-            //     }
-            // }
-
             double query_pt[dim];
             for (std::size_t d = 0; d < dim; ++d)
             {
                 query_pt[d] = particles.pos()(i)(d);
                 // query_pt[d] = particles.pos()(i)(d);
             }
-            // std::cout << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+            PLOG_INFO << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
             std::vector<std::pair<size_t, double>> indices_dists;
 
             nanoflann::RadiusResultSet<double, std::size_t> resultSet(
-                m_params.kd_tree_radius, indices_dists);
+                this->m_params.kd_tree_radius, indices_dists);
 
             std::vector<std::pair<std::size_t, double>> ret_matches;
 
-            auto nMatches_loc = index.radiusSearch(query_pt, m_params.kd_tree_radius, ret_matches,
+            auto nMatches_loc = index.radiusSearch(query_pt, this->m_params.kd_tree_radius, ret_matches,
                 nanoflann::SearchParams());
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
                 std::size_t j = ret_matches[ic].first;
                 if (i < j)
-                { 
-                    compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                {
+                    compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
                     m_nMatches++;
                 }
             }
@@ -245,7 +227,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -266,6 +248,8 @@ namespace scopi
             // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
         }
         */
+
+        particles.reset_periodic();
 
         return contacts;
 

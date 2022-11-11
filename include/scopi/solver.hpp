@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 
+#include <CLI/CLI.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xfixed.hpp>
 
@@ -80,7 +81,7 @@ namespace scopi
     {
     private:
         /**
-         * @brief Alias for problem type. 
+         * @brief Alias for problem type.
          */
         using problem_t = typename optim_solver_t::problem_type;
     public:
@@ -88,6 +89,19 @@ namespace scopi
          * @brief Alias for the type of parameters class.
          */
         using params_t = Params<optim_solver_t, contact_t, vap_t>;
+
+        /**
+         * @brief Constructor.
+         *
+         * @param box used to apply periodic boundary conditions.
+         * @param particles "Array" of particles.
+         * @param dt Time step. It is fixed during the simulation.
+         * @param params Parameters for the different steps of the algorithm.
+         */
+        ScopiSolver(const BoxDomain<dim>& box,
+                    scopi_container<dim>& particles,
+                    double dt,
+                    const Params<optim_solver_t, contact_t, vap_t>& params = Params<optim_solver_t, contact_t, vap_t>());
 
         /**
          * @brief Constructor.
@@ -100,6 +114,8 @@ namespace scopi
                     double dt,
                     const Params<optim_solver_t, contact_t, vap_t>& params = Params<optim_solver_t, contact_t, vap_t>());
 
+        void init_options(CLI::App& app);
+
         /**
          * @brief Run the simulation.
          *
@@ -107,6 +123,11 @@ namespace scopi
          * @param initial_iter [in] Initial index of iteration. Used for restart or to change external parameters.
          */
         void run(std::size_t total_it, std::size_t initial_iter = 0);
+
+        /**
+         * @brief Return the parameters of the solver.
+         */
+        params_t& get_params();
 
     private:
         /**
@@ -153,6 +174,8 @@ namespace scopi
          */
         ScopiParams m_params;
 
+        BoxDomain<dim> m_box;
+
         /**
          * @brief Array of particles.
          */
@@ -162,7 +185,22 @@ namespace scopi
          * @brief Time step, fixed during the simulation.
          */
         double m_dt;
+
     };
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(const BoxDomain<dim>& box,
+                                                                    scopi_container<dim>& particles,
+                                                                    double dt,
+                                                                    const Params<optim_solver_t, contact_t, vap_t>& params)
+    : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
+    , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
+    , contact_t(params.contacts_params)
+    , m_params(params.scopi_params)
+    , m_box(box)
+    , m_particles(particles)
+    , m_dt(dt)
+    {}
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles,
@@ -172,6 +210,7 @@ namespace scopi
     , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
     , contact_t(params.contacts_params)
     , m_params(params.scopi_params)
+    , m_box()
     , m_particles(particles)
     , m_dt(dt)
     {}
@@ -188,7 +227,9 @@ namespace scopi
             auto contacts = compute_contacts();
             auto contacts_worms = compute_contacts_worms();
             if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
+            {
                 write_output_files(contacts, nite);
+            }
             this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
             this->extra_steps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
@@ -199,6 +240,20 @@ namespace scopi
             move_active_particles();
             update_velocity();
         }
+    }
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::init_options(CLI::App& app)
+    {
+        m_params.init_options(app);
+        contact_t::init_options(app);
+        optim_solver_t::init_options(app);
+    }
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    auto ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::get_params() -> params_t&
+    {
+        return m_params;
     }
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
@@ -234,7 +289,7 @@ namespace scopi
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
-        auto contacts = contact_t::run(m_particles, m_particles.nb_inactive());
+        auto contacts = contact_t::run(m_box, m_particles, m_particles.nb_inactive());
         PLOG_INFO << "contacts.size() = " << contacts.size() << std::endl;
         return contacts;
     }
@@ -263,20 +318,26 @@ namespace scopi
     void ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::write_output_files(const std::vector<neighbor<dim>>& contacts, std::size_t nite)
     {
         tic();
+
+        if (!std::filesystem::exists(m_params.path))
+        {
+            std::filesystem::create_directories(m_params.path);
+        }
+
         nl::json json_output;
 
-        std::ofstream file(fmt::format("{}{:04d}.json", m_params.filename, nite));
+        std::ofstream file(fmt::format("{}_{:04d}.json", (m_params.path / m_params.filename).string(), nite));
 
         json_output["objects"] = {};
 
-        for (std::size_t i = 0; i < m_particles.size(); ++i)
+        for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
         {
             json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i]));
         }
 
         if (m_params.write_velocity)
         {
-            for (std::size_t i = 0; i < m_particles.size(); ++i)
+            for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
             {
                 json_output["objects"][i]["velocity"] = m_particles.v()(i);
                 json_output["objects"][i]["rotationvelocity"] = m_particles.omega()(i);
@@ -332,6 +393,24 @@ namespace scopi
 
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
+
+            for (std::size_t d = 0; d < dim; ++d)
+            {
+                if (m_box.is_periodic(d))
+                {
+                    for (auto& p: m_particles.pos())
+                    {
+                        if (p[d] > m_box.upper_bound(d))
+                        {
+                            p[d] -= m_box.upper_bound(d) - m_box.lower_bound(d);
+                        }
+                        else if (p[d] < m_box.lower_bound(d))
+                        {
+                            p[d] += m_box.upper_bound(d) - m_box.lower_bound(d);
+                        }
+                    }
+                }
+            }
         }
 
         auto duration = toc();

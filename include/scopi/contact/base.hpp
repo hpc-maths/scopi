@@ -1,5 +1,7 @@
-#pragma once 
+#pragma once
 
+#include <CLI/CLI.hpp>
+#include "../box.hpp"
 #include "../container.hpp"
 #include "../objects/methods/closest_points.hpp"
 #include "../objects/methods/select.hpp"
@@ -19,11 +21,18 @@ namespace scopi
     class contact_base: public crtp_base<D>
     {
     public:
+        using params_t = ContactsParams<D>;
         /**
          * @brief Default constructor.
          */
-        contact_base() {}
+        contact_base(const params_t& params)
+        : m_params(params)
+        {}
 
+        void init_options(CLI::App& app)
+        {
+            m_params.init_options(app);
+        }
         /**
          * @brief Compute contacts between particles.
          *
@@ -34,14 +43,17 @@ namespace scopi
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        std::vector<neighbor<dim>> run(scopi_container<dim>& particles, std::size_t active_ptr);
+        std::vector<neighbor<dim>> run(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
+
+    protected:
+        params_t m_params;
     };
 
     template <class D>
     template <std::size_t dim>
-    std::vector<neighbor<dim>> contact_base<D>::run(scopi_container<dim>& particles, std::size_t active_ptr)
+    std::vector<neighbor<dim>> contact_base<D>::run(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
-        return this->derived_cast().run_impl(particles, active_ptr);
+        return this->derived_cast().run_impl(box, particles, active_ptr);
     }
 
     /**
@@ -55,15 +67,32 @@ namespace scopi
      * @param dmax [in] Maximum distance to consider two particles to be neighbors.
      */
     template <std::size_t dim>
-    void compute_exact_distance(scopi_container<dim>& particles, std::size_t i, std::size_t j, std::vector<neighbor<dim>>& contacts, double dmax)
+    void compute_exact_distance(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t i, std::size_t j, std::vector<neighbor<dim>>& contacts, double dmax)
     {
         std::size_t o1 = particles.object_index(i);
         std::size_t o2 = particles.object_index(j);
         auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*particles[o1], index(i-particles.offset(o1))),
                                                               *select_object_dispatcher<dim>::dispatch(*particles[o2], index(j-particles.offset(o2))));
-        if (neigh.dij < dmax) {
-            neigh.i = i;
-            neigh.j = j;
+
+        if (neigh.dij < dmax)
+        {
+            neigh.i = (i<particles.periodic_ptr())? i: particles.periodic_index(i - particles.periodic_ptr());
+            neigh.j = (j<particles.periodic_ptr())? j: particles.periodic_index(j - particles.periodic_ptr());
+
+            for(std::size_t d = 0; d < dim; ++d)
+            {
+                if(box.is_periodic(d))
+                {
+                    if (neigh.pi(d) > box.upper_bound(d))
+                    {
+                      neigh.pi(d) -= box.upper_bound(d) - box.lower_bound(d);
+                    }
+                    if (neigh.pj(d) > box.upper_bound(d))
+                    {
+                      neigh.pj(d) -= box.upper_bound(d) - box.lower_bound(d);
+                    }
+                }
+            }
             #pragma omp critical
             contacts.emplace_back(std::move(neigh));
         }

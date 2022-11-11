@@ -1,6 +1,8 @@
 #pragma once
 
 #include "base.hpp"
+#include "../box.hpp"
+#include "../utils.hpp"
 
 #include <cstddef>
 #include <locale>
@@ -18,18 +20,14 @@ namespace scopi
      * Specialization of ContactsParams.
      */
     template<>
-    struct ContactsParams<contact_brute_force> 
+    struct ContactsParams<contact_brute_force>
     {
         /**
          * @brief Default constructor.
          */
         ContactsParams();
-        /**
-         * @brief Copy constructor.
-         *
-         * @param params [in] Parameters to be copied.
-         */
-        ContactsParams(const ContactsParams<contact_brute_force>& params);
+
+        void init_options(CLI::App& app);
 
         /**
          * @brief Maximum distance between two neighboring particles.
@@ -72,30 +70,27 @@ namespace scopi
          * @param particles [in] Array of particles.
          * @param active_ptr [in] Index of the first active particle.
          *
-         * @return Array of neighbors. 
+         * @return Array of neighbors.
          */
         template <std::size_t dim>
-        std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
-
-    protected:
-        /**
-         * @brief Parameters.
-         */
-        ContactsParams<contact_brute_force> m_params;
+        std::vector<neighbor<dim>> run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
 
     };
 
     template <std::size_t dim>
-    std::vector<neighbor<dim>> contact_brute_force::run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
+    std::vector<neighbor<dim>> contact_brute_force::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
         std::vector<neighbor<dim>> contacts;
+
+        add_objects_from_periodicity(box, particles, this->m_params.dmax);
+
         tic();
         #pragma omp parallel for
         for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -104,7 +99,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, m_params.dmax);
+                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -115,6 +110,8 @@ namespace scopi
         sort_contacts(contacts);
         duration = toc();
         PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
+
+        particles.reset_periodic();
 
         return contacts;
 

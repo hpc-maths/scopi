@@ -3,16 +3,16 @@
 namespace scopi
 {
     contact_brute_force::contact_brute_force(const ContactsParams<contact_brute_force>& params)
-    : contact_base()
-    , m_params(params)
+    : contact_base(params)
     {}
 
     ContactsParams<contact_brute_force>::ContactsParams()
     : dmax(2.)
     {}
 
-    ContactsParams<contact_brute_force>::ContactsParams(const ContactsParams<contact_brute_force>& params)
-    : dmax(params.dmax)
-    {}
-
+    void ContactsParams<contact_brute_force>::init_options(CLI::App& app)
+    {
+        auto opt = app.add_option_group("Brute force contact options");
+        opt->add_option("--dmax", dmax, "Maximum distance between two neighboring particles")->capture_default_str();
+    }
 }

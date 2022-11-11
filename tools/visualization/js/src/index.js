@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
-import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min'
 
 let camera, scene, renderer;
 let container, controls, stats, gui, guiStatsEl;
@@ -10,7 +10,7 @@ var guiFrame;
 var clock = new THREE.Clock();
 
 var options = {
-    "refresh": 0.2,
+    "refresh": 0.01,
     "pause": true,
     "current_frame": 0,
 };
@@ -133,6 +133,12 @@ function drawObjects() {
 
             clean(scene);
 
+            const domain = new THREE.PlaneGeometry( 1, 1 );
+            const domain_material = new THREE.MeshBasicMaterial( {color: 0xffff00, tansparent: true} );
+            const domain_mesh = new THREE.Mesh( domain, domain_material );
+            domain_mesh.position.set(0.5, 0.5, 0);
+            scene.add(domain_mesh);
+
             var geometry = new THREE.SphereGeometry(1, 16, 16);
             const diffuseColor = new THREE.Color().setHSL(0., 0.5, 0.25);
             const material = new THREE.MeshPhysicalMaterial({ color: 'red', metalness: 0.5, roughness: 0., clearcoat: 0., clearcoatRoughness: 0., reflectivity: 0. });
@@ -181,7 +187,7 @@ function drawObjects() {
                         normal.z = obj.normal[2];
                         position.z = obj.position[2];
                     }
-                    const plane = new THREE.Plane( normal, - position.dot(normal)); 
+                    const plane = new THREE.Plane( normal, - position.dot(normal));
                     plane.normalize();
                     var canvasWidth = window.innerWidth;
                     const helper = new THREE.PlaneHelper( plane, canvasWidth, 'red' );
@@ -238,14 +244,14 @@ function drawObjects() {
             scene.add( line_mesh );
             */
 
-            guiStatsEl.innerHTML = [
+            // guiStatsEl.innerHTML = [
 
-                '<i>Number of objects</i>: ' + objects.length,
-                '<i>Number of contacts</i>: ' + contacts.length
+            //     '<i>Number of objects</i>: ' + objects.length,
+            //     '<i>Number of contacts</i>: ' + contacts.length
 
-            ].join('<br/>');
+            // ].join('<br/>');
 
-            // The X axis is red. The Y axis is green. The Z axis is blue. 
+            // The X axis is red. The Y axis is green. The Z axis is blue.
             // const axesHelper = new THREE.AxesHelper( 5 );
             // scene.add( axesHelper );
 
@@ -316,13 +322,13 @@ function init() {
     }
     gui.add(obj, 'reset').name("Reset camera");
 
-    const infoFolder = gui.addFolder('Informations');
+    // const infoFolder = gui.addFolder('Informations');
 
-    guiStatsEl = document.createElement('li');
-    guiStatsEl.classList.add('gui-stats');
+    // guiStatsEl = document.createElement('li');
+    // guiStatsEl.classList.add('gui-stats');
 
-    infoFolder.__ul.appendChild(guiStatsEl);
-    infoFolder.open();
+    // infoFolder.__ul.appendChild(guiStatsEl);
+    // infoFolder.open();
 }
 
 function onWindowResize() {
