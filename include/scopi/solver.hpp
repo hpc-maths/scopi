@@ -93,6 +93,19 @@ namespace scopi
         /**
          * @brief Constructor.
          *
+         * @param box used to apply periodic boundary conditions.
+         * @param particles "Array" of particles.
+         * @param dt Time step. It is fixed during the simulation.
+         * @param params Parameters for the different steps of the algorithm.
+         */
+        ScopiSolver(const BoxDomain<dim>& box,
+                    scopi_container<dim>& particles,
+                    double dt,
+                    const Params<optim_solver_t, contact_t, vap_t>& params = Params<optim_solver_t, contact_t, vap_t>());
+
+        /**
+         * @brief Constructor.
+         *
          * @param particles "Array" of particles.
          * @param dt Time step. It is fixed during the simulation.
          * @param params Parameters for the different steps of the algorithm.
@@ -161,6 +174,8 @@ namespace scopi
          */
         ScopiParams m_params;
 
+        BoxDomain<dim> m_box;
+
         /**
          * @brief Array of particles.
          */
@@ -170,7 +185,22 @@ namespace scopi
          * @brief Time step, fixed during the simulation.
          */
         double m_dt;
+
     };
+
+    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
+    ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(const BoxDomain<dim>& box,
+                                                                    scopi_container<dim>& particles,
+                                                                    double dt,
+                                                                    const Params<optim_solver_t, contact_t, vap_t>& params)
+    : optim_solver_t(particles.nb_active(), dt, particles, params.optim_params, params.problem_params)
+    , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
+    , contact_t(params.contacts_params)
+    , m_params(params.scopi_params)
+    , m_box(box)
+    , m_particles(particles)
+    , m_dt(dt)
+    {}
 
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::ScopiSolver(scopi_container<dim>& particles,
@@ -180,6 +210,7 @@ namespace scopi
     , vap_t(particles.nb_active(), particles.nb_inactive(), particles.size(), dt, params.vap_params)
     , contact_t(params.contacts_params)
     , m_params(params.scopi_params)
+    , m_box()
     , m_particles(particles)
     , m_dt(dt)
     {}
@@ -258,7 +289,7 @@ namespace scopi
     template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
     std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
-        auto contacts = contact_t::run(m_particles, m_particles.nb_inactive());
+        auto contacts = contact_t::run(m_box, m_particles, m_particles.nb_inactive());
         PLOG_INFO << "contacts.size() = " << contacts.size() << std::endl;
         return contacts;
     }
@@ -363,15 +394,21 @@ namespace scopi
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
 
-            for (auto& p: m_particles.pos())
+            for (std::size_t d = 0; d < dim; ++d)
             {
-                if (p[0] > 1.)
+                if (m_box.is_periodic(d))
                 {
-                    p[0] -= 1.;
-                }
-                else if (p[0] < 0.)
-                {
-                    p[0] += 1.;
+                    for (auto& p: m_particles.pos())
+                    {
+                        if (p[d] > m_box.upper_bound(d))
+                        {
+                            p[d] -= m_box.upper_bound(d) - m_box.lower_bound(d);
+                        }
+                        else if (p[d] < m_box.lower_bound(d))
+                        {
+                            p[d] += m_box.upper_bound(d) - m_box.lower_bound(d);
+                        }
+                    }
                 }
             }
         }

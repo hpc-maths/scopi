@@ -42,7 +42,7 @@ double toc();
  * @param ry
  * @param e
  *
- * @return 
+ * @return
  */
 std::vector<double> create_binit(std::vector<double> binit, int n,
   double theta_g, double theta_d, double rx, double ry, double e);
@@ -71,7 +71,7 @@ template<typename F, typename DF, typename U, typename A>
  * @param ftol
  * @param xtol
  *
- * @return 
+ * @return
  */
 auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double ftol, const double xtol){
   // std::cout << "newton_method : u0 = " << u0 << std::endl;
@@ -156,7 +156,7 @@ namespace scopi
         }
     }
     /**
-     * @brief 
+     * @brief
      *
      * \todo Write documentation.
      *
@@ -164,7 +164,7 @@ namespace scopi
      * @tparam E
      * @param e
      *
-     * @return 
+     * @return
      */
     template <std::size_t dim, class E>
     auto cross_product(const E& e)
@@ -190,4 +190,32 @@ namespace scopi
      * @return  w
      */
     const xt::xtensor_fixed<double, xt::xshape<3>>& get_omega(const xt::xtensor_fixed<double, xt::xshape<3>>& w);
+
+
+    template<std::size_t dim>
+    class BoxDomain;
+
+    template<std::size_t dim>
+    class scopi_container;
+
+    template<std::size_t dim>
+    void add_objects_from_periodicity(const BoxDomain<dim>& box, scopi_container<dim>& particles, double dmax)
+    {
+        for (std::size_t d = 0; d < dim; ++d)
+        {
+            if (box.is_periodic(d))
+            {
+                for (std::size_t ip = 0; ip < particles.size(false); ++ip)
+                {
+                    auto& pos = particles.pos()[ip];
+                    if (pos[d] - dmax < box.lower_bound(d))
+                    {
+                        auto new_pos = pos;
+                        new_pos[d] += box.upper_bound(d) - box.lower_bound(d);
+                        particles.push_back(ip, new_pos);
+                    }
+                }
+            }
+        }
+    }
 }

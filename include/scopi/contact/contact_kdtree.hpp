@@ -1,6 +1,8 @@
 #pragma once
 
 #include "base.hpp"
+#include "../box.hpp"
+#include "../utils.hpp"
 #include <CLI/CLI.hpp>
 
 #include <cstddef>
@@ -154,7 +156,7 @@ namespace scopi
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
+        std::vector<neighbor<dim>> run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
 
     private:
         /**
@@ -164,26 +166,13 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    std::vector<neighbor<dim>> contact_kdtree::run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
+    std::vector<neighbor<dim>> contact_kdtree::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
         // std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
 
         std::vector<neighbor<dim>> contacts;
-        // double dmax = 2;
 
-        std::size_t ip = 0;
-        for (auto& p: particles.pos())
-        {
-            // if (p[0] + this->m_params.dmax > 1.)
-            // {
-            //     particles.push_back(ip, {{p[0] - 1, p[1]}});
-            // }
-            if (p[0] - this->m_params.dmax < 0.)
-            {
-                particles.push_back(ip, {{p[0] + 1, p[1]}});
-            }
-            ip++;
-        }
+        add_objects_from_periodicity(box, particles, this->m_params.dmax);
 
         // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
         tic();
@@ -205,17 +194,6 @@ namespace scopi
 
         for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
         {
-            // for (std::size_t j = i + 1; j < particles.size(); ++j)
-            // {
-            //     auto neigh = closest_points_dispatcher<dim>::dispatch(*particles[i], *particles[j]);
-            //     if (neigh.dij < dmax)
-            //     {
-            //         contacts.emplace_back(std::move(neigh));
-            //         contacts.back().i = i;
-            //         contacts.back().j = j;
-            //     }
-            // }
-
             double query_pt[dim];
             for (std::size_t d = 0; d < dim; ++d)
             {
@@ -238,7 +216,7 @@ namespace scopi
                 std::size_t j = ret_matches[ic].first;
                 if (i < j)
                 {
-                    compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
+                    compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
                     m_nMatches++;
                 }
             }
@@ -249,7 +227,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 

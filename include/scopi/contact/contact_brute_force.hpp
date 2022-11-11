@@ -1,6 +1,8 @@
 #pragma once
 
 #include "base.hpp"
+#include "../box.hpp"
+#include "../utils.hpp"
 
 #include <cstddef>
 #include <locale>
@@ -71,21 +73,24 @@ namespace scopi
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        std::vector<neighbor<dim>> run_impl(scopi_container<dim>& particles, std::size_t active_ptr);
+        std::vector<neighbor<dim>> run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
 
     };
 
     template <std::size_t dim>
-    std::vector<neighbor<dim>> contact_brute_force::run_impl(scopi_container<dim>& particles, std::size_t active_ptr)
+    std::vector<neighbor<dim>> contact_brute_force::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
         std::vector<neighbor<dim>> contacts;
+
+        add_objects_from_periodicity(box, particles, this->m_params.dmax);
+
         tic();
         #pragma omp parallel for
         for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -94,7 +99,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -105,6 +110,8 @@ namespace scopi
         sort_contacts(contacts);
         duration = toc();
         PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
+
+        particles.reset_periodic();
 
         return contacts;
 

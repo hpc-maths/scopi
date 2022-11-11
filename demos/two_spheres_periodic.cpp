@@ -4,6 +4,7 @@
 #include <xtensor/xview.hpp>
 #include <xtensor/xmasked_view.hpp>
 
+#include <scopi/box.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/property.hpp>
@@ -27,7 +28,8 @@ int main(int argc, char **argv)
     particles.push_back(s1, scopi::property<dim>().desired_velocity({{vel, 0}}).mass(1.).moment_inertia(0.1));
     particles.push_back(s2, scopi::property<dim>().desired_velocity({{-vel, 0}}).mass(1.).moment_inertia(0.1));
 
-    scopi::ScopiSolver<dim> solver(particles, dt);
+    auto domain = scopi::BoxDomain<dim>({0, 0}, {1, 1}).with_periodicity(0);
+    scopi::ScopiSolver<dim> solver(domain, particles, dt);
     solver.init_options(app);
     CLI11_PARSE(app, argc, argv);
     solver.run(total_it);
