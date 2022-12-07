@@ -198,7 +198,6 @@ namespace scopi
             for (std::size_t d = 0; d < dim; ++d)
             {
                 query_pt[d] = particles.pos()(i)(d);
-                // query_pt[d] = particles.pos()(i)(d);
             }
             PLOG_INFO << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 

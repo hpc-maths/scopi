@@ -205,7 +205,7 @@ namespace scopi
         {
             if (box.is_periodic(d))
             {
-                for (std::size_t ip = 0; ip < particles.size(false); ++ip)
+                for (std::size_t ip = 0; ip < particles.periodic_ptr(); ++ip)
                 {
                     auto& pos = particles.pos()[ip];
                     if (pos[d] - dmax < box.lower_bound(d))

@@ -10,6 +10,7 @@ set(SCOPI_EXAMPLES
    viscosity.cpp
    two_spheres_viscosity.cpp
    two_worms.cpp
+   two_worms_periodic.cpp
    convergence_scheme.cpp
    box_spheres_3d.cpp
    pile_of_sand_spheres.cpp

@@ -11,6 +11,7 @@
 #include <xtensor/xadapt.hpp>
 
 #include "objects/types/base.hpp"
+#include "objects/methods/select.hpp"
 #include "types.hpp"
 #include "property.hpp"
 #include "crtp.hpp"
@@ -377,7 +378,9 @@ namespace scopi
     {
         assert(i >= 0 && i < m_positions.size());
         m_periodic_added = true;
-        m_offset.push_back(m_offset.back() + m_offset[i+1] - m_offset[i]);
+        auto id = object_index(i);
+
+        m_offset.push_back(m_offset.back() + 1);
 
         m_positions.push_back(pos);
         m_quaternions.push_back(m_quaternions[i]);
@@ -389,7 +392,15 @@ namespace scopi
         m_masses.push_back(m_masses[i]);
         m_moments_inertia.push_back(m_moments_inertia[i]);
 
-        m_shapes_id.push_back(m_shapes_id[i]);
+        auto obj = select_object_dispatcher<dim>::dispatch(*operator[](id), i - m_offset[id]);
+
+        auto it = m_shape_map.find(obj->hash());
+        if (it == m_shape_map.end())
+        {
+            m_shape_map.insert(std::make_pair(obj->hash(), std::move(obj->construct())));
+        }
+
+        m_shapes_id.push_back(obj->hash());
 
         m_periodic_indices.push_back(i);
     }
@@ -406,14 +417,12 @@ namespace scopi
         m_forces.reserve(size);
         m_masses.reserve(size);
         m_moments_inertia.reserve(size);
-        m_offset.reserve(size+1);
-        m_shapes_id.reserve(size);
     }
 
     template<std::size_t dim>
     std::size_t scopi_container<dim>::size(bool with_periodic) const
     {
-        return m_shapes_id.size() - ((with_periodic) ? 0 : m_periodic_indices.size());
+        return (with_periodic) ? m_shapes_id.size(): object_index(m_periodic_ptr) + 1;
     }
 
     template<std::size_t dim>
@@ -568,11 +577,11 @@ namespace scopi
         m_forces.resize(size);
         m_masses.resize(size);
         m_moments_inertia.resize(size);
-        m_offset.resize(size+1);
-        m_shapes_id.resize(size);
+        auto nb_object = object_index(m_periodic_ptr);
+        m_offset.resize(nb_object+1);
+        m_shapes_id.resize(nb_object);
 
         m_periodic_added = false;
-        m_periodic_ptr = size;
     }
 
     template<std::size_t dim>
