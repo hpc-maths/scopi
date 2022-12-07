@@ -68,7 +68,7 @@ namespace scopi
         /**
          * @brief Alias for the problem.
          */
-        using problem_type = problem_t; 
+        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimBase
@@ -102,14 +102,12 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
          * @return Number of iterations SCS' solver needed to converge.
          */
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts, 
-                                            const std::vector<neighbor<dim>>& contacts_worms);
+                                            const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
@@ -189,7 +187,7 @@ namespace scopi
          * @param index [in] Index of the first row with moments.
          */
         void set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
-        
+
 
         /**
          * @brief SCS' data structure for the matrix \f$ \mathbb{P} \f$.
@@ -256,7 +254,7 @@ namespace scopi
          */
         ScsInfo m_info;
         /**
-         * @brief Struct containing all settings. 
+         * @brief Struct containing all settings.
          */
         ScsSettings m_stgs;
     };
@@ -264,11 +262,10 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     int OptimScs<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                             const std::vector<neighbor<dim>>& contacts,
-                                                             const std::vector<neighbor<dim>>& contacts_worms)
+                                                             const std::vector<neighbor<dim>>& contacts)
     {
         tic();
-        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, 0);
+        this->create_matrix_constraint_coo(particles, contacts, 0);
         // COO storage to CSR storage is easy to write
         // The CSC storage of A is the CSR storage of A^T
         // reverse the role of row and column pointers to have the transpose

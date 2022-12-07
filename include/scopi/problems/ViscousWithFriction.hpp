@@ -78,10 +78,10 @@ namespace scopi
      *
      * For each contact \f$ ij \f$, \f$ \gamma_{ij} \f$ verifies
      * - \f$ \gamma_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right) \f$ else. 
+     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right) \f$ else.
      *
      * \f$ \mathbf{\lambda}^+ \f$ (resp. \f$ \mathbf{\lambda}^- \f$) is the Lagrange multiplier associated with the constraint \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0 \f$ (resp. \f$ -\mathbf{d} - \mathbb{B} \mathbf{u} \ge 0 \f$).
-     * By convention, \f$ \mathbf{\lambda}^+ \ge 0 \f$ and \f$ \mathbf{\lambda}^- \ge 0 \f$. 
+     * By convention, \f$ \mathbf{\lambda}^+ \ge 0 \f$ and \f$ \mathbf{\lambda}^- \ge 0 \f$.
      *
      * Only one matrix is built.
      * See \c create_vector_distances for the order of the rows of the matrix.
@@ -118,24 +118,20 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other problems).
          * @param firstCol [in] Index of the first column (solver-dependent).
          */
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
-                                          const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
         /**
          * @brief Get the number of rows in the matrix.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          *
          * @return Number of rows in the matrix.
          */
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                      const std::vector<neighbor<dim>>& contacts_worms);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Create vector \f$ \mathbf{d} \f$.
          *
@@ -151,10 +147,8 @@ namespace scopi
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          */
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
-                                     const std::vector<neighbor<dim>>& contacts_worms);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
         /**
          * @brief Returns the number of contacts \f$ ij \f$ with \f$ \gamma_{ij} < \gamma_{\min} \f$.
@@ -243,11 +237,10 @@ namespace scopi
     template<std::size_t dim>
     void ViscousWithFriction<dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                                 const std::vector<neighbor<dim>>& contacts,
-                                                                const std::vector<neighbor<dim>>& contacts_worms,
                                                                 std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t size = 6 * this->number_row_matrix(contacts, contacts_worms);
+        std::size_t size = 6 * this->number_row_matrix(contacts);
         this->m_A_rows.resize(size);
         this->m_A_cols.resize(size);
         this->m_A_values.resize(size);
@@ -529,7 +522,7 @@ namespace scopi
                 {
                     m_lambda[ic] = + xt::linalg::dot(xt::view(u, contacts[ic].j, xt::range(_, dim)) - particles.v()(contacts[ic].j), contacts[ic].nij)(0)/this->m_dt;
                 }
-                ind_gamma_min++; 
+                ind_gamma_min++;
             }
         }
     }
@@ -555,15 +548,13 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t ViscousWithFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts, 
-                                                            const std::vector<neighbor<dim>>&)
+    std::size_t ViscousWithFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
         return contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min;
     }
 
     template<std::size_t dim>
-    void ViscousWithFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts,
-                                                           const std::vector<neighbor<dim>>&)
+    void ViscousWithFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         this->m_distances = xt::zeros<double>({contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min});
         std::size_t index_dry = 0;

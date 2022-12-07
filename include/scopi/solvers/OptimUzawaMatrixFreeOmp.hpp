@@ -45,7 +45,7 @@ namespace scopi{
         /**
          * @brief Alias for the problem.
          */
-        using problem_type = problem_t; 
+        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimUzawaBase.
@@ -112,8 +112,7 @@ namespace scopi{
          */
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
-                             const std::vector<neighbor<dim>>& contacts,
-                             const std::vector<neighbor<dim>>& contacts_worms);
+                             const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief For compatibility with other methods to compute matrix-vector products.
          */
@@ -124,7 +123,6 @@ namespace scopi{
     template <class problem_t>
     template <std::size_t dim>
     void OptimUzawaMatrixFreeOmp<problem_t>::init_uzawa_impl(const scopi_container<dim>&,
-                                                             const std::vector<neighbor<dim>>&,
                                                              const std::vector<neighbor<dim>>&)
     {}
 

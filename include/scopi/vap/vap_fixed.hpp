@@ -7,7 +7,7 @@
 namespace scopi
 {
     class vap_fixed;
-     
+
     /**
      * @brief Parameters for vap_fixed.
      *
@@ -35,11 +35,10 @@ namespace scopi
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [out] Array of particles.
-         * @param contacts_pos [in] Array of neighbors with positive distance.
-         * @param contacts_neg [in] Array of neighbors with negative distance.
+         * @param contacts [in] Array of contacts.
          */
         template <std::size_t dim>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts_pos, const std::vector<neighbor<dim>>& contacts_neg);
+        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts);
 
         /**
          * @brief Constructor.
@@ -55,6 +54,8 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&, const std::vector<neighbor<dim>>&, const std::vector<neighbor<dim>>&)
-    {}
+    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&, const std::vector<neighbor<dim>>&)
+    {
+
+    }
 }

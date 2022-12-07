@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "../container.hpp"
 #include "../utils.hpp"
@@ -22,11 +22,10 @@ namespace scopi
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [out] Array of particles.
-         * @param contacts_pos [in] Array of neighbors with positive distance.
-         * @param contacts_neg [in] Array of neighbors with negative distance.
+         * @param contacts [in] Array of contacts.
          */
         template <std::size_t dim>
-        void set_a_priori_velocity(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts_pos, const std::vector<neighbor<dim>>& contacts_neg);
+        void set_a_priori_velocity(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Constructor.
          *
@@ -61,10 +60,10 @@ namespace scopi
 
     template <class D>
     template <std::size_t dim>
-    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts_pos, const std::vector<neighbor<dim>>& contacts_neg)
+    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts)
     {
         tic();
-        this->derived_cast().set_a_priori_velocity_impl(particles, contacts_pos, contacts_neg);
+        this->derived_cast().set_a_priori_velocity_impl(particles, contacts);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : set vap = " << duration;
     }
