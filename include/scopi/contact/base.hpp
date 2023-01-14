@@ -5,6 +5,7 @@
 #include "../container.hpp"
 #include "../objects/methods/closest_points.hpp"
 #include "../objects/methods/select.hpp"
+#include "../objects/methods/write_objects.hpp"
 #include "../objects/neighbor.hpp"
 #include "../params.hpp"
 #include <cstddef>
@@ -74,7 +75,7 @@ namespace scopi
         auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*particles[o1], index(i-particles.offset(o1))),
                                                               *select_object_dispatcher<dim>::dispatch(*particles[o2], index(j-particles.offset(o2))));
 
-        if (neigh.dij < dmax)
+        if (neigh.dij < dmax && (i < particles.periodic_ptr() || j < particles.periodic_ptr()))
         {
             neigh.i = (i<particles.periodic_ptr())? i: particles.periodic_index(i - particles.periodic_ptr());
             neigh.j = (j<particles.periodic_ptr())? j: particles.periodic_index(j - particles.periodic_ptr());
@@ -83,11 +84,11 @@ namespace scopi
             {
                 if(box.is_periodic(d))
                 {
-                    if (neigh.pi(d) > box.upper_bound(d))
+                    if (neigh.pi(d) > box.upper_bound(d) && i>=particles.periodic_ptr())
                     {
                       neigh.pi(d) -= box.upper_bound(d) - box.lower_bound(d);
                     }
-                    if (neigh.pj(d) > box.upper_bound(d))
+                    if (neigh.pj(d) > box.upper_bound(d) && j>=particles.periodic_ptr())
                     {
                       neigh.pj(d) -= box.upper_bound(d) - box.lower_bound(d);
                     }

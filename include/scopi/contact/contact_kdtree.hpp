@@ -240,14 +240,6 @@ namespace scopi
         duration = toc();
         PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
 
-        /*
-        for (std::size_t ic=0; ic<contacts.size(); ++ic)
-        {
-            std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
-            // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
-        }
-        */
-
         particles.reset_periodic();
 
         return contacts;

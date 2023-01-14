@@ -26,7 +26,7 @@ namespace scopi
      * See neighbor.hpp.
      *
      * @tparam dim Dimension (2 or 3).
-     * @tparam owner 
+     * @tparam owner
      * @param si [in] Sphere \c i.
      * @param sj [in] Sphere \c j.
      *
@@ -54,7 +54,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param s1 [in] Superellipsoid \c i.
      * @param s2 [in] Superellipsoid \c j.
      *
@@ -251,7 +251,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param s1 [in] Superellipsoid \c i.
      * @param s2 [in] Superellipsod \c j.
      *
@@ -718,7 +718,7 @@ namespace scopi
      * @param p1 [in] Plane \c i.
      * @param p2 [in] Plane \c j.
      *
-     * @return 
+     * @return
      * @return Neighbor struct for contact between plane \c i and plane \c j.
      */
     template<std::size_t dim, bool owner>
@@ -734,7 +734,7 @@ namespace scopi
      * See neighbor.hpp.
      *
      * @tparam dim Dimension (2 or 3).
-     * @tparam owner 
+     * @tparam owner
      * @param s [in] Sphere \c i.
      * @param p [in] Plane \c j.
      *
@@ -768,7 +768,7 @@ namespace scopi
      * See neighbor.hpp.
      *
      * @tparam dim Dimension (2 or 3).
-     * @tparam owner 
+     * @tparam owner
      * @param p [in] Plane \c i.
      * @param s [in] Sphere \c j.
      *
@@ -789,7 +789,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param s2 [in] Sphere \c i.
      * @param s1 [in] Superellipsoid \c j.
      *
@@ -1126,7 +1126,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param s2 [in] Superellipsoid \c i.
      * @param s1 [in] Sphere \c j.
      *
@@ -1146,7 +1146,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param s2 [in] Sphere \c i.
      * @param s1 [in] Superellipsoid \c j.
      *
@@ -1295,7 +1295,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param superellipsoid [in] Superellipsoid \c i.
      * @param sphere [in] Sphere \c j.
      *
@@ -1316,7 +1316,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param s1 [in] Superellipsoid \c i.
      * @param p2 [in] Plane \c j.
      *
@@ -1606,7 +1606,7 @@ namespace scopi
      * See neighbor.hpp.
      *
      * @tparam dim Dimension (2 or 3).
-     * @tparam owner 
+     * @tparam owner
      * @param p2 [in] Plane \c i.
      * @param s1 [in] Superellipsoid \c j.
      *
@@ -1626,7 +1626,7 @@ namespace scopi
      *
      * See neighbor.hpp.
      *
-     * @tparam owner 
+     * @tparam owner
      * @param s1 [in] Superellipsoid \c i.
      * @param d2 [in] Plane \c j.
      *
@@ -1792,7 +1792,7 @@ namespace scopi
      * See neighbor.hpp.
      *
      * @tparam dim Dimension (2 or 3).
-     * @tparam owner 
+     * @tparam owner
      * @param d2 [in] Plane \c i.
      * @param s1 [in] Superellipsoid \c j.
      *
@@ -1809,7 +1809,7 @@ namespace scopi
     }
 
     /**
-     * @brief 
+     * @brief
      *
      * TODO
      *
@@ -1823,7 +1823,7 @@ namespace scopi
          */
         using return_type = neighbor<dim>;
         /**
-         * @brief 
+         * @brief
          *
          * TODO
          *
@@ -1832,7 +1832,7 @@ namespace scopi
          * @param obj1
          * @param obj2
          *
-         * @return 
+         * @return
          */
         template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2) const
@@ -1840,7 +1840,7 @@ namespace scopi
             return closest_points(obj1, obj2);
         }
         /**
-         * @brief 
+         * @brief
          *
          * TODO
          *
@@ -1851,7 +1851,7 @@ namespace scopi
          * @param i1
          * @param i2
          *
-         * @return 
+         * @return
          */
         template <class T1, class T2>
         return_type run(const T1& obj1, const T2& obj2, std::size_t i1, std::size_t i2) const
@@ -1859,14 +1859,14 @@ namespace scopi
             return closest_points(obj1, obj2, i1, i2);
         }
         /**
-         * @brief 
+         * @brief
          *
          * TODO
          *
          * @param object
          * @param object
          *
-         * @return 
+         * @return
          */
          return_type on_error(const object<dim, false>&, const object<dim, false>&) const
         {
@@ -1875,7 +1875,7 @@ namespace scopi
     };
 
     /**
-     * @brief 
+     * @brief
      *
      * TODO
      *

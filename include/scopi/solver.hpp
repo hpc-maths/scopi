@@ -271,7 +271,6 @@ namespace scopi
             }
             m_particles.q()(i) = mult_quaternion(m_particles.q()(i), expw);
             normalize(m_particles.q()(i));
-            // std::cout << "obstacle " << i << ": " << m_particles.pos()(0) << " " << m_particles.q()(0) << std::endl;
         }
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
@@ -305,14 +304,14 @@ namespace scopi
 
         json_output["objects"] = {};
 
-        for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
+        for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
             json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i]));
         }
 
         if (m_params.write_velocity)
         {
-            for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
+            for (std::size_t i = 0; i < m_particles.size(); ++i)
             {
                 json_output["objects"][i]["velocity"] = m_particles.v()(i);
                 json_output["objects"][i]["rotationvelocity"] = m_particles.omega()(i);
@@ -325,6 +324,8 @@ namespace scopi
         {
             nl::json contact;
 
+            contact["i"] = contacts[i].i;
+            contact["j"] = contacts[i].j;
             contact["pi"] = contacts[i].pi;
             contact["pj"] = contacts[i].pj;
             contact["nij"] = contacts[i].nij;
@@ -368,26 +369,49 @@ namespace scopi
 
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
+        }
 
+        for (std::size_t io=0; io < m_particles.size(); ++io)
+        {
             for (std::size_t d = 0; d < dim; ++d)
             {
                 if (m_box.is_periodic(d))
                 {
-                    for (auto& p: m_particles.pos())
+                    std::size_t plus = 0;
+                    std::size_t minus = 0;
+                    for (std::size_t offset = m_particles.offset(io); offset < m_particles.offset(io+1); ++offset)
                     {
+                        auto& p = m_particles.pos()[offset];
                         if (p[d] > m_box.upper_bound(d))
                         {
+                            plus++;
+                        }
+                        if (p[d] < m_box.lower_bound(d))
+                        {
+                            minus++;
+                        }
+                    }
+
+                    auto object_size = m_particles.offset(io+1) - m_particles.offset(io);
+                    if (plus == object_size)
+                    {
+                        for (std::size_t offset = m_particles.offset(io); offset < m_particles.offset(io+1); ++offset)
+                        {
+                            auto& p = m_particles.pos()[offset];
                             p[d] -= m_box.upper_bound(d) - m_box.lower_bound(d);
                         }
-                        else if (p[d] < m_box.lower_bound(d))
+                    }
+                    if (minus == object_size)
+                    {
+                        for (std::size_t offset = m_particles.offset(io); offset < m_particles.offset(io+1); ++offset)
                         {
+                            auto& p = m_particles.pos()[offset];
                             p[d] += m_box.upper_bound(d) - m_box.lower_bound(d);
                         }
                     }
                 }
             }
         }
-
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
     }
