@@ -55,7 +55,7 @@ namespace scopi
      * @brief Problem that models contacts without friction and with viscosity.
      *
      * See ProblemBase for the notations.
-     * The constraint is 
+     * The constraint is
      * \f[
      *      \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0,
      * \f]
@@ -67,10 +67,10 @@ namespace scopi
      *
      * For each contact \f$ ij \f$, \f$ \gamma_{ij} \f$ verifies
      * - \f$ \gamma_{ij} = 0 \f$ if particles \c i and \c j are not in contact;
-     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right) \f$ else. 
+     * - \f$ \frac{\mathrm{d} \gamma_{ij}}{\mathrm{d} t} = - \left( \mathbf{\lambda}_{ij}^+ - \mathbf{\lambda}_{ij}^- \right) \f$ else.
      *
      * \f$ \mathbf{\lambda}^+ \f$ (resp. \f$ \mathbf{\lambda}^- \f$) is the Lagrange multiplier associated with the constraint \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0 \f$ (resp. \f$ -\mathbf{d} - \mathbb{B} \mathbf{u} \ge 0 \f$).
-     * By convention, \f$ \mathbf{\lambda}^+ \ge 0 \f$ and \f$ \mathbf{\lambda}^- \ge 0 \f$. 
+     * By convention, \f$ \mathbf{\lambda}^+ \ge 0 \f$ and \f$ \mathbf{\lambda}^- \ge 0 \f$.
      *
      * @tparam dim Dimension (2 or 3).
      */
@@ -96,24 +96,20 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          * @param firstCol [in] Index of the first column (solver-dependent).
          */
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
-                                          const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
         /**
          * @brief Get the number of rows in the matrix.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          *
          * @return Number of rows in the matrix.
          */
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                      const std::vector<neighbor<dim>>& contacts_worms);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Create vector \f$ \mathbf{d} \f$.
          *
@@ -121,10 +117,8 @@ namespace scopi
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          */
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts,
-                                     const std::vector<neighbor<dim>>& contacts_worms);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
         /**
          * @brief Matrix-free product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
@@ -200,11 +194,10 @@ namespace scopi
     template<std::size_t dim>
     void ViscousWithoutFriction<dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                                    const std::vector<neighbor<dim>>& contacts,
-                                                                   const std::vector<neighbor<dim>>& contacts_worms,
                                                                    std::size_t firstCol)
     {
         std::size_t active_offset = particles.nb_inactive();
-        matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 1);
+        matrix_positive_distance(particles, contacts, firstCol, 1);
         std::size_t ic = 0;
         for (auto &c: contacts)
         {
@@ -325,15 +318,13 @@ namespace scopi
 
 
     template<std::size_t dim>
-    std::size_t ViscousWithoutFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                                               const std::vector<neighbor<dim>>&)
+    std::size_t ViscousWithoutFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
     {
         return contacts.size() + this->m_nb_gamma_neg;
     }
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts,
-                                                              const std::vector<neighbor<dim>>&)
+    void ViscousWithoutFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         this->m_distances = xt::zeros<double>({contacts.size() + this->m_nb_gamma_neg});
         for (std::size_t i = 0; i < contacts.size(); ++i)

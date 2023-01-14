@@ -24,36 +24,36 @@ namespace scopi
     {
     private:
 
-        template <class lhs_type>
-        static return_type invoke_executor(lhs_type& lhs)
+        template <class lhs_type, class... Args>
+        static return_type invoke_executor(lhs_type& lhs, Args&&... args)
         {
             executor exec;
-            return exec.run(lhs);
+            return exec.run(lhs, std::forward<Args>(args)...);
         }
 
-        static return_type dispatch_lhs(base_lhs& lhs,
-                                        mpl::vector<>)
+        template <class... Args>
+        static return_type dispatch_lhs(base_lhs& lhs, mpl::vector<>, Args&&... args)
         {
             executor exec;
-            return exec.on_error(lhs);
+            return exec.on_error(lhs, std::forward<Args>(args)...);
         }
 
-        template <class T, class... U>
-        static return_type dispatch_lhs(base_lhs& lhs,
-                                        mpl::vector<T, U...>)
+        template <class T, class... U, class... Args>
+        static return_type dispatch_lhs(base_lhs& lhs, mpl::vector<T, U...>, Args&&... args)
         {
             if (T* p = dynamic_cast<T*>(&lhs))
             {
-                return invoke_executor(*p);
+                return invoke_executor(*p, std::forward<Args>(args)...);
             }
-            return dispatch_lhs(lhs, mpl::vector<U...>());
+            return dispatch_lhs(lhs, mpl::vector<U...>(), std::forward<Args>(args)...);
         }
 
     public:
 
-        static return_type dispatch(base_lhs& lhs)
+        template <class... Args>
+        static return_type dispatch(base_lhs& lhs, Args&&... args)
         {
-            return dispatch_lhs(lhs, lhs_type_list());
+            return dispatch_lhs(lhs, lhs_type_list(), std::forward<Args>(args)...);
         }
     };
 
@@ -71,37 +71,41 @@ namespace scopi
     {
     private:
 
-        template <class lhs_type, class rhs_type>
+        template <class lhs_type, class rhs_type, class... Args>
         static return_type invoke_executor(lhs_type& lhs,
                                            rhs_type& rhs,
-                                           std::false_type)
+                                           std::false_type,
+                                           Args&&... args)
         {
             executor exec;
-            return exec.run(lhs, rhs);
+            return exec.run(lhs, rhs, std::forward<Args>(args)...);
         }
 
-        template <class lhs_type, class rhs_type>
+        template <class lhs_type, class rhs_type, class... Args>
         static return_type invoke_executor(lhs_type& lhs,
                                            rhs_type& rhs,
-                                           std::true_type)
+                                           std::true_type,
+                                           Args&&... args)
         {
             executor exec;
-            return exec.run(rhs, lhs);
+            return exec.run(rhs, lhs, std::forward<Args>(args)...);
         }
 
-        template <class lhs_type>
+        template <class lhs_type, class... Args>
         static return_type dispatch_rhs(lhs_type& lhs,
                                         base_rhs& rhs,
-                                        mpl::vector<>)
+                                        mpl::vector<>,
+                                        Args&&... args)
         {
             executor exec;
-            return exec.on_error(lhs, rhs);
+            return exec.on_error(lhs, rhs, std::forward<Args>(args)...);
         }
 
-        template <class lhs_type, class T, class... U>
+        template <class lhs_type, class T, class... U, class... Args>
         static return_type dispatch_rhs(lhs_type& lhs,
                                         base_rhs& rhs,
-                                        mpl::vector<T, U...>)
+                                        mpl::vector<T, U...>,
+                                        Args&&... args)
         {
             if (T* p = dynamic_cast<T*>(&rhs))
             {
@@ -110,36 +114,40 @@ namespace scopi
 
                 using invoke_flag = std::integral_constant<bool,
                     std::is_same<symmetric, symmetric_dispatch>::value && (rhs_index < lhs_index)>;
-                return invoke_executor(lhs, *p, invoke_flag());
+                return invoke_executor(lhs, *p, invoke_flag(), std::forward<Args>(args)...);
             }
-            return dispatch_rhs(lhs, rhs, mpl::vector<U...>());
+            return dispatch_rhs(lhs, rhs, mpl::vector<U...>(), std::forward<Args>(args)...);
         }
 
+        template <class... Args>
         static return_type dispatch_lhs(base_lhs& lhs,
                                         base_rhs& rhs,
-                                        mpl::vector<>)
+                                        mpl::vector<>,
+                                        Args&&... args)
         {
             executor exec;
-            return exec.on_error(lhs, rhs);
+            return exec.on_error(lhs, rhs, std::forward<Args>(args)...);
         }
 
-        template <class T, class... U>
+        template <class T, class... U, class... Args>
         static return_type dispatch_lhs(base_lhs& lhs,
                                         base_rhs& rhs,
-                                        mpl::vector<T, U...>)
+                                        mpl::vector<T, U...>,
+                                        Args&&... args)
         {
             if (T* p = dynamic_cast<T*>(&lhs))
             {
-                return dispatch_rhs(*p, rhs, rhs_type_list());
+                return dispatch_rhs(*p, rhs, rhs_type_list(), std::forward<Args>(args)...);
             }
-            return dispatch_lhs(lhs, rhs, mpl::vector<U...>());
+            return dispatch_lhs(lhs, rhs, mpl::vector<U...>(), std::forward<Args>(args)...);
         }
 
     public:
 
-        static return_type dispatch(base_lhs& lhs, base_rhs& rhs)
+        template <class... Args>
+        static return_type dispatch(base_lhs& lhs, base_rhs& rhs, Args&&... args)
         {
-            return dispatch_lhs(lhs, rhs, lhs_type_list());
+            return dispatch_lhs(lhs, rhs, lhs_type_list(), std::forward<Args>(args)...);
         }
     };
 

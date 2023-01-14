@@ -16,7 +16,7 @@ namespace scopi
      * @class ProblemBase
      * @brief Shared methods for problems.
      *
-     * All problems (models) solve 
+     * All problems (models) solve
      * \f[
      *      \min \frac{1}{2} \mathbf{u} \cdot \mathbb{P} \mathbf{u} + \mathbf{u} \cdot \mathbf{c}
      * \f]
@@ -66,21 +66,19 @@ namespace scopi
          * @param particles [in] Array of particles (to get the position).
          * @param contacts [in] Array of contacts.
          * @param firstCol [in] Index of the first column (solver-dependent).
-         * @param nb_row [in] Number of rows (problem-dependent).
          * @param nb_row_per_contact [in] Number of rows per contact (problem-dependent).
          */
         template<std::size_t dim>
         void matrix_positive_distance(const scopi_container<dim>& particles,
                                       const std::vector<neighbor<dim>>& contacts,
                                       std::size_t firstCol,
-                                      std::size_t nb_row,
                                       std::size_t nb_row_per_contact);
 
     private:
         /**
          * @brief 2D implementation of rows in matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$ that involve moments of inertia.
          *
-         * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
+         * Some rows in matrix_free_gemv_inv_P involve the moment of inertia.
          * The implentation is different in 2D or in 3D.
          *
          * @param particles [in] Array of particles (for the moments of inertia).
@@ -95,7 +93,7 @@ namespace scopi
         /**
          * @brief 3D implementation of rows in matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$ that involve moments of inertia.
          *
-         * Some rows in matrix_free_gemv_inv_P involve the moment of inertia. 
+         * Some rows in matrix_free_gemv_inv_P involve the moment of inertia.
          * The implentation is different in 2D or in 3D.
          *
          * @param particles [in] Array of particles (for the moments of inertia).
@@ -158,7 +156,7 @@ namespace scopi
     {
         for (std::size_t d = 0; d < dim; ++d)
         {
-            U(3*row + d) /= (-1.*particles.m()(active_offset + row)); 
+            U(3*row + d) /= (-1.*particles.m()(active_offset + row));
         }
         matrix_free_gemv_inv_P_moment(particles, U, active_offset, row);
     }
@@ -167,16 +165,16 @@ namespace scopi
     void ProblemBase::matrix_positive_distance(const scopi_container<dim>& particles,
                                                const std::vector<neighbor<dim>>& contacts,
                                                std::size_t firstCol,
-                                               std::size_t nb_row,
                                                std::size_t nb_row_per_contact)
     {
         std::size_t active_offset = particles.nb_inactive();
+        std::size_t nb_rows = contacts.size();
         m_A_rows.clear();
         m_A_cols.clear();
         m_A_values.clear();
-        m_A_rows.reserve(12*nb_row);
-        m_A_cols.reserve(12*nb_row);
-        m_A_values.reserve(12*nb_row);
+        m_A_rows.reserve(12*nb_rows*nb_row_per_contact);
+        m_A_cols.reserve(12*nb_rows*nb_row_per_contact);
+        m_A_values.reserve(12*nb_rows*nb_row_per_contact);
 
         std::size_t ic = 0;
         for (auto &c: contacts)

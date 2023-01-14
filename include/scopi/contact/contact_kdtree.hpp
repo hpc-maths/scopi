@@ -198,7 +198,6 @@ namespace scopi
             for (std::size_t d = 0; d < dim; ++d)
             {
                 query_pt[d] = particles.pos()(i)(d);
-                // query_pt[d] = particles.pos()(i)(d);
             }
             PLOG_INFO << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
@@ -240,14 +239,6 @@ namespace scopi
         sort_contacts(contacts);
         duration = toc();
         PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
-
-        /*
-        for (std::size_t ic=0; ic<contacts.size(); ++ic)
-        {
-            std::cout << "----> CONTACTS : i j = " << contacts[ic].i << " " << contacts[ic].j << " d = " <<  contacts[ic].dij << std::endl;
-            // std::cout << "----> CONTACTS : contact = " << contacts[ic] << std::endl;
-        }
-        */
 
         particles.reset_periodic();
 

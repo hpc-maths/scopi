@@ -93,7 +93,7 @@ namespace scopi
      * @brief Shared functions to model contacts with friction and without viscosity.
      *
      * See ProblemBase.hpp for the notations.
-     * The constraint is 
+     * The constraint is
      * \f[
      *      \d_{\ij} + \B \u_{\ij} \ge \norm{\T \u_{\ij}}
      * \f]
@@ -130,20 +130,7 @@ namespace scopi
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                           const std::vector<neighbor<dim>>& contacts,
-                                          const std::vector<neighbor<dim>>& contacts_worms,
                                           std::size_t firstCol);
-        /**
-         * @brief Get the number of rows in the matrix.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
-         *
-         * @return Number of rows in the matrix.
-         */
-        template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                      const std::vector<neighbor<dim>>& contacts_worms);
     private:
         /**
          * @brief Friction coefficient.
@@ -154,10 +141,9 @@ namespace scopi
     template<std::size_t dim>
     void DryWithFrictionBase::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                            const std::vector<neighbor<dim>>& contacts,
-                                                           const std::vector<neighbor<dim>>& contacts_worms,
                                                            std::size_t firstCol)
     {
-        matrix_positive_distance(particles, contacts, firstCol, number_row_matrix(contacts, contacts_worms), 4);
+        matrix_positive_distance(particles, contacts, firstCol, 4);
         std::size_t active_offset = particles.nb_inactive();
         std::size_t ic = 0;
         for (auto &c: contacts)
@@ -232,13 +218,6 @@ namespace scopi
             }
             ++ic;
         }
-    }
-
-    template <std::size_t dim>
-    std::size_t DryWithFrictionBase::number_row_matrix(const std::vector<neighbor<dim>>& contacts,
-                                                       const std::vector<neighbor<dim>>&)
-    {
-        return 4*contacts.size();
     }
 }
 

@@ -45,7 +45,7 @@ namespace scopi
         /**
          * @brief Alias for the problem.
          */
-        using problem_type = problem_t; 
+        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimUzawaBase.
@@ -169,7 +169,7 @@ namespace scopi
          */
         sparse_matrix_t m_A;
         /**
-         * @brief Structure specifying \f$ \mathbb{B} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{B} \f$ properties.
          */
         struct matrix_descr m_descrA;
         /**
@@ -177,7 +177,7 @@ namespace scopi
          */
         sparse_matrix_t m_inv_P;
         /**
-         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties.
          */
         struct matrix_descr m_descr_inv_P;
         /**
@@ -190,15 +190,14 @@ namespace scopi
     template <class problem_t>
     template<std::size_t dim>
     void OptimUzawaMkl<problem_t>::init_uzawa_impl(const scopi_container<dim>& particles,
-                                                  const std::vector<scopi::neighbor<dim>>& contacts,
-                                                  const std::vector<scopi::neighbor<dim>>& contacts_worms)
+                                                  const std::vector<scopi::neighbor<dim>>& contacts)
     {
-        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, 0);
+        this->create_matrix_constraint_coo(particles, contacts, 0);
 
         sparse_matrix_t A_coo;
         m_status =  mkl_sparse_d_create_coo(&A_coo,
                                            SPARSE_INDEX_BASE_ZERO,
-                                           this->number_row_matrix(contacts, contacts_worms), // number of rows
+                                           this->number_row_matrix(contacts), // number of rows
                                            6*this->m_nparts, // number of cols
                                            this->m_A_values.size(), // number of non-zero elements
                                            this->m_A_rows.data(),

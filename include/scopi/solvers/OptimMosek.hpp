@@ -54,11 +54,11 @@ namespace scopi{
      * @brief Solve optimization problem using Mosek.
      *
      * See ProblemBase for the notations.
-     * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$, 
+     * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$,
      * minimize \f$ \tilde{\mathbf{u}} \cdot \tilde{\mathbf{c}} \f$, with
      * \f$ \tilde{\mathbf{u}} = (s_0, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, 0) \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (DryWithoutFriction and ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with 
+     * Without friction (DryWithoutFriction and ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with
      * \f[
      *      \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
@@ -85,7 +85,7 @@ namespace scopi{
         /**
          * @brief Alias for the problem.
          */
-        using problem_type = problem_t; 
+        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimBase
@@ -125,8 +125,7 @@ namespace scopi{
          */
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts,
-                                            const std::vector<neighbor<dim>>& contacts_worms);
+                                            const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
@@ -207,7 +206,7 @@ namespace scopi{
          */
         std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
         /**
-         * @brief The constraint depends on the problem, this class help to deal with this. 
+         * @brief The constraint depends on the problem, this class help to deal with this.
          *
          * \todo Shouldn't OptimMosek inherits from this class?
          */
@@ -219,14 +218,13 @@ namespace scopi{
         /**
          * @brief Mosek's data structure to compute the constraint after solving the optimization problem.
          */
-        std::shared_ptr<monty::ndarray<double, 1>> m_result_gemv; 
+        std::shared_ptr<monty::ndarray<double, 1>> m_result_gemv;
     };
 
     template<class problem_t>
     template<std::size_t dim>
     int OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                               const std::vector<neighbor<dim>>& contacts,
-                                                               const std::vector<neighbor<dim>>& contacts_worms)
+                                                               const std::vector<neighbor<dim>>& contacts)
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -244,8 +242,8 @@ namespace scopi{
         m_D_mosek = std::make_shared<monty::ndarray<double, 1>>(this->m_distances.data(), monty::shape_t<1>(this->m_distances.shape(0)));
 
         // matrix
-        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, m_constraint.index_first_col_matrix());
-        m_A = Matrix::sparse(this->number_row_matrix(contacts, contacts_worms), m_constraint.number_col_matrix(),
+        this->create_matrix_constraint_coo(particles, contacts, m_constraint.index_first_col_matrix());
+        m_A = Matrix::sparse(this->number_row_matrix(contacts), m_constraint.number_col_matrix(),
                              std::make_shared<ndarray<int, 1>>(this->m_A_rows.data(), shape_t<1>({this->m_A_rows.size()})),
                              std::make_shared<ndarray<int, 1>>(this->m_A_cols.data(), shape_t<1>({this->m_A_cols.size()})),
                              std::make_shared<ndarray<double, 1>>(this->m_A_values.data(), shape_t<1>({this->m_A_values.size()})));
@@ -270,7 +268,7 @@ namespace scopi{
         model->solve();
 
         m_Xlvl = X->level();
-        m_constraint.update_dual(this->number_row_matrix(contacts, contacts_worms), contacts.size());
+        m_constraint.update_dual(this->number_row_matrix(contacts), contacts.size());
         for (auto& x : *(m_constraint.m_dual))
         {
             x *= -1.;

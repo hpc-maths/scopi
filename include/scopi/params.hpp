@@ -19,7 +19,7 @@ namespace scopi
      *
      * @tparam solver_t Type of the solver.
      */
-    template<class solver_t>
+    template<class optim_t>
     struct OptimParams
     {
     private:
