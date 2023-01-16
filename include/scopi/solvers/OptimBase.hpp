@@ -48,7 +48,6 @@ namespace scopi{
         template<std::size_t dim>
         void run(const scopi_container<dim>& particles,
                  const std::vector<neighbor<dim>>& contacts,
-                 const std::vector<neighbor<dim>>& contacts_worms,
                  const std::size_t nite);
 
         /**
@@ -75,7 +74,7 @@ namespace scopi{
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contatcs.
          *
-         * @return 
+         * @return
          */
         template<std::size_t dim>
         xt::xtensor<double, 2> get_constraint(const std::vector<neighbor<dim>>& contacts);
@@ -88,12 +87,11 @@ namespace scopi{
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
          * @return \f$ N_c \f$ array.
          */
         template<std::size_t dim>
-        auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
+        auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts);
 
     protected:
         /**
@@ -126,14 +124,12 @@ namespace scopi{
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for a priori velocities, masses, and moments of inertia).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
          * @return Number of iterations needed by the solver to converge.
          */
         template<std::size_t dim>
         int solve_optimization_problem(const scopi_container<dim>& particles,
-                                       const std::vector<neighbor<dim>>& contacts,
-                                       const std::vector<neighbor<dim>>& contacts_worms);
+                                       const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
@@ -149,16 +145,15 @@ namespace scopi{
     template<std::size_t dim>
     void OptimBase<Derived, problem_t>::run(const scopi_container<dim>& particles,
                                             const std::vector<neighbor<dim>>& contacts,
-                                            const std::vector<neighbor<dim>>& contacts_worms,
                                             const std::size_t)
     {
         tic();
         create_vector_c(particles);
-        this->create_vector_distances(contacts, contacts_worms);
+        this->create_vector_distances(contacts);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
-        auto nbIter = solve_optimization_problem(particles, contacts, contacts_worms);
+        auto nbIter = solve_optimization_problem(particles, contacts);
         PLOG_INFO << "iterations : " << nbIter;
         PLOG_INFO << "Contacts: " << contacts.size() << "  active contacts " << get_nb_active_contacts();
     }
@@ -203,10 +198,9 @@ namespace scopi{
     template<class Derived, class problem_t>
     template<std::size_t dim>
     int OptimBase<Derived, problem_t>::solve_optimization_problem(const scopi_container<dim>& particles,
-                                                                  const std::vector<neighbor<dim>>& contacts,
-                                                                  const std::vector<neighbor<dim>>& contacts_worms)
+                                                                  const std::vector<neighbor<dim>>& contacts)
     {
-        return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts, contacts_worms);
+        return static_cast<Derived&>(*this).solve_optimization_problem_impl(particles, contacts);
     }
 
     template<class Derived, class problem_t>
@@ -236,11 +230,10 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     template<std::size_t dim>
-    auto OptimBase<Derived, problem_t>::get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts,
-                                                                const std::vector<neighbor<dim>>& contacts_worms)
+    auto OptimBase<Derived, problem_t>::get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts)
     {
         auto data = static_cast<Derived&>(*this).lagrange_multiplier_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {this->number_row_matrix(contacts, contacts_worms)});
+        return xt::adapt(reinterpret_cast<double*>(data), {this->number_row_matrix(contacts)});
     }
 
     template<class Derived, class problem_t>

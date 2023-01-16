@@ -11,6 +11,7 @@
 #include <xtensor/xadapt.hpp>
 
 #include "objects/types/base.hpp"
+#include "objects/methods/select.hpp"
 #include "types.hpp"
 #include "property.hpp"
 #include "crtp.hpp"
@@ -101,7 +102,7 @@ namespace scopi
          * @param i [in] Index of the particle to copy.
          * @param pos [in] Position of the new particle.
          */
-        void push_back(std::size_t i, const position_type& pos);
+        void push_back(std::size_t i, const std::vector<position_type>& pos);
 
         /**
          * @brief Increase the capacity of the container.
@@ -300,6 +301,7 @@ namespace scopi
          * @brief Index of the first duplicated particle.
          */
         std::size_t m_periodic_ptr;
+        std::size_t m_periodic_obj_ptr;
 
         /**
          * @brief Number of obstacles (inactive particles).
@@ -315,6 +317,7 @@ namespace scopi
     template<std::size_t dim>
     scopi_container<dim>::scopi_container()
     : m_periodic_ptr(0)
+    , m_periodic_obj_ptr(0)
     , m_nb_inactive_core_objects(0)
     , m_periodic_added(false)
     {}
@@ -369,29 +372,33 @@ namespace scopi
 
         m_shapes_id.push_back(s.hash());
         m_periodic_ptr += s.size();
+        m_periodic_obj_ptr++;
     }
 
     template<std::size_t dim>
-    void scopi_container<dim>::push_back(std::size_t i,
-                                         const position_type& pos)
+    void scopi_container<dim>::push_back(std::size_t io, const std::vector<position_type>& pos)
     {
-        assert(i >= 0 && i < m_positions.size());
+        assert(io >= 0 && i < m_periodic_obj_ptr);
         m_periodic_added = true;
-        m_offset.push_back(m_offset.back() + m_offset[i+1] - m_offset[i]);
 
-        m_positions.push_back(pos);
-        m_quaternions.push_back(m_quaternions[i]);
-        m_velocities.push_back(m_velocities[i]);
-        m_omega.push_back(m_omega[i]);
-        m_desired_omega.push_back(m_desired_omega[i]);
-        m_desired_velocities.push_back(m_desired_velocities[i]);
-        m_forces.push_back(m_forces[i]);
-        m_masses.push_back(m_masses[i]);
-        m_moments_inertia.push_back(m_moments_inertia[i]);
+        std::size_t size = m_offset[io + 1] - m_offset[io];
+        m_offset.push_back(m_offset.back() + size);
+        for (std::size_t i = 0, ii = m_offset[io]; i < size; ++i, ++ii)
+        {
+            m_positions.push_back(pos[i]);
+            m_quaternions.push_back(m_quaternions[ii]);
+            m_velocities.push_back(m_velocities[ii]);
+            m_omega.push_back(m_omega[ii]);
+            m_desired_omega.push_back(m_desired_omega[ii]);
+            m_desired_velocities.push_back(m_desired_velocities[ii]);
+            m_forces.push_back(m_forces[ii]);
+            m_masses.push_back(m_masses[ii]);
+            m_moments_inertia.push_back(m_moments_inertia[ii]);
+            m_periodic_indices.push_back(ii);
+        }
 
-        m_shapes_id.push_back(m_shapes_id[i]);
+        m_shapes_id.push_back(m_shapes_id[io]);
 
-        m_periodic_indices.push_back(i);
     }
 
     template<std::size_t dim>
@@ -406,14 +413,12 @@ namespace scopi
         m_forces.reserve(size);
         m_masses.reserve(size);
         m_moments_inertia.reserve(size);
-        m_offset.reserve(size+1);
-        m_shapes_id.reserve(size);
     }
 
     template<std::size_t dim>
     std::size_t scopi_container<dim>::size(bool with_periodic) const
     {
-        return m_shapes_id.size() - ((with_periodic) ? 0 : m_periodic_indices.size());
+        return (with_periodic) ? m_shapes_id.size(): m_periodic_obj_ptr;
     }
 
     template<std::size_t dim>
@@ -568,11 +573,11 @@ namespace scopi
         m_forces.resize(size);
         m_masses.resize(size);
         m_moments_inertia.resize(size);
-        m_offset.resize(size+1);
-        m_shapes_id.resize(size);
+
+        m_offset.resize(m_periodic_obj_ptr+1);
+        m_shapes_id.resize(m_periodic_obj_ptr);
 
         m_periodic_added = false;
-        m_periodic_ptr = size;
     }
 
     template<std::size_t dim>
