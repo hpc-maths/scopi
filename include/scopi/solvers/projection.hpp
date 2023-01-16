@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mkl_spblas.h>
+// #include <mkl_spblas.h>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xnoalias.hpp>

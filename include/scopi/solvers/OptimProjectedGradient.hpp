@@ -107,7 +107,7 @@ namespace scopi{
         /**
          * @brief Alias for the problem.
          */
-        using problem_type = problem_t; 
+        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimBase.
@@ -141,14 +141,12 @@ namespace scopi{
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
          * @return Number of iterations gradient descent algorithm needed to converge.
          */
         template <std::size_t dim>
         std::size_t solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                    const std::vector<neighbor<dim>>& contacts,
-                                                    const std::vector<neighbor<dim>>& contacts_worms);
+                                                    const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
@@ -222,12 +220,10 @@ namespace scopi{
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          */
         template <std::size_t dim>
         void create_matrix_B(const scopi_container<dim>& particles,
-                             const std::vector<neighbor<dim>>& contacts,
-                             const std::vector<neighbor<dim>>& contacts_worms);
+                             const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Build matrix \f$ \mathbb{A} = \mathbb{B}^T \mathbb{P}^{-1} \mathbb{B} \f$.
          */
@@ -255,7 +251,7 @@ namespace scopi{
          */
         sparse_matrix_t m_A;
         /**
-         * @brief Structure specifying \f$ \mathbb{A} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{A} \f$ properties.
          */
         struct matrix_descr m_descrA;
         /**
@@ -263,7 +259,7 @@ namespace scopi{
          */
         sparse_matrix_t m_B;
         /**
-         * @brief Structure specifying \f$ \mathbb{B} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{B} \f$ properties.
          */
         struct matrix_descr m_descrB;
         /**
@@ -271,7 +267,7 @@ namespace scopi{
          */
         sparse_matrix_t m_inv_P;
         /**
-         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties. 
+         * @brief Structure specifying \f$ \mathbb{P}^{-1} \f$ properties.
          */
         struct matrix_descr m_descr_inv_P;
         /**
@@ -334,17 +330,16 @@ namespace scopi{
     template<class problem_t, template<class> class gradient_t>
     template <std::size_t dim>
     std::size_t OptimProjectedGradient<problem_t, gradient_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                                                               const std::vector<neighbor<dim>>& contacts,
-                                                                                               const std::vector<neighbor<dim>>& contacts_worms)
+                                                                                               const std::vector<neighbor<dim>>& contacts)
     {
         tic();
-        xt::noalias(m_l) = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
+        xt::noalias(m_l) = xt::zeros<double>({this->number_row_matrix(contacts)});
         // u = P^{-1}*c = vap
         m_status = mkl_sparse_d_mv(SPARSE_OPERATION_NON_TRANSPOSE, -1., m_inv_P, m_descr_inv_P, this->m_c.data(), 0., m_u.data());
         PLOG_ERROR_IF(m_status != SPARSE_STATUS_SUCCESS) << "Error in mkl_sparse_d_mv for u = P^{-1}*c: " << m_status;
         double time_vector_operations = toc();
 
-        create_matrix_B(particles, contacts, contacts_worms);
+        create_matrix_B(particles, contacts);
         tic();
         create_matrix_A();
         auto duration = toc();
@@ -412,21 +407,20 @@ namespace scopi{
     template <class problem_t, template<class> class gradient_t>
     template <std::size_t dim>
     void OptimProjectedGradient<problem_t, gradient_t>::create_matrix_B(const scopi_container<dim>& particles,
-                                                                        const std::vector<neighbor<dim>>& contacts,
-                                                                        const std::vector<neighbor<dim>>& contacts_worms)
+                                                                        const std::vector<neighbor<dim>>& contacts)
     {
         m_descrB.type = SPARSE_MATRIX_TYPE_GENERAL;
         sparse_matrix_t B_coo;
 
         tic();
-        this->create_matrix_constraint_coo(particles, contacts, contacts_worms, 0UL);
+        this->create_matrix_constraint_coo(particles, contacts, 0UL);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : projected gradient : create_matrix_B : create_matrix_constraint_coo = " << duration;
 
         tic();
         m_status =  mkl_sparse_d_create_coo(&B_coo,
                                            SPARSE_INDEX_BASE_ZERO,
-                                           this->number_row_matrix(contacts, contacts_worms), // number of rows
+                                           this->number_row_matrix(contacts), // number of rows
                                            6*this->m_nparts, // number of cols
                                            this->m_A_values.size(), // number of non-zero elements
                                            this->m_A_rows.data(),

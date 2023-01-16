@@ -18,6 +18,7 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
 #include "container.hpp"
+#include "objects/methods/add_contact.hpp"
 #include "objects/methods/closest_points.hpp"
 #include "objects/methods/write_objects.hpp"
 #include "objects/neighbor.hpp"
@@ -143,15 +144,6 @@ namespace scopi
         std::vector<neighbor<dim>> compute_contacts();
 
         /**
-         * @brief Compute the list of contacts to impose \f$D < 0\f$.
-         *
-         * If some particles are of type worms, compute a second list of contacts to also impose \f$D < 0\f$ between the spheres that form the worm.
-         *
-         * @return Vector containing all the contacts involved in a worm.
-         */
-        std::vector<neighbor<dim>> compute_contacts_worms();
-
-        /**
          * @brief Write output files (json format) for visualization.
          *
          * @param contacts [in] List of contacts (only \f$D > 0\f$).
@@ -225,17 +217,16 @@ namespace scopi
 
             displacement_obstacles();
             auto contacts = compute_contacts();
-            auto contacts_worms = compute_contacts_worms();
             if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
             {
                 write_output_files(contacts, nite);
             }
-            this->set_a_priori_velocity(m_particles, contacts, contacts_worms);
+            this->set_a_priori_velocity(m_particles, contacts);
             this->extra_steps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
             {
-                optim_solver_t::run(m_particles, contacts, contacts_worms, nite);
-                this->extra_steps_after_solve(contacts, this->get_lagrange_multiplier(contacts, contacts_worms), this->get_constraint(contacts));
+                optim_solver_t::run(m_particles, contacts, nite);
+                this->extra_steps_after_solve(contacts, this->get_lagrange_multiplier(contacts), this->get_constraint(contacts));
             }
             move_active_particles();
             update_velocity();
@@ -280,7 +271,6 @@ namespace scopi
             }
             m_particles.q()(i) = mult_quaternion(m_particles.q()(i), expw);
             normalize(m_particles.q()(i));
-            // std::cout << "obstacle " << i << ": " << m_particles.pos()(0) << " " << m_particles.q()(0) << std::endl;
         }
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : obstacles = " << duration;
@@ -290,27 +280,11 @@ namespace scopi
     std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts()
     {
         auto contacts = contact_t::run(m_box, m_particles, m_particles.nb_inactive());
-        PLOG_INFO << "contacts.size() = " << contacts.size() << std::endl;
-        return contacts;
-    }
-
-    template<std::size_t dim, class optim_solver_t, class contact_t, class vap_t>
-    std::vector<neighbor<dim>> ScopiSolver<dim, optim_solver_t, contact_t, vap_t>::compute_contacts_worms()
-    {
-        std::vector<neighbor<dim>> contacts;
-        #pragma omp parallel for
         for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
-            for (std::size_t j = 0; j < m_particles[i]->size()-1; ++j)
-            {
-                auto neigh = closest_points_dispatcher<dim>::dispatch(*select_object_dispatcher<dim>::dispatch(*m_particles[i], index(j  )),
-                                                                      *select_object_dispatcher<dim>::dispatch(*m_particles[i], index(j+1)));
-                neigh.i = m_particles.offset(i) + j;
-                neigh.j = m_particles.offset(i) + j + 1;
-                #pragma omp critical
-                contacts.emplace_back(std::move(neigh));
-            }
+            add_contact_from_object_dispatcher<dim>::dispatch(*m_particles[i], m_particles.offset(i), contacts);
         }
+        PLOG_INFO << "contacts.size() = " << contacts.size() << std::endl;
         return contacts;
     }
 
@@ -328,14 +302,14 @@ namespace scopi
 
         json_output["objects"] = {};
 
-        for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
+        for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
             json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i]));
         }
 
         if (m_params.write_velocity)
         {
-            for (std::size_t i = 0; i < m_particles.size(/*with_periodic*/ true); ++i)
+            for (std::size_t i = 0; i < m_particles.size(); ++i)
             {
                 json_output["objects"][i]["velocity"] = m_particles.v()(i);
                 json_output["objects"][i]["rotationvelocity"] = m_particles.omega()(i);
@@ -348,6 +322,8 @@ namespace scopi
         {
             nl::json contact;
 
+            contact["i"] = contacts[i].i;
+            contact["j"] = contacts[i].j;
             contact["pi"] = contacts[i].pi;
             contact["pj"] = contacts[i].pj;
             contact["nij"] = contacts[i].nij;
@@ -402,26 +378,49 @@ namespace scopi
 
             m_particles.q()(i + active_offset) = mult_quaternion(m_particles.q()(i + active_offset), expw);
             normalize(m_particles.q()(i + active_offset));
+        }
 
+        for (std::size_t io=0; io < m_particles.size(); ++io)
+        {
             for (std::size_t d = 0; d < dim; ++d)
             {
                 if (m_box.is_periodic(d))
                 {
-                    for (auto& p: m_particles.pos())
+                    std::size_t plus = 0;
+                    std::size_t minus = 0;
+                    for (std::size_t offset = m_particles.offset(io); offset < m_particles.offset(io+1); ++offset)
                     {
+                        auto& p = m_particles.pos()[offset];
                         if (p[d] > m_box.upper_bound(d))
                         {
+                            plus++;
+                        }
+                        if (p[d] < m_box.lower_bound(d))
+                        {
+                            minus++;
+                        }
+                    }
+
+                    auto object_size = m_particles.offset(io+1) - m_particles.offset(io);
+                    if (plus == object_size)
+                    {
+                        for (std::size_t offset = m_particles.offset(io); offset < m_particles.offset(io+1); ++offset)
+                        {
+                            auto& p = m_particles.pos()[offset];
                             p[d] -= m_box.upper_bound(d) - m_box.lower_bound(d);
                         }
-                        else if (p[d] < m_box.lower_bound(d))
+                    }
+                    if (minus == object_size)
+                    {
+                        for (std::size_t offset = m_particles.offset(io); offset < m_particles.offset(io+1); ++offset)
                         {
+                            auto& p = m_particles.pos()[offset];
                             p[d] += m_box.upper_bound(d) - m_box.lower_bound(d);
                         }
                     }
                 }
             }
         }
-
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : move active particles = " << duration;
     }

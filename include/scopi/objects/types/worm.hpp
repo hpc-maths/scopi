@@ -62,11 +62,11 @@ namespace scopi
         worm(position_type pos, quaternion_type q, double radius, std::size_t size);
 
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
-         * @return 
+         * @return
          */
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         /**
@@ -96,7 +96,7 @@ namespace scopi
         /**
          * @brief Create the hash of the worm.
          *
-         * Two worms with the same dimension, same radius and same number of spheres have the same hash. 
+         * Two worms with the same dimension, same radius and same number of spheres have the same hash.
          */
         void create_hash();
 

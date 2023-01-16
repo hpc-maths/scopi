@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <vector>
 
@@ -201,18 +202,28 @@ namespace scopi
     template<std::size_t dim>
     void add_objects_from_periodicity(const BoxDomain<dim>& box, scopi_container<dim>& particles, double dmax)
     {
+        using position_t = typename scopi_container<dim>::position_type;
         for (std::size_t d = 0; d < dim; ++d)
         {
             if (box.is_periodic(d))
             {
-                for (std::size_t ip = 0; ip < particles.size(false); ++ip)
+                for (std::size_t io=0; io < particles.size(/*with_periodic = */ false); ++io)
                 {
-                    auto& pos = particles.pos()[ip];
-                    if (pos[d] - dmax < box.lower_bound(d))
+                    for (std::size_t offset = particles.offset(io); offset < particles.offset(io+1); ++offset)
                     {
-                        auto new_pos = pos;
-                        new_pos[d] += box.upper_bound(d) - box.lower_bound(d);
-                        particles.push_back(ip, new_pos);
+                        auto& pos = particles.pos()[offset];
+                        if (pos[d] - dmax < box.lower_bound(d))
+                        {
+                            auto size = particles.offset(io+1) - particles.offset(io);
+                            std::vector<position_t> new_pos(size);
+                            for (std::size_t i = 0, ii = particles.offset(io); i < size; ++i, ++ii)
+                            {
+                                new_pos[i] = particles.pos()[ii];
+                                new_pos[i][d] += box.upper_bound(d) - box.lower_bound(d);
+                            }
+                            particles.push_back(io, new_pos);
+                            break;
+                        }
                     }
                 }
             }

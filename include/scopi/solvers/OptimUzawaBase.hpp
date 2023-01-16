@@ -115,14 +115,12 @@ namespace scopi{
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          *
          * @return Number of iterations Uzawa algorithm needed to converge.
          */
         template <std::size_t dim>
         int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts,
-                                            const std::vector<neighbor<dim>>& contacts_worms);
+                                            const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
          *
@@ -204,12 +202,10 @@ namespace scopi{
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles (for positions).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
          */
         template <std::size_t dim>
         void init_uzawa(const scopi_container<dim>& particles,
-                        const std::vector<neighbor<dim>>& contacts,
-                        const std::vector<neighbor<dim>>& contacts_worms);
+                        const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Free the memory allocated for the matrices.
          */
@@ -249,14 +245,13 @@ namespace scopi{
     template<class Derived, class problem_t>
     template <std::size_t dim>
     int OptimUzawaBase<Derived, problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                                            const std::vector<neighbor<dim>>& contacts,
-                                                                            const std::vector<neighbor<dim>>& contacts_worms)
+                                                                            const std::vector<neighbor<dim>>& contacts)
     {
         tic();
-        init_uzawa(particles, contacts, contacts_worms);
+        init_uzawa(particles, contacts);
         auto duration = toc();
-        m_L = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
-        m_R = xt::zeros<double>({this->number_row_matrix(contacts, contacts_worms)});
+        m_L = xt::zeros<double>({this->number_row_matrix(contacts)});
+        m_R = xt::zeros<double>({this->number_row_matrix(contacts)});
         PLOG_INFO << "----> CPUTIME : Uzawa matrix = " << duration;
 
         double time_assign_u = 0.;
@@ -391,10 +386,9 @@ namespace scopi{
     template<class Derived, class problem_t>
     template <std::size_t dim>
     void OptimUzawaBase<Derived, problem_t>::init_uzawa(const scopi_container<dim>& particles,
-                                                        const std::vector<neighbor<dim>>& contacts,
-                                                        const std::vector<neighbor<dim>>& contacts_worms)
+                                                        const std::vector<neighbor<dim>>& contacts)
     {
-        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts, contacts_worms);
+        static_cast<Derived&>(*this).init_uzawa_impl(particles, contacts);
     }
 
     template<class Derived, class problem_t>
