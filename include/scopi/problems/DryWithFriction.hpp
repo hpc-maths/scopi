@@ -52,7 +52,7 @@ namespace scopi
      * @brief Problem that models contacts with friction and without viscosity.
      *
      * See ProblemBase for the notations.
-     * The constraint is 
+     * The constraint is
      * \f[
      *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}||
      * \f]
@@ -118,10 +118,31 @@ namespace scopi
                                      const xt::xtensor<double, 1>& lambda,
                                      const xt::xtensor<double, 2>& u_tilde);
         /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return Number of rows in the matrix.
+         */
+        template <std::size_t dim>
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
+        /**
          * @brief Whether the optimization problem should be solved.
          *
          * For compatibility with the other problems.
          */
+
+        /**
+         * @brief Create vector \f$ \mathbf{d} \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         */
+        template<std::size_t dim>
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+
         bool should_solve_optimization_problem();
 
     private:
@@ -154,6 +175,20 @@ namespace scopi
     {
         this->m_should_solve = false;
     }
-  
+    template <std::size_t dim>
+    std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
+    {
+        return contacts.size();
+    }
+
+    template<std::size_t dim>
+    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    {
+        this->m_distances = xt::zeros<double>({contacts.size()});
+        for (std::size_t i = 0; i < contacts.size(); ++i)
+        {
+            this->m_distances[i] = contacts[i].dij;
+        }
+    }
 }
 

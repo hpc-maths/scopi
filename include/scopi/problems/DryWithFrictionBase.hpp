@@ -144,80 +144,80 @@ namespace scopi
                                                            std::size_t firstCol)
     {
         matrix_positive_distance(particles, contacts, firstCol, 4);
-        std::size_t active_offset = particles.nb_inactive();
-        std::size_t ic = 0;
-        for (auto &c: contacts)
-        {
-            if (c.i >= active_offset)
-            {
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(-this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col]);
-                        if(ind_row == ind_col)
-                        {
-                            this->m_A_values[this->m_A_values.size()-1] += this->m_dt*m_mu;
-                        }
-                    }
-                }
-            }
+        // std::size_t active_offset = particles.nb_inactive();
+        // std::size_t ic = 0;
+        // for (auto &c: contacts)
+        // {
+        //     if (c.i >= active_offset)
+        //     {
+        //         for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+        //         {
+        //             for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+        //             {
+        //                 this->m_A_rows.push_back(4*ic + 1 + ind_row);
+        //                 this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + ind_col);
+        //                 this->m_A_values.push_back(-this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col]);
+        //                 if(ind_row == ind_col)
+        //                 {
+        //                     this->m_A_values[this->m_A_values.size()-1] += this->m_dt*m_mu;
+        //                 }
+        //             }
+        //         }
+        //     }
 
-            if (c.j >= active_offset)
-            {
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col]);
-                        if(ind_row == ind_col)
-                        {
-                            this->m_A_values[this->m_A_values.size()-1] -= this->m_dt*m_mu;
-                        }
-                    }
-                }
-            }
+        //     if (c.j >= active_offset)
+        //     {
+        //         for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+        //         {
+        //             for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+        //             {
+        //                 this->m_A_rows.push_back(4*ic + 1 + ind_row);
+        //                 this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + ind_col);
+        //                 this->m_A_values.push_back(this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col]);
+        //                 if(ind_row == ind_col)
+        //                 {
+        //                     this->m_A_values[this->m_A_values.size()-1] -= this->m_dt*m_mu;
+        //                 }
+        //             }
+        //         }
+        //     }
 
-            auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
-            auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
-            auto Ri = rotation_matrix<3>(particles.q()(c.i));
-            auto Rj = rotation_matrix<3>(particles.q()(c.j));
+        //     auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
+        //     auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
+        //     auto Ri = rotation_matrix<3>(particles.q()(c.i));
+        //     auto Rj = rotation_matrix<3>(particles.q()(c.j));
 
-            if (c.i >= active_offset)
-            {
-                std::size_t ind_part = c.i - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(-m_mu*this->m_dt*dot(ind_row, ind_col) + m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
-                    }
-                }
-            }
+        //     if (c.i >= active_offset)
+        //     {
+        //         std::size_t ind_part = c.i - active_offset;
+        //         auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+        //         for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+        //         {
+        //             for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+        //             {
+        //                 this->m_A_rows.push_back(4*ic + 1 + ind_row);
+        //                 this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
+        //                 this->m_A_values.push_back(-m_mu*this->m_dt*dot(ind_row, ind_col) + m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
+        //             }
+        //         }
+        //     }
 
-            if (c.j >= active_offset)
-            {
-                std::size_t ind_part = c.j - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
-                {
-                    for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
-                    {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(m_mu*this->m_dt*dot(ind_row, ind_col) - m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
-                    }
-                }
-            }
-            ++ic;
-        }
+        //     if (c.j >= active_offset)
+        //     {
+        //         std::size_t ind_part = c.j - active_offset;
+        //         auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+        //         for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
+        //         {
+        //             for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
+        //             {
+        //                 this->m_A_rows.push_back(4*ic + 1 + ind_row);
+        //                 this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
+        //                 this->m_A_values.push_back(m_mu*this->m_dt*dot(ind_row, ind_col) - m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
+        //             }
+        //         }
+        //     }
+        //     ++ic;
+        // }
     }
 }
 

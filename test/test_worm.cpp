@@ -432,7 +432,7 @@ namespace scopi
         }
     }
 
-    TEST_CASE_TEMPLATE("two worms", SolverType, SOLVER_WORMS(2, contact_kdtree, vap_fixed), SOLVER_WORMS(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("two worms", SolverType, two_worms)
     {
         using params_t = typename SolverType::params_t;
 
@@ -454,10 +454,12 @@ namespace scopi
         params_t params;
         set_params_test(params.optim_params);
         params.contacts_params.dmax = 1.;
-        params.scopi_params.output_frequency = total_it-1;
+        // params.scopi_params.output_frequency = total_it-1;
         SolverType solver(particles, dt, params);
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_worms.json", tolerance));
     }
+
+    TEST_CASE_TEMPLATE_APPLY(two_worms, solver_dry_without_friction_t<2>);
 }
