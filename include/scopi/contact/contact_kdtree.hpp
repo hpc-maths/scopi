@@ -69,8 +69,8 @@ namespace scopi
         inline std::size_t kdtree_get_point_count() const
         {
           //std::cout << "KDTREE m_p.size() = "<< m_p.size() <<std::endl;
-          return m_p.pos().size();
-          // return m_p.pos().size() - m_actptr;
+          // return m_p.pos().size();
+          return m_p.pos().size() - m_actptr;
         }
         /**
          * @brief
@@ -183,7 +183,6 @@ namespace scopi
         dim, kd,
         nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)
         );
-        index.buildIndex();
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : build kdtree index = " << duration << std::endl;
 
@@ -201,18 +200,13 @@ namespace scopi
             }
             PLOG_INFO << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
-            std::vector<std::pair<size_t, double>> indices_dists;
-
-            nanoflann::RadiusResultSet<double, std::size_t> resultSet(
-                this->m_params.kd_tree_radius, indices_dists);
-
             std::vector<std::pair<std::size_t, double>> ret_matches;
 
             auto nMatches_loc = index.radiusSearch(query_pt, this->m_params.kd_tree_radius, ret_matches,
                 nanoflann::SearchParams());
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic) {
-                std::size_t j = ret_matches[ic].first;
+                std::size_t j = ret_matches[ic].first + particles.offset(active_ptr);
                 if (i < j)
                 {
                     compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
