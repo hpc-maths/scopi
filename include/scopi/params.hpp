@@ -119,6 +119,12 @@ namespace scopi
          * Default value is false.
          */
         bool write_velocity;
+        /**
+         * @brief true for binary output files, false for text files.
+         *
+         * Default value is false.
+         */
+        bool binary_output;
     };
 
     /**

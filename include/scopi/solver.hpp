@@ -300,8 +300,6 @@ namespace scopi
 
         nl::json json_output;
 
-        std::ofstream file(fmt::format("{}_{:04d}.json", (m_params.path / m_params.filename).string(), nite));
-
         json_output["objects"] = {};
 
         for (std::size_t i = 0; i < m_particles.size(); ++i)
@@ -334,8 +332,19 @@ namespace scopi
 
         }
 
-        file << std::setw(4) << json_output;
-        file.close();
+        if (m_params.binary_output)
+        {
+            std::ofstream file(fmt::format("{}_{:04d}.bson", (m_params.path / m_params.filename).string(), nite), std::ios::out | std::ios::binary);
+            const std::vector<std::uint8_t> vbson = nl::json::to_bson(json_output);
+            file.write(reinterpret_cast<const char*>(vbson.data()), vbson.size() * sizeof(uint8_t));
+            file.close();
+        }
+        else
+        {
+            std::ofstream file(fmt::format("{}_{:04d}.json", (m_params.path / m_params.filename).string(), nite));
+            file << std::setw(4) << json_output;
+            file.close();
+        }
 
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : write output files = " << duration;

@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
-import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min'
+import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
+import * as BSON from 'bson';
 
 let camera, scene, renderer;
 let container, controls, stats, gui, guiStatsEl;
@@ -12,6 +13,8 @@ var clock = new THREE.Clock();
 var options = {
     "refresh": 0.01,
     "pause": true,
+    "contacts" : true,
+    "radiuses" : true,
     "current_frame": 0,
 };
 
@@ -127,7 +130,8 @@ function drawObjects() {
     if (options.current_frame < oFiles.length) {
         const reader = new FileReader();
         reader.addEventListener('load', (event) => {
-            const data = JSON.parse(reader.result);
+            const data = ext == 'json' ? JSON.parse(reader.result) : BSON.deserialize(event.target.result);
+            
             const objects = data.objects;
             const contacts = data.contacts;
 
@@ -209,32 +213,36 @@ function drawObjects() {
             });
 
             // radius of spheres
-            const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
-            const line_material_rot = new THREE.LineBasicMaterial({
-                color: 'blue',
-                depthTest: false
-            });
-            var line_mesh_rot = new THREE.LineSegments(line_geometry_rot, line_material_rot);
-            scene.add(line_mesh_rot);
+            if (options.radiuses) {
+                const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
+                const line_material_rot = new THREE.LineBasicMaterial({
+                    color: 'blue',
+                    depthTest: false
+                });
+                var line_mesh_rot = new THREE.LineSegments(line_geometry_rot, line_material_rot);
+                scene.add(line_mesh_rot);
+            }
 
             // contacts
-            const points = [];
-            contacts.forEach((obj, index) => {
-                if (obj.pi.length == 2) {
-                    points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], 0.));
-                    points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], 0.));
-                }
-                else {
-                    points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], obj.pi[2]));
-                    points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], obj.pi[2]));
-                }
-            });
-            const line_geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const line_material = new THREE.LineBasicMaterial({
-                color: 'green',
-            });
-            var line_mesh = new THREE.LineSegments(line_geometry, line_material);
-            scene.add(line_mesh);
+            if (options.contacts) {
+                const points = [];
+                contacts.forEach((obj, index) => {
+                    if (obj.pi.length == 2) {
+                        points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], 0.));
+                        points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], 0.));
+                    }
+                    else {
+                        points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], obj.pi[2]));
+                        points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], obj.pi[2]));
+                    }
+                });
+                const line_geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line_material = new THREE.LineBasicMaterial({
+                    color: 'green',
+                });
+                var line_mesh = new THREE.LineSegments(line_geometry, line_material);
+                scene.add(line_mesh);
+            }
 
             /*
             const path = new ContactsCurve(contacts);
@@ -256,7 +264,12 @@ function drawObjects() {
             // scene.add( axesHelper );
 
         });
-        reader.readAsText(oFiles[options.current_frame]);
+
+        const ext = (oFiles[options.current_frame].name.match(/\.[0-9a-z]{1,5}$/i) || [""])[0].substring(1);
+        if (ext == 'json')
+            reader.readAsText(oFiles[options.current_frame]);
+        else
+            reader.readAsArrayBuffer(oFiles[options.current_frame]);
     }
     else {
         options.current_frame = 0;
@@ -299,6 +312,7 @@ function init() {
     container.appendChild(renderer.domElement);
 
     stats = new Stats();
+    stats.dom.style.cssText = 'position:fixed;bottom:20px;left:20px';
     container.appendChild(stats.dom);
 
     window.addEventListener('resize', onWindowResize);
@@ -306,26 +320,34 @@ function init() {
     controls = new OrbitControls(camera, renderer.domElement);
 
     gui = new GUI();
-    gui.add(options, 'refresh', 0.01, 5, 0.01);
-    guiFrame = gui.add(options, 'current_frame', 0, 0, 1).listen();
+    
+    var animation = gui.addFolder('Animation');
+    animation.add(options, 'refresh', 0.01, 5, 0.01);
+    guiFrame = animation.add(options, 'current_frame', 0, 0, 1).listen();
     guiFrame.onChange(
         function (value) {
             drawObjects();
         });
+    animation.add(options, 'pause').name('Pause');
+    animation.open();
 
-    gui.add(options, 'pause').name('Pause');
-
+    var view = gui.addFolder('View');
+    view.add(options, 'contacts').name('Draw contacts').listen().onChange(
+        function (value) {
+            drawObjects();
+        });
+    view.add(options, 'radiuses').name('Draw radiuses').listen().onChange(
+        function (value) {
+            drawObjects();
+        });
+    view.open();
+    
     var obj = {
         reset: function () {
             controls.reset();
         }
     }
-    gui.add(obj, 'reset').name("Reset camera");
-
-    // const infoFolder = gui.addFolder('Informations');
-
-    // guiStatsEl = document.createElement('li');
-    // guiStatsEl.classList.add('gui-stats');
+    view.add(obj, 'reset').name("Reset camera");
 
     // infoFolder.__ul.appendChild(guiStatsEl);
     // infoFolder.open();
