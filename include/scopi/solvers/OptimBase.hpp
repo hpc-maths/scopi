@@ -233,7 +233,7 @@ namespace scopi{
     auto OptimBase<Derived, problem_t>::get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts)
     {
         auto data = static_cast<Derived&>(*this).lagrange_multiplier_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {this->number_row_matrix(contacts), 1UL});
+        return xt::adapt(reinterpret_cast<double*>(data), {this->number_row_matrix(contacts)});
     }
 
     template<class Derived, class problem_t>
