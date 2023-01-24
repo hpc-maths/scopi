@@ -218,7 +218,7 @@ namespace scopi
         // obstacles
         for (std::size_t i = 0; i < active_ptr; ++i)
         {
-            for (std::size_t j = active_ptr; j < particles.size(); ++j)
+            for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
                 compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
             }
