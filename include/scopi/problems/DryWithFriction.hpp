@@ -78,22 +78,6 @@ namespace scopi
         DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
 
         /**
-         * @brief Create vector \f$ \mathbf{d} \f$.
-         *
-         * See \c create_vector_distances for the order of the rows of the matrix.
-         *
-         * \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
-         * \f$ (d_{ij}, 0, 0, 0) \f$,
-         * where \f$ d_{ij} \f$ is the distance between particles \c i and \c j.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
-         */
-        template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
-
-        /**
          * @brief Extra steps before solving the optimization problem.
          *
          * For compatibility with the other problems.
@@ -153,16 +137,6 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
-    {
-        this->m_distances = xt::zeros<double>({4*contacts.size()});
-        for (std::size_t i = 0; i < contacts.size(); ++i)
-        {
-            this->m_distances[4*i] = contacts[i].dij;
-        }
-    }
-
-    template<std::size_t dim>
     void DryWithFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&)
     {
         this->m_should_solve = true;
@@ -178,16 +152,16 @@ namespace scopi
     template <std::size_t dim>
     std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
     {
-        return contacts.size();
+        return 4*contacts.size();
     }
 
     template<std::size_t dim>
     void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
-        this->m_distances = xt::zeros<double>({contacts.size()});
+        this->m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            this->m_distances[i] = contacts[i].dij;
+            this->m_distances[4*i] = contacts[i].dij;
         }
     }
 }
