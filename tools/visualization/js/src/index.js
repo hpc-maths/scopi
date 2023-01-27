@@ -119,8 +119,8 @@ const sphereObject = function () {
             vec.y = 0.;
             vec.z = 0.;
         }
-        vec.add(center);
         vec.applyQuaternion(quaternion);
+        vec.add(center);
         rot.push(vec);
     };
 }();
@@ -131,7 +131,7 @@ function drawObjects() {
         const reader = new FileReader();
         reader.addEventListener('load', (event) => {
             const data = ext == 'json' ? JSON.parse(reader.result) : BSON.deserialize(event.target.result);
-            
+
             const objects = data.objects;
             const contacts = data.contacts;
 
@@ -320,7 +320,7 @@ function init() {
     controls = new OrbitControls(camera, renderer.domElement);
 
     gui = new GUI();
-    
+
     var animation = gui.addFolder('Animation');
     animation.add(options, 'refresh', 0.01, 5, 0.01);
     guiFrame = animation.add(options, 'current_frame', 0, 0, 1).listen();
@@ -341,7 +341,7 @@ function init() {
             drawObjects();
         });
     view.open();
-    
+
     var obj = {
         reset: function () {
             controls.reset();
