@@ -98,7 +98,7 @@ namespace scopi
                                                              const std::vector<neighbor<dim>>&)
     {
         using namespace mosek::fusion;
-        m_qc1 =  model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
+        m_qc1 =  model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)), Domain::lessThan(D));
     }
 
 
@@ -364,13 +364,13 @@ namespace scopi
     template <std::size_t dim>
     std::size_t ConstraintMosek<ViscousWithoutFriction<dim>>::index_first_col_matrix() const
     {
-        return 1;
+        return 0;
     }
 
     template <std::size_t dim>
     std::size_t ConstraintMosek<ViscousWithoutFriction<dim>>::number_col_matrix() const
     {
-        return 1 + 6*m_nparticles + 6*m_nparticles;
+        return 6*m_nparticles;
     }
 
     template <std::size_t dim>

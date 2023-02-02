@@ -11,12 +11,12 @@ namespace scopi
 
     std::size_t ConstraintMosek<DryWithoutFriction>::index_first_col_matrix() const
     {
-        return 1;
+        return 0;
     }
 
     std::size_t ConstraintMosek<DryWithoutFriction>::number_col_matrix() const
     {
-        return 1 + 6*m_nparticles + 6*m_nparticles;
+        return  6*m_nparticles;
     }
 
     void ConstraintMosek<DryWithoutFriction>::update_dual(std::size_t,
