@@ -9,10 +9,6 @@ namespace scopi
     : m_nparticles(nparticles)
     {}
 
-    std::size_t ConstraintMosek<DryWithoutFriction>::index_first_col_matrix() const
-    {
-        return 0;
-    }
 
     std::size_t ConstraintMosek<DryWithoutFriction>::number_col_matrix() const
     {
@@ -33,10 +29,6 @@ namespace scopi
     : m_nparticles(nparticles)
     {}
 
-    std::size_t ConstraintMosek<DryWithFriction>::index_first_col_matrix() const
-    {
-        return 0;
-    }
 
     std::size_t ConstraintMosek<DryWithFriction>::number_col_matrix() const
     {
@@ -62,11 +54,6 @@ namespace scopi
     ConstraintMosek<DryWithFrictionFixedPoint>::ConstraintMosek(std::size_t nparticles)
     : m_nparticles(nparticles)
     {}
-
-    std::size_t ConstraintMosek<DryWithFrictionFixedPoint>::index_first_col_matrix() const
-    {
-        return 0;
-    }
 
     std::size_t ConstraintMosek<DryWithFrictionFixedPoint>::number_col_matrix() const
     {

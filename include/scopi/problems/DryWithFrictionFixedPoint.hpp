@@ -116,10 +116,19 @@ namespace scopi
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          */
         template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+
+        /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @return Number of rows in the matrix.
+         */
+        template <std::size_t dim>
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
 
         /**
          * @brief Initialize variables for fixed-point algorithm.
@@ -137,10 +146,9 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
-        template<std::size_t dim>
+        template<std::size_t dim, class ScopiSolver>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     const xt::xtensor<double, 1>& lambda,
-                                     const xt::xtensor<double, 2>& u_tilde);
+                                     ScopiSolver* solver);
         /**
          * @brief Stop criterion for the fixed point algorithm.
          *
@@ -168,13 +176,19 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void DryWithFrictionFixedPoint::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
+    void DryWithFrictionFixedPoint::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         this->m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             this->m_distances[4*i] = contacts[i].dij + m_params.mu*this->m_dt*m_s(i);
         }
+    }
+
+    template <std::size_t dim>
+    std::size_t DryWithFrictionFixedPoint::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
+    {
+        return 4*contacts.size();
     }
 
     template<std::size_t dim>
@@ -185,13 +199,13 @@ namespace scopi
         m_s_old = xt::ones<double>({contacts.size()});
     }
 
-    template<std::size_t dim>
+    template<std::size_t dim, class ScopiSolver>
     void DryWithFrictionFixedPoint::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                            const xt::xtensor<double, 1>&,
-                                                            const xt::xtensor<double, 2>& u_tilde)
+                                                            ScopiSolver* solver)
     {
         m_nb_iter++;
         m_s_old = m_s;
+        auto u_tilde = solver->get_constraint(contacts);
         // TODO use xtensor functions to avoid loop
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {

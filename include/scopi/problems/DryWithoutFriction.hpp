@@ -66,8 +66,7 @@ namespace scopi
          */
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts,
-                                          std::size_t firstCol);
+                                          const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Get the number of rows in the matrix.
          *
@@ -145,10 +144,9 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
-        template<std::size_t dim>
+        template<std::size_t dim, class ScopiSolver>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     const xt::xtensor<double, 1>& lambda,
-                                     const xt::xtensor<double, 2>& u_tilde);
+                                      ScopiSolver* solver);
         /**
          * @brief Whether the optimization problem should be solved.
          *
@@ -159,52 +157,10 @@ namespace scopi
 
     template<std::size_t dim>
     void DryWithoutFriction::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                          const std::vector<neighbor<dim>>& contacts,
-                                                          std::size_t firstCol)
+                                                          const std::vector<neighbor<dim>>& contacts)
     {
-        matrix_positive_distance(particles, contacts, firstCol, 1);
-        // std::size_t ic = contacts.size();
-        // std::size_t active_offset = particles.nb_inactive();
-
-        // for (auto &c: contacts)
-        // {
-        //     std::cout << "contact: " << ic << " " << c << std::endl;
-        //     for (std::size_t d = 0; d < 3; ++d)
-        //     {
-        //         this->m_A_rows.push_back(ic);
-        //         this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + d);
-        //         this->m_A_values.push_back(this->m_dt*c.nij[d]);
-        //     }
-        //     for (std::size_t d = 0; d < 3; ++d)
-        //     {
-        //         this->m_A_rows.push_back(ic);
-        //         this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + d);
-        //         this->m_A_values.push_back(-this->m_dt*c.nij[d]);
-        //     }
-
-        //     auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
-        //     auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
-        //     auto Ri = rotation_matrix<3>(particles.q()(c.i));
-        //     auto Rj = rotation_matrix<3>(particles.q()(c.j));
-
-        //     std::size_t ind_part = c.i - active_offset;
-        //     auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
-        //     for (std::size_t ip = 0; ip < 3; ++ip)
-        //     {
-        //         this->m_A_rows.push_back(ic);
-        //         this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
-        //         this->m_A_values.push_back(-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-        //     }
-        //     ind_part = c.j - active_offset;
-        //     dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-        //     for (std::size_t ip = 0; ip < 3; ++ip)
-        //     {
-        //         this->m_A_rows.push_back(ic);
-        //         this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
-        //         this->m_A_values.push_back(this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-        //     }
-        //     ic++;
-        // }
+        matrix_positive_distance(particles, contacts, 1);
+  
     }
 
     template <std::size_t dim>
@@ -333,10 +289,9 @@ namespace scopi
         this->m_should_solve = true;
     }
 
-    template<std::size_t dim>
+    template<std::size_t dim, class ScopiSolver>
     void DryWithoutFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
-                                                     const xt::xtensor<double, 1>&,
-                                                     const xt::xtensor<double, 2>&)
+                                                      ScopiSolver*)
     {
         this->m_should_solve = false;
     }

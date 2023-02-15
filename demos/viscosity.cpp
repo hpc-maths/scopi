@@ -13,9 +13,11 @@
 
 int main()
 {
-    plog::init(plog::warning, "viscosity.log");
+    plog::init(plog::info, "viscosity.log");
 
     constexpr std::size_t dim = 2;
+    using solver_t = scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousWithoutFriction<dim>>, scopi::contact_kdtree, scopi::vap_fpd>;
+    using params_t = typename solver_t::params_t;
     double PI = xt::numeric_constants<double>::PI;
 
     double radius = 1.;
@@ -25,18 +27,20 @@ int main()
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
 
     double dt = 0.05;
-    std::size_t total_it = 150;
-
+    std::size_t total_it = 60;
     scopi::scopi_container<dim> particles;
     scopi::plan<dim> p({{0., 0.}}, PI/2.);
-    scopi::sphere<dim> s({{0., h}}, radius);
+    scopi::sphere<dim> s({{0., 2*h}}, radius);
     particles.push_back(p, scopi::property<dim>().deactivate());
     particles.push_back(s, prop.force({{g*std::cos(alpha), -g*std::sin(alpha)}}));
-
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::ViscousWithoutFriction<dim>>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    params_t params;
+    params.contacts_params.dmax = 2;
+    solver_t solver(particles, dt, params);
     solver.run(total_it);
     particles.f()(1)(1) *= -1.;
-    solver.run(5*total_it, total_it);
+    solver.run(3*total_it, total_it);
+    particles.f()(1)(1) *= -1.;
+    solver.run(8*total_it, 3*total_it);
 
     return 0;
 }

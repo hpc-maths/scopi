@@ -97,10 +97,9 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
-        template<std::size_t dim>
+        template<std::size_t dim, class ScopiSolver>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     const xt::xtensor<double, 1>& lambda,
-                                     const xt::xtensor<double, 2>& u_tilde);
+                                     ScopiSolver* solver);
         /**
          * @brief Get the number of rows in the matrix.
          *
@@ -142,10 +141,9 @@ namespace scopi
         this->m_should_solve = true;
     }
 
-    template<std::size_t dim>
+    template<std::size_t dim, class ScopiSolver>
     void DryWithFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
-                                                  const xt::xtensor<double, 1>&,
-                                                  const xt::xtensor<double, 2>&)
+                                                  ScopiSolver*)
     {
         this->m_should_solve = false;
     }

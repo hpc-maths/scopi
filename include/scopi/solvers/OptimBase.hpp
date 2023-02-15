@@ -23,7 +23,7 @@ namespace scopi{
     class OptimBase : protected problem_t
     {
 
-    protected:
+    public:
         /**
          * @brief Constructor.
          *

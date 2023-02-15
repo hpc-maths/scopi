@@ -214,19 +214,19 @@ namespace scopi
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
-
+            
             displacement_obstacles();
             auto contacts = compute_contacts();
             if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
-            {
+            {   
                 write_output_files(contacts, nite);
             }
             this->set_a_priori_velocity(m_particles, contacts);
             this->extra_steps_before_solve(contacts);
             while (this->should_solve_optimization_problem())
-            {
+            {   
                 optim_solver_t::run(m_particles, contacts, nite);
-                this->extra_steps_after_solve(contacts, this->get_lagrange_multiplier(contacts), this->get_constraint(contacts));
+                this->extra_steps_after_solve(contacts, dynamic_cast<typename optim_solver_t::base_type*>(this));
             }
             move_active_particles();
             update_velocity();

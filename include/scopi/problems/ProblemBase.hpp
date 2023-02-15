@@ -71,7 +71,6 @@ namespace scopi
         template<std::size_t dim>
         void matrix_positive_distance(const scopi_container<dim>& particles,
                                       const std::vector<neighbor<dim>>& contacts,
-                                      std::size_t firstCol,
                                       std::size_t nb_row_per_contact);
 
     private:
@@ -164,7 +163,6 @@ namespace scopi
     template<std::size_t dim>
     void ProblemBase::matrix_positive_distance(const scopi_container<dim>& particles,
                                                const std::vector<neighbor<dim>>& contacts,
-                                               std::size_t firstCol,
                                                std::size_t nb_row_per_contact)
     {
         std::size_t active_offset = particles.nb_inactive();
@@ -184,7 +182,7 @@ namespace scopi
                 for (std::size_t d = 0; d < 3; ++d)
                 {
                     m_A_rows.push_back(nb_row_per_contact*ic);
-                    m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + d);
+                    m_A_cols.push_back((c.i - active_offset)*3 + d);
                     m_A_values.push_back(-m_dt*c.nij[d]);
                 }
             }
@@ -194,7 +192,7 @@ namespace scopi
                 for (std::size_t d = 0; d < 3; ++d)
                 {
                     m_A_rows.push_back(nb_row_per_contact*ic);
-                    m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + d);
+                    m_A_cols.push_back((c.j - active_offset)*3 + d);
                     m_A_values.push_back(m_dt*c.nij[d]);
                 }
             }
@@ -211,7 +209,7 @@ namespace scopi
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
                     m_A_rows.push_back(nb_row_per_contact*ic);
-                    m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
+                    m_A_cols.push_back(3*particles.nb_active() + 3*ind_part + ip);
                     m_A_values.push_back(m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                 }
             }
@@ -223,7 +221,7 @@ namespace scopi
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
                     m_A_rows.push_back(nb_row_per_contact*ic);
-                    m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ip);
+                    m_A_cols.push_back(3*particles.nb_active() + 3*ind_part + ip);
                     m_A_values.push_back(-m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                 }
             }

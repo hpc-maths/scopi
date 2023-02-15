@@ -353,7 +353,7 @@ namespace scopi
         using namespace mosek::fusion;
         using namespace monty;
 
-        m_qc1 = model->constraint("qc1", Expr::mul(A, X), Domain::lessThan(D));
+        m_qc1 = model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)), Domain::lessThan(D));
     }
 
     template <std::size_t dim>
@@ -361,11 +361,6 @@ namespace scopi
     : m_nparticles(nparticles)
     {}
 
-    template <std::size_t dim>
-    std::size_t ConstraintMosek<ViscousWithoutFriction<dim>>::index_first_col_matrix() const
-    {
-        return 0;
-    }
 
     template <std::size_t dim>
     std::size_t ConstraintMosek<ViscousWithoutFriction<dim>>::number_col_matrix() const

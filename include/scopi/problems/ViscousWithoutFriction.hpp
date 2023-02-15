@@ -99,8 +99,7 @@ namespace scopi
          * @param firstCol [in] Index of the first column (solver-dependent).
          */
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts,
-                                          std::size_t firstCol);
+                                          const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Get the number of rows in the matrix.
          *
@@ -174,9 +173,9 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
+        template<class ScopiSolver>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     const xt::xtensor<double, 1>& lambda,
-                                     const xt::xtensor<double, 2>& u_tilde);
+                                      ScopiSolver* solver);
         /**
          * @brief Whether the optimization problem should be solved.
          *
@@ -193,12 +192,12 @@ namespace scopi
 
     template<std::size_t dim>
     void ViscousWithoutFriction<dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                                   const std::vector<neighbor<dim>>& contacts,
-                                                                   std::size_t firstCol)
+                                                                   const std::vector<neighbor<dim>>& contacts)
     {
         std::size_t active_offset = particles.nb_inactive();
-        matrix_positive_distance(particles, contacts, firstCol, 1);
+        matrix_positive_distance(particles, contacts, 1);
         std::size_t ic = 0;
+        std::size_t igamma = 0;
         for (auto &c: contacts)
         {
             if (c.i >= active_offset)
@@ -207,8 +206,8 @@ namespace scopi
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
-                        this->m_A_rows.push_back(contacts.size() + ic);
-                        this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + d);
+                        this->m_A_rows.push_back(contacts.size() + igamma);
+                        this->m_A_cols.push_back((c.i - active_offset)*3 + d);
                         this->m_A_values.push_back(this->m_dt*c.nij[d]);
                     }
                 }
@@ -220,8 +219,8 @@ namespace scopi
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
-                        this->m_A_rows.push_back(contacts.size() + ic);
-                        this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + d);
+                        this->m_A_rows.push_back(contacts.size() + igamma);
+                        this->m_A_cols.push_back( (c.j - active_offset)*3 + d);
                         this->m_A_values.push_back(-this->m_dt*c.nij[d]);
                     }
                 }
@@ -240,8 +239,8 @@ namespace scopi
                 {
                     if (this->m_gamma[ic] < -m_params.tol)
                     {
-                        this->m_A_rows.push_back(contacts.size() + ic);
-                        this->m_A_cols.push_back(firstCol + 3*this->m_nparticles + 3*ind_part + ip);
+                        this->m_A_rows.push_back(contacts.size() + igamma);
+                        this->m_A_cols.push_back(3*this->m_nparticles + 3*ind_part + ip);
                         this->m_A_values.push_back(-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
@@ -255,11 +254,15 @@ namespace scopi
                 {
                     for (std::size_t ip = 0; ip < 3; ++ip)
                     {
-                        this->m_A_rows.push_back(contacts.size() + ic);
-                        this->m_A_cols.push_back(firstCol + 3*this->m_nparticles + 3*ind_part + ip);
+                        this->m_A_rows.push_back(contacts.size() + igamma);
+                        this->m_A_cols.push_back( 3*this->m_nparticles + 3*ind_part + ip);
                         this->m_A_values.push_back(this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
                     }
                 }
+            }
+            if (this->m_gamma[ic] < -m_params.tol)
+            {
+                igamma++;
             }
             ++ic;
         }
@@ -286,24 +289,29 @@ namespace scopi
     }
 
     template<std::size_t dim>
+    template<class ScopiSolver>
     void ViscousWithoutFriction<dim>::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                              const xt::xtensor<double, 1>& lambda,
-                                                              const xt::xtensor<double, 2>&)
-    {
+                                                               ScopiSolver* solver)
+    {   
         this->m_should_solve = false;
+        if (contacts.size() == 0)
+        {
+            return;
+        }
+        auto lambda = solver->get_lagrange_multiplier(contacts);
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
         std::size_t ind_gamma_neg = 0;
         for (std::size_t i = 0; i < this->m_gamma_old.size(); ++i)
-        {
+        {   std::cout<<"Gamma "<<i<<" = "<<this->m_gamma[i]<<std::endl;
             double f_contact;
             if (this->m_gamma[i] < -m_params.tol)
-            {
+            {   
                 f_contact = lambda(i) - lambda(this->m_gamma.size() + ind_gamma_neg);
                 ind_gamma_neg++;
             }
             else
-            {
+            {   
                 f_contact = lambda(i);
             }
             this->m_gamma_old[i] = std::min(0., this->m_gamma[i] - this->m_dt * f_contact);
@@ -311,7 +319,6 @@ namespace scopi
                 this->m_gamma_old[i] = 0.;
             // if (this->m_gamma_old[i] > -m_params.tol)
             //     this->m_gamma_old[i] = 0.;
-
             PLOG_WARNING << this->m_gamma[i];
         }
     }
@@ -327,12 +334,14 @@ namespace scopi
     void ViscousWithoutFriction<dim>::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         this->m_distances = xt::zeros<double>({contacts.size() + this->m_nb_gamma_neg});
+        std::size_t igamma = 0;
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             this->m_distances[i] = contacts[i].dij;
             if(this->m_gamma[i] < -m_params.tol)
             {
-                this->m_distances[contacts.size() + i] = -contacts[i].dij;
+                this->m_distances[contacts.size() + igamma] = -contacts[i].dij;
+                igamma++;
             }
         }
     }
