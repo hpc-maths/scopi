@@ -3,7 +3,7 @@
 
 namespace scopi
 {
-    vap_fpd::vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t, double dt, const VapParams<vap_fpd>&)
+    vap_fpd::vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t, double dt)
     : base_type(Nactive, active_ptr, dt)
     {}
 

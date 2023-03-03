@@ -42,11 +42,6 @@ namespace scopi
     template<class problem_t = DryWithoutFriction>
     class OptimUzawaMatrixFreeTbb : public OptimUzawaBase<OptimUzawaMatrixFreeTbb<problem_t>, problem_t>
     {
-    public:
-        /**
-         * @brief Alias for the problem.
-         */
-        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimUzawaBase.
@@ -67,9 +62,7 @@ namespace scopi
         template <std::size_t dim>
         OptimUzawaMatrixFreeTbb(std::size_t nparts,
                                 double dt,
-                                const scopi_container<dim>& particles,
-                                const OptimParams<OptimUzawaMatrixFreeTbb<problem_t>>& optim_params,
-                                const ProblemParams<problem_t>& problem_params);
+                                const scopi_container<dim>& particles);
 
     public:
         /**
@@ -172,10 +165,8 @@ namespace scopi
     template <std::size_t dim>
     OptimUzawaMatrixFreeTbb<problem_t>::OptimUzawaMatrixFreeTbb(std::size_t nparts,
                                                                 double dt,
-                                                                const scopi_container<dim>&,
-                                                                const OptimParams<OptimUzawaMatrixFreeTbb<problem_t>>& optim_params,
-                                                                const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, dt, optim_params, problem_params)
+                                                                const scopi_container<dim>&)
+    : base_type(nparts, dt)
     {}
 
 }

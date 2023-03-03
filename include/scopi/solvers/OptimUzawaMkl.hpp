@@ -41,11 +41,6 @@ namespace scopi
     template <class problem_t = DryWithoutFriction>
     class OptimUzawaMkl: public OptimUzawaBase<OptimUzawaMkl<problem_t>, problem_t>
     {
-    public:
-        /**
-         * @brief Alias for the problem.
-         */
-        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimUzawaBase.
@@ -68,9 +63,7 @@ namespace scopi
         template <std::size_t dim>
         OptimUzawaMkl(std::size_t nparts,
                       double dt,
-                      const scopi_container<dim>& particles,
-                      const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
-                      const ProblemParams<problem_t>& problem_params);
+                      const scopi_container<dim>& particles);
         /**
          * @brief Free the memory allocated for the matrix \f$ \mathbb{P}^{-1} \f$.
          */
@@ -89,8 +82,7 @@ namespace scopi
          */
         template <std::size_t dim>
         void init_uzawa_impl(const scopi_container<dim>& particles,
-                             const std::vector<neighbor<dim>>& contacts,
-                             const std::vector<neighbor<dim>>& contacts_worms);
+                             const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Free the memory allocated for the matrix \f$ \mathbb{B} \f$.
          */
@@ -259,10 +251,8 @@ namespace scopi
     template<std::size_t dim>
     OptimUzawaMkl<problem_t>::OptimUzawaMkl(std::size_t nparts,
                                             double dt,
-                                            const scopi_container<dim>& particles,
-                                            const OptimParams<OptimUzawaMkl<problem_t>>& optim_params,
-                                            const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, dt, optim_params, problem_params)
+                                            const scopi_container<dim>& particles)
+    : base_type(nparts, dt)
     {
         std::vector<MKL_INT> invP_csr_row;
         std::vector<MKL_INT> invP_csr_col;

@@ -434,8 +434,6 @@ namespace scopi
 
     TEST_CASE_TEMPLATE_DEFINE("two worms", SolverType, two_worms)
     {
-        using params_t = typename SolverType::params_t;
-
         constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -451,11 +449,11 @@ namespace scopi
         particles.push_back(w1, prop.desired_velocity({-1., 0.}));
         particles.push_back(w2, prop.desired_velocity({1., 0.}));
 
-        params_t params;
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
         set_params_test(params.optim_params);
-        params.contacts_params.dmax = 1.;
-        // params.scopi_params.output_frequency = total_it-1;
-        SolverType solver(particles, dt, params);
+        params.contact_params.dmax = 1.;
+        // params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_worms.json", tolerance));

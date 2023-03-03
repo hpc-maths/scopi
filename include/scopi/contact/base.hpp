@@ -58,6 +58,7 @@ namespace scopi
         template <std::size_t dim>
         std::vector<neighbor<dim>> run(scopi_container<dim>& particles, std::size_t active_ptr);
 
+        params_t& get_params();
     protected:
         params_t m_params;
     };
@@ -74,6 +75,12 @@ namespace scopi
     std::vector<neighbor<dim>> contact_base<D>::run(scopi_container<dim>& particles, std::size_t active_ptr)
     {
         return this->derived_cast().run_impl(BoxDomain<dim>(), particles, active_ptr);
+    }
+
+    template <class D>
+    auto contact_base<D>::get_params() -> params_t&
+    {
+        return m_params;
     }
 
     /**

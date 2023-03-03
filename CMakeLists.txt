@@ -107,7 +107,6 @@ set(SCOPI_SRC
     src/problems/DryWithFriction.cpp
     src/problems/DryWithFrictionBase.cpp
     src/problems/DryWithFrictionFixedPoint.cpp
-    src/problems/ProblemBase.cpp
     src/solvers/ConstraintMosek.cpp
     src/solvers/OptimUzawaBase.cpp
     src/solvers/OptimProjectedGradient.cpp

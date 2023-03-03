@@ -65,9 +65,9 @@ namespace scopi
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      *
      */
-    class DryWithFriction : protected DryWithFrictionBase
+    class DryWithFriction : public DryWithFrictionBase<ProblemParams<DryWithFriction>>
     {
-    protected:
+    public:
         /**
          * @brief Constructor.
          *
@@ -75,7 +75,7 @@ namespace scopi
          * @param dt [in] Time step.
          * @param problem_params [in] Parameters.
          */
-        DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
+        DryWithFriction(std::size_t nparticles, double dt);
 
         /**
          * @brief Extra steps before solving the optimization problem.
@@ -85,8 +85,8 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          */
-        template<std::size_t dim>
-        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        template<std::size_t dim, class optim_solver_t>
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts, optim_solver_t&);
         /**
          * @brief Extra steps after solving the optimization problem.
          *
@@ -97,9 +97,9 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
-        template<std::size_t dim, class ScopiSolver>
+        template<std::size_t dim, class optim_solver_t>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     ScopiSolver* solver);
+                                     optim_solver_t& optim_solver);
         /**
          * @brief Get the number of rows in the matrix.
          *
@@ -126,24 +126,19 @@ namespace scopi
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
 
-        bool should_solve_optimization_problem();
+        bool should_solve() const;
 
-    private:
-        /**
-         * @brief Parameters.
-         */
-        ProblemParams<DryWithFriction> m_params;
     };
 
-    template<std::size_t dim>
-    void DryWithFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&)
+    template<std::size_t dim, class optim_solver_t>
+    void DryWithFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&, optim_solver_t&)
     {
         this->m_should_solve = true;
     }
 
-    template<std::size_t dim, class ScopiSolver>
+    template<std::size_t dim, class optim_solver_t>
     void DryWithFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
-                                                  ScopiSolver*)
+                                                  optim_solver_t&)
     {
         this->m_should_solve = false;
     }

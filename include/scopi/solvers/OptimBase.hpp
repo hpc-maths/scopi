@@ -11,7 +11,8 @@
 #include "../utils.hpp"
 #include "../params.hpp"
 
-namespace scopi{
+namespace scopi
+{
     /**
      * @class OptimBase
      * @brief Commun interface for the different optimization solvers.
@@ -19,11 +20,14 @@ namespace scopi{
      * @tparam Derived Optimization solver.
      * @tparam problem_t Problem to be solved.
      */
-    template <class Derived, class problem_t>
-    class OptimBase : protected problem_t
+    template <class Derived, class problem_type>
+    class OptimBase
     {
 
     public:
+        using problem_t = problem_type;
+        using params_t = OptimParams<Derived>;
+
         /**
          * @brief Constructor.
          *
@@ -34,7 +38,7 @@ namespace scopi{
          * @param optim_params [in] Parameters for the optimization solver.
          * @param problem_params [in] Parameters for the problem.
          */
-        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params);
+        OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec);
 
         /**
          * @brief Build the vectors and matrices necessary to solve the optimization problem and solve it.
@@ -93,11 +97,24 @@ namespace scopi{
         template<std::size_t dim>
         auto get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts);
 
+        bool should_solve() const;
+
+        template<std::size_t dim>
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
+
+        template<std::size_t dim>
+        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts);
+
+        params_t& get_params();
+
+        problem_t& problem();
+
     protected:
+        problem_t m_problem;
         /**
          * @brief Parameters for the optimization solver.
          */
-        OptimParams<Derived> m_params;
+        params_t m_params;
         /**
          * @brief Number of particles.
          */
@@ -106,6 +123,7 @@ namespace scopi{
          * @brief Vector \f$ \mathbf{c} \f$.
          */
         xt::xtensor<double, 1> m_c;
+
 
     private:
         /**
@@ -149,7 +167,7 @@ namespace scopi{
     {
         tic();
         create_vector_c(particles);
-        this->create_vector_distances(contacts);
+        m_problem.create_vector_distances(contacts);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : vectors = " << duration;
 
@@ -160,9 +178,9 @@ namespace scopi{
 
 
     template<class Derived, class problem_t>
-    OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec, const OptimParams<Derived>& optim_params, const ProblemParams<problem_t>& problem_params)
-    : problem_t(nparts, dt, problem_params)
-    , m_params(optim_params)
+    OptimBase<Derived, problem_t>::OptimBase(std::size_t nparts, double dt, std::size_t cSize, std::size_t c_dec)
+    : m_problem(nparts, dt)
+    , m_params()
     , m_nparts(nparts)
     , m_c(xt::zeros<double>({cSize}))
     , m_c_dec(c_dec)
@@ -207,14 +225,14 @@ namespace scopi{
     auto OptimBase<Derived, problem_t>::get_uadapt()
     {
         auto data = static_cast<Derived&>(*this).uadapt_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
+        return xt::adapt(reinterpret_cast<double*>(data), {m_nparts, 3UL});
     }
 
     template<class Derived, class problem_t>
     auto OptimBase<Derived, problem_t>::get_wadapt()
     {
         auto data = static_cast<Derived&>(*this).wadapt_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {this->m_nparts, 3UL});
+        return xt::adapt(reinterpret_cast<double*>(data), {m_nparts, 3UL});
     }
 
     template<class Derived, class problem_t>
@@ -233,13 +251,45 @@ namespace scopi{
     auto OptimBase<Derived, problem_t>::get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts)
     {
         auto data = static_cast<Derived&>(*this).lagrange_multiplier_data();
-        return xt::adapt(reinterpret_cast<double*>(data), {this->number_row_matrix(contacts)});
+        return xt::adapt(reinterpret_cast<double*>(data), {m_problem.number_row_matrix(contacts)});
     }
 
     template<class Derived, class problem_t>
     int OptimBase<Derived, problem_t>::get_nb_active_contacts() const
     {
         return static_cast<const Derived&>(*this).get_nb_active_contacts_impl();
+    }
+
+    template<class Derived, class problem_t>
+    template<std::size_t dim>
+    void OptimBase<Derived, problem_t>::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts)
+    {
+        m_problem.extra_steps_before_solve(contacts, *this);
+    }
+
+    template<class Derived, class problem_t>
+    template<std::size_t dim>
+    void OptimBase<Derived, problem_t>::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts)
+    {
+        m_problem.extra_steps_after_solve(contacts, *this);
+    }
+
+    template<class Derived, class problem_t>
+    bool OptimBase<Derived, problem_t>::should_solve() const
+    {
+        return m_problem.should_solve();
+    }
+
+    template<class Derived, class problem_t>
+    auto OptimBase<Derived, problem_t>::get_params() -> params_t&
+    {
+        return m_params;
+    }
+
+    template<class Derived, class problem_t>
+    auto OptimBase<Derived, problem_t>::problem() -> problem_t&
+    {
+        return m_problem;
     }
 }
 

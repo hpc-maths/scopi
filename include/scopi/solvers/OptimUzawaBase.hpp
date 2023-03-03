@@ -84,10 +84,6 @@ namespace scopi{
     {
     private:
         /**
-         * @brief Alias for the problem.
-         */
-        using problem_type = problem_t;
-        /**
          * @brief Alias for the base class OptimBase.
          */
         using base_type = OptimBase<Derived, problem_t>;
@@ -101,10 +97,7 @@ namespace scopi{
          * @param optim_params [in] Parameters.
          * @param problem_params [in] Parameters for the problem.
          */
-        OptimUzawaBase(std::size_t nparts,
-                       double dt,
-                       const OptimParams<Derived>& optim_params,
-                       const ProblemParams<problem_t>& problem_params);
+        OptimUzawaBase(std::size_t nparts, double dt);
 
     public:
         /**
@@ -234,10 +227,8 @@ namespace scopi{
 
     template<class Derived, class problem_t>
     OptimUzawaBase<Derived, problem_t>::OptimUzawaBase(std::size_t nparts,
-                                                       double dt,
-                                                       const OptimParams<Derived>& optim_params,
-                                                       const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
+                                                       double dt)
+    : base_type(nparts, dt, 2*3*nparts, 0)
     , m_U(xt::zeros<double>({6*nparts}))
     , m_dmin(0.)
     {}
@@ -250,8 +241,8 @@ namespace scopi{
         tic();
         init_uzawa(particles, contacts);
         auto duration = toc();
-        m_L = xt::zeros<double>({this->number_row_matrix(contacts)});
-        m_R = xt::zeros<double>({this->number_row_matrix(contacts)});
+        m_L = xt::zeros<double>({this->problem().number_row_matrix(contacts)});
+        m_R = xt::zeros<double>({this->problem().number_row_matrix(contacts)});
         PLOG_INFO << "----> CPUTIME : Uzawa matrix = " << duration;
 
         double time_assign_u = 0.;
@@ -286,7 +277,7 @@ namespace scopi{
             time_solve += duration;
 
             tic();
-            xt::noalias(m_R) = this->m_distances - m_dmin;
+            xt::noalias(m_R) = this->problem().distances() - m_dmin;
             duration = toc();
             time_assign_r += duration;
             time_solve += duration;

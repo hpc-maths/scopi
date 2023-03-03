@@ -11,12 +11,11 @@ namespace scopi
     : mu(params.mu)
     {}
 
-    DryWithFriction::DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& params)
-    : DryWithFrictionBase(nparticles, dt, params.mu)  
-    , m_params(params)
+    DryWithFriction::DryWithFriction(std::size_t nparticles, double dt)
+    : DryWithFrictionBase(nparticles, dt)
     {}
 
-    bool DryWithFriction::should_solve_optimization_problem()
+    bool DryWithFriction::should_solve() const
     {
         return this->m_should_solve;
     }

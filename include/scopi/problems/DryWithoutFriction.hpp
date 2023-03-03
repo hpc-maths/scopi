@@ -43,30 +43,17 @@ namespace scopi
      * For worms, we also impose that the distance between spheres in a worm is non-positive.
      * More exactly, we impose that minus the distance is non-negative.
      */
-    class DryWithoutFriction : protected ProblemBase
+    class DryWithoutFriction : public ProblemBase<ProblemParams<DryWithoutFriction>>
     {
-    protected:
+    public:
         /**
          * @brief Constructor.
          *
          * @param nparts [in] Number of particles.
          * @param dt [in] Time step.
-         * @param problem_params [in] Parameters (for compatibilty).
          */
-        DryWithoutFriction(std::size_t nparts, double dt, const ProblemParams<DryWithoutFriction>& problem_params);
+        DryWithoutFriction(std::size_t nparts, double dt);
 
-    protected:
-        /**
-         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param particles [in] Array of particles (for positions).
-         * @param contacts [in] Array of contacts.
-         * @param firstCol [in] Index of the first column (solver-dependent).
-         */
-        template <std::size_t dim>
-        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts);
         /**
          * @brief Get the number of rows in the matrix.
          *
@@ -86,6 +73,50 @@ namespace scopi
          */
         template<std::size_t dim>
         void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+
+        /**
+         * @brief Extra steps before solving the optimization problem.
+         *
+         * For compatibility with the other problems.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         */
+        template<std::size_t dim, class optim_solver_t>
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts,
+                                      const optim_solver_t& solver);
+        /**
+         * @brief Extra steps after solving the optimization problem.
+         *
+         * For compatibility with the other problems.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param lambda [in] Lagrange multipliers.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
+         */
+        template<std::size_t dim, class optim_solver_t>
+        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
+                                     const optim_solver_t& solver);
+        /**
+         * @brief Whether the optimization problem should be solved.
+         *
+         * For compatibility with the other problems.
+         */
+        bool should_solve() const;
+
+    public:
+        /**
+         * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param particles [in] Array of particles (for positions).
+         * @param contacts [in] Array of contacts.
+         * @param firstCol [in] Index of the first column (solver-dependent).
+         */
+        template <std::size_t dim>
+        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
+                                          const std::vector<neighbor<dim>>& contacts);
 
         /**
          * @brief Matrix-free product \f$ \mathbf{r} = \mathbf{r} - \mathbb{B} \mathbf{u} \f$.
@@ -123,36 +154,6 @@ namespace scopi
                                           xt::xtensor<double, 1>& U,
                                           std::size_t active_offset,
                                           std::size_t row);
-
-        /**
-         * @brief Extra steps before solving the optimization problem.
-         *
-         * For compatibility with the other problems.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contacts.
-         */
-        template<std::size_t dim>
-        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
-        /**
-         * @brief Extra steps after solving the optimization problem.
-         *
-         * For compatibility with the other problems.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contacts.
-         * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
-         */
-        template<std::size_t dim, class ScopiSolver>
-        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                      ScopiSolver* solver);
-        /**
-         * @brief Whether the optimization problem should be solved.
-         *
-         * For compatibility with the other problems.
-         */
-        bool should_solve_optimization_problem();
     };
 
     template<std::size_t dim>
@@ -160,7 +161,7 @@ namespace scopi
                                                           const std::vector<neighbor<dim>>& contacts)
     {
         matrix_positive_distance(particles, contacts, 1);
-  
+
     }
 
     template <std::size_t dim>
@@ -283,15 +284,15 @@ namespace scopi
         }
     }
 
-    template<std::size_t dim>
-    void DryWithoutFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&)
+    template<std::size_t dim, class optim_solver_t>
+    void DryWithoutFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&, const optim_solver_t&)
     {
         this->m_should_solve = true;
     }
 
-    template<std::size_t dim, class ScopiSolver>
+    template<std::size_t dim, class optim_solver_t>
     void DryWithoutFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
-                                                      ScopiSolver*)
+                                                     const optim_solver_t&)
     {
         this->m_should_solve = false;
     }

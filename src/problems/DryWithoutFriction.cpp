@@ -3,11 +3,11 @@
 
 namespace scopi
 {
-    DryWithoutFriction::DryWithoutFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithoutFriction>&)
+    DryWithoutFriction::DryWithoutFriction(std::size_t nparticles, double dt)
     : ProblemBase(nparticles, dt)
     {}
 
-    bool DryWithoutFriction::should_solve_optimization_problem()
+    bool DryWithoutFriction::should_solve() const
     {
         return this->m_should_solve;
     }

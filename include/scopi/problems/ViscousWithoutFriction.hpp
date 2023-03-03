@@ -75,18 +75,18 @@ namespace scopi
      * @tparam dim Dimension (2 or 3).
      */
     template<std::size_t dim>
-    class ViscousWithoutFriction: protected ProblemBase
-                                , protected ViscousBase<dim>
+    class ViscousWithoutFriction: public ProblemBase<ProblemParams<ViscousWithoutFriction<dim>>>
+                                , public ViscousBase<dim>
     {
-    protected:
+    public:
         /**
          * @brief Constructor.
          *
          * @param nparts [in] Number of particles.
          * @param dt [in] Time step.
-         * @param problem_params [in] Parameters.
+         * @param problethis->m_params [in] Parameters.
          */
-        ViscousWithoutFriction(std::size_t nparts, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params);
+        ViscousWithoutFriction(std::size_t nparts, double dt);
 
         /**
          * @brief Construct the COO storage of the matrix \f$ \mathbb{B} \f$ for the constraint.
@@ -161,7 +161,8 @@ namespace scopi
          *
          * @param contacts_new
          */
-        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new);
+        template<class optim_solver_t>
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new, optim_solver_t&);
         /**
          * @brief Compute the value of \f$ \gamma^{n+1} \f$.
          *
@@ -173,36 +174,31 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
-        template<class ScopiSolver>
+        template<class optim_solver_t>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                      ScopiSolver* solver);
+                                    optim_solver_t& optim_solver);
         /**
          * @brief Whether the optimization problem should be solved.
          *
          * For compatibility with the other problems.
          */
-        bool should_solve_optimization_problem();
+        bool should_solve() const;
 
-    private:
-        /**
-         * @brief Parameters.
-         */
-        ProblemParams<ViscousWithoutFriction<dim>> m_params;
-    };
+   };
 
     template<std::size_t dim>
     void ViscousWithoutFriction<dim>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
                                                                    const std::vector<neighbor<dim>>& contacts)
     {
         std::size_t active_offset = particles.nb_inactive();
-        matrix_positive_distance(particles, contacts, 1);
+        this->matrix_positive_distance(particles, contacts, 1);
         std::size_t ic = 0;
         std::size_t igamma = 0;
         for (auto &c: contacts)
         {
             if (c.i >= active_offset)
             {
-                if (this->m_gamma[ic] < -m_params.tol)
+                if (this->m_gamma[ic] < -this->m_params.tol)
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
@@ -215,7 +211,7 @@ namespace scopi
 
             if (c.j >= active_offset)
             {
-                if (this->m_gamma[ic] < -m_params.tol)
+                if (this->m_gamma[ic] < -this->m_params.tol)
                 {
                     for (std::size_t d = 0; d < 3; ++d)
                     {
@@ -237,7 +233,7 @@ namespace scopi
                 auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ip = 0; ip < 3; ++ip)
                 {
-                    if (this->m_gamma[ic] < -m_params.tol)
+                    if (this->m_gamma[ic] < -this->m_params.tol)
                     {
                         this->m_A_rows.push_back(contacts.size() + igamma);
                         this->m_A_cols.push_back(3*this->m_nparticles + 3*ind_part + ip);
@@ -250,7 +246,7 @@ namespace scopi
             {
                 std::size_t ind_part = c.j - active_offset;
                 auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
-                if (this->m_gamma[ic] < -m_params.tol)
+                if (this->m_gamma[ic] < -this->m_params.tol)
                 {
                     for (std::size_t ip = 0; ip < 3; ++ip)
                     {
@@ -260,7 +256,7 @@ namespace scopi
                     }
                 }
             }
-            if (this->m_gamma[ic] < -m_params.tol)
+            if (this->m_gamma[ic] < -this->m_params.tol)
             {
                 igamma++;
             }
@@ -269,55 +265,55 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt, const ProblemParams<ViscousWithoutFriction<dim>>& problem_params)
-    : ProblemBase(nparticles, dt)
+    ViscousWithoutFriction<dim>::ViscousWithoutFriction(std::size_t nparticles, double dt)
+    : ProblemBase<ProblemParams<ViscousWithoutFriction<dim>>>(nparticles, dt)
     , ViscousBase<dim>()
-    , m_params(problem_params)
     {}
 
     template<std::size_t dim>
-    void ViscousWithoutFriction<dim>::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new)
+    template<class optim_solver_t>
+    void ViscousWithoutFriction<dim>::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts_new, optim_solver_t&)
     {
         this->m_should_solve = true;
         this->set_gamma_base(contacts_new);
         this->m_nb_gamma_neg = 0;
         for (auto& g : this->m_gamma)
         {
-            if (g < -m_params.tol)
+            if (g < -this->m_params.tol)
                 this->m_nb_gamma_neg++;
         }
     }
 
     template<std::size_t dim>
-    template<class ScopiSolver>
+    template<class optim_solver_t>
     void ViscousWithoutFriction<dim>::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                               ScopiSolver* solver)
-    {   
+                                                              optim_solver_t& optim_solver)
+    {
         this->m_should_solve = false;
         if (contacts.size() == 0)
         {
             return;
         }
-        auto lambda = solver->get_lagrange_multiplier(contacts);
+        auto lambda = optim_solver.get_lagrange_multiplier(contacts);
         this->m_contacts_old = contacts;
         this->m_gamma_old.resize(this->m_gamma.size());
         std::size_t ind_gamma_neg = 0;
         for (std::size_t i = 0; i < this->m_gamma_old.size(); ++i)
         {   std::cout<<"Gamma "<<i<<" = "<<this->m_gamma[i]<<std::endl;
             double f_contact;
-            if (this->m_gamma[i] < -m_params.tol)
-            {   
+            if (this->m_gamma[i] < -this->m_params.tol)
+            {
                 f_contact = lambda(i) - lambda(this->m_gamma.size() + ind_gamma_neg);
                 ind_gamma_neg++;
             }
             else
-            {   
+            {
                 f_contact = lambda(i);
             }
             this->m_gamma_old[i] = std::min(0., this->m_gamma[i] - this->m_dt * f_contact);
-            if (this->m_gamma_old[i] > -m_params.tol)
+            if (this->m_gamma_old[i] > -this->m_params.tol)
                 this->m_gamma_old[i] = 0.;
-            // if (this->m_gamma_old[i] > -m_params.tol)
+            // if (this->m_gamma_old[i] > -this->m_params.tol)
             //     this->m_gamma_old[i] = 0.;
             PLOG_WARNING << this->m_gamma[i];
         }
@@ -338,7 +334,7 @@ namespace scopi
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
             this->m_distances[i] = contacts[i].dij;
-            if(this->m_gamma[i] < -m_params.tol)
+            if(this->m_gamma[i] < -this->m_params.tol)
             {
                 this->m_distances[contacts.size() + igamma] = -contacts[i].dij;
                 igamma++;
@@ -359,7 +355,7 @@ namespace scopi
             for (std::size_t d = 0; d < 3; ++d)
             {
                 R(row) -= (-this->m_dt*c.nij[d]) * U((c.i - active_offset)*3 + d);
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (this->m_dt*c.nij[d]) * U((c.i - active_offset)*3 + d);
                 }
@@ -371,7 +367,7 @@ namespace scopi
             for (std::size_t d = 0; d < 3; ++d)
             {
                 R(row) -= (this->m_dt*c.nij[d]) * U((c.j - active_offset)*3 + d);
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (-this->m_dt*c.nij[d]) * U((c.j - active_offset)*3 + d);
                 }
@@ -390,7 +386,7 @@ namespace scopi
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
                 R(row) -= (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
                 }
@@ -404,7 +400,7 @@ namespace scopi
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
                 R(row) -= (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
                     R(this->m_gamma.size() + row) -= (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip))) * U(3*this->m_nparticles + 3*ind_part + ip);
                 }
@@ -426,7 +422,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U((c.i - active_offset)*3 + d) += L(row) * (-this->m_dt*c.nij[d]);
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
 #pragma omp atomic
                     U((c.i - active_offset)*3 + d) += L(this->m_gamma.size() + row) * (this->m_dt*c.nij[d]);
@@ -440,7 +436,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U((c.j - active_offset)*3 + d) += L(row) * (this->m_dt*c.nij[d]);
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
 #pragma omp atomic
                     U((c.j - active_offset)*3 + d) += L(this->m_gamma.size() + row) * (-this->m_dt*c.nij[d]);
@@ -461,7 +457,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U(3*this->m_nparticles + 3*ind_part + ip) += L(row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
 #pragma omp atomic
                     U(3*this->m_nparticles + 3*ind_part + ip) += L(this->m_gamma.size() + row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
@@ -477,7 +473,7 @@ namespace scopi
             {
 #pragma omp atomic
                 U(3*this->m_nparticles + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                if (this->m_gamma[row] < -m_params.tol)
+                if (this->m_gamma[row] < -this->m_params.tol)
                 {
 #pragma omp atomic
                     U(3*this->m_nparticles + 3*ind_part + ip) += L(this->m_gamma.size() + row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
@@ -487,7 +483,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    bool ViscousWithoutFriction<dim>::should_solve_optimization_problem()
+    bool ViscousWithoutFriction<dim>::should_solve() const
     {
         return this->m_should_solve;
     }

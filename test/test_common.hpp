@@ -44,7 +44,7 @@ namespace scopi
             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_ar>, contact, vap>,
             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_asr>, contact, vap>,
 #endif
-#ifdef SCOPI_USE_TPP
+#ifdef SCOPI_USE_TBB
             ScopiSolver<dim, OptimUzawaMatrixFreeTbb<problem>, contact, vap>,
 #endif
 #ifdef SCOPI_USE_MOSEK
@@ -67,6 +67,13 @@ namespace scopi
     template<std::size_t dim>
     using solver_dry_without_friction_t = tuple_cat_t<solver_t<dim, DryWithoutFriction, contact_kdtree, vap_fixed>,
                                                       solver_t<dim, DryWithoutFriction, contact_brute_force, vap_fixed>>;
+
+    template<std::size_t dim, class vap>
+    using solver_dry_with_friction_t = std::tuple<ScopiSolver<dim, OptimMosek<DryWithFriction>, contact_kdtree, vap>,
+                                                   ScopiSolver<dim, OptimMosek<DryWithFriction>, contact_brute_force, vap>>;
+
+
+
 
 }
 
@@ -130,16 +137,14 @@ namespace scopi
 // #define SOLVER_VISCOUS_WITH_FRICTION(dim, contact, vap) \
 //     ScopiSolver<dim, OptimMosek<ViscousWithFriction<dim>>, contact, vap>
 
-// #define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \
-//     static size_t _doctest_subcase_idx = 0; \
-//     std::for_each(data_container.begin(), data_container.end(), [&](const auto& in) {  \
-//             DOCTEST_SUBCASE((std::string(#data_container "[") + \
-//                         std::to_string(_doctest_subcase_idx++) + "]").c_str()) { data = in; } \
-//                         }); \
-//     _doctest_subcase_idx = 0;
-
+#define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \
+    static size_t _doctest_subcase_idx = 0; \
+    std::for_each(data_container.begin(), data_container.end(), [&](const auto& in) {  \
+            DOCTEST_SUBCASE((std::string(#data_container "[") + \
+                        std::to_string(_doctest_subcase_idx++) + "]").c_str()) { data = in; } \
+                        }); \
+    _doctest_subcase_idx = 0;
 // }
-
 #define TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact, vap) \
     TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::solver<scopi::problem>, scopi::contact, scopi::vap>)
 #define TYPE_TO_STRING_CONTACTS_VAP(solver, problem, dim)\

@@ -33,16 +33,18 @@ namespace scopi
      *
      * Different solvers can be used to solve the problem, see OptimBase.
      */
+    template<class Params>
     class ProblemBase
     {
-    protected:
-        /**
-         * @brief Constructor.
-         *
-         * @param nparts [in] Number of active particles.
-         * @param dt [in] Time step.
-         */
-        ProblemBase(std::size_t nparts, double dt);
+    public:
+        using params_t = Params;
+
+        xt::xtensor<double, 1>& distances();
+        std::vector<int>& A_rows();
+        std::vector<int>& A_cols();
+        std::vector<double>& A_values();
+
+        params_t& get_params();
 
         /**
          * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$.
@@ -58,6 +60,14 @@ namespace scopi
                                     xt::xtensor<double, 1>& U,
                                     std::size_t active_offset,
                                     std::size_t row);
+    protected:
+        /**
+         * @brief Constructor.
+         *
+         * @param nparts [in] Number of active particles.
+         * @param dt [in] Time step.
+         */
+        ProblemBase(std::size_t nparts, double dt);
 
         /**
          * @brief COO storage of the shared row of \f$ \mathbb{B} \f$.
@@ -72,6 +82,8 @@ namespace scopi
         void matrix_positive_distance(const scopi_container<dim>& particles,
                                       const std::vector<neighbor<dim>>& contacts,
                                       std::size_t nb_row_per_contact);
+
+        params_t m_params;
 
     private:
         /**
@@ -147,8 +159,9 @@ namespace scopi
         bool m_should_solve;
     };
 
+    template<class Params>
     template<std::size_t dim>
-    void ProblemBase::matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
+    void ProblemBase<Params>::matrix_free_gemv_inv_P(const scopi_container<dim>& particles,
                                              xt::xtensor<double, 1>& U,
                                              std::size_t active_offset,
                                              std::size_t row)
@@ -160,8 +173,9 @@ namespace scopi
         matrix_free_gemv_inv_P_moment(particles, U, active_offset, row);
     }
 
+    template<class Params>
     template<std::size_t dim>
-    void ProblemBase::matrix_positive_distance(const scopi_container<dim>& particles,
+    void ProblemBase<Params>::matrix_positive_distance(const scopi_container<dim>& particles,
                                                const std::vector<neighbor<dim>>& contacts,
                                                std::size_t nb_row_per_contact)
     {
@@ -227,6 +241,68 @@ namespace scopi
             }
 
             ++ic;
+        }
+    }
+
+    template<class Params>
+    ProblemBase<Params>::ProblemBase(std::size_t nparts, double dt)
+    : m_params()
+    , m_nparticles(nparts)
+    , m_dt(dt)
+    {}
+
+    template<class Params>
+    auto ProblemBase<Params>::get_params() -> params_t&
+    {
+        return m_params;
+    }
+
+    template<class Params>
+    xt::xtensor<double, 1>& ProblemBase<Params>::distances()
+    {
+        return m_distances;
+    }
+
+    template<class Params>
+    std::vector<int>& ProblemBase<Params>::A_rows()
+    {
+        return m_A_rows;
+    }
+
+
+
+    template<class Params>
+    std::vector<int>& ProblemBase<Params>::A_cols()
+    {
+        return m_A_cols;
+    }
+
+    template<class Params>
+    std::vector<double>& ProblemBase<Params>::A_values()
+    {
+        return m_A_values;
+    }
+
+    template<class Params>
+    void ProblemBase<Params>::matrix_free_gemv_inv_P_moment(const scopi_container<2>& particles,
+                                                    xt::xtensor<double, 1>& U,
+                                                    std::size_t active_offset,
+                                                    std::size_t row)
+    {
+        auto nparticles = particles.nb_active();
+        U(3*nparticles + 3*row + 2) /= (-1.*particles.j()(active_offset + row));
+    }
+
+    template<class Params>
+    void ProblemBase<Params>::matrix_free_gemv_inv_P_moment(const scopi_container<3>& particles,
+                                                    xt::xtensor<double, 1>& U,
+                                                    std::size_t active_offset,
+                                                    std::size_t row)
+    {
+        auto nparticles = particles.nb_active();
+        for (std::size_t d = 0; d < 3; ++d)
+        {
+            U(3*nparticles + 3*row + d) /= (-1.*particles.j()(active_offset + row)[d]);
         }
     }
 }
