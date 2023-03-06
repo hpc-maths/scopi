@@ -200,7 +200,12 @@ namespace scopi
     {
         m_nb_iter++;
         m_s_old = m_s;
-        auto u_tilde = optim_solver.get_constraint(contacts);
+        auto data = optim_solver.constraint_data();
+        xt::xtensor<double, 2> u_tilde;
+        if (data)
+        {
+            u_tilde = xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
+        }
         // TODO use xtensor functions to avoid loop
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {

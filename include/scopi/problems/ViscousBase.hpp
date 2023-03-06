@@ -79,7 +79,7 @@ namespace scopi
                 auto cn = contacts_new[index_new];
                 std::size_t index_old = 0.;
                 auto co = m_contacts_old[index_old];
-                while (co.i < cn.i && index_old < m_contacts_old.size())
+                while (co.i < cn.i && index_old < m_contacts_old.size()-1)
                 {
                     index_old ++;
                     co = m_contacts_old[index_old];

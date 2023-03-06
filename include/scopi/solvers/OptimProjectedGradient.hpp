@@ -172,7 +172,7 @@ namespace scopi{
          *
          * @return \f$ N_c \f$ elements.
          */
-        double* constraint_data();
+        double* constraint_data_impl();
         /**
          * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
@@ -384,7 +384,7 @@ namespace scopi{
     }
 
     template<class problem_t, template<class> class gradient_t>
-    double* OptimProjectedGradient<problem_t, gradient_t>::constraint_data()
+    double* OptimProjectedGradient<problem_t, gradient_t>::constraint_data_impl()
     {
         return NULL;
     }

@@ -70,18 +70,7 @@ namespace scopi
          * @return \f$ N \times 3 \f$ array.
          */
         auto get_wadapt();
-        /**
-         * @brief Returns \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
-         *
-         * \pre Call \c run before calling this function.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contatcs.
-         *
-         * @return
-         */
-        template<std::size_t dim>
-        xt::xtensor<double, 2> get_constraint(const std::vector<neighbor<dim>>& contacts);
+
         /**
          * @brief Returns the Lagrange multipliers (solution of the dual problem) when the optimization is solved.
          *
@@ -104,6 +93,8 @@ namespace scopi
 
         template<std::size_t dim>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts);
+
+        auto constraint_data();
 
         params_t& get_params();
 
@@ -237,17 +228,6 @@ namespace scopi
 
     template<class Derived, class problem_t>
     template<std::size_t dim>
-    xt::xtensor<double, 2> OptimBase<Derived, problem_t>::get_constraint(const std::vector<neighbor<dim>>& contacts)
-    {
-        auto data = static_cast<Derived&>(*this).constraint_data();
-        if (data)
-            return xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
-        else
-            return xt::xtensor<double, 2>{};
-    }
-
-    template<class Derived, class problem_t>
-    template<std::size_t dim>
     auto OptimBase<Derived, problem_t>::get_lagrange_multiplier(const std::vector<neighbor<dim>>& contacts)
     {
         auto data = static_cast<Derived&>(*this).lagrange_multiplier_data();
@@ -278,6 +258,12 @@ namespace scopi
     bool OptimBase<Derived, problem_t>::should_solve() const
     {
         return m_problem.should_solve();
+    }
+
+    template<class Derived, class problem_t>
+    auto OptimBase<Derived, problem_t>::constraint_data()
+    {
+        return static_cast<Derived&>(*this).constraint_data_impl();
     }
 
     template<class Derived, class problem_t>

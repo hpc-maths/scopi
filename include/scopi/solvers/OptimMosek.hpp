@@ -141,7 +141,7 @@ namespace scopi{
          *
          * @return \f$ N_c \f$ elements.
          */
-        double* constraint_data();
+        double* constraint_data_impl();
         /**
          * @brief Returns the Lagrange multipliers (solution of the dual problem) when the optimization is solved.
          *
@@ -340,7 +340,7 @@ namespace scopi{
     }
 
     template<class problem_t>
-    double* OptimMosek<problem_t>::constraint_data()
+    double* OptimMosek<problem_t>::constraint_data_impl()
     {
         using namespace monty;
         auto u = std::make_shared<monty::ndarray<double, 1>>(m_Xlvl->raw()+1, shape_t<1>(m_A->numColumns()));

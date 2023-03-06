@@ -146,7 +146,7 @@ namespace scopi{
          *
          * @return \f$ N_c \f$ elements.
          */
-        double* constraint_data();
+        double* constraint_data_impl();
         /**
          * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
@@ -340,7 +340,7 @@ namespace scopi{
     }
 
     template<class Derived, class problem_t>
-    double* OptimUzawaBase<Derived, problem_t>::constraint_data()
+    double* OptimUzawaBase<Derived, problem_t>::constraint_data_impl()
     {
         return NULL;
     }

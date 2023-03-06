@@ -133,7 +133,7 @@ namespace scopi
          *
          * @return Null pointer instead of \f$ N_c \f$ elements.
          */
-        double* constraint_data();
+        double* constraint_data_impl();
         /**
          * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
@@ -372,7 +372,7 @@ namespace scopi
     }
 
     template<class problem_t>
-    double* OptimScs<problem_t>::constraint_data()
+    double* OptimScs<problem_t>::constraint_data_impl()
     {
         return NULL;
     }

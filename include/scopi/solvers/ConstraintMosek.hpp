@@ -124,7 +124,7 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see DryWithFriction for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see DryWithFriction for the difference).
          *
          * @return 0.
          */
@@ -208,7 +208,7 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see DryWithFrictionFixedPoint for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see DryWithFrictionFixedPoint for the difference).
          *
          * @return 0.
          */
@@ -400,7 +400,7 @@ namespace scopi
          */
         std::size_t number_col_matrix() const;
         /**
-         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see ViscousWithFriction for the difference).  
+         * @brief The matrix \f$ \tilde{\mathbb{B}} \f$ contains the matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$ (see ProblemBase for the notations), but it is not a larger matrix (see ViscousWithFriction for the difference).
          *
          * @return 0.
          */
@@ -437,11 +437,6 @@ namespace scopi
          */
         std::shared_ptr<monty::ndarray<double,1>> m_dual;
 
-    private:
-        /**
-         * @brief Number of particles.
-         */
-        std::size_t m_nparticles;
         /**
          * @brief Mosek's data structure for the constraint \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \ge 0 \f$.
          */
@@ -450,6 +445,12 @@ namespace scopi
          * @brief Mosek's data structure for the constraint \f$ \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}|| \f$.
          */
         mosek::fusion::Constraint::t m_qc4;
+
+    private:
+        /**
+         * @brief Number of particles.
+         */
+        std::size_t m_nparticles;
     };
 
     template <std::size_t dim>
@@ -462,15 +463,22 @@ namespace scopi
         using namespace mosek::fusion;
         using namespace monty;
 
-        auto D_restricted_1 = std::make_shared<ndarray<double, 1>>(D->raw(), shape_t<1>({contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg()}));
-        m_qc1 = model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))->slice(0, contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg()), Domain::lessThan(D_restricted_1));
+        auto nb_gamma_min = this->get_nb_gamma_min();
+        auto nb_gamma_neg = this->get_nb_gamma_neg();
 
-        auto D_restricted_4 = std::make_shared<ndarray<double, 1>>(D->raw()+(contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg()), shape_t<1>(4*this->get_nb_gamma_min()));
-        m_qc4 = model->constraint("qc4", 
+        auto D_restricted_1 = std::make_shared<ndarray<double, 1>>(D->raw(), shape_t<1>(contacts.size() - nb_gamma_min + nb_gamma_neg));
+        m_qc1 = model->constraint("qc1", Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles))->slice(0, contacts.size() - nb_gamma_min + nb_gamma_neg), Domain::lessThan(D_restricted_1));
+
+        auto D_restricted_4 = std::make_shared<ndarray<double, 1>>(D->raw()+(contacts.size() - nb_gamma_min + nb_gamma_neg), shape_t<1>(4*nb_gamma_min));
+
+        if(nb_gamma_min!=0)
+        {
+            m_qc4 = model->constraint("qc4",
                 Expr::reshape(
-                    Expr::sub(D_restricted_4, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg(), contacts.size() - this->get_nb_gamma_min() + this->get_nb_gamma_neg() + 4*this->get_nb_gamma_min()) ),
-                    this->get_nb_gamma_min(), 4),
+                    Expr::sub(D_restricted_4, (Expr::mul(A, X->slice(1, 1 + 6*this->m_nparticles)))->slice(contacts.size() - nb_gamma_min + nb_gamma_neg, contacts.size() - nb_gamma_min + nb_gamma_neg + 4*nb_gamma_min) ),
+                    nb_gamma_min, 4),
                 Domain::inQCone());
+        }
     }
 
     template <std::size_t dim>
@@ -493,14 +501,27 @@ namespace scopi
 
     template <std::size_t dim>
     void ConstraintMosek<ViscousWithFriction<dim>>::update_dual(std::size_t nb_row_matrix,
-                                                                std::size_t nb_contacts)
+                                                                std::size_t)
     {
         using namespace mosek::fusion;
         using namespace monty;
-        m_dual = std::make_shared<monty::ndarray<double, 1>>(m_qc1->dual()->raw(), shape_t<1>(nb_row_matrix));
-        for (std::size_t i = 0; i < 4*this->get_nb_gamma_min(); ++i)
+
+        m_dual = std::make_shared<monty::ndarray<double, 1>>(shape_t<1>(nb_row_matrix));
+
+        for (std::size_t i = 0; i < m_qc1->dual()->size(); ++i)
         {
-            m_dual->raw()[nb_contacts - this->get_nb_gamma_min() + this->get_nb_gamma_neg() + i] = -m_qc4->dual()->raw()[i];
+            m_dual->raw()[i] = m_qc1->dual()->raw()[i];
+        }
+
+
+        auto nb_gamma_min = this->get_nb_gamma_min();
+        std::size_t qc1_size = m_qc1->dual()->size();
+        if(nb_gamma_min != 0)
+        {
+            for (std::size_t i = 0; i < 4*nb_gamma_min; ++i)
+            {
+                m_dual->raw()[qc1_size + i] = m_qc4->dual()->raw()[i];
+            }
         }
     }
 }

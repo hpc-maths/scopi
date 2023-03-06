@@ -299,7 +299,7 @@ namespace scopi
         this->m_gamma_old.resize(this->m_gamma.size());
         std::size_t ind_gamma_neg = 0;
         for (std::size_t i = 0; i < this->m_gamma_old.size(); ++i)
-        {   std::cout<<"Gamma "<<i<<" = "<<this->m_gamma[i]<<std::endl;
+        {
             double f_contact;
             if (this->m_gamma[i] < -this->m_params.tol)
             {
@@ -312,10 +312,10 @@ namespace scopi
             }
             this->m_gamma_old[i] = std::min(0., this->m_gamma[i] - this->m_dt * f_contact);
             if (this->m_gamma_old[i] > -this->m_params.tol)
+            {
                 this->m_gamma_old[i] = 0.;
-            // if (this->m_gamma_old[i] > -this->m_params.tol)
-            //     this->m_gamma_old[i] = 0.;
-            PLOG_WARNING << this->m_gamma[i];
+            }
+            PLOG_INFO << this->m_gamma[i];
         }
     }
 
