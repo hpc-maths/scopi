@@ -71,7 +71,7 @@ int main()
 
     scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
     auto params = solver.get_params();
-    params.scopi_params.output_frequency = 99;
+    params.solver_params.output_frequency = 99;
     params.optim_params.tol_l = 1e-3;
     params.optim_params.rho = rho;
     params.contact_params.dmax = 0.9*r0;

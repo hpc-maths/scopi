@@ -32,13 +32,6 @@ int main()
     double r_obs = r/10.;
     double dt = 0.2*r/(std::sqrt(2.*width_box*g));
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> params;
-    params.optim_params.tol_l = 1e-3;
-    params.optim_params.rho = 0.2/dt/dt;
-    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220917_ellipses/scopi_objects_";
-    params.contacts_params.dmax = 2.*r;
-    params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 3.*r;
-
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g}});
 
@@ -82,7 +75,15 @@ int main()
         particles.push_back(s, prop.mass(m).moment_inertia(m*PI/4.*2.*rx*r*r*r));
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    auto params = solver.get_params();
+    params.optim_params.tol_l = 1e-3;
+    params.optim_params.rho = 0.2/dt/dt;
+    params.solver_params.path = "pile_sand_friction";
+    params.solver_params.filename = "ellipses/scopi_objects_";
+    params.contact_params.dmax = 2.*r;
+    params.contact_params.kd_tree_radius = params.contact_params.dmax + 3.*r;
+
     solver.run(total_it);
 
     return 0;

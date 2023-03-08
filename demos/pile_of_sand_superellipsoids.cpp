@@ -92,7 +92,7 @@ int main()
     params.optim_params.tol_l = 1e-6;
     params.contact_params.dmax = 2.*1.5*r;
     // params.optim_params.rho = 2.;
-    // params.scopi_params.output_frequency = 2;
+    // params.solver_params.output_frequency = 2;
     // params.optim_params.change_default_tol_mosek = false;
     // params.problem_params.mu = 0.1;
     solver.run(total_it);
