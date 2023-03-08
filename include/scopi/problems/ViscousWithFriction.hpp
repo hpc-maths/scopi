@@ -143,7 +143,7 @@ namespace scopi
          *
          * @return Number of rows in the matrix.
          */
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
         /**
          * @brief Create vector \f$ \mathbf{d} \f$.
          *
@@ -165,7 +165,7 @@ namespace scopi
         /**
          * @brief Returns the number of contacts \f$ ij \f$ with \f$ \gamma_{ij} < \gamma_{\min} \f$.
          */
-        std::size_t get_nb_gamma_min();
+        std::size_t get_nb_gamma_min() const;
         /**
          * @brief Set \f$ \gamma_{ij}^n \f$ from the previous time step, compute the number of contacts with \f$ \gamma_{ij} < 0 \f$ and \f$ \gamma_{ij} < \gamma_{\min} \f$.
          *
@@ -660,7 +660,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t ViscousWithFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    std::size_t ViscousWithFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
     {
         return contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*m_nb_gamma_min;
     }
@@ -698,7 +698,7 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    std::size_t ViscousWithFriction<dim>::get_nb_gamma_min()
+    std::size_t ViscousWithFriction<dim>::get_nb_gamma_min() const
     {
         return m_nb_gamma_min;
     }

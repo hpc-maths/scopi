@@ -108,7 +108,7 @@ namespace scopi
          *
          * @return Number of rows in the matrix.
          */
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts);
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
         /**
          * @brief Create vector \f$ \mathbf{d} \f$.
          *
@@ -321,7 +321,7 @@ namespace scopi
 
 
     template<std::size_t dim>
-    std::size_t ViscousWithoutFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts)
+    std::size_t ViscousWithoutFriction<dim>::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
     {
         return contacts.size() + this->m_nb_gamma_neg;
     }

@@ -46,6 +46,8 @@ namespace scopi
 
         params_t& get_params();
 
+        std::size_t size() const;
+
         /**
          * @brief Matrix-free product \f$ \mathbf{u} = \mathbb{P}^{-1} \mathbf{u} \f$.
          *
@@ -255,6 +257,12 @@ namespace scopi
     auto ProblemBase<Params>::get_params() -> params_t&
     {
         return m_params;
+    }
+
+    template<class Params>
+    std::size_t ProblemBase<Params>::size() const
+    {
+        return m_nparticles;
     }
 
     template<class Params>

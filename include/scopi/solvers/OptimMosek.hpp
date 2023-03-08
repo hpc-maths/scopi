@@ -2,7 +2,6 @@
 
 #include <new>
 #ifdef SCOPI_USE_MOSEK
-#include "OptimBase.hpp"
 #include "../problems/DryWithoutFriction.hpp"
 #include "ConstraintMosek.hpp"
 
@@ -235,12 +234,12 @@ namespace scopi{
 
         // matrix
         this->problem().create_matrix_constraint_coo(particles, contacts);
-        m_A = Matrix::sparse(this->problem().number_row_matrix(contacts), m_constraint.number_col_matrix(),
+        m_A = Matrix::sparse(this->problem().number_row_matrix(contacts), this->m_constraint.number_col_matrix(),
                              std::make_shared<ndarray<int, 1>>(this->problem().A_rows().data(), shape_t<1>({this->problem().A_rows().size()})),
                              std::make_shared<ndarray<int, 1>>(this->problem().A_cols().data(), shape_t<1>({this->problem().A_cols().size()})),
                              std::make_shared<ndarray<double, 1>>(this->problem().A_values().data(), shape_t<1>({this->problem().A_values().size()})));
 
-        m_constraint.add_constraints(m_D_mosek, m_A, X, model, contacts);
+        this->m_constraint.add_constraints(m_D_mosek, m_A, X, model, contacts);
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
         Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
 
@@ -260,8 +259,8 @@ namespace scopi{
         model->solve();
 
         m_Xlvl = X->level();
-        m_constraint.update_dual(this->problem().number_row_matrix(contacts), contacts.size());
-        for (auto& x : *(m_constraint.m_dual))
+        this->m_constraint.update_dual(contacts);
+        for (auto& x : *(this->m_constraint.m_dual))
         {
             x *= -1.;
         }
@@ -283,7 +282,7 @@ namespace scopi{
                                       double dt,
                                       const scopi_container<dim>& particles)
     : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
-    , m_constraint(nparts)
+    , m_constraint(this->problem())
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -336,7 +335,7 @@ namespace scopi{
     template<class problem_t>
     double* OptimMosek<problem_t>::lagrange_multiplier_data()
     {
-        return m_constraint.m_dual->raw();
+        return this->m_constraint.m_dual->raw();
     }
 
     template<class problem_t>
@@ -353,7 +352,7 @@ namespace scopi{
     int OptimMosek<problem_t>::get_nb_active_contacts_impl() const
     {
         int nb_active_contacts = 0;
-        for (auto x : *(m_constraint.m_dual))
+        for (auto x : *(this->m_constraint.m_dual))
         {
             if(std::abs(x) > 1e-3)
                 nb_active_contacts++;

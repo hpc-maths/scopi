@@ -27,6 +27,11 @@ namespace scopi
     template<std::size_t dim>
     class ViscousBase
     {
+    public:
+        /**
+         * @brief Returns the number of contacts with \f$ \gamma_{ij} < 0 \f$.
+         */
+        std::size_t get_nb_gamma_neg() const;
     protected:
         /**
          * @brief Default constructor.
@@ -41,10 +46,6 @@ namespace scopi
          * @param contacts_new [in] Array of contacts at time \f$ t^{n+1} \f$.
          */
         void set_gamma_base(const std::vector<neighbor<dim>>& contacts_new);
-        /**
-         * @brief Returns the number of contacts with \f$ \gamma_{ij} < 0 \f$.
-         */
-        std::size_t get_nb_gamma_neg() const;
 
         /**
          * @brief Array of contacts at time \f$ t^n \f$.
