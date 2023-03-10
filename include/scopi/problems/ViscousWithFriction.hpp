@@ -685,13 +685,12 @@ namespace scopi
             if(this->m_gamma[i] < -this->m_params.tol)
             {
                this->m_distances[contacts.size() - m_nb_gamma_min + index_gamma_neg] = -contacts[i].dij;
-               std::cout << "distance visqueux " << i << " = " << - contacts[i].dij <<std::endl;
                index_gamma_neg++;
             }
             //Friction
             if (this->m_gamma[i] == this->m_params.gamma_min)
             {
-                this->m_distances[contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*index_friciton] = contacts[i].dij+ this->m_params.mu*this->m_dt*m_s(i);
+                this->m_distances[contacts.size() - m_nb_gamma_min + this->m_nb_gamma_neg + 4*index_friciton] = contacts[i].dij+ this->m_params.mu*this->m_dt*m_s(index_friciton);
                 index_friciton++;
             }
         }
