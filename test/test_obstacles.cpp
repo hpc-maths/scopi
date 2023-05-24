@@ -241,10 +241,10 @@ namespace scopi
     }
 
     TEST_CASE_TEMPLATE_APPLY(sphere_plan, solver_dry_without_friction_t<2>);
-    TEST_CASE_TEMPLATE_APPLY(sphere_plan_force, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plan_force, solver_dry_without_friction_t<2, vap_fpd>);
     TEST_CASE_TEMPLATE_APPLY(sphere_sphere_fixed, solver_dry_without_friction_t<2>);
-    TEST_CASE_TEMPLATE_APPLY(sphere_sphere_fixed_force, solver_dry_without_friction_t<2>);
-    TEST_CASE_TEMPLATE_APPLY(sphere_sphere_moving, solver_dry_without_friction_t<2>);
-    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plan, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_sphere_fixed_force, solver_dry_without_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_sphere_moving, solver_dry_without_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plan, solver_dry_without_friction_t<2, vap_fpd>);
 
 }

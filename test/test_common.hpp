@@ -64,13 +64,13 @@ namespace scopi
     template<typename ... input_t>
     using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
 
-    template<std::size_t dim>
-    using solver_dry_without_friction_t = tuple_cat_t<solver_t<dim, DryWithoutFriction, contact_kdtree, vap_fixed>,
-                                                      solver_t<dim, DryWithoutFriction, contact_brute_force, vap_fixed>>;
+    template<std::size_t dim, class vap = vap_fixed>
+    using solver_dry_without_friction_t = tuple_cat_t<solver_t<dim, DryWithoutFriction, contact_kdtree, vap>,
+                                                      solver_t<dim, DryWithoutFriction, contact_brute_force, vap>>;
 
     template<std::size_t dim, class vap>
     using solver_dry_with_friction_t = std::tuple<ScopiSolver<dim, OptimMosek<DryWithFriction>, contact_kdtree, vap>,
-                                                   ScopiSolver<dim, OptimMosek<DryWithFriction>, contact_brute_force, vap>>;
+                                                  ScopiSolver<dim, OptimMosek<DryWithFriction>, contact_brute_force, vap>>;
 
 
 

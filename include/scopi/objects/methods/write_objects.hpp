@@ -36,11 +36,12 @@ namespace scopi
      * @return nlohmann json object.
      */
     template<std::size_t dim>
-    nl::json write_objects(const sphere<dim, false>& s)
+    nl::json write_objects(const sphere<dim, false>& s, std::size_t id)
     {
         nl::json object;
 
         object["type"] = "sphere";
+        object["id"] = id;
         object["position"] = s.pos();
         object["radius"] = s.radius();
         object["rotation"] = xt::flatten(s.rotation());
@@ -73,11 +74,12 @@ namespace scopi
      * @return nlohmann json object.
      */
     template<std::size_t dim>
-    nl::json write_objects(const superellipsoid<dim, false>& s)
+    nl::json write_objects(const superellipsoid<dim, false>& s, std::size_t id)
     {
         nl::json object;
 
         object["type"] = "superellipsoid";
+        object["id"] = id;
         object["position"] = s.pos();
         object["radius"] = s.radius();
         object["squareness"] = s.squareness();
@@ -104,7 +106,7 @@ namespace scopi
 
     // PLAN
     /**
-     * @brief 
+     * @brief
      * @brief Write the elements of a plane in json format.
      *
      * @tparam dim Dimension (2 or 3).
@@ -113,11 +115,12 @@ namespace scopi
      * @return nlohmann json object.
      */
     template<std::size_t dim>
-    nl::json write_objects(const plan<dim, false> p)
+    nl::json write_objects(const plan<dim, false> p, std::size_t id)
     {
         nl::json object;
 
         object["type"] = "plan";
+        object["id"] = id;
         object["position"] = p.pos();
         object["normal"] = p.normal();
         object["rotation"] = xt::flatten(p.rotation());
@@ -150,7 +153,7 @@ namespace scopi
      * @return nlohmann json object.
      */
     template<std::size_t dim>
-    nl::json write_objects(const worm<dim, false> w)
+    nl::json write_objects(const worm<dim, false> w, std::size_t id)
     {
         nl::json object;
         object["type"] = "worm";
@@ -158,6 +161,7 @@ namespace scopi
         {
             nl::json json_worm;
             json_worm["position"] = w.pos(i);
+            json_worm["id"] = id + i;
             json_worm["radius"] = w.radius();
             json_worm["quaternion"] = w.q(i);
             object["worm"].push_back(json_worm);
@@ -170,7 +174,7 @@ namespace scopi
     }
 
     /**
-     * @brief 
+     * @brief
      *
      * \todo Write documentation.
      *
@@ -185,38 +189,38 @@ namespace scopi
         using return_type = nl::json;
 
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @tparam T1
          * @param obj1
          *
-         * @return 
+         * @return
          */
         template <class T1>
-        return_type run(const T1& obj1) const
+        return_type run(const T1& obj1, std::size_t id) const
         {
-            return write_objects(obj1);
+            return write_objects(obj1, id);
         }
 
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @param object
          *
-         * @return 
+         * @return
          */
-        return_type on_error(const object<dim, false>&) const
+        return_type on_error(const object<dim, false>&, std::size_t) const
         {
             return nl::json::object();
         }
     };
 
     /**
-     * @brief 
+     * @brief
      *
      * \todo Write documentation.
      *
