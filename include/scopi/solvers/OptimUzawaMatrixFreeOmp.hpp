@@ -43,16 +43,10 @@ namespace scopi{
     {
     public:
         /**
-         * @brief Alias for the problem.
-         */
-        using problem_type = problem_t;
-    private:
-        /**
          * @brief Alias for the base class OptimUzawaBase.
          */
         using base_type = OptimUzawaBase<OptimUzawaMatrixFreeOmp<problem_t>, problem_t>;
 
-    protected:
         /**
          * @brief Constructor.
          *
@@ -66,9 +60,7 @@ namespace scopi{
         template <std::size_t dim>
         OptimUzawaMatrixFreeOmp(std::size_t nparts,
                                 double dt,
-                                const scopi_container<dim>& particles,
-                                const OptimParams<OptimUzawaMatrixFreeOmp<problem_t>>& optim_params,
-                                const ProblemParams<problem_t>& problem_params);
+                                const scopi_container<dim>& particles);
 
     public:
         /**
@@ -138,7 +130,7 @@ namespace scopi{
         #pragma omp parallel for
         for (std::size_t i = 0; i < particles.nb_active(); ++i)
         {
-            this->matrix_free_gemv_inv_P(particles, this->m_U, active_offset, i);
+            this->problem().matrix_free_gemv_inv_P(particles, this->m_U, active_offset, i);
         }
     }
 
@@ -152,7 +144,7 @@ namespace scopi{
         for (std::size_t ic = 0; ic < contacts.size(); ++ic)
         {
             auto &c = contacts[ic];
-            this->matrix_free_gemv_A(c, particles, this->m_U, this->m_R, active_offset, ic);
+            this->problem().matrix_free_gemv_A(c, particles, this->m_U, this->m_R, active_offset, ic);
         }
     }
 
@@ -166,7 +158,7 @@ namespace scopi{
         for(std::size_t ic = 0; ic < contacts.size(); ++ic)
         {
             auto &c = contacts[ic];
-            this->matrix_free_gemv_transpose_A(c, particles, this->m_L, this->m_U, active_offset, ic);
+            this->problem().matrix_free_gemv_transpose_A(c, particles, this->m_L, this->m_U, active_offset, ic);
         }
     }
 
@@ -174,10 +166,8 @@ namespace scopi{
     template <std::size_t dim>
     OptimUzawaMatrixFreeOmp<problem_t>::OptimUzawaMatrixFreeOmp(std::size_t nparts,
                                                                 double dt,
-                                                                const scopi_container<dim>&,
-                                                                const OptimParams<OptimUzawaMatrixFreeOmp<problem_t>>& optim_params,
-                                                                const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, dt, optim_params, problem_params)
+                                                                const scopi_container<dim>&)
+    : base_type(nparts, dt)
     {}
 
 }

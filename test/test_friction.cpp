@@ -13,9 +13,8 @@
 
 namespace scopi {
 
-    TEST_CASE_TEMPLATE("two spheres asymetrical friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("two spheres asymetrical friction", SolverType, two_spheres_asymetrical_friction)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -29,18 +28,17 @@ namespace scopi {
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        params_t params;
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
         params.problem_params.mu = mu;
-        params.scopi_params.output_frequency = total_it-1;
-        SolverType solver(particles, dt, params);
+        params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d spheres friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("critical 2d spheres friction", SolverType, critical_2d_spheres_friction)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .01;
         std::size_t total_it = 100;
@@ -75,18 +73,17 @@ namespace scopi {
             }
         }
 
-        params_t params;
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
         params.problem_params.mu = mu;
-        params.scopi_params.output_frequency = total_it-1;
-        SolverType solver(particles, dt, params);
+        params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere inclined plan friction", SolverType, SOLVER_DRY_WITH_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITH_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE_DEFINE("sphere inclined plan friction", SolverType, sphere_inclined_plan_friction)
     {
-        using params_t = typename SolverType::params_t;
         std::tuple<double, double, double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double, double, double>>
             data_container({std::make_tuple(0.1, PI/6., 0.00101117, 0.00409424, 0.00100648, 0.000971288),
@@ -96,9 +93,9 @@ namespace scopi {
                     std::make_tuple(0.5, PI/4., 0.00104746, 0.0102814, 0.0009988832, 0.000999008),
                     std::make_tuple(0.5, PI/3., 0.0010907, 0.0096141, 0.00105025, 0.000883162),
                     std::make_tuple(1., PI/6., 0.00107652, 0.00680805, 0.0009990016, 0.000999002),
-                    std::make_tuple(1., PI/4., 0.00112413, 0.00844355, 0.0009990034, 0.000999003), 
-                    std::make_tuple(1., PI/3., 0.0011583, 0.00915214, 0.0009990065, 0.000999013)});
-
+                    std::make_tuple(1., PI/4., 0.00112413, 0.00844355, 0.0009990034, 0.000999003),
+                    std::make_tuple(1., PI/3., 0.0011583, 0.00915214, 0.0009990065, 0.000999013)
+            });
         DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
 
         static constexpr std::size_t dim = 2;
@@ -118,10 +115,10 @@ namespace scopi {
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0., -g}}));
 
-        params_t params;
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
         params.problem_params.mu = mu;
-        params.scopi_params.output_frequency = std::size_t(-1);
-        SolverType solver(particles, dt, params);
+        params.solver_params.output_frequency = std::size_t(-1);
         solver.run(total_it);
 
         auto pos = particles.pos();
@@ -144,5 +141,9 @@ namespace scopi {
         REQUIRE(error_v == doctest::Approx(std::get<4>(data)));
         REQUIRE(error_omega == doctest::Approx(std::get<5>(data)));
     }
+
+    TEST_CASE_TEMPLATE_APPLY(two_spheres_asymetrical_friction, solver_dry_with_friction_t<2, vap_fixed>);
+    TEST_CASE_TEMPLATE_APPLY(critical_2d_spheres_friction, solver_dry_with_friction_t<2, vap_fixed>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plan_friction, solver_dry_with_friction_t<2, vap_fpd>);
 
 }

@@ -401,9 +401,8 @@ namespace scopi
         REQUIRE(rotation_matrix(2, 2) == doctest::Approx(1.));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("two ellispsoids symetrical", SolverType, two_ellispsoids_symetrical)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 200;
@@ -416,18 +415,16 @@ namespace scopi
         particles.push_back(s1, p);
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
+        params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/two_ellipsoids_symmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids spheres symetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("two ellispsoids spheres symetrical", SolverType, two_ellispsoids_spheres_symetrical)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 50;
@@ -440,18 +437,16 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
+        params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0049.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids asymetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("two ellispsoids asymetrical", SolverType, two_ellispsoids_asymetrical)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -464,18 +459,16 @@ namespace scopi
         particles.push_back(s1, p.desired_velocity({{0.25, 0}}));
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
+        params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_asymmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("two ellispsoids spheres asymetrical", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("two ellispsoids spheres asymetrical", SolverType, two_ellispsoids_spheres_asymetrical)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 1000;
@@ -488,18 +481,16 @@ namespace scopi
         particles.push_back(s1, p);
         particles.push_back(s2, p.desired_velocity({{-0.25, 0}}));
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
+        params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("critical 2d superellipsoids", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("critical 2d superellipsoids", SolverType, critical_2d_superellipsoids)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .01;
         std::size_t total_it = 20;
@@ -541,12 +532,17 @@ namespace scopi
             }
         }
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
+        auto params = solver.get_params();
+        params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
     }
+
+    TEST_CASE_TEMPLATE_APPLY(two_ellispsoids_symetrical, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(two_ellispsoids_spheres_symetrical, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(two_ellispsoids_asymetrical, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(two_ellispsoids_spheres_asymetrical, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(critical_2d_superellipsoids, solver_dry_without_friction_t<2>);
 }

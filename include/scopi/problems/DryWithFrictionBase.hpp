@@ -106,7 +106,8 @@ namespace scopi
      * Therefore, the matrix is in \f$ \R^{4\Nc \times 6N} \f$ and \f$ \d \in \R^{4\Nc} \f$.
      *
      */
-    class DryWithFrictionBase : protected ProblemBase
+    template<class Params>
+    class DryWithFrictionBase : public ProblemBase<Params>
     {
     protected:
         /**
@@ -116,8 +117,9 @@ namespace scopi
          * @param dt [in] Time step.
          * @param mu [in] Friction coefficient.
          */
-        DryWithFrictionBase(std::size_t nparticles, double dt, double mu);
+        DryWithFrictionBase(std::size_t nparticles, double dt);
 
+    public:
         /**
          * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
          *
@@ -129,23 +131,19 @@ namespace scopi
          */
         template <std::size_t dim>
         void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts,
-                                          std::size_t firstCol);
-    private:
-        /**
-         * @brief Friction coefficient.
-         */
-        double m_mu;
+                                          const std::vector<neighbor<dim>>& contacts);
     };
 
+
+    template<class Params>
     template<std::size_t dim>
-    void DryWithFrictionBase::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                           const std::vector<neighbor<dim>>& contacts,
-                                                           std::size_t firstCol)
+    void DryWithFrictionBase<Params>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
+                                                                   const std::vector<neighbor<dim>>& contacts)
     {
-        matrix_positive_distance(particles, contacts, firstCol, 4);
+        this->matrix_positive_distance(particles, contacts, 4);
         std::size_t active_offset = particles.nb_inactive();
         std::size_t ic = 0;
+        double mu = this->m_params.mu;
         for (auto &c: contacts)
         {
             if (c.i >= active_offset)
@@ -155,11 +153,11 @@ namespace scopi
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
                         this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + (c.i - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(-this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col]);
+                        this->m_A_cols.push_back((c.i - active_offset)*3 + ind_col);
+                        this->m_A_values.push_back(-this->m_dt*mu*c.nij[ind_row]*c.nij[ind_col]);
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[this->m_A_values.size()-1] += this->m_dt*m_mu;
+                            this->m_A_values[this->m_A_values.size()-1] += this->m_dt*mu;
                         }
                     }
                 }
@@ -172,11 +170,11 @@ namespace scopi
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
                         this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + (c.j - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(this->m_dt*m_mu*c.nij[ind_row]*c.nij[ind_col]);
+                        this->m_A_cols.push_back((c.j - active_offset)*3 + ind_col);
+                        this->m_A_values.push_back(this->m_dt*mu*c.nij[ind_row]*c.nij[ind_col]);
                         if(ind_row == ind_col)
                         {
-                            this->m_A_values[this->m_A_values.size()-1] -= this->m_dt*m_mu;
+                            this->m_A_values[this->m_A_values.size()-1] -= this->m_dt*mu;
                         }
                     }
                 }
@@ -196,8 +194,8 @@ namespace scopi
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
                         this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(-m_mu*this->m_dt*dot(ind_row, ind_col) + m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
+                        this->m_A_cols.push_back(3*particles.nb_active() + 3*ind_part + ind_col);
+                        this->m_A_values.push_back(-mu*this->m_dt*dot(ind_row, ind_col) + mu*this->m_dt*c.nij[ind_row]*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
                     }
                 }
             }
@@ -211,13 +209,19 @@ namespace scopi
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
                         this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(firstCol + 3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(m_mu*this->m_dt*dot(ind_row, ind_col) - m_mu*this->m_dt*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
+                        this->m_A_cols.push_back(3*particles.nb_active() + 3*ind_part + ind_col);
+                        this->m_A_values.push_back(mu*this->m_dt*dot(ind_row, ind_col) - mu*this->m_dt*c.nij[ind_row]*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
                     }
                 }
             }
             ++ic;
         }
     }
+
+    template<class Params>
+    DryWithFrictionBase<Params>::DryWithFrictionBase(std::size_t nparticles, double dt)
+    : ProblemBase<Params>(nparticles, dt)
+    {}
+
 }
 

@@ -50,7 +50,7 @@ namespace scopi
          * @param dt Time step.
          * @param params Parameters (for compatibility).
          */
-        vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt, const VapParams<vap_fpd>& params);
+        vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt);
 
     };
 

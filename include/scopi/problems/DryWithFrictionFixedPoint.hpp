@@ -68,8 +68,8 @@ namespace scopi
      * @brief Problem that models contacts with friction and without viscosity. A fixed point algorithm is used to ensure \f$ D = 0 \f$.
      *
      * See ProblemBase for the notations.
-     * The constraint is 
-     * \f[ 
+     * The constraint is
+     * \f[
      *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge \left( ||\mathbb{T} \mathbf{u}_{ij}|| - \mu \Delta t \mathbf{s}_{ij} \right),
      * \f]
      * for all contacts \f$ ij \f$, with \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$.
@@ -89,23 +89,23 @@ namespace scopi
      *   - Compute \f$ \mathbf{u}^{\mathbf{s}^{k}} \f$ as the solution of the optimization problem under the constraint written above;
      *   - \f$ \mathbf{s}^{k+1}_{ij} = ||\mathbb{T} \mathbf{u}^{\mathbf{s}^{k}}_{ij}|| \f$ for all contacts \f$ ij \f$;
      *   - \f$ k ++ \f$.
-     * 
+     *
      * Only one matrix is built.
      * It contains both matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
      * A contact \f$ ij \f$ corresponds to four rows in the matrix, one for \f$ \mathbb{B} \f$ and three for \f$ \mathbb{T} \f$.
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      */
-    class DryWithFrictionFixedPoint : protected DryWithFrictionBase
+    class DryWithFrictionFixedPoint : public DryWithFrictionBase<ProblemParams<DryWithFrictionFixedPoint>>
     {
-    protected:
+    public:
         /**
          * @brief Constructor.
          *
          * @param nparticles [in] Number of particles.
          * @param dt [in] Time step.
-         * @param problem_params [in] Parameters.
+         * @param problethis->m_params [in] Parameters.
          */
-        DryWithFrictionFixedPoint(std::size_t nparticles, double dt, const ProblemParams<DryWithFrictionFixedPoint>& problem_params);
+        DryWithFrictionFixedPoint(std::size_t nparticles, double dt);
 
         /**
          * @brief Create vector \f$ \mathbf{d} \f$.
@@ -116,10 +116,19 @@ namespace scopi
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
          */
         template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+
+        /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @return Number of rows in the matrix.
+         */
+        template <std::size_t dim>
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
 
         /**
          * @brief Initialize variables for fixed-point algorithm.
@@ -127,8 +136,8 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          */
-        template<std::size_t dim>
-        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        template<std::size_t dim, class optim_solver_t>
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts, optim_solver_t&);
         /**
          * @brief Compute \f$ \mathbf{s}^{k+1} \f$.
          *
@@ -137,22 +146,17 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
-        template<std::size_t dim>
+        template<std::size_t dim, class optim_solver_t>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     const xt::xtensor<double, 1>& lambda,
-                                     const xt::xtensor<double, 2>& u_tilde);
+                                     optim_solver_t&);
         /**
          * @brief Stop criterion for the fixed point algorithm.
          *
-         * @return Whether the fixed point algorithm has converged. 
+         * @return Whether the fixed point algorithm has converged.
          */
-        bool should_solve_optimization_problem();
+        bool should_solve() const;
 
     private:
-        /**
-         * @brief Parameters.
-         */
-        ProblemParams<DryWithFrictionFixedPoint> m_params;
         /**
          * @brief \f$ \mathbf{s}^{k+1} \f$.
          */
@@ -168,36 +172,46 @@ namespace scopi
     };
 
     template<std::size_t dim>
-    void DryWithFrictionFixedPoint::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
+    void DryWithFrictionFixedPoint::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         this->m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            this->m_distances[4*i] = contacts[i].dij + m_params.mu*this->m_dt*m_s(i);
+            this->m_distances[4*i] = contacts[i].dij + this->m_params.mu*this->m_dt*m_s(i);
         }
     }
 
-    template<std::size_t dim>
-    void DryWithFrictionFixedPoint::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts)
+    template <std::size_t dim>
+    std::size_t DryWithFrictionFixedPoint::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
+    {
+        return 4*contacts.size();
+    }
+
+    template<std::size_t dim, class optim_solver_t>
+    void DryWithFrictionFixedPoint::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts,  optim_solver_t&)
     {
         m_nb_iter = 0;
         m_s = xt::zeros<double>({contacts.size()});
         m_s_old = xt::ones<double>({contacts.size()});
     }
 
-    template<std::size_t dim>
-    void DryWithFrictionFixedPoint::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                                            const xt::xtensor<double, 1>&,
-                                                            const xt::xtensor<double, 2>& u_tilde)
+    template<std::size_t dim, class optim_solver_t>
+    void DryWithFrictionFixedPoint::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,  optim_solver_t& optim_solver)
     {
         m_nb_iter++;
         m_s_old = m_s;
+        auto data = optim_solver.constraint_data();
+        xt::xtensor<double, 2> u_tilde;
+        if (data)
+        {
+            u_tilde = xt::adapt(reinterpret_cast<double*>(data), {contacts.size(), 4UL});
+        }
         // TODO use xtensor functions to avoid loop
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            m_s(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _)))/(this->m_dt*m_params.mu);
+            m_s(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _)))/(this->m_dt*this->m_params.mu);
         }
     }
-  
+
 }
 

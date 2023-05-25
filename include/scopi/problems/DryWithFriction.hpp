@@ -52,7 +52,7 @@ namespace scopi
      * @brief Problem that models contacts with friction and without viscosity.
      *
      * See ProblemBase for the notations.
-     * The constraint is 
+     * The constraint is
      * \f[
      *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}||
      * \f]
@@ -65,9 +65,9 @@ namespace scopi
      * Therefore, the matrix is in \f$ \mathbb{R}^{4N_c \times 6N} \f$ and \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$.
      *
      */
-    class DryWithFriction : protected DryWithFrictionBase
+    class DryWithFriction : public DryWithFrictionBase<ProblemParams<DryWithFriction>>
     {
-    protected:
+    public:
         /**
          * @brief Constructor.
          *
@@ -75,23 +75,7 @@ namespace scopi
          * @param dt [in] Time step.
          * @param problem_params [in] Parameters.
          */
-        DryWithFriction(std::size_t nparticles, double dt, const ProblemParams<DryWithFriction>& problem_params);
-
-        /**
-         * @brief Create vector \f$ \mathbf{d} \f$.
-         *
-         * See \c create_vector_distances for the order of the rows of the matrix.
-         *
-         * \f$ \mathbf{d} \in \mathbb{R}^{4N_c} \f$ can be seen as a block vector, each block has the form
-         * \f$ (d_{ij}, 0, 0, 0) \f$,
-         * where \f$ d_{ij} \f$ is the distance between particles \c i and \c j.
-         *
-         * @tparam dim Dimension (2 or 3).
-         * @param contacts [in] Array of contacts.
-         * @param contacts_worms [in] Array of contacts to impose non-positive distance (for compatibility with other models).
-         */
-        template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>& contacts_worms);
+        DryWithFriction(std::size_t nparticles, double dt);
 
         /**
          * @brief Extra steps before solving the optimization problem.
@@ -101,8 +85,8 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          */
-        template<std::size_t dim>
-        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts);
+        template<std::size_t dim, class optim_solver_t>
+        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts, optim_solver_t&);
         /**
          * @brief Extra steps after solving the optimization problem.
          *
@@ -113,26 +97,59 @@ namespace scopi
          * @param lambda [in] Lagrange multipliers.
          * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
          */
-        template<std::size_t dim>
+        template<std::size_t dim, class optim_solver_t>
         void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     const xt::xtensor<double, 1>& lambda,
-                                     const xt::xtensor<double, 2>& u_tilde);
+                                     optim_solver_t& optim_solver);
+        /**
+         * @brief Get the number of rows in the matrix.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
+         * @param contacts_worms [in] Array of contacts to impose non-positive distance.
+         *
+         * @return Number of rows in the matrix.
+         */
+        template <std::size_t dim>
+        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
         /**
          * @brief Whether the optimization problem should be solved.
          *
          * For compatibility with the other problems.
          */
-        bool should_solve_optimization_problem();
 
-    private:
         /**
-         * @brief Parameters.
+         * @brief Create vector \f$ \mathbf{d} \f$.
+         *
+         * @tparam dim Dimension (2 or 3).
+         * @param contacts [in] Array of contacts.
          */
-        ProblemParams<DryWithFriction> m_params;
+        template<std::size_t dim>
+        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+
+        bool should_solve() const;
+
     };
 
+    template<std::size_t dim, class optim_solver_t>
+    void DryWithFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&, optim_solver_t&)
+    {
+        this->m_should_solve = true;
+    }
+
+    template<std::size_t dim, class optim_solver_t>
+    void DryWithFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
+                                                  optim_solver_t&)
+    {
+        this->m_should_solve = false;
+    }
+    template <std::size_t dim>
+    std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
+    {
+        return 4*contacts.size();
+    }
+
     template<std::size_t dim>
-    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts, const std::vector<neighbor<dim>>&)
+    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
     {
         this->m_distances = xt::zeros<double>({4*contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
@@ -140,20 +157,5 @@ namespace scopi
             this->m_distances[4*i] = contacts[i].dij;
         }
     }
-
-    template<std::size_t dim>
-    void DryWithFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&)
-    {
-        this->m_should_solve = true;
-    }
-
-    template<std::size_t dim>
-    void DryWithFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
-                                                  const xt::xtensor<double, 1>&,
-                                                  const xt::xtensor<double, 2>&)
-    {
-        this->m_should_solve = false;
-    }
-  
 }
 

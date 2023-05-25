@@ -32,9 +32,15 @@ namespace scopi
         REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    TEST_CASE_TEMPLATE("sphere plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    template<class solver_t>
+    void set_params(solver_t& solver, std::size_t total_it)
     {
-        using params_t = typename SolverType::params_t;
+        auto params = solver.get_params();
+        params.solver_params.output_frequency = total_it-1;
+    }
+
+    TEST_CASE_TEMPLATE_DEFINE("sphere plan", SolverType, sphere_plan)
+    {
         static constexpr std::size_t dim = 2;
 
         double dt = .005;
@@ -48,29 +54,28 @@ namespace scopi
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
 
         SUBCASE("fixed")
         {
             particles.push_back(s, prop);
-            SolverType solver(particles, dt, params);
+            SolverType solver(particles, dt);
             solver.run(total_it);
+            set_params(solver, total_it);
             check_result_sphere_plan(particles);
         }
 
         SUBCASE("velocity")
         {
             particles.push_back(s, prop.desired_velocity({{0., -1.}}));
-            SolverType solver(particles, dt, params);
+            SolverType solver(particles, dt);
             solver.run(total_it);
+            set_params(solver, total_it);
             check_result_sphere_plan(particles);
         }
     }
 
-    TEST_CASE_TEMPLATE("sphere plan force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE_DEFINE("sphere plan force", SolverType, sphere_plan_force)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
 
         double dt = .005;
@@ -84,12 +89,10 @@ namespace scopi
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
         particles.push_back(s, prop.force({{0., -1.}}));
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
         solver.run(total_it);
+        set_params(solver, total_it);
         check_result_sphere_plan(particles);
     }
 
@@ -112,9 +115,8 @@ namespace scopi
         REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere fixed", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fixed), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fixed))
+    TEST_CASE_TEMPLATE_DEFINE("sphere sphere fixed", SolverType, sphere_sphere_fixed)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 100;
@@ -127,29 +129,27 @@ namespace scopi
         scopi_container<dim> particles;
         particles.push_back(obstacle, property<dim>().deactivate());
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
         SUBCASE("fixed")
         {
             particles.push_back(sphere, prop);
-            SolverType solver(particles, dt, params);
+            SolverType solver(particles, dt);
             solver.run(total_it);
+            set_params(solver, total_it);
             check_result_sphere_sphere(particles);
         }
 
         SUBCASE("velocity")
         {
             particles.push_back(sphere, prop.desired_velocity({{0., -1.}}));
-            SolverType solver(particles, dt, params);
+            SolverType solver(particles, dt);
             solver.run(total_it);
+            set_params(solver, total_it);
             check_result_sphere_sphere(particles);
         }
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere fixed force", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE_DEFINE("sphere sphere fixed force", SolverType, sphere_sphere_fixed_force)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 100;
@@ -162,18 +162,15 @@ namespace scopi
         scopi_container<dim> particles;
         particles.push_back(obstacle, property<dim>().deactivate());
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
         particles.push_back(sphere, prop.force({{0., -1.}}));
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
         solver.run(total_it);
+        set_params(solver, total_it);
         check_result_sphere_sphere(particles);
     }
 
-    TEST_CASE_TEMPLATE("sphere sphere moving", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE_DEFINE("sphere sphere moving", SolverType, sphere_sphere_moving)
     {
-        using params_t = typename SolverType::params_t;
         static constexpr std::size_t dim = 2;
         double dt = .005;
         std::size_t total_it = 100;
@@ -187,18 +184,15 @@ namespace scopi
         particles.push_back(obstacle, property<dim>().deactivate());
         particles.push_back(sphere, prop.force({{0., -10.}}));
 
-        params_t params;
-        params.scopi_params.output_frequency = total_it-1;
-
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
+        set_params(solver, total_it);
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE("sphere inclined plan", SolverType, SOLVER_DRY_WITHOUT_FRICTION(2, contact_kdtree, vap_fpd), SOLVER_DRY_WITHOUT_FRICTION(2, contact_brute_force, vap_fpd))
+    TEST_CASE_TEMPLATE_DEFINE("sphere inclined plan", SolverType, sphere_inclined_plan)
     {
-        using params_t = typename SolverType::params_t;
         std::tuple<double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double>>
             data_container({std::make_tuple(PI/6., 0.000998789, 0., 0.0010002),
@@ -223,11 +217,9 @@ namespace scopi
         particles.push_back(p, property<dim>().deactivate());
         particles.push_back(s, prop.force({{0., -g}}));
 
-        params_t params;
-        params.scopi_params.output_frequency = std::size_t(-1);
-
-        SolverType solver(particles, dt, params);
+        SolverType solver(particles, dt);
         solver.run(total_it);
+        set_params(solver, total_it);
 
         auto pos = particles.pos();
         auto q = particles.q();
@@ -247,4 +239,12 @@ namespace scopi
         REQUIRE(error_v == doctest::Approx(std::get<3>(data)).epsilon(1e-4));
         REQUIRE(omega(1) == doctest::Approx(0.));
     }
+
+    TEST_CASE_TEMPLATE_APPLY(sphere_plan, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plan_force, solver_dry_without_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_sphere_fixed, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_sphere_fixed_force, solver_dry_without_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_sphere_moving, solver_dry_without_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plan, solver_dry_without_friction_t<2, vap_fpd>);
+
 }

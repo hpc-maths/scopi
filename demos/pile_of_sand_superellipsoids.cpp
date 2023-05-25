@@ -22,6 +22,8 @@ void add_obstacle(scopi::scopi_container<dim>& particles, double x, double r)
 
 int main()
 {
+#ifdef SCOPI_USE_MKL
+
     plog::init(plog::info, "pile_of_sand_superellipsoids.log");
 
     constexpr std::size_t dim = 2;
@@ -33,14 +35,7 @@ int main()
     std::size_t n = 10; // n^2 ellipses
     double g = 1.;
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction>, scopi::contact_brute_force, scopi::vap_fpd> params;
-    params.optim_params.tol_l = 1e-6;
-    // params.optim_params.rho = 2.;
-    // params.scopi_params.output_frequency = 2;
-    // params.optim_params.change_default_tol_mosek = false;
-    // params.problem_params.mu = 0.1;
     double r = width_box/2./(n+1);
-    params.contacts_params.dmax = 2.*1.5*r;
     double r_obs = r/10.;
 
     scopi::scopi_container<dim> particles;
@@ -92,8 +87,15 @@ int main()
         particles.push_back(s, prop.mass(m).moment_inertia(m*PI/4.*2.*rx*r*r*r));
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction>, scopi::contact_brute_force, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction>, scopi::contact_brute_force, scopi::vap_fpd> solver(particles, dt);
+    auto params = solver.get_params();
+    params.optim_params.tol_l = 1e-6;
+    params.contact_params.dmax = 2.*1.5*r;
+    // params.optim_params.rho = 2.;
+    // params.solver_params.output_frequency = 2;
+    // params.optim_params.change_default_tol_mosek = false;
+    // params.problem_params.mu = 0.1;
     solver.run(total_it);
-
+#endif
     return 0;
 }

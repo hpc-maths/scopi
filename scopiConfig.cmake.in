@@ -12,6 +12,7 @@ find_dependency(xtensor @xtensor_REQUIRED_VERSION@)
 find_dependency(nlohmann_json @nlohmann_json_REQUIRED_VERSION@)
 find_dependency(fmt @fmt_REQUIRED_VERSION@)
 find_dependency(plog @plog_REQUIRED_VERSION@)
+find_dependency(CLI11 @CLI11_REQUIRED_VERSION@)
 
 if(@SCOPI_USE_OPENMP@)
     find_dependency(OpenMP @openmp_REQUIRED_VERSION@)

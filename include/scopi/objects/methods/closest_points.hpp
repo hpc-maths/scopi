@@ -12,6 +12,7 @@
 #include "../../minpack.hpp"
 
 #include "../types/sphere.hpp"
+#include "../types/segment.hpp"
 #include "../types/superellipsoid.hpp"
 #include "../types/plan.hpp"
 #include "../neighbor.hpp"
@@ -780,6 +781,56 @@ namespace scopi
         auto neigh = closest_points(s, p);
         neigh.nij *= -1.;
         std::swap(neigh.pi, neigh.pj);
+        return neigh;
+    }
+
+    // SPHERE - SEGMENT
+    /**
+     * @brief Neighbor between a sphere and a segment.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner
+     * @param s [in] Sphere \c i.
+     * @param p [in] Segment \c j.
+     *
+     * @return Neighbor struct for contact between sphere \c i and Segment \c j.
+     */
+    template<std::size_t dim, bool owner>
+    auto closest_points(const sphere<dim, owner>& s, const segment<dim, owner>& seg)
+    {
+        auto s_pos = s.pos(0);
+        auto seg_pos = seg.extrema();
+
+        auto tangent = seg.tangent();
+
+        neighbor<dim> neigh;
+        if (xt::linalg::dot(s_pos - seg_pos[0], tangent)[0] < 0)
+        {
+          neigh.nij = xt::eval((s_pos - seg_pos[0])/xt::linalg::norm(s_pos - seg_pos[0]));
+          neigh.pi = s_pos - neigh.nij*s.radius();
+          neigh.pj = seg_pos[0];
+          neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+        }
+        else if (xt::linalg::dot(s_pos - seg_pos[1], tangent)[0] > 0)
+        {
+          neigh.nij = xt::eval((s_pos - seg_pos[1])/xt::linalg::norm(s_pos - seg_pos[1]));
+          neigh.pi = s_pos - neigh.nij*s.radius();
+          neigh.pj = seg_pos[1];
+          neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+        }
+        else
+        {
+          auto normal = seg.normal();
+          auto segment_to_sphere = xt::eval(xt::linalg::dot(s_pos - seg.pos(0), normal));
+          auto sign = xt::sign(segment_to_sphere);
+
+          neigh.pi = s_pos - sign*s.radius()*normal;
+          neigh.pj = s_pos - segment_to_sphere*normal;
+          neigh.nij = sign*normal;
+          neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
+        }
         return neigh;
     }
 

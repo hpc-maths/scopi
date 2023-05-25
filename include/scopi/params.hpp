@@ -134,71 +134,61 @@ namespace scopi
      * \todo Interface is not used friendly.
      *
      * @tparam solver_t Type of the optimization solver.
-     * @tparam problem_t Type of the problem (redundant with \c solver_t).
-     * @tparam contact_t Type of contacts.
-     * @tparam vap_t Type of a priori velocity.
      */
-    template<class solver_t,
-             class contact_t,
-             class vap_t>
+    template<class solver_t>
     struct Params
     {
-        /**
-         * @brief Alias for problem type.
-         */
-        using problem_t = typename solver_t::problem_type;
+        using solver_params_t = ScopiParams;
+        using optim_params_t = typename solver_t::optim_solver_t::params_t;
+        using problem_params_t = typename solver_t::optim_solver_t::problem_t::params_t;
+        using contact_params_t = typename solver_t::contact_t::params_t;
+        using vap_params_t = typename solver_t::vap_t::params_t;
 
         /**
          * @brief Default constructor.
          */
-        Params();
-        /**
-         * @brief Copy constructor.
-         *
-         * @param params Parameters to be copied.
-         */
-        Params(const Params<solver_t, contact_t, vap_t>& params);
+        Params(solver_params_t& solver_params,
+               optim_params_t& optim_params,
+               problem_params_t& problem_params,
+               contact_params_t& contact_params,
+               vap_params_t& vap_params
+        );
 
         /**
          * @brief Parameters for the optimization solver.
          */
-        OptimParams<solver_t> optim_params;
+        optim_params_t& optim_params;
         /**
          * @brief Parameters for the problem.
          */
-        ProblemParams<problem_t> problem_params;
+        problem_params_t& problem_params;
         /**
          * @brief Parameters for the contacts.
          */
-        ContactsParams<contact_t> contacts_params;
+        contact_params_t& contact_params;
         /**
          * @brief Parameters for the a priori velocity.
          */
-        VapParams<vap_t> vap_params;
+        vap_params_t& vap_params;
         /**
          * @brief Parameters for the main solver.
          */
-        ScopiParams scopi_params;
+        solver_params_t& solver_params;
     };
 
-    template<class solver_t, class contact_t, class vap_t>
-    Params<solver_t, contact_t, vap_t>::Params()
-    : optim_params()
-    , problem_params()
-    , contacts_params()
-    , vap_params()
-    , scopi_params()
+    template<class solver_t>
+    Params<solver_t>::Params(solver_params_t& solver_params,
+                             optim_params_t& optim_params,
+                             problem_params_t& problem_params,
+                             contact_params_t& contact_params,
+                             vap_params_t& vap_params
+    )
+    : optim_params(optim_params)
+    , problem_params(problem_params)
+    , contact_params(contact_params)
+    , vap_params(vap_params)
+    , solver_params(solver_params)
     {}
-
-    template<class solver_t, class contact_t, class vap_t>
-    Params<solver_t, contact_t, vap_t>::Params(const Params<solver_t, contact_t, vap_t>& params)
-    : optim_params(params.optim_params)
-    , problem_params(params.problem_params)
-    , contacts_params(params.contacts_params)
-    , vap_params(params.vap_params)
-    , scopi_params(params.scopi_params)
-    {}
-
 }
 
 

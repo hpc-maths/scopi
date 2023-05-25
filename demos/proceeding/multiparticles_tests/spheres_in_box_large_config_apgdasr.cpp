@@ -29,13 +29,6 @@ int main()
     double dt = 0.2*0.9*r0/(std::sqrt(2.*width_box*g));
     double rho = 0.2/(dt*dt);
 
-    scopi::Params<scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> params;
-    params.scopi_params.output_frequency = 2000;
-    params.optim_params.tol_l = 1e-3;
-    params.optim_params.rho = rho;
-    params.contacts_params.dmax = 0.9*r0;
-    params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*0.9*r0;
-
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
 
@@ -75,7 +68,14 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_asr>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    auto params = solver.get_params();
+    params.solver_params.output_frequency = 2000;
+    params.optim_params.tol_l = 1e-3;
+    params.optim_params.rho = rho;
+    params.contact_params.dmax = 0.9*r0;
+    params.contact_params.kd_tree_radius = params.contact_params.dmax + 2.*0.9*r0;
+
     solver.run(total_it);
 
     return 0;

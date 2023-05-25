@@ -103,11 +103,6 @@ namespace scopi{
     class OptimProjectedGradient: public OptimBase<OptimProjectedGradient<problem_t, gradient_t>, problem_t>
                                 , public gradient_t<problem_t>
     {
-    public:
-        /**
-         * @brief Alias for the problem.
-         */
-        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimBase.
@@ -130,9 +125,7 @@ namespace scopi{
         template<std::size_t dim>
         OptimProjectedGradient(std::size_t nparts,
                                double dt,
-                               const scopi_container<dim>& particles,
-                               const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params,
-                               const ProblemParams<problem_t>& problem_params);
+                               const scopi_container<dim>& particles);
 
     public:
         /**
@@ -179,7 +172,7 @@ namespace scopi{
          *
          * @return \f$ N_c \f$ elements.
          */
-        double* constraint_data();
+        double* constraint_data_impl();
         /**
          * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
@@ -280,10 +273,8 @@ namespace scopi{
     template<std::size_t dim>
     OptimProjectedGradient<problem_t, gradient_t>::OptimProjectedGradient(std::size_t nparts,
                                                                           double dt,
-                                                                          const scopi_container<dim>& particles,
-                                                                          const OptimParams<OptimProjectedGradient<problem_t, gradient_t>>& optim_params,
-                                                                          const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
+                                                                          const scopi_container<dim>& particles)
+    : base_type(nparts, dt, 2*3*nparts, 0)
     , gradient_t<problem_t>(optim_params.max_iter, optim_params.rho, optim_params.tol_dg, optim_params.tol_l, optim_params.verbose)
     , m_u(xt::zeros<double>({6*nparts}))
     , m_bl(xt::zeros<double>({6*nparts}))
@@ -393,7 +384,7 @@ namespace scopi{
     }
 
     template<class problem_t, template<class> class gradient_t>
-    double* OptimProjectedGradient<problem_t, gradient_t>::constraint_data()
+    double* OptimProjectedGradient<problem_t, gradient_t>::constraint_data_impl()
     {
         return NULL;
     }

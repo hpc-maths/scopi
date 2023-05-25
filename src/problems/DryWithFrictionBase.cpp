@@ -67,11 +67,4 @@ namespace scopi
             return std::make_pair(x, 0.);
         }
     }
-
-
-    DryWithFrictionBase::DryWithFrictionBase(std::size_t nparticles, double dt, double mu)
-    : ProblemBase(nparticles, dt) 
-    , m_mu(mu)
-    {}
-
 }

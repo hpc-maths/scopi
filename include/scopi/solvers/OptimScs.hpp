@@ -64,11 +64,6 @@ namespace scopi
     template <class problem_t = DryWithoutFriction>
     class OptimScs: public OptimBase<OptimScs<problem_t>, problem_t>
     {
-    public:
-        /**
-         * @brief Alias for the problem.
-         */
-        using problem_type = problem_t;
     private:
         /**
          * @brief Alias for the base class OptimBase
@@ -91,9 +86,7 @@ namespace scopi
         template <std::size_t dim>
         OptimScs(std::size_t nparts,
                  double dt,
-                 const scopi_container<dim>& particles,
-                 const OptimParams<OptimScs<problem_t>>& optim_params,
-                 const ProblemParams<problem_t>& problem_params);
+                 const scopi_container<dim>& particles);
 
     public:
         /**
@@ -140,7 +133,7 @@ namespace scopi
          *
          * @return Null pointer instead of \f$ N_c \f$ elements.
          */
-        double* constraint_data();
+        double* constraint_data_impl();
         /**
          * @brief Number of Lagrange multipliers > 0 (active constraints).
          */
@@ -317,10 +310,8 @@ namespace scopi
     template<std::size_t dim>
     OptimScs<problem_t>::OptimScs(std::size_t nparts,
                                   double dt,
-                                  const scopi_container<dim>& particles,
-                                  const OptimParams<OptimScs<problem_t>>& optim_params,
-                                  const ProblemParams<problem_t>& problem_params)
-    : base_type(nparts, dt, 2*3*nparts, 0, optim_params, problem_params)
+                                  const scopi_container<dim>& particles)
+    : base_type(nparts, dt, 2*3*nparts, 0)
     , m_P_x(6*nparts)
     , m_P_i(6*nparts)
     , m_P_p(6*nparts+1)
@@ -381,7 +372,7 @@ namespace scopi
     }
 
     template<class problem_t>
-    double* OptimScs<problem_t>::constraint_data()
+    double* OptimScs<problem_t>::constraint_data_impl()
     {
         return NULL;
     }

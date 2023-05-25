@@ -27,14 +27,6 @@ int main()
     double r = width_box/2./(n+1);
     double dt = 0.1*r/(std::sqrt(2.*width_box*g));
 
-    scopi::Params<scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> params;
-    params.optim_params.change_default_tol_mosek = false;
-    params.problem_params.mu = 0.1;
-    params.contacts_params.dmax = r;
-    params.contacts_params.kd_tree_radius = params.contacts_params.dmax + 2.*r;
-    params.scopi_params.output_frequency = 20;
-    params.scopi_params.filename = "/mnt/beegfs/workdir/helene.bloch/scopi/proceeding/220909_pile_sand_friction/mu01_convex_";
-
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().force({{0., -g, 0.}});
 
@@ -69,7 +61,15 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt, params);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithoutFriction>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
+    auto params = solver.get_params();
+    params.optim_params.change_default_tol_mosek = false;
+    //params.problem_params.mu = 0.1;
+    params.contact_params.dmax = r;
+    params.contact_params.kd_tree_radius = params.contact_params.dmax + 2.*r;
+    params.solver_params.output_frequency = 20;
+    params.solver_params.path = "pile_sand_no_friction";
+    params.solver_params.filename = "nofriction_convex_";
     solver.run(total_it);
 
     return 0;

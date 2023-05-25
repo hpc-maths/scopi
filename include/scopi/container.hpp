@@ -378,7 +378,7 @@ namespace scopi
     template<std::size_t dim>
     void scopi_container<dim>::push_back(std::size_t io, const std::vector<position_type>& pos)
     {
-        assert(io >= 0 && i < m_periodic_obj_ptr);
+        assert(io >= 0 && io < m_periodic_obj_ptr);
         m_periodic_added = true;
 
         std::size_t size = m_offset[io + 1] - m_offset[io];

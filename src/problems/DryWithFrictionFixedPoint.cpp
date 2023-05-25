@@ -15,12 +15,11 @@ namespace scopi
     , max_iter_fixed_point(params.max_iter_fixed_point)
     {}
 
-    DryWithFrictionFixedPoint::DryWithFrictionFixedPoint(std::size_t nparticles, double dt, const ProblemParams<DryWithFrictionFixedPoint>& params)
-    : DryWithFrictionBase(nparticles, dt, params.mu) 
-    , m_params(params)
+    DryWithFrictionFixedPoint::DryWithFrictionFixedPoint(std::size_t nparticles, double dt)
+    : DryWithFrictionBase(nparticles, dt)
     {}
 
-    bool DryWithFrictionFixedPoint::should_solve_optimization_problem()
+    bool DryWithFrictionFixedPoint::should_solve() const
     {
         bool res = (xt::linalg::norm(m_s_old - m_s)/(xt::linalg::norm(m_s)+1.) > m_params.tol_fixed_point && m_nb_iter < m_params.max_iter_fixed_point);
         if (!res)
