@@ -47,8 +47,23 @@ namespace scopi
      * @param i [in] Index of the particle to update.
      * @param wadapt [in] \f$N \times 3\f$ array that contains the new velocity, where \f$N\f$ is the total number of particles.
      */
-    template<std::size_t dim>
-    void update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt::xtensor<double, 2>& wadapt);
+    template<std::size_t dim, class xt_container>
+    inline std::enable_if_t<dim == 2, void> update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt_container& wadapt)
+    {
+        particles.omega()(i + particles.nb_inactive()) = wadapt(i, 2);
+    }
+
+    template<std::size_t dim, class xt_container>
+    inline std::enable_if_t<dim == 3, void> update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt_container& wadapt)
+    {
+        for (std::size_t d = 0; d < 3; ++d)
+        {
+            particles.omega()(i + particles.nb_inactive())(d) = wadapt(i, d);
+        }
+    }
+
+    // template<std::size_t dim, class xt_container>
+    // void update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt_container& wadapt);
 
     /**
      * @brief Entry point of SCoPI.
@@ -292,7 +307,7 @@ namespace scopi
 
         nl::json json_output;
 
-        
+
         json_output["objects"] = {};
 
         for (std::size_t i = 0; i < m_particles.size(); ++i)
