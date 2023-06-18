@@ -57,11 +57,11 @@ namespace scopi
          */
         double radius() const;
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
-         * @return 
+         * @return
          */
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         /**
@@ -116,9 +116,9 @@ namespace scopi
         /**
          * @brief Create the hash of the sphere.
          *
-         * Two spheres with the same dimension and the same radius have the same hash. 
+         * Two spheres with the same dimension and the same radius have the same hash.
          */
-        void create_hash();
+        void create_hash() const;
 
         /**
          * @brief Radius of the sphere.
@@ -127,7 +127,7 @@ namespace scopi
         /**
          * @brief Hash of the sphere.
          */
-        std::size_t m_hash;
+        mutable std::size_t m_hash;
     };
 
     ///////////////////////////
@@ -137,16 +137,16 @@ namespace scopi
     sphere<dim, owner>::sphere(position_type pos, double radius)
     : base_type(pos, {quaternion()}, 1)
     , m_radius(radius)
+    , m_hash(std::numeric_limits<std::size_t>::min())
     {
-        create_hash();
     }
 
     template<std::size_t dim, bool owner>
     sphere<dim, owner>::sphere(position_type pos, quaternion_type q, double radius)
     : base_type(pos, q, 1)
     , m_radius(radius)
+    , m_hash(std::numeric_limits<std::size_t>::min())
     {
-        create_hash();
     }
 
     template<std::size_t dim, bool owner>
@@ -170,11 +170,15 @@ namespace scopi
     template<std::size_t dim, bool owner>
     std::size_t sphere<dim, owner>::hash() const
     {
+        if (m_hash == std::numeric_limits<std::size_t>::min())
+        {
+            create_hash();
+        }
         return m_hash;
     }
 
     template<std::size_t dim, bool owner>
-    void sphere<dim, owner>::create_hash()
+    void sphere<dim, owner>::create_hash() const
     {
         std::stringstream ss;
         ss << "sphere<" << dim << ">(" << m_radius << ")";
