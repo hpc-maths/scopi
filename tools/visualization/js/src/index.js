@@ -138,11 +138,11 @@ function drawObjects() {
 
             clean(scene);
 
-            const domain = new THREE.PlaneGeometry( 1, 1 );
-            const domain_material = new THREE.MeshBasicMaterial( {color: 0xffff00, tansparent: true} );
-            const domain_mesh = new THREE.Mesh( domain, domain_material );
-            domain_mesh.position.set(0.5, 0.5, 0);
-            scene.add(domain_mesh);
+            // const domain = new THREE.PlaneGeometry( 1, 1 );
+            // const domain_material = new THREE.MeshBasicMaterial( {color: 0xffff00, tansparent: true} );
+            // const domain_mesh = new THREE.Mesh( domain, domain_material );
+            // domain_mesh.position.set(0.5, 0.5, 0);
+            // scene.add(domain_mesh);
 
             var geometry = new THREE.SphereGeometry(1, 16, 16);
             const diffuseColor = new THREE.Color().setHSL(0., 0.5, 0.25);
@@ -205,10 +205,34 @@ function drawObjects() {
                         nbSpheres += 1;
                     });
                 }
-                else {
+                else if (obj.type === "sphere") {
                     sphereObject(obj, matrix, rot);
                     mesh.setMatrixAt(nbSpheres, matrix);
                     nbSpheres += 1;
+                }
+                else if (obj.type === "segment") {
+
+                    const p1 = new THREE.Vector3();
+                    const p2 = new THREE.Vector3();
+                    p1.x = obj.p1[0];
+                    p1.y = obj.p1[1];
+                    p2.x = obj.p2[0];
+                    p2.y = obj.p2[1];
+                    if (obj.p1.length == 2) {
+                        p1.z = 0.;
+                        p2.z = 0.;
+                    }
+                    else {
+                        p1.z = obj.p1[2];
+                        p2.z = obj.p2[2];
+                    }
+                    const points = [p1, p2];
+                    const geometry = new THREE.BufferGeometry().setFromPoints( points );
+                    const material = new THREE.LineBasicMaterial({
+                        color: 'red'
+                    });
+                    const line = new THREE.Line( geometry, material );
+                    scene.add( line );
                 }
 
             });

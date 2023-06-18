@@ -14,6 +14,7 @@
 #include "../types/superellipsoid.hpp"
 #include "../types/worm.hpp"
 #include "../types/plan.hpp"
+#include "../types/segment.hpp"
 #include "../neighbor.hpp"
 #include "../dispatch.hpp"
 
@@ -115,7 +116,7 @@ namespace scopi
      * @return nlohmann json object.
      */
     template<std::size_t dim>
-    nl::json write_objects(const plan<dim, false> p, std::size_t id)
+    nl::json write_objects(const plan<dim, false>& p, std::size_t id)
     {
         nl::json object;
 
@@ -143,6 +144,33 @@ namespace scopi
       // return ssss;
     }
 
+    // SEGMENT
+    /**
+     * @brief
+     * @brief Write the elements of a segment in json format.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @param p [in] Plane.
+     *
+     * @return nlohmann json object.
+     */
+    template<std::size_t dim>
+    nl::json write_objects(const segment<dim, false>& seg, std::size_t id)
+    {
+        nl::json object;
+
+        object["type"] = "segment";
+        object["id"] = id;
+        auto extrema = seg.extrema();
+        object["p1"] = extrema[0];
+        object["p2"] = extrema[1];
+        object["normal"] = seg.normal();
+        object["tangent"] = seg.tangent();
+        object["quaternion"] = seg.q();
+
+        return object;
+    }
+
     // WORM
     /**
      * @brief Write the elements of a worm in json format.
@@ -153,7 +181,7 @@ namespace scopi
      * @return nlohmann json object.
      */
     template<std::size_t dim>
-    nl::json write_objects(const worm<dim, false> w, std::size_t id)
+    nl::json write_objects(const worm<dim, false>& w, std::size_t id)
     {
         nl::json object;
         object["type"] = "worm";
@@ -234,7 +262,8 @@ namespace scopi
         mpl::vector<const sphere<dim, false>,
                     const superellipsoid<dim, false>,
                     const worm<dim, false>,
-                    const plan<dim, false>>,
+                    const plan<dim, false>,
+                    const segment<dim, false>>,
         typename write_objects_functor<dim>::return_type
     >;
 }
