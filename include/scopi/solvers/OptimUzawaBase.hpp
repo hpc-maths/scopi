@@ -290,7 +290,6 @@ namespace scopi{
 
             tic();
             xt::noalias(m_L) = xt::maximum( m_L-this->m_params.rho*m_R, 0);
-            PLOG_INFO << "m_L " << m_L << std::endl;
             duration = toc();
             time_assign_l += duration;
             time_solve += duration;
