@@ -292,11 +292,12 @@ namespace scopi
 
         nl::json json_output;
 
+        
         json_output["objects"] = {};
 
         for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
-            json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i]));
+            json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i], i));
         }
 
         if (m_params.write_velocity)

@@ -723,7 +723,7 @@ namespace scopi
      * @return Neighbor struct for contact between plane \c i and plane \c j.
      */
     template<std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner> /* p1 */, const plan<dim, owner> /* p2 */)
+    auto closest_points(const plan<dim, owner>& /* p1 */, const plan<dim, owner>& /* p2 */)
     {
         return neighbor<dim>();
     }
@@ -832,6 +832,77 @@ namespace scopi
           neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         }
         return neigh;
+    }
+
+    // SEGMENT - SPHERE
+    /**
+     * @brief Neighbor between a segment and a sphere.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner
+     * @param p [in] Segment \c i.
+     * @param s [in] Sphere \c j.
+     *
+     * @return Neighbor struct for contact between segment \c i and sphere \c j.
+     */
+    template<std::size_t dim, bool owner>
+    auto closest_points(const segment<dim, owner>& seg, const sphere<dim, owner>& s)
+    {
+        auto neigh = closest_points(s, seg);
+        neigh.nij *= -1.;
+        std::swap(neigh.pi, neigh.pj);
+        return neigh;
+    }
+
+    // SEGMENT - SEGMENT
+    /**
+     * @brief Neighbor between two segments.
+     *
+     * See neighbor.hpp.
+     *
+     * @tparam dim Dimension (2 or 3).
+     * @tparam owner
+     * @param s1 [in] Plane \c i.
+     * @param s2 [in] Plane \c j.
+     *
+     * @return
+     * @return Neighbor struct for contact between segment \c i and segment \c j.
+     */
+    template<std::size_t dim, bool owner>
+    auto closest_points(const segment<dim, owner>&, const segment<dim, owner>&)
+    {
+        std::cerr << "closest_points for segment/segment must be implemented" << std::endl;
+        return neighbor<dim>();
+    }
+
+    template<std::size_t dim, bool owner>
+    auto closest_points(const plan<dim, owner>&, const segment<dim, owner>&)
+    {
+        std::cerr << "closest_points for plan/segment must be implemented" << std::endl;
+        return neighbor<dim>();
+    }
+
+    template<std::size_t dim, bool owner>
+    auto closest_points(const segment<dim, owner>&, const plan<dim, owner>&)
+    {
+        std::cerr << "closest_points for segment/plan must be implemented" << std::endl;
+        return neighbor<dim>();
+    }
+
+    template<std::size_t dim, bool owner>
+    auto closest_points(const superellipsoid<dim, owner>&, const segment<dim, owner>&)
+    {
+        std::cerr << "closest_points for superellipsoid/segment must be implemented" << std::endl;
+        return neighbor<dim>();
+    }
+
+    template<std::size_t dim, bool owner>
+    auto closest_points(const segment<dim, owner>&, const superellipsoid<dim, owner>&)
+    {
+        std::cerr << "closest_points for segment/superellipsoid must be implemented" << std::endl;
+        return neighbor<dim>();
     }
 
     // SUPERELLIPSOID 3D - SPHERE 3D
@@ -1940,7 +2011,8 @@ namespace scopi
         const object<dim, owner>,
         mpl::vector<const sphere<dim, owner>,
                     const superellipsoid<dim, owner>,
-                    const plan<dim, owner>>,
+                    const plan<dim, owner>,
+                    const segment<dim, owner>>,
         typename closest_points_functor<dim>::return_type,
         antisymmetric_dispatch
     >;
