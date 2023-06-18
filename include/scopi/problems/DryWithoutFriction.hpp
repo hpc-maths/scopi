@@ -211,10 +211,14 @@ namespace scopi
         if (c.i >= active_offset)
         {
             std::size_t ind_part = c.i - active_offset;
-            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            // auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                R(row) -= (this->m_dt*(c.nij[0]*dot(0, ip) + c.nij[1]*dot(1, ip) + c.nij[2]*dot(2, ip)))
+                // R(row) -= (this->m_dt*(c.nij[0]*dot(0, ip) + c.nij[1]*dot(1, ip) + c.nij[2]*dot(2, ip)))
+                //     * U(3*particles.nb_active() + 3*ind_part + ip);
+                R(row) -= (this->m_dt*(c.nij[0]*(ri_cross(0, 0)*Ri(0, ip) + ri_cross(0, 1)*Ri(1, ip) + ri_cross(0, 2)*Ri(2, ip))
+                                                                                    +c.nij[1]*(ri_cross(1, 0)*Ri(0, ip) + ri_cross(1, 1)*Ri(1, ip) + ri_cross(1, 2)*Ri(2, ip))
+                                                                                    +c.nij[2]*(ri_cross(2, 0)*Ri(0, ip) + ri_cross(2, 1)*Ri(1, ip) + ri_cross(2, 2)*Ri(2, ip))))
                     * U(3*particles.nb_active() + 3*ind_part + ip);
             }
         }
@@ -222,10 +226,14 @@ namespace scopi
         if (c.j >= active_offset)
         {
             std::size_t ind_part = c.j - active_offset;
-            auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+            // auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                R(row) -= (-this->m_dt*(c.nij[0]*dot(0, ip) + c.nij[1]*dot(1, ip) + c.nij[2]*dot(2, ip)))
+                // R(row) -= (-this->m_dt*(c.nij[0]*dot(0, ip) + c.nij[1]*dot(1, ip) + c.nij[2]*dot(2, ip)))
+                //     * U(3*particles.nb_active() + 3*ind_part + ip);
+                R(row) -= (-this->m_dt*(c.nij[0]*(rj_cross(0, 0)*Rj(0, ip) + rj_cross(0, 1)*Rj(1, ip) + rj_cross(0, 2)*Rj(2, ip))
+                                                                                    +c.nij[1]*(rj_cross(1, 0)*Rj(0, ip) + rj_cross(1, 1)*Rj(1, ip) + rj_cross(1, 2)*Rj(2, ip))
+                                                                                    +c.nij[2]*(rj_cross(2, 0)*Rj(0, ip) + rj_cross(2, 1)*Rj(1, ip) + rj_cross(2, 2)*Rj(2, ip))))
                     * U(3*particles.nb_active() + 3*ind_part + ip);
             }
         }
@@ -264,22 +272,28 @@ namespace scopi
         if (c.i >= active_offset)
         {
             std::size_t ind_part = c.i - active_offset;
-            auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            // auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
 #pragma omp atomic
-                U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                // U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * this->m_dt*(c.nij[0]*(ri_cross(0, 0)*Ri(0, ip) + ri_cross(0, 1)*Ri(1, ip) + ri_cross(0, 2)*Ri(2, ip))
+                                                                                    +c.nij[1]*(ri_cross(1, 0)*Ri(0, ip) + ri_cross(1, 1)*Ri(1, ip) + ri_cross(1, 2)*Ri(2, ip))
+                                                                                    +c.nij[2]*(ri_cross(2, 0)*Ri(0, ip) + ri_cross(2, 1)*Ri(1, ip) + ri_cross(2, 2)*Ri(2, ip)));
             }
         }
 
         if (c.j >= active_offset)
         {
             std::size_t ind_part = c.j - active_offset;
-            auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+            // auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
 #pragma omp atomic
-                U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                // U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
+                U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*(rj_cross(0, 0)*Rj(0, ip) + rj_cross(0, 1)*Rj(1, ip) + rj_cross(0, 2)*Rj(2, ip))
+                                                                                    +c.nij[1]*(rj_cross(1, 0)*Rj(0, ip) + rj_cross(1, 1)*Rj(1, ip) + rj_cross(1, 2)*Rj(2, ip))
+                                                                                    +c.nij[2]*(rj_cross(2, 0)*Rj(0, ip) + rj_cross(2, 1)*Rj(1, ip) + rj_cross(2, 2)*Rj(2, ip))));
             }
         }
     }
