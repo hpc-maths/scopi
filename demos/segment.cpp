@@ -11,11 +11,17 @@ int main(int argc, char **argv)
 {
     constexpr std::size_t dim = 2;
     double dt = .001;
-    std::size_t total_it = 1000;
+    double max_radius = 0.06;
+    std::size_t total_it = 100;
+    std::size_t n_parts = 20;
 
     plog::init(plog::info, "two_segments.log");
 
     CLI::App app("two segments");
+    app.add_option("--nparts", n_parts, "Number of particles")->capture_default_str();
+    app.add_option("--nite", total_it, "Number of iterations")->capture_default_str();
+    app.add_option("--dt", dt, "Time step")->capture_default_str();
+    CLI11_PARSE(app, argc, argv);
 
     scopi::segment<dim> seg1(scopi::type::position_t<dim>{0., 1.}, scopi::type::position_t<dim>{0.4, 1.});
     scopi::segment<dim> seg2(scopi::type::position_t<dim>{0.6, 1.}, scopi::type::position_t<dim>{1., 1.});
@@ -27,10 +33,9 @@ int main(int argc, char **argv)
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distrib_x(0.1, 0.9);
     std::uniform_real_distribution<double> distrib_y(0, 0.7);
-    std::uniform_real_distribution<double> distrib_r(0.01, 0.06);
+    std::uniform_real_distribution<double> distrib_r(0.01, max_radius);
 
-    auto s_prop = scopi::property<dim>().desired_velocity({{.5, 2}}).mass(1.).moment_inertia(0.1);
-    for (std::size_t i = 0; i < 20; ++i)
+    for (std::size_t i = 0; i < n_parts; ++i)
     {
         auto x = distrib_x(generator);
         auto y = distrib_y(generator);
@@ -42,8 +47,9 @@ int main(int argc, char **argv)
 
     using solver_type = scopi::ScopiSolver<dim>;
     solver_type solver(particles, dt);
-    solver.init_options(app);
-    CLI11_PARSE(app, argc, argv);
+    auto params = solver.get_params();
+    params.optim_params.rho = 0.2/(dt*dt);
+    params.contact_params.dmax = 4*max_radius;
     solver.run(total_it);
 
     return 0;
