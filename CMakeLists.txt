@@ -10,9 +10,8 @@ project(scopi)
 
 # set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic ")
-set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 message(STATUS "CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
@@ -20,7 +19,6 @@ set(SCOPI_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Versionning
 # ===========
-
 include(version)
 set_version()
 
@@ -46,10 +44,12 @@ endif()
 if(SCOPI_USE_TBB)
     set(XTENSOR_USE_TBB 1)
 endif()
+
 find_package(xtensor REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
 find_package(CLI11 REQUIRED)
+
 # find_package(plog REQUIRED)
 # find_package(nanoflann)
 
@@ -57,7 +57,7 @@ find_package(CLI11 REQUIRED)
 # see https://xtensor-blas.readthedocs.io/en/latest/performance.html
 add_definitions(-DHAVE_CBLAS=1)
 
-if (WIN32)
+if(WIN32)
     find_package(OpenBLAS REQUIRED)
     set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
 else()
@@ -67,8 +67,8 @@ endif()
 
 message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
 message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
-# end of xtensor-blas section
 
+# end of xtensor-blas section
 if(SCOPI_USE_TBB)
     find_package(TBB REQUIRED)
 endif()
@@ -81,11 +81,13 @@ if(SCOPI_USE_MKL)
     if(SCOPI_USE_TBB)
         set(MKL_THREAD_LAYER "TBB")
     endif()
+
     find_package(MKL REQUIRED)
 endif()
 
 if(SCOPI_USE_MOSEK)
     find_package(MOSEK REQUIRED)
+
     if(APPLE)
         set(MOSEK_FUSION_LIBRARY "" CACHE FILEPATH "MOSEK FUSION LIBRARY")
     endif(APPLE)
@@ -97,8 +99,7 @@ endif()
 
 # Package
 # =======
-
-set (CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
+set(CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
     src/contact/contact_brute_force.cpp
@@ -117,32 +118,31 @@ set(SCOPI_SRC
     src/minpack.cpp
     src/params.cpp
     src/quaternion.cpp
-    src/solver.cpp
     src/utils.cpp
 )
 
 add_library(scopi ${SCOPI_SRC})
 
 target_include_directories(scopi PUBLIC
-                                 $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
-                                 $<INSTALL_INTERFACE:include>)
+    $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(scopi PUBLIC xtensor
-                      nlohmann_json::nlohmann_json
-                      fmt::fmt
-                      CLI11::CLI11
-                      # plog::plog
-                      #nanoflann::nanoflann
-                      ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+    nlohmann_json::nlohmann_json
+    fmt::fmt
+    CLI11::CLI11
+
+    # plog::plog
+    # nanoflann::nanoflann
+    ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 # set_target_properties(scopi PROPERTIES
-#                       PUBLIC_HEADER "${SCOPI_HEADERS}"
-#                     #   COMPILE_DEFINITIONS "SCOPI_EXPORTS"
-#                       PREFIX ""
-#                       VERSION ${${PROJECT_NAME}_VERSION}
-#                       SOVERSION ${VERSION_MAJOR}
-#                       OUTPUT_NAME "libscopi")
-
+# PUBLIC_HEADER "${SCOPI_HEADERS}"
+# #   COMPILE_DEFINITIONS "SCOPI_EXPORTS"
+# PREFIX ""
+# VERSION ${${PROJECT_NAME}_VERSION}
+# SOVERSION ${VERSION_MAJOR}
+# OUTPUT_NAME "libscopi")
 if(SCOPI_USE_MKL)
     target_link_libraries(scopi PUBLIC MKL::MKL)
     target_compile_definitions(scopi PUBLIC SCOPI_USE_MKL)
@@ -181,7 +181,6 @@ endif()
 if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
-
 
 # Installation
 # ============

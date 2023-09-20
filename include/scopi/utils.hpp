@@ -173,6 +173,19 @@ namespace scopi
         return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
     }
 
+    template<class matrix, class vector>
+    inline vector MatMatVecMult(const matrix& A, const matrix& B, const vector& v)
+    {
+        vector out;
+        for (std::size_t iv = 0; iv < 3; ++iv)
+        {
+            out(iv) = A(iv, 0)*(B(0, 0)*v(0)+B(0, 1)*v(1)+B(0, 2)*v(2))
+                    + A(iv, 1)*(B(1, 0)*v(0)+B(1, 1)*v(1)+B(1, 2)*v(2))
+                    + A(iv, 2)*(B(2, 0)*v(0)+B(2, 1)*v(1)+B(2, 2)*v(2));
+        }
+        return out;
+    }
+
     /**
      * @brief Get rotation velocity (3D vector) from a scalar value (2D simulation)
      *
