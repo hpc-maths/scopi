@@ -180,6 +180,7 @@ namespace scopi
         }
     }
 
+
     template<std::size_t dim>
     void DryWithoutFriction::matrix_free_gemv_A(const neighbor<dim>& c,
                                                 const scopi_container<dim>& particles,
@@ -190,16 +191,18 @@ namespace scopi
     {
         if (c.i >= active_offset)
         {
+            std::size_t index = 3*(c.i - active_offset);
             for (std::size_t d = 0; d < 3; ++d)
             {
-                R(row) -= (-this->m_dt*c.nij[d]) * U((c.i - active_offset)*3 + d);
+                R(row) += this->m_dt*c.nij[d] * U(index + d);
             }
         }
         if (c.j >= active_offset)
         {
+            std::size_t index = 3*(c.j - active_offset);
             for (std::size_t d = 0; d < 3; ++d)
             {
-                R(row) -= (this->m_dt*c.nij[d]) * U((c.j - active_offset)*3 + d);
+                R(row) -= this->m_dt*c.nij[d] * U(index + d);
             }
         }
 
@@ -210,31 +213,21 @@ namespace scopi
 
         if (c.i >= active_offset)
         {
-            std::size_t ind_part = c.i - active_offset;
-            // auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            std::size_t index = 3*(particles.nb_active() + c.i - active_offset);
+            auto rot = MatMatVecMult(ri_cross, Ri, c.nij);
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                // R(row) -= (this->m_dt*(c.nij[0]*dot(0, ip) + c.nij[1]*dot(1, ip) + c.nij[2]*dot(2, ip)))
-                //     * U(3*particles.nb_active() + 3*ind_part + ip);
-                R(row) -= (this->m_dt*(c.nij[0]*(ri_cross(0, 0)*Ri(0, ip) + ri_cross(0, 1)*Ri(1, ip) + ri_cross(0, 2)*Ri(2, ip))
-                                                                                    +c.nij[1]*(ri_cross(1, 0)*Ri(0, ip) + ri_cross(1, 1)*Ri(1, ip) + ri_cross(1, 2)*Ri(2, ip))
-                                                                                    +c.nij[2]*(ri_cross(2, 0)*Ri(0, ip) + ri_cross(2, 1)*Ri(1, ip) + ri_cross(2, 2)*Ri(2, ip))))
-                    * U(3*particles.nb_active() + 3*ind_part + ip);
+                R(row) -= this->m_dt*rot(ip)*U(index + ip);
             }
         }
 
         if (c.j >= active_offset)
         {
-            std::size_t ind_part = c.j - active_offset;
-            // auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+            std::size_t index = 3*(particles.nb_active() + c.j - active_offset);
+            auto rot = MatMatVecMult(rj_cross, Rj, c.nij);
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
-                // R(row) -= (-this->m_dt*(c.nij[0]*dot(0, ip) + c.nij[1]*dot(1, ip) + c.nij[2]*dot(2, ip)))
-                //     * U(3*particles.nb_active() + 3*ind_part + ip);
-                R(row) -= (-this->m_dt*(c.nij[0]*(rj_cross(0, 0)*Rj(0, ip) + rj_cross(0, 1)*Rj(1, ip) + rj_cross(0, 2)*Rj(2, ip))
-                                                                                    +c.nij[1]*(rj_cross(1, 0)*Rj(0, ip) + rj_cross(1, 1)*Rj(1, ip) + rj_cross(1, 2)*Rj(2, ip))
-                                                                                    +c.nij[2]*(rj_cross(2, 0)*Rj(0, ip) + rj_cross(2, 1)*Rj(1, ip) + rj_cross(2, 2)*Rj(2, ip))))
-                    * U(3*particles.nb_active() + 3*ind_part + ip);
+                R(row) += this->m_dt*rot(ip)*U(index + ip);
             }
         }
     }
@@ -249,18 +242,21 @@ namespace scopi
     {
         if (c.i >= active_offset)
         {
+            std::size_t index = 3*(c.i - active_offset);
             for (std::size_t d = 0; d < 3; ++d)
             {
 #pragma omp atomic
-                U((c.i - active_offset)*3 + d) += -L(row) * this->m_dt * c.nij[d];
+                U(index + d) -= L(row) * this->m_dt * c.nij[d];
             }
         }
+
         if (c.j >= active_offset)
         {
+            std::size_t index = 3*(c.j - active_offset);
             for (std::size_t d = 0; d < 3; ++d)
             {
 #pragma omp atomic
-                U((c.j - active_offset)*3 + d) += L(row) * this->m_dt * c.nij[d];
+                U(index + d) += L(row) * this->m_dt * c.nij[d];
             }
         }
 
@@ -271,29 +267,24 @@ namespace scopi
 
         if (c.i >= active_offset)
         {
-            std::size_t ind_part = c.i - active_offset;
-            // auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+            std::size_t index = 3*(particles.nb_active() + c.i - active_offset);
+            auto rot = MatMatVecMult(ri_cross, Ri, c.nij);
+
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
 #pragma omp atomic
-                // U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * this->m_dt*(c.nij[0]*(ri_cross(0, 0)*Ri(0, ip) + ri_cross(0, 1)*Ri(1, ip) + ri_cross(0, 2)*Ri(2, ip))
-                                                                                    +c.nij[1]*(ri_cross(1, 0)*Ri(0, ip) + ri_cross(1, 1)*Ri(1, ip) + ri_cross(1, 2)*Ri(2, ip))
-                                                                                    +c.nij[2]*(ri_cross(2, 0)*Ri(0, ip) + ri_cross(2, 1)*Ri(1, ip) + ri_cross(2, 2)*Ri(2, ip)));
+                U(index + ip) += L(row) * this->m_dt*rot(ip);
             }
         }
 
         if (c.j >= active_offset)
         {
-            std::size_t ind_part = c.j - active_offset;
-            // auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+            std::size_t index = 3*(particles.nb_active() + c.j - active_offset);
+            auto rot = MatMatVecMult(rj_cross, Rj, c.nij);
             for (std::size_t ip = 0; ip < 3; ++ip)
             {
 #pragma omp atomic
-                // U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*dot(0, ip)+c.nij[1]*dot(1, ip)+c.nij[2]*dot(2, ip)));
-                U(3*particles.nb_active() + 3*ind_part + ip) += L(row) * (-this->m_dt*(c.nij[0]*(rj_cross(0, 0)*Rj(0, ip) + rj_cross(0, 1)*Rj(1, ip) + rj_cross(0, 2)*Rj(2, ip))
-                                                                                    +c.nij[1]*(rj_cross(1, 0)*Rj(0, ip) + rj_cross(1, 1)*Rj(1, ip) + rj_cross(1, 2)*Rj(2, ip))
-                                                                                    +c.nij[2]*(rj_cross(2, 0)*Rj(0, ip) + rj_cross(2, 1)*Rj(1, ip) + rj_cross(2, 2)*Rj(2, ip))));
+                U(index + ip) -= L(row) * this->m_dt*rot(ip);
             }
         }
     }
