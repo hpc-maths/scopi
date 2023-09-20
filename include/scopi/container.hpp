@@ -35,11 +35,11 @@ namespace scopi
      *
      * @tparam dim Dimension (2 or 3).
      */
-    template<std::size_t dim>
+    template<std::size_t Dim>
     class scopi_container
     {
     public:
-
+        static constexpr std::size_t dim = Dim;
         /**
          * @brief Alias for the type of the position.
          */
