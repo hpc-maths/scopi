@@ -76,6 +76,10 @@ namespace scopi
     {
     };
 
+    struct Friction
+    {
+    };
+
     template <std::size_t dim_, class Contacts>
     class LagrangeMultiplier<dim_, WithoutFriction, Contacts>
         : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, WithoutFriction, Contacts>>
@@ -123,10 +127,6 @@ namespace scopi
             lambda = xt::maximum(lambda, 0.);
         }
     };
-
-    // struct Gamma
-    // {
-    // };
 
     template <std::size_t dim_, class Contacts>
     class LagrangeMultiplier<dim_, Viscous, Contacts> : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, Viscous, Contacts>>
@@ -216,6 +216,67 @@ namespace scopi
         const double m_tol;
     };
 
+    template <std::size_t dim_, class Contacts>
+    class LagrangeMultiplier<dim_, Friction, Contacts> : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, Friction, Contacts>>
+    {
+      public:
+
+        static constexpr std::size_t dim = dim_;
+
+        using base = LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, Friction, Contacts>>;
+
+        LagrangeMultiplier(const Contacts& contacts, double mu)
+            : base(contacts)
+            , m_mu(mu)
+        {
+        }
+
+        auto global2local(const xt::xtensor<double, 1>& x) const
+        {
+            return x;
+        }
+
+        auto local2global(const xt::xtensor<double, 1>& x) const
+        {
+            return x;
+        }
+
+        std::size_t size() const
+        {
+            return 3 * this->m_contacts.size();
+        }
+
+        void projection(xt::xtensor<double, 1>& lambda) const
+        {
+            assert(lambda.size() == size());
+            for (std::size_t i = 0, row = 0; i < this->m_contacts.size(); ++i, row += 3)
+            {
+                auto lambda_i = xt::view(lambda, xt::range(row, row + dim));
+                auto lambda_n = xt::linalg::dot(lambda_i, this->m_contacts[i].nij)[0];
+                auto lambda_t = xt::eval(lambda_i - lambda_n * this->m_contacts[i].nij);
+                auto norm     = xt::norm_l2(lambda_t)[0];
+                if (norm > m_mu * lambda_n)
+                {
+                    if (lambda_n <= -m_mu * norm)
+                    {
+                        lambda_i = 0;
+                    }
+                    else
+                    {
+                        auto new_norm     = (m_mu * m_mu) * (norm + lambda_n / m_mu) / (m_mu * m_mu + 1);
+                        auto new_lambda_n = new_norm / m_mu;
+                        lambda_t /= norm;
+                        lambda_i = new_norm * lambda_t + new_lambda_n * this->m_contacts[i].nij;
+                    }
+                }
+            }
+        }
+
+      private:
+
+        const double m_mu;
+    };
+
     template <class Problem, class Contacts, class Particles>
     class Gradient
     {
@@ -248,13 +309,14 @@ namespace scopi
                 xt::view(U, xt::range(3 * i, 3 * i + dim))      = particles.vd()[particles.nb_inactive() + i];
                 xt::view(m_invM, xt::range(3 * i, 3 * i + dim)) = 1. / particles.m()[particles.nb_inactive() + i];
                 U[offset + 3 * i + 2]                           = particles.desired_omega()[particles.nb_inactive() + i];
-                m_invM[offset + 3 * i + 2]                      = particles.j()[particles.nb_inactive() + i];
+                m_invM[offset + 3 * i + 2]                      = 1. / particles.j()[particles.nb_inactive() + i];
             }
             for (std::size_t i = 0; i < contacts.size(); ++i)
             {
                 xt::view(normal, xt::range(3 * i, 3 * i + dim)) = contacts[i].nij;
             }
             m_C = d.mat_mult(normal) + dt * m_A.mat_mult(U);
+            std::cout << "C " << m_C << std::endl;
         }
 
         auto operator()(const xt::xtensor<double, 1>& lambda) const
@@ -271,7 +333,6 @@ namespace scopi
 
         auto velocities(const xt::xtensor<double, 1>& lambda)
         {
-            std::cout << "A_t " << m_At.mat_mult(m_lagrange.local2global(lambda)) << " invM " << m_invM << std::endl;
             return xt::eval(m_invM * m_At.mat_mult(m_lagrange.local2global(lambda)));
         }
 
@@ -466,6 +527,8 @@ namespace scopi
         {
             xt::xtensor<double, 1> dG = gradient(y_n);
             lambda_np1                = y_n - alpha * dG;
+            // std::cout << "lambda avant proj: " << lambda_np1 << std::endl;
+
             gradient.projection(lambda_np1);
             // if (dynamic_descent)
             // {
@@ -481,8 +544,7 @@ namespace scopi
             double norm_la = xt::norm_linf(lambda_np1)[0];
             // std::cout << "lambda: " << lambda_np1 << std::endl;
             // std::cout << "dG: " << dG << std::endl;
-            // std::cout << fmt::format("ite = {}, |DG| = {}, |lambda| = {}, residual = {}", ite, norm_dG, norm_la, residual) <<
-            // std::endl;
+            // std::cout << fmt::format("ite = {}, |DG| = {}, |lambda| = {}, residual = {}", ite, norm_dG, norm_la, residual) << std::endl;
             if (norm_dG < tolerance || norm_la < tolerance)
             {
                 std::swap(lambda_n, lambda_np1);
@@ -609,7 +671,7 @@ namespace scopi
         }
     };
 
-    // Viscous
+    // Friction
     template <std::size_t dim_, class Problem>
     class NewOptimSolver : public NewOptimSolverBase<dim_, Problem, NewOptimSolver<dim_, Problem>>
     {
@@ -621,81 +683,108 @@ namespace scopi
 
         NewOptimSolver(std::size_t, double dt, const scopi_container<dim>&)
             : base_t(dt)
-            , m_gamma_min(-2.)
-            , m_gamma_tol(1e-6)
+            , m_mu(.1)
         {
-        }
-
-        void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, std::size_t ite)
-        {
-            base_t::run(particles, contacts, ite);
-
-            auto lagrange = make_lagrange(contacts);
-            auto lambda   = lagrange.local2global(this->lagrange_multiplier());
-
-            std::cout << "ite: " << ite << " gamma = ";
-            std::size_t row = 0;
-            for (std::size_t i = 0; i < contacts.size(); ++i)
-            {
-                m_gamma[{contacts[i].i, contacts[i].j}].second = std::min(
-                    std::max(m_gamma[{contacts[i].i, contacts[i].j}].second
-                                 - this->m_dt * xt::linalg::dot(contacts[i].nij, xt::view(lambda, xt::range(row, row + dim)))[0],
-                             m_gamma_min),
-                    0.);
-                std::cout << m_gamma[{contacts[i].i, contacts[i].j}].second << " ";
-                row += 3;
-            }
-
-            std::cout << " lambda = " << this->lagrange_multiplier() << std::endl;
         }
 
         template <class Contacts>
-        auto make_lagrange(const Contacts& contacts)
+        auto make_lagrange(const Contacts& contacts) const
         {
-            xt::xtensor<double, 1> gamma = xt::zeros<double>({contacts.size()});
-
-            for (auto it = m_gamma.begin(); it != m_gamma.end(); ++it)
-            {
-                it->second.first = false;
-            }
-
-            std::size_t next = 0;
-            for (std::size_t i = 0; i < contacts.size(); ++i)
-            {
-                if (auto search = m_gamma.find({contacts[i].i, contacts[i].j}); search == m_gamma.end())
-                {
-                    m_gamma[{contacts[i].i, contacts[i].j}] = {true, 0.};
-                    gamma[next]                             = 0;
-                }
-                else
-                {
-                    m_gamma[{contacts[i].i, contacts[i].j}].first = true;
-                    gamma[next]                                   = m_gamma[{contacts[i].i, contacts[i].j}].second;
-                }
-                ++next;
-            }
-
-            for (auto it = m_gamma.begin(); it != m_gamma.end();)
-            {
-                if (it->second.first == false)
-                {
-                    m_gamma.erase(it);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
-
-            return LagrangeMultiplier<dim, Problem, std::decay_t<Contacts>>(contacts, gamma, m_gamma_tol);
+            return LagrangeMultiplier<dim, Problem, std::decay_t<Contacts>>(contacts, m_mu);
         }
 
       private:
 
-        double m_gamma_min;
-        double m_gamma_tol;
-        std::unordered_map<std::pair<std::size_t, std::size_t>, std::pair<bool, double>, pairhash> m_gamma;
+        double m_mu;
     };
+
+    // // Viscous
+    // template <std::size_t dim_, class Problem>
+    // class NewOptimSolver : public NewOptimSolverBase<dim_, Problem, NewOptimSolver<dim_, Problem>>
+    // {
+    //   public:
+
+    //     using base_t                     = NewOptimSolverBase<dim_, Problem, NewOptimSolver<dim_, Problem>>;
+    //     static constexpr std::size_t dim = dim_;
+    //     using problem_t                  = Problem;
+
+    //     NewOptimSolver(std::size_t, double dt, const scopi_container<dim>&)
+    //         : base_t(dt)
+    //         , m_gamma_min(-2.)
+    //         , m_gamma_tol(1e-6)
+    //     {
+    //     }
+
+    //     void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts, std::size_t ite)
+    //     {
+    //         base_t::run(particles, contacts, ite);
+
+    //         auto lagrange = make_lagrange(contacts);
+    //         auto lambda   = lagrange.local2global(this->lagrange_multiplier());
+
+    //         std::cout << "ite: " << ite << " gamma = ";
+    //         std::size_t row = 0;
+    //         for (std::size_t i = 0; i < contacts.size(); ++i)
+    //         {
+    //             m_gamma[{contacts[i].i, contacts[i].j}].second = std::min(
+    //                 std::max(m_gamma[{contacts[i].i, contacts[i].j}].second
+    //                              - this->m_dt * xt::linalg::dot(contacts[i].nij, xt::view(lambda, xt::range(row, row + dim)))[0],
+    //                          m_gamma_min),
+    //                 0.);
+    //             std::cout << m_gamma[{contacts[i].i, contacts[i].j}].second << " ";
+    //             row += 3;
+    //         }
+
+    //         std::cout << " lambda = " << this->lagrange_multiplier() << std::endl;
+    //     }
+
+    //     template <class Contacts>
+    //     auto make_lagrange(const Contacts& contacts)
+    //     {
+    //         xt::xtensor<double, 1> gamma = xt::zeros<double>({contacts.size()});
+
+    //         for (auto it = m_gamma.begin(); it != m_gamma.end(); ++it)
+    //         {
+    //             it->second.first = false;
+    //         }
+
+    //         std::size_t next = 0;
+    //         for (std::size_t i = 0; i < contacts.size(); ++i)
+    //         {
+    //             if (auto search = m_gamma.find({contacts[i].i, contacts[i].j}); search == m_gamma.end())
+    //             {
+    //                 m_gamma[{contacts[i].i, contacts[i].j}] = {true, 0.};
+    //                 gamma[next]                             = 0;
+    //             }
+    //             else
+    //             {
+    //                 m_gamma[{contacts[i].i, contacts[i].j}].first = true;
+    //                 gamma[next]                                   = m_gamma[{contacts[i].i, contacts[i].j}].second;
+    //             }
+    //             ++next;
+    //         }
+
+    //         for (auto it = m_gamma.begin(); it != m_gamma.end();)
+    //         {
+    //             if (it->second.first == false)
+    //             {
+    //                 m_gamma.erase(it);
+    //             }
+    //             else
+    //             {
+    //                 ++it;
+    //             }
+    //         }
+
+    //         return LagrangeMultiplier<dim, Problem, std::decay_t<Contacts>>(contacts, gamma, m_gamma_tol);
+    //     }
+
+    //   private:
+
+    //     double m_gamma_min;
+    //     double m_gamma_tol;
+    //     std::unordered_map<std::pair<std::size_t, std::size_t>, std::pair<bool, double>, pairhash> m_gamma;
+    // };
 
     // WithoutFriction
     // template <std::size_t dim_, class Problem>
@@ -747,8 +836,8 @@ namespace scopi
 int main()
 
 {
-    std::setprecision(12);
-    xt::print_options::set_precision(12);
+    std::setprecision(15);
+    xt::print_options::set_precision(15);
     // plog::init(plog::info, "quentin.log");
 
     constexpr std::size_t dim = 2;
@@ -756,27 +845,29 @@ int main()
     scopi::scopi_container<dim> particles;
 
     // SPHERE - PLAN CASE
+    double rr = 2;
+    double dd = 1;
     double PI = xt::numeric_constants<double>::PI;
     scopi::plan<dim> plan(
         {
             {0., 0.}
     },
-        PI / 2);
+        PI / 2 - PI / 6);
     scopi::sphere<dim> sphere(
         {
-            {0, 1.}
+            {0, (rr + dd) / std::cos(PI / 6)}
     },
-        0.5);
+        rr);
     particles.push_back(plan, scopi::property<dim>().deactivate());
     particles.push_back(sphere,
                         scopi::property<dim>()
                             .mass(1)
-                            .moment_inertia(1)
+                            .moment_inertia(.5 * rr * rr)
                             .desired_velocity({
                                 {0, 0}
     })
                             .force({{0, -1}}));
-    double Tf = 2.5;
+    double Tf = 10;
 
     // SPHERE - SPHERE CASE
 
@@ -800,13 +891,15 @@ int main()
     //                         {-1, 0}
     // }));
 
-    double dt = 0.05;
+    double dt = 0.1;
 
     // using optim_solver = scopi::NewOptimSolver<dim, scopi::WithoutFriction>;
-    using optim_solver = scopi::NewOptimSolver<dim, scopi::Viscous>;
+    // using optim_solver = scopi::NewOptimSolver<dim, scopi::Viscous>;
+    using optim_solver = scopi::NewOptimSolver<dim, scopi::Friction>;
     using contact_t    = scopi::contact_kdtree;
     using vap_t        = scopi::vap_fpd;
     scopi::ScopiSolver<dim, optim_solver, contact_t, vap_t> solver(particles, dt);
-    solver.run(Tf / dt);
+    // solver.run(Tf / dt);
+    solver.run(15);
     return 0;
 }
