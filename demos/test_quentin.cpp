@@ -316,7 +316,7 @@ namespace scopi
                 xt::view(normal, xt::range(3 * i, 3 * i + dim)) = contacts[i].nij;
             }
             m_C = d.mat_mult(normal) + dt * m_A.mat_mult(U);
-            std::cout << "C " << m_C << std::endl;
+            // std::cout << "C " << m_C << std::endl;
         }
 
         auto operator()(const xt::xtensor<double, 1>& lambda) const
@@ -324,6 +324,12 @@ namespace scopi
             // std::cout << "C_vector " << m_C << std::endl;
             // std::cout << "C " << m_lagrange.global2local(m_C) << std::endl;
             return m_lagrange.global2local(m_dt * m_dt * m_A.mat_mult(m_invM * m_At.mat_mult(m_lagrange.local2global(lambda))) + m_C);
+        }
+
+        double min_f(const xt::xtensor<double, 1>& lambda) const
+        {
+            auto lambda_global = m_lagrange.local2global(lambda);
+            return xt::linalg::dot(lambda_global, 0.5 * m_A.mat_mult(lambda_global) + m_C)[0];
         }
 
         const auto& contacts() const
@@ -502,7 +508,7 @@ namespace scopi
     }
 
     template <class Gradient>
-    auto apgd(Gradient& gradient, double alpha, double tolerance = 1e-6, std::size_t max_ite = 10000)
+    auto apgd(Gradient& gradient, double alpha, double tolerance = 1e-6, std::size_t max_ite = 10000, bool dynamic_descent = false)
     {
         std::size_t ite = 0;
 
@@ -523,6 +529,8 @@ namespace scopi
             r0 = 1.;
         }
 
+        double lipsch = 1. / alpha;
+
         while (residual > tolerance && ite < max_ite)
         {
             xt::xtensor<double, 1> dG = gradient(y_n);
@@ -530,14 +538,6 @@ namespace scopi
             // std::cout << "lambda avant proj: " << lambda_np1 << std::endl;
 
             gradient.projection(lambda_np1);
-            // if (dynamic_descent)
-            // {
-            //     double lipsch = 1./alpha;
-            //     auto& la = lambda.get(y_n);
-
-            //     while()
-
-            // }
             // double norm_dG = xt::linalg::norm(dG);
             // double norm_la = xt::linalg::norm(lambda_np1);
             double norm_dG = xt::norm_linf(dG)[0];
@@ -551,17 +551,40 @@ namespace scopi
                 break;
             }
 
+            if (dynamic_descent)
+            {
+                while (gradient.min_f(lambda_np1)
+                       >= gradient.min_f(y_n) + xt::linalg::dot(dG, lambda_np1 - y_n)[0] + 0.5 * lipsch * xt::norm_l2(lambda_np1 - y_n)[0])
+                {
+                    lipsch *= 2;
+                    alpha      = 1. / lipsch;
+                    lambda_np1 = y_n - alpha * dG;
+                    gradient.projection(lambda_np1);
+                }
+            }
             theta_np1 = 0.5 * (theta_n * xt::sqrt(4 + theta_n * theta_n) - theta_n * theta_n);
             auto beta = theta_n * (1 - theta_n) / (theta_n * theta_n + theta_np1);
             y_np1     = lambda_np1 + beta * (lambda_np1 - lambda_n);
 
             residual = xt::linalg::norm(lambda_np1 - lambda_n) / r0;
+            // std::cout << "residual = " << residual << std::endl;
+
+            if (dynamic_descent)
+            {
+                if (xt::linalg::dot(dG, lambda_np1 - lambda_n)[0] > 0)
+                {
+                    y_np1 = lambda_np1;
+                    theta_np1.fill(1.);
+                }
+                lipsch *= 0.97;
+                alpha = 1. / lipsch;
+            }
             std::swap(lambda_n, lambda_np1);
             std::swap(theta_n, theta_np1);
             std::swap(y_n, y_np1);
-
             ite++;
         }
+        std::cout << fmt::format("apgd converged in {} iterations.", ite) << std::endl;
         return lambda_n;
     }
 
@@ -899,7 +922,7 @@ int main()
     using contact_t    = scopi::contact_kdtree;
     using vap_t        = scopi::vap_fpd;
     scopi::ScopiSolver<dim, optim_solver, contact_t, vap_t> solver(particles, dt);
-    // solver.run(Tf / dt);
-    solver.run(15);
+    solver.run(Tf / dt);
+    // solver.run(15);
     return 0;
 }
