@@ -13,6 +13,11 @@
 #include <scopi/contact/contact_brute_force.hpp>
 #include <scopi/matrix/velocities.hpp>
 
+#include <plog/Appenders/ColorConsoleAppender.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Init.h>
+#include <plog/Log.h>
+
 namespace scopi
 {
 
@@ -225,9 +230,9 @@ namespace scopi
 
         using base = LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, Friction, Contacts>>;
 
-        LagrangeMultiplier(const Contacts& contacts, double mu)
+        LagrangeMultiplier(const Contacts& contacts)
             : base(contacts)
-            , m_mu(mu)
+            , m_mu(0.1)
         {
         }
 
@@ -277,69 +282,127 @@ namespace scopi
         const double m_mu;
     };
 
+    template <std::size_t dim, class Type, class Contacts>
+    auto make_lagrange_multplier(const Contacts& contacts)
+    {
+        return LagrangeMultiplier<dim, Type, Contacts>(contacts);
+    }
+
+    template <class Particles>
+    inline auto M_inverse(const Particles& particles)
+    {
+        static constexpr std::size_t dim = Particles::dim;
+
+        xt::xtensor<double, 1> out = xt::zeros<double>({6 * particles.nb_active()});
+
+        std::size_t offset = 3 * particles.nb_active();
+        for (std::size_t i = 0; i < particles.nb_active(); ++i)
+        {
+            xt::view(out, xt::range(3 * i, 3 * i + dim)) = 1. / particles.m()[particles.nb_inactive() + i];
+            if constexpr (dim == 2)
+            {
+                out[offset + 3 * i + 2] = 1. / particles.j()[particles.nb_inactive() + i];
+            }
+            else if constexpr (dim == 3)
+            {
+                xt::view(out, xt::range(offset + 3 * i, offset + 3 * i + dim)) = 1. / particles.j()[particles.nb_inactive() + i];
+            }
+        }
+        return out;
+    }
+
+    template <class Contacts, class Particles>
+    auto CVector(double dt, const Contacts& contacts, const Particles& particles)
+    {
+        static constexpr std::size_t dim = Particles::dim;
+        AMatrix A(contacts, particles);
+        DMatrix D(contacts);
+
+        xt::xtensor<double, 1> U = xt::zeros<double>({6 * particles.nb_active()});
+
+        std::size_t offset = 3 * particles.nb_active();
+        for (std::size_t i = 0; i < particles.nb_active(); ++i)
+        {
+            xt::view(U, xt::range(3 * i, 3 * i + dim)) = particles.vd()[particles.nb_inactive() + i];
+            if constexpr (dim == 2)
+            {
+                U[offset + 3 * i + 2] = particles.desired_omega()[particles.nb_inactive() + i];
+            }
+            else if constexpr (dim == 3)
+            {
+                xt::view(U, xt::range(offset + 3 * i, offset + 3 * i + dim)) = particles.desired_omega()[particles.nb_inactive() + i];
+            }
+        }
+
+        xt::xtensor<double, 1> normal = xt::zeros<double>({3 * contacts.size()});
+        for (std::size_t i = 0; i < contacts.size(); ++i)
+        {
+            xt::view(normal, xt::range(3 * i, 3 * i + dim)) = contacts[i].nij;
+        }
+
+        xt::xtensor<double, 1> value = D.mat_mult(normal) + dt * A.mat_mult(U);
+        return value;
+    }
+
+    template <class Contacts, class Particles>
+    struct QMatrix
+    {
+      public:
+
+        QMatrix(double dt, const Contacts& contacts, const Particles& particles)
+            : m_dt(dt)
+            , m_A(contacts, particles)
+            , m_AT(contacts, particles)
+            , m_invM(M_inverse(particles))
+        {
+        }
+
+        inline auto operator()(const xt::xtensor<double, 1>& lambda) const
+        {
+            return m_dt * m_dt * m_A.mat_mult(m_invM * m_AT.mat_mult(lambda));
+        }
+
+        inline auto velocities(const xt::xtensor<double, 1>& lambda) const
+        {
+            return xt::eval(m_invM * m_AT.mat_mult(lambda));
+        }
+
+      private:
+
+        double m_dt;
+        AMatrix<Contacts, Particles> m_A;
+        ATMatrix<Contacts, Particles> m_AT;
+        xt::xtensor<double, 1> m_invM;
+    };
+
     template <class Problem, class Contacts, class Particles>
-    class Gradient
+    class minimization_problem
     {
       public:
 
         static constexpr std::size_t dim = Particles::dim;
 
-        Gradient(double dt,
-                 const Contacts& contacts,
-                 const Particles& particles,
-                 const LagrangeMultiplier<Particles::dim, Problem, Contacts>& lagrange)
-            : m_dt(dt)
-            , m_lagrange(lagrange)
-            , m_contacts(contacts)
-            , m_particles(particles)
-            , m_A(contacts, particles)
-            , m_At(contacts, particles)
-            , m_work(xt::zeros<double>({3 * contacts.size()}))
+        inline minimization_problem(double dt, const Contacts& contacts, const Particles& particles)
+            : m_Q(dt, contacts, particles)
+            , m_C(CVector(dt, contacts, particles))
+            , m_lagrange(make_lagrange_multplier<Particles::dim, Problem>(contacts))
         {
-            static constexpr std::size_t dim = Particles::dim;
-            xt::xtensor<double, 1> U         = xt::zeros<double>({6 * particles.nb_active()});
-            m_invM                           = xt::zeros<double>({6 * particles.nb_active()});
-            xt::xtensor<double, 1> normal    = xt::zeros<double>({3 * contacts.size()});
-
-            D d(contacts);
-
-            std::size_t offset = 3 * particles.nb_active();
-            for (std::size_t i = 0; i < particles.nb_active(); ++i)
-            {
-                xt::view(U, xt::range(3 * i, 3 * i + dim))      = particles.vd()[particles.nb_inactive() + i];
-                xt::view(m_invM, xt::range(3 * i, 3 * i + dim)) = 1. / particles.m()[particles.nb_inactive() + i];
-                U[offset + 3 * i + 2]                           = particles.desired_omega()[particles.nb_inactive() + i];
-                m_invM[offset + 3 * i + 2]                      = 1. / particles.j()[particles.nb_inactive() + i];
-            }
-            for (std::size_t i = 0; i < contacts.size(); ++i)
-            {
-                xt::view(normal, xt::range(3 * i, 3 * i + dim)) = contacts[i].nij;
-            }
-            m_C = d.mat_mult(normal) + dt * m_A.mat_mult(U);
-            // std::cout << "C " << m_C << std::endl;
         }
 
-        auto operator()(const xt::xtensor<double, 1>& lambda) const
+        inline auto gradient(const xt::xtensor<double, 1>& lambda) const
         {
-            // std::cout << "C_vector " << m_C << std::endl;
-            // std::cout << "C " << m_lagrange.global2local(m_C) << std::endl;
-            return m_lagrange.global2local(m_dt * m_dt * m_A.mat_mult(m_invM * m_At.mat_mult(m_lagrange.local2global(lambda))) + m_C);
+            return m_lagrange.global2local(m_Q(m_lagrange.local2global(lambda)) + m_C);
         }
 
-        double min_f(const xt::xtensor<double, 1>& lambda) const
+        inline double operator()(const xt::xtensor<double, 1>& lambda) const
         {
             auto lambda_global = m_lagrange.local2global(lambda);
-            return xt::linalg::dot(lambda_global, 0.5 * m_A.mat_mult(lambda_global) + m_C)[0];
+            return xt::linalg::dot(lambda_global, 0.5 * m_Q(lambda_global) + m_C)[0];
         }
 
-        const auto& contacts() const
+        inline auto velocities(const xt::xtensor<double, 1>& lambda) const
         {
-            return m_contacts;
-        }
-
-        auto velocities(const xt::xtensor<double, 1>& lambda)
-        {
-            return xt::eval(m_invM * m_At.mat_mult(m_lagrange.local2global(lambda)));
+            return m_Q.velocities(m_lagrange.local2global(lambda));
         }
 
         void projection(xt::xtensor<double, 1>& lambda) const
@@ -354,132 +417,25 @@ namespace scopi
 
       private:
 
-        double m_dt;
-        const LagrangeMultiplier<Particles::dim, Problem, Contacts>& m_lagrange;
-        const Contacts& m_contacts;
-        const Particles& m_particles;
-        const A<Contacts, Particles> m_A;
-        const AT<Contacts, Particles> m_At;
-        xt::xtensor<double, 1> m_invM;
-        xt::xtensor<double, 1> m_C;
-        xt::xtensor<double, 1> m_work;
+        const QMatrix<Contacts, Particles> m_Q;
+        const xt::xtensor<double, 1> m_C;
+        const LagrangeMultiplier<Particles::dim, Problem, Contacts> m_lagrange;
     };
 
-    template <class Problem, class Contacts, class Particles, class Lagrange>
-    auto make_gradient(double dt, const Contacts& contacts, const Particles& particles, const Lagrange& lagrange)
+    template <class Problem, class Contacts, class Particles>
+    auto make_minimization_problem(double dt, const Contacts& contacts, const Particles& particles)
     {
-        return Gradient<Problem, Contacts, Particles>(dt, contacts, particles, lagrange);
+        return minimization_problem<Problem, Contacts, Particles>(dt, contacts, particles);
     }
 
-    // template <std::size_t dim_, class Contacts>
-    // class LagrangeMultiplier<dim_, Viscous, Contacts> : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, Viscous,
-    // Contacts>>
-    // {
-    //   public:
-
-    //     static constexpr std::size_t dim = dim_;
-
-    //     using base = LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, Viscous, Contacts>>;
-
-    //     LagrangeMultiplier(const Contacts& contacts)
-    //         : base(contacts)
-    //         , m_lambda(xt::zeros<double>({contacts.size()}))
-    //         , m_work(xt::zeros<double>({3 * contacts.size()}))
-    //         , m_gamma(xt::zeros<double>({contacts.size()}))
-    //         , m_gamma_tol(1e-6)
-    //         , m_gamma_min(-2)
-    //     {
-    //     }
-
-    //     auto& get()
-    //     {
-    //         for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
-    //         {
-    //             if (m_gamma[i] < -m_gamma_tol)
-    //             {
-    //                 xt::view(this->m_work, xt::range(3 * i, 3 * i + dim)) = (m_lambda[i] - m_lambda[i + m_contacts.size()])
-    //                                                                       * this->m_contacts[i].nij;
-    //             }
-    //             else
-    //             {
-    //                 xt::view(this->m_work, xt::range(3 * i, 3 * i + dim)) = m_lambda[i] * this->m_contacts[i].nij;
-    //             }
-    //         }
-
-    //         return this->m_work;
-    //     }
-
-    //     auto& get(const xt::xtensor<double, 1>& lambda)
-    //     {
-    //         for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
-    //         {
-    //             xt::view(this->m_work, xt::range(3 * i, 3 * i + dim)) = lambda[i] * this->m_contacts[i].nij;
-    //         }
-
-    //         return this->m_work;
-    //     }
-
-    //     void set(const xt::xtensor<double, 1>& lambda)
-    //     {
-    //         for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
-    //         {
-    //             auto lambda_tmp = xt::linalg::dot(xt::view(lambda, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
-    //             m_gamma[i]      = std::min(std::max(m_gamma[i] - dt * lambda, m_gamma_min), 0);
-    //             if (m_gamma[i] < -m_gamma_tol)
-    //             {
-    //             }
-    //             else
-    //             {
-    //                 m_lambda[i] = lambda_tmp;
-    //             }
-    //             m_lambda_plus[i] = xt::linalg::dot(xt::view(lambda, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
-    //         }
-    //     }
-
-    //     const auto& lambda() const
-
-    //     {
-    //         return m_lambda;
-    //     }
-
-    //     auto& lambda()
-    //     {
-    //         return m_lambda;
-    //     }
-
-    //     std::size_t size()
-    //     {
-    //         return m_lambda.size();
-    //     }
-
-    //     void projection(xt::xtensor<double, 1>& lambda)
-    //     {
-    //         lambda = xt::maximum(lambda, 0.);
-    //     }
-
-    //   private:
-
-    //     xt::xtensor<double, 1> m_lambda;
-    //     xt::xtensor<double, 1> m_work;
-    //     xt::xtensor<double, 1> m_gamma;
-    //     double m_gamma_tol;
-    //     double m_gamma_min;
-    // };
-
-    template <std::size_t dim, class Type, class Contacts>
-    auto make_lagrange_multplier(const Contacts& contacts)
-    {
-        return LagrangeMultiplier<dim, Type, std::decay_t<Contacts>>(contacts);
-    }
-
-    template <class Gradient, class Lambda>
-    auto pgd(Gradient& gradient, Lambda& lambda, double alpha, double tolerance = 1e-6, std::size_t max_ite = 10000)
+    template <class Problem, class Contacts, class Particles>
+    auto
+    pgd(const minimization_problem<Problem, Contacts, Particles>& min_p, double alpha, double tolerance = 1e-6, std::size_t max_ite = 10000)
     {
         std::size_t ite = 0;
 
-        double residual = 1;
-
-        xt::xtensor<double, 1> lambda_n = lambda.lambda();
+        xt::xtensor<double, 1> lambda_n   = xt::zeros<double>({min_p.size()});
+        xt::xtensor<double, 1> lambda_np1 = xt::zeros<double>({min_p.size()});
 
         double r0 = xt::linalg::norm(lambda_n);
         if (r0 == 0.)
@@ -487,87 +443,81 @@ namespace scopi
             r0 = 1.;
         }
 
-        while (residual > tolerance && ite < max_ite)
+        while (ite < max_ite)
         {
-            auto& la = lambda.get();
+            ++ite;
 
-            auto& dG = gradient(la);
-            la -= alpha * dG;
+            xt::xtensor<double, 1> dG = min_p.gradient(lambda_n);
+            lambda_np1                = lambda_n - alpha * dG;
+            min_p.projection(lambda_np1);
 
-            lambda.set(la);
-            auto& lambda_np1 = lambda.projection();
-
-            residual = xt::linalg::norm(lambda_np1 - lambda_n) / r0;
-            lambda_n = lambda_np1;
-            // std::cout << fmt::format("ite = {}, |DG| = {}, |lambda| = {}, residual = {}", ite, xt::linalg::norm(dG), lambda_n[0],
-            // residual)
-            //   << std::endl;
-            ite++;
-        }
-        return lambda.lambda();
-    }
-
-    template <class Gradient>
-    auto apgd(Gradient& gradient, double alpha, double tolerance = 1e-6, std::size_t max_ite = 10000, bool dynamic_descent = false)
-    {
-        std::size_t ite = 0;
-
-        xt::xtensor<double, 1> lambda_n   = xt::zeros<double>({gradient.size()});
-        xt::xtensor<double, 1> lambda_np1 = xt::zeros<double>({gradient.size()});
-
-        xt::xtensor<double, 1> theta_n   = xt::ones<double>({gradient.size()});
-        xt::xtensor<double, 1> theta_np1 = xt::ones<double>({gradient.size()});
-
-        xt::xtensor<double, 1> y_n   = xt::zeros<double>({gradient.size()});
-        xt::xtensor<double, 1> y_np1 = xt::zeros<double>({gradient.size()});
-
-        double residual = 1;
-
-        double r0 = xt::linalg::norm(lambda_n);
-        if (r0 == 0.)
-        {
-            r0 = 1.;
-        }
-
-        double lipsch = 1. / alpha;
-
-        while (residual > tolerance && ite < max_ite)
-        {
-            xt::xtensor<double, 1> dG = gradient(y_n);
-            lambda_np1                = y_n - alpha * dG;
-            // std::cout << "lambda avant proj: " << lambda_np1 << std::endl;
-
-            gradient.projection(lambda_np1);
-            // double norm_dG = xt::linalg::norm(dG);
-            // double norm_la = xt::linalg::norm(lambda_np1);
-            double norm_dG = xt::norm_linf(dG)[0];
-            double norm_la = xt::norm_linf(lambda_np1)[0];
-            // std::cout << "lambda: " << lambda_np1 << std::endl;
-            // std::cout << "dG: " << dG << std::endl;
-            // std::cout << fmt::format("ite = {}, |DG| = {}, |lambda| = {}, residual = {}", ite, norm_dG, norm_la, residual) << std::endl;
-            if (norm_dG < tolerance || norm_la < tolerance)
+            if (xt::norm_l2(lambda_np1 - lambda_n)[0] / r0 < tolerance)
             {
                 std::swap(lambda_n, lambda_np1);
                 break;
             }
 
+            std::swap(lambda_n, lambda_np1);
+        }
+        PLOG_INFO << fmt::format("pgd converged in {} iterations.", ite) << std::endl;
+        return lambda_n;
+    }
+
+    template <class Problem, class Contacts, class Particles>
+    auto apgd(const minimization_problem<Problem, Contacts, Particles>& min_p,
+              double alpha,
+              double tolerance     = 1e-6,
+              std::size_t max_ite  = 10000,
+              bool dynamic_descent = true)
+    {
+        std::size_t ite = 0;
+
+        xt::xtensor<double, 1> lambda_n   = xt::zeros<double>({min_p.size()});
+        xt::xtensor<double, 1> lambda_np1 = xt::zeros<double>({min_p.size()});
+
+        xt::xtensor<double, 1> theta_n   = xt::ones<double>({min_p.size()});
+        xt::xtensor<double, 1> theta_np1 = xt::ones<double>({min_p.size()});
+
+        xt::xtensor<double, 1> y_n   = xt::zeros<double>({min_p.size()});
+        xt::xtensor<double, 1> y_np1 = xt::zeros<double>({min_p.size()});
+
+        double lipsch = 1. / alpha; // used only if dynamic_descent = true
+
+        double r0 = xt::linalg::norm(lambda_n);
+        if (r0 == 0.)
+        {
+            r0 = 1.;
+        }
+
+        while (ite < max_ite)
+        {
+            ++ite;
+
+            xt::xtensor<double, 1> dG = min_p.gradient(y_n);
+            lambda_np1                = y_n - alpha * dG;
+            min_p.projection(lambda_np1);
+
             if (dynamic_descent)
             {
-                while (gradient.min_f(lambda_np1)
-                       >= gradient.min_f(y_n) + xt::linalg::dot(dG, lambda_np1 - y_n)[0] + 0.5 * lipsch * xt::norm_l2(lambda_np1 - y_n)[0])
+                while (min_p(lambda_np1)
+                       >= min_p(y_n) + xt::linalg::dot(dG, lambda_np1 - y_n)[0] + 0.5 * lipsch * xt::norm_l2(lambda_np1 - y_n)[0])
                 {
                     lipsch *= 2;
                     alpha      = 1. / lipsch;
                     lambda_np1 = y_n - alpha * dG;
-                    gradient.projection(lambda_np1);
+                    min_p.projection(lambda_np1);
                 }
             }
+
+            if (xt::norm_l2(lambda_np1 - lambda_n)[0] / r0 < tolerance)
+            {
+                std::swap(lambda_n, lambda_np1);
+                break;
+            }
+
             theta_np1 = 0.5 * (theta_n * xt::sqrt(4 + theta_n * theta_n) - theta_n * theta_n);
             auto beta = theta_n * (1 - theta_n) / (theta_n * theta_n + theta_np1);
             y_np1     = lambda_np1 + beta * (lambda_np1 - lambda_n);
-
-            residual = xt::linalg::norm(lambda_np1 - lambda_n) / r0;
-            // std::cout << "residual = " << residual << std::endl;
 
             if (dynamic_descent)
             {
@@ -582,9 +532,8 @@ namespace scopi
             std::swap(lambda_n, lambda_np1);
             std::swap(theta_n, theta_np1);
             std::swap(y_n, y_np1);
-            ite++;
         }
-        std::cout << fmt::format("apgd converged in {} iterations.", ite) << std::endl;
+        PLOG_INFO << fmt::format("apgd converged in {} iterations.", ite) << std::endl;
         return lambda_n;
     }
 
@@ -618,24 +567,29 @@ namespace scopi
             m_omega.resize({particles.nb_active(), 3});
             m_omega.fill(0);
 
-            // std::cout << "V " << particles.vd() << std::endl;
-            // std::cout << "pos " << particles.pos() << std::endl;
             if (contacts.size() != 0)
             {
-                auto lagrange = this->derived_cast().make_lagrange(contacts);
-                auto gradient = make_gradient<problem_t>(m_dt, contacts, particles, lagrange);
+                auto min_p = make_minimization_problem<problem_t>(m_dt, contacts, particles);
 
-                m_lambda = apgd(gradient, 0.05, 1e-6, 10000);
+                m_lambda = apgd(min_p, 0.05, 1e-6, 10000);
 
-                auto velocities = gradient.velocities(m_lambda);
+                auto velocities = min_p.velocities(m_lambda);
                 // std::cout << velocities << std::endl;
                 for (std::size_t i = 0; i < particles.nb_active(); ++i)
                 {
                     for (std::size_t d = 0; d < dim; ++d)
                     {
                         m_u(i, d) = particles.vd()(i + active_offset)(d) + m_dt * velocities(i * 3 + d);
+                        if constexpr (dim == 3)
+                        {
+                            m_omega(i, d) = particles.desired_omega()(i + active_offset)(d)
+                                          + m_dt * velocities((i + particles.nb_active()) * 3 + d);
+                        }
                     }
-                    m_omega(i, 2) = particles.desired_omega()(i + active_offset) + m_dt * velocities((i + particles.nb_active()) * 3 + 2);
+                    if constexpr (dim == 2)
+                    {
+                        m_omega(i, 2) = particles.desired_omega()(i + active_offset) + m_dt * velocities((i + particles.nb_active()) * 3 + 2);
+                    }
                 }
             }
             else
@@ -645,8 +599,15 @@ namespace scopi
                     for (std::size_t d = 0; d < dim; ++d)
                     {
                         m_u(i, d) = particles.vd()(i + active_offset)(d);
+                        if constexpr (dim == 3)
+                        {
+                            m_omega(i, d) = particles.desired_omega()(i + active_offset)(d);
+                        }
                     }
-                    m_omega(i, 2) = particles.desired_omega()(i + active_offset);
+                    if constexpr (dim == 2)
+                    {
+                        m_omega(i, 2) = particles.desired_omega()(i + active_offset);
+                    }
                 }
             }
         }
@@ -831,37 +792,15 @@ namespace scopi
     //     }
     // };
 
-    // template <class Type, class Particles>
-    // void solver(double dt, double Tf, Particles& p)
-    // {
-    //     double dt = 0.05;
-    //     double t  = 0;
-
-    //     contact_brute_force cont;
-    //     while (t != Tf)
-    //     {
-    //         t += dt;
-    //         if (t > Tf)
-    //         {
-    //             dt += Tf - t;
-    //             t = Tf;
-    //         }
-    //         auto contacts = cont.run(particles, 0);
-    //         auto gradient = Gradient(dt, contacts, particles);
-    //         auto lambda   = make_lagrange_multplier<dim, scopi::WithoutFriction>(contacts);
-
-    //         scopi::apgd(gradient, lambda, 0.05, 1e-6, 100);
-    //     }
-    // }
-
 } // namespace scopi
 
 int main()
-
 {
+    static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
+    plog::init(plog::info, &consoleAppender);
+
     std::setprecision(15);
     xt::print_options::set_precision(15);
-    // plog::init(plog::info, "quentin.log");
 
     constexpr std::size_t dim = 2;
 
