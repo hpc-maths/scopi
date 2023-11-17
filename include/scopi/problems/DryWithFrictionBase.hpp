@@ -1,17 +1,17 @@
 #pragma once
 
+#include "plog/Initializers/RollingFileInitializer.h"
 #include <cmath>
 #include <plog/Log.h>
-#include "plog/Initializers/RollingFileInitializer.h"
-#include <xtensor/xtensor.hpp>
 #include <xtensor/xfixed.hpp>
+#include <xtensor/xtensor.hpp>
 
-#include "../types.hpp"
 #include "../container.hpp"
-#include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
-#include "../utils.hpp"
 #include "../params.hpp"
+#include "../quaternion.hpp"
+#include "../types.hpp"
+#include "../utils.hpp"
 #include "ProblemBase.hpp"
 
 namespace scopi
@@ -22,7 +22,8 @@ namespace scopi
      * - Notations:
      *      - We consider two referentials:
      *          - \f$ (x, y) \f$, the usual cartesian referential;
-     *          - \f$ (x', y') \f$ the referential where \f$ x' \f$ is aligned with the plane (rotation of angle \f$ \alpha \f$ of \f$ (x, y) \f$.
+     *          - \f$ (x', y') \f$ the referential where \f$ x' \f$ is aligned with the plane (rotation of angle \f$ \alpha \f$ of \f$ (x,
+     * y) \f$.
      *      - \f$ t_i = \sqrt{\frac{2 \left( y_0-r \right)}{g \cos \alpha}} \f$ is the time of the impact between the sphere and the plane.
      *      - \f$ v_t^- \f$ is the tangential velocity just before the impact, \f$ v_t^- = g \sin \alpha t_i \f$.
      *      - \f$ v_n^- \f$ is the normal velocity just before the impact, \f$ v_n^- = - g \cos \alpha t_i \f$.
@@ -46,15 +47,14 @@ namespace scopi
      *              \begin{aligned}
      *                  x'(t) &= \frac{1}{3} g \sin \alpha \left( t - t_i \right) ^2 + \frac{2}{3} v_t^- \left( t - t_i \right) + x_i'\\
      *                  y'(t) &= r\\
-     *                  \theta(t) &= - \frac{1}{3} \frac{g \sin \alpha}{r} \left( t - t_i \right)^2 - \frac{2}{3} \frac{v_t^-}{r} \left( t - t_i \right).
-     *              \end{aligned}
-     *          \right.
-     *      \f]
+     *                  \theta(t) &= - \frac{1}{3} \frac{g \sin \alpha}{r} \left( t - t_i \right)^2 - \frac{2}{3} \frac{v_t^-}{r} \left( t -
+     * t_i \right). \end{aligned} \right. \f]
      *      - If \f$ \mu \le \frac{\tan \alpha}{3} \f$ (sliding motion),
      *      \f[
      *          \left\{
      *              \begin{aligned}
-     *                  x'(t) &= \frac{1}{2} g \left( \sin \alpha - \mu \cos \alpha \right) \left( t - t_i \right)^2 + \left( v_t^- + \mu v_n^- \right) \left( t - t_i \right)  x_i'\\
+     *                  x'(t) &= \frac{1}{2} g \left( \sin \alpha - \mu \cos \alpha \right) \left( t - t_i \right)^2 + \left( v_t^- + \mu
+     * v_n^- \right) \left( t - t_i \right)  x_i'\\
      *                  y'(t) &= R\\
      *                  \theta (t) &= - \frac{\mu g \cos \alpha}{r} \left( t - t_i \right)^2 + \frac{2}{r} \mu v_n^- \left( t - t_i \right)
      *              \end{aligned}
@@ -85,7 +85,8 @@ namespace scopi
      *
      * @return Velocity of the sphere (x and y coordinates) and rotation (\f$ \omega \f$).
      */
-    std::pair<type::position_t<2>, double> analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0);
+    std::pair<type::position_t<2>, double>
+    analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0);
 
     class DryWithFriction;
 
@@ -106,10 +107,11 @@ namespace scopi
      * Therefore, the matrix is in \f$ \R^{4\Nc \times 6N} \f$ and \f$ \d \in \R^{4\Nc} \f$.
      *
      */
-    template<class Params>
+    template <class Params>
     class DryWithFrictionBase : public ProblemBase<Params>
     {
-    protected:
+      protected:
+
         /**
          * @brief Constructor.
          *
@@ -119,7 +121,9 @@ namespace scopi
          */
         DryWithFrictionBase(std::size_t nparticles, double dt);
 
-    public:
+      public:
+
+        using contact_container_t = std::vector<neighbor<dim, Friction>>;
         /**
          * @brief Construct the COO storage of the matrices \f$ \B \f$ and \f$ \T \f$.
          *
@@ -130,21 +134,18 @@ namespace scopi
          * @param firstCol [in] Index of the first column (solver-dependent).
          */
         template <std::size_t dim>
-        void create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                          const std::vector<neighbor<dim>>& contacts);
+        void create_matrix_constraint_coo(const scopi_container<dim>& particles, const contact_container_t& contacts);
     };
 
-
-    template<class Params>
-    template<std::size_t dim>
-    void DryWithFrictionBase<Params>::create_matrix_constraint_coo(const scopi_container<dim>& particles,
-                                                                   const std::vector<neighbor<dim>>& contacts)
+    template <class Params>
+    template <std::size_t dim>
+    void DryWithFrictionBase<Params>::create_matrix_constraint_coo(const scopi_container<dim>& particles, const contact_container_t& contacts)
     {
         this->matrix_positive_distance(particles, contacts, 4);
         std::size_t active_offset = particles.nb_inactive();
-        std::size_t ic = 0;
-        double mu = this->m_params.mu;
-        for (auto &c: contacts)
+        std::size_t ic            = 0;
+        double mu                 = this->m_params.mu;
+        for (auto& c : contacts)
         {
             if (c.i >= active_offset)
             {
@@ -152,12 +153,12 @@ namespace scopi
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back((c.i - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(-this->m_dt*mu*c.nij[ind_row]*c.nij[ind_col]);
-                        if(ind_row == ind_col)
+                        this->m_A_rows.push_back(4 * ic + 1 + ind_row);
+                        this->m_A_cols.push_back((c.i - active_offset) * 3 + ind_col);
+                        this->m_A_values.push_back(-this->m_dt * mu * c.nij[ind_row] * c.nij[ind_col]);
+                        if (ind_row == ind_col)
                         {
-                            this->m_A_values[this->m_A_values.size()-1] += this->m_dt*mu;
+                            this->m_A_values[this->m_A_values.size() - 1] += this->m_dt * mu;
                         }
                     }
                 }
@@ -169,12 +170,12 @@ namespace scopi
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back((c.j - active_offset)*3 + ind_col);
-                        this->m_A_values.push_back(this->m_dt*mu*c.nij[ind_row]*c.nij[ind_col]);
-                        if(ind_row == ind_col)
+                        this->m_A_rows.push_back(4 * ic + 1 + ind_row);
+                        this->m_A_cols.push_back((c.j - active_offset) * 3 + ind_col);
+                        this->m_A_values.push_back(this->m_dt * mu * c.nij[ind_row] * c.nij[ind_col]);
+                        if (ind_row == ind_col)
                         {
-                            this->m_A_values[this->m_A_values.size()-1] -= this->m_dt*mu;
+                            this->m_A_values[this->m_A_values.size() - 1] -= this->m_dt * mu;
                         }
                     }
                 }
@@ -182,20 +183,23 @@ namespace scopi
 
             auto ri_cross = cross_product<dim>(c.pi - particles.pos()(c.i));
             auto rj_cross = cross_product<dim>(c.pj - particles.pos()(c.j));
-            auto Ri = rotation_matrix<3>(particles.q()(c.i));
-            auto Rj = rotation_matrix<3>(particles.q()(c.j));
+            auto Ri       = rotation_matrix<3>(particles.q()(c.i));
+            auto Rj       = rotation_matrix<3>(particles.q()(c.j));
 
             if (c.i >= active_offset)
             {
                 std::size_t ind_part = c.i - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(ri_cross, Ri));
+                auto dot             = xt::eval(xt::linalg::dot(ri_cross, Ri));
                 for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(-mu*this->m_dt*dot(ind_row, ind_col) + mu*this->m_dt*c.nij[ind_row]*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
+                        this->m_A_rows.push_back(4 * ic + 1 + ind_row);
+                        this->m_A_cols.push_back(3 * particles.nb_active() + 3 * ind_part + ind_col);
+                        this->m_A_values.push_back(
+                            -mu * this->m_dt * dot(ind_row, ind_col)
+                            + mu * this->m_dt * c.nij[ind_row]
+                                  * (c.nij[0] * dot(0, ind_col) + c.nij[1] * dot(1, ind_col) + c.nij[2] * dot(2, ind_col)));
                     }
                 }
             }
@@ -203,14 +207,17 @@ namespace scopi
             if (c.j >= active_offset)
             {
                 std::size_t ind_part = c.j - active_offset;
-                auto dot = xt::eval(xt::linalg::dot(rj_cross, Rj));
+                auto dot             = xt::eval(xt::linalg::dot(rj_cross, Rj));
                 for (std::size_t ind_row = 0; ind_row < 3; ++ind_row)
                 {
                     for (std::size_t ind_col = 0; ind_col < 3; ++ind_col)
                     {
-                        this->m_A_rows.push_back(4*ic + 1 + ind_row);
-                        this->m_A_cols.push_back(3*particles.nb_active() + 3*ind_part + ind_col);
-                        this->m_A_values.push_back(mu*this->m_dt*dot(ind_row, ind_col) - mu*this->m_dt*c.nij[ind_row]*(c.nij[0]*dot(0, ind_col)+c.nij[1]*dot(1, ind_col)+c.nij[2]*dot(2, ind_col)));
+                        this->m_A_rows.push_back(4 * ic + 1 + ind_row);
+                        this->m_A_cols.push_back(3 * particles.nb_active() + 3 * ind_part + ind_col);
+                        this->m_A_values.push_back(
+                            mu * this->m_dt * dot(ind_row, ind_col)
+                            - mu * this->m_dt * c.nij[ind_row]
+                                  * (c.nij[0] * dot(0, ind_col) + c.nij[1] * dot(1, ind_col) + c.nij[2] * dot(2, ind_col)));
                     }
                 }
             }
@@ -218,10 +225,10 @@ namespace scopi
         }
     }
 
-    template<class Params>
+    template <class Params>
     DryWithFrictionBase<Params>::DryWithFrictionBase(std::size_t nparticles, double dt)
-    : ProblemBase<Params>(nparticles, dt)
-    {}
+        : ProblemBase<Params>(nparticles, dt)
+    {
+    }
 
 }
-

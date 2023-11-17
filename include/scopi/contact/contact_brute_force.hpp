@@ -1,13 +1,13 @@
 #pragma once
 
-#include "base.hpp"
 #include "../box.hpp"
 #include "../utils.hpp"
+#include "base.hpp"
 
+#include "plog/Initializers/RollingFileInitializer.h"
 #include <cstddef>
 #include <locale>
 #include <plog/Log.h>
-#include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi
 {
@@ -19,7 +19,7 @@ namespace scopi
      *
      * Specialization of ContactsParams.
      */
-    template<>
+    template <>
     struct ContactsParams<contact_brute_force>
     {
         /**
@@ -43,9 +43,10 @@ namespace scopi
      *
      * Contacts between particles are computed using brute force algorithm.
      */
-    class contact_brute_force: public contact_base<contact_brute_force>
+    class contact_brute_force : public contact_base<contact_brute_force>
     {
-    public:
+      public:
+
         /**
          * @brief Alias for the base class contact_base.
          */
@@ -72,25 +73,24 @@ namespace scopi
          *
          * @return Array of neighbors.
          */
-        template <std::size_t dim>
-        std::vector<neighbor<dim>> run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
-
+        template <class problem_t, std::size_t dim>
+        auto run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
     };
 
-    template <std::size_t dim>
-    std::vector<neighbor<dim>> contact_brute_force::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
+    template <class problem_t, std::size_t dim>
+    auto contact_brute_force::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
-        std::vector<neighbor<dim>> contacts;
+        std::vector<neighbor<dim, problem_t>> contacts;
 
         add_objects_from_periodicity(box, particles, this->m_params.dmax);
 
         tic();
-        #pragma omp parallel for
+#pragma omp parallel for
         for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance<problem_t>(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -99,7 +99,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance<problem_t>(box, particles, i, j, contacts, this->m_params.dmax);
             }
         }
 
@@ -114,6 +114,5 @@ namespace scopi
         particles.reset_periodic();
 
         return contacts;
-
     }
 }

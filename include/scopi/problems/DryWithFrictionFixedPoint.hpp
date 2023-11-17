@@ -1,19 +1,19 @@
 #pragma once
 
+#include "plog/Initializers/RollingFileInitializer.h"
 #include <cmath>
 #include <cstddef>
 #include <plog/Log.h>
-#include "plog/Initializers/RollingFileInitializer.h"
 #include <vector>
-#include <xtensor/xtensor.hpp>
 #include <xtensor/xfixed.hpp>
+#include <xtensor/xtensor.hpp>
 
-#include "../types.hpp"
 #include "../container.hpp"
-#include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
-#include "../utils.hpp"
 #include "../params.hpp"
+#include "../quaternion.hpp"
+#include "../types.hpp"
+#include "../utils.hpp"
 #include "DryWithFrictionBase.hpp"
 
 namespace scopi
@@ -26,7 +26,7 @@ namespace scopi
      *
      * Specialization of ProblemParams.
      */
-    template<>
+    template <>
     struct ProblemParams<DryWithFrictionFixedPoint>
     {
         /**
@@ -80,12 +80,14 @@ namespace scopi
      *               & \mathbf{s}_{ij} \mapsto ||\mathbb{T} \mathbf{u}^{\mathbf{s}}_{ij}||,
      *      \end{aligned}
      * \f]
-     * and search for a fixed point of \f$ \mathbf{F} \f$ : \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$ such that \f$ \mathbf{F}(\mathbf{s}) = \mathbf{s} \f$.
+     * and search for a fixed point of \f$ \mathbf{F} \f$ : \f$ \mathbf{s} \in \mathbb{R}^{N_c} \f$ such that \f$ \mathbf{F}(\mathbf{s}) =
+     * \mathbf{s} \f$.
      *
      * This leads to the following algorithm:
      * - \f$ \mathbf{s}^{0} \f$;
      * - \f$ k = 0 \f$;
-     * - While \f$ \frac{||\mathbf{s}^{k-1} - \mathbf{s}^{k}||}{||\mathbf{s}^{k}|| + 1} > \f$ \c tol_fixed_point and \f$ k < \f$ \c max_iter_fixed_point
+     * - While \f$ \frac{||\mathbf{s}^{k-1} - \mathbf{s}^{k}||}{||\mathbf{s}^{k}|| + 1} > \f$ \c tol_fixed_point and \f$ k < \f$ \c
+     * max_iter_fixed_point
      *   - Compute \f$ \mathbf{u}^{\mathbf{s}^{k}} \f$ as the solution of the optimization problem under the constraint written above;
      *   - \f$ \mathbf{s}^{k+1}_{ij} = ||\mathbb{T} \mathbf{u}^{\mathbf{s}^{k}}_{ij}|| \f$ for all contacts \f$ ij \f$;
      *   - \f$ k ++ \f$.
@@ -97,7 +99,11 @@ namespace scopi
      */
     class DryWithFrictionFixedPoint : public DryWithFrictionBase<ProblemParams<DryWithFrictionFixedPoint>>
     {
-    public:
+      public:
+
+        using base                = DryWithFrictionBase<ProblemParams<DryWithFrictionFixedPoint>>;
+        using contact_container_t = typename base::contact_container_t;
+
         /**
          * @brief Constructor.
          *
@@ -117,8 +123,8 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          */
-        template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+        template <std::size_t dim>
+        void create_vector_distances(const contact_container_t& contacts);
 
         /**
          * @brief Get the number of rows in the matrix.
@@ -128,7 +134,7 @@ namespace scopi
          * @return Number of rows in the matrix.
          */
         template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
+        std::size_t number_row_matrix(const contact_container_t& contacts) const;
 
         /**
          * @brief Initialize variables for fixed-point algorithm.
@@ -136,19 +142,19 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          */
-        template<std::size_t dim, class optim_solver_t>
-        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts, optim_solver_t&);
+        template <std::size_t dim, class optim_solver_t>
+        void extra_steps_before_solve(const contact_container_t& contacts, optim_solver_t&);
         /**
          * @brief Compute \f$ \mathbf{s}^{k+1} \f$.
          *
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the
+         * solution of the optimization problem.
          */
-        template<std::size_t dim, class optim_solver_t>
-        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     optim_solver_t&);
+        template <std::size_t dim, class optim_solver_t>
+        void extra_steps_after_solve(const contact_container_t& contacts, optim_solver_t&);
         /**
          * @brief Stop criterion for the fixed point algorithm.
          *
@@ -156,7 +162,8 @@ namespace scopi
          */
         bool should_solve() const;
 
-    private:
+      private:
+
         /**
          * @brief \f$ \mathbf{s}^{k+1} \f$.
          */
@@ -171,35 +178,35 @@ namespace scopi
         std::size_t m_nb_iter;
     };
 
-    template<std::size_t dim>
-    void DryWithFrictionFixedPoint::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    template <std::size_t dim>
+    void DryWithFrictionFixedPoint::create_vector_distances(const contact_container_t& contacts)
     {
-        this->m_distances = xt::zeros<double>({4*contacts.size()});
+        this->m_distances = xt::zeros<double>({4 * contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            this->m_distances[4*i] = contacts[i].dij + this->m_params.mu*this->m_dt*m_s(i);
+            this->m_distances[4 * i] = contacts[i].dij + this->m_params.mu * this->m_dt * m_s(i);
         }
     }
 
     template <std::size_t dim>
-    std::size_t DryWithFrictionFixedPoint::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
+    std::size_t DryWithFrictionFixedPoint::number_row_matrix(const contact_container_t& contacts) const
     {
-        return 4*contacts.size();
+        return 4 * contacts.size();
     }
 
-    template<std::size_t dim, class optim_solver_t>
-    void DryWithFrictionFixedPoint::extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts,  optim_solver_t&)
+    template <std::size_t dim, class optim_solver_t>
+    void DryWithFrictionFixedPoint::extra_steps_before_solve(const contact_container_t& contacts, optim_solver_t&)
     {
         m_nb_iter = 0;
-        m_s = xt::zeros<double>({contacts.size()});
-        m_s_old = xt::ones<double>({contacts.size()});
+        m_s       = xt::zeros<double>({contacts.size()});
+        m_s_old   = xt::ones<double>({contacts.size()});
     }
 
-    template<std::size_t dim, class optim_solver_t>
-    void DryWithFrictionFixedPoint::extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,  optim_solver_t& optim_solver)
+    template <std::size_t dim, class optim_solver_t>
+    void DryWithFrictionFixedPoint::extra_steps_after_solve(const contact_container_t& contacts, optim_solver_t& optim_solver)
     {
         m_nb_iter++;
-        m_s_old = m_s;
+        m_s_old   = m_s;
         auto data = optim_solver.constraint_data();
         xt::xtensor<double, 2> u_tilde;
         if (data)
@@ -209,9 +216,8 @@ namespace scopi
         // TODO use xtensor functions to avoid loop
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            m_s(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _)))/(this->m_dt*this->m_params.mu);
+            m_s(i) = xt::linalg::norm(xt::view(u_tilde, i, xt::range(1, _))) / (this->m_dt * this->m_params.mu);
         }
     }
 
 }
-

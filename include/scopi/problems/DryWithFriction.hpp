@@ -1,17 +1,17 @@
 #pragma once
 
+#include "plog/Initializers/RollingFileInitializer.h"
 #include <cmath>
 #include <plog/Log.h>
-#include "plog/Initializers/RollingFileInitializer.h"
-#include <xtensor/xtensor.hpp>
 #include <xtensor/xfixed.hpp>
+#include <xtensor/xtensor.hpp>
 
-#include "../types.hpp"
 #include "../container.hpp"
-#include "../quaternion.hpp"
 #include "../objects/neighbor.hpp"
-#include "../utils.hpp"
 #include "../params.hpp"
+#include "../quaternion.hpp"
+#include "../types.hpp"
+#include "../utils.hpp"
 #include "DryWithFrictionBase.hpp"
 
 namespace scopi
@@ -24,7 +24,7 @@ namespace scopi
      *
      * Specialization of ProblemParams in params.hpp
      */
-    template<>
+    template <>
     struct ProblemParams<DryWithFriction>
     {
         /**
@@ -57,7 +57,8 @@ namespace scopi
      *      \mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij} \ge ||\mathbb{T} \mathbf{u}_{ij}||
      * \f]
      * for all contacts \f$ ij \f$.
-     * \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$, and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
+     * \f$ \mathbf{d} \in \mathbb{R}^{N_c} \f$, \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$, \f$ \mathbb{B} \in \mathbb{R}^{N_c \times 6 N} \f$,
+     * and \f$ \mathbb{T} \in R^{3 N_c \times 6N} \f$.
      *
      * Only one matrix is built.
      * It contains both matrices \f$ \mathbb{B} \f$ and \f$ \mathbb{T} \f$.
@@ -67,7 +68,11 @@ namespace scopi
      */
     class DryWithFriction : public DryWithFrictionBase<ProblemParams<DryWithFriction>>
     {
-    public:
+      public:
+
+        using base                = DryWithFrictionBase<ProblemParams<DryWithFriction>>;
+        using contact_container_t = typename base::contact_container_t;
+
         /**
          * @brief Constructor.
          *
@@ -85,8 +90,8 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          */
-        template<std::size_t dim, class optim_solver_t>
-        void extra_steps_before_solve(const std::vector<neighbor<dim>>& contacts, optim_solver_t&);
+        template <std::size_t dim, class optim_solver_t>
+        void extra_steps_before_solve(const contact_container_t& contacts, optim_solver_t&);
         /**
          * @brief Extra steps after solving the optimization problem.
          *
@@ -95,11 +100,11 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          * @param lambda [in] Lagrange multipliers.
-         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the solution of the optimization problem.
+         * @param u_tilde [in] Vector \f$ \mathbf{d} + \mathbb{B} \mathbf{u} - \mathbf{f}(\mathbf{u}) \f$, where \f$ \mathbf{u} \f$ is the
+         * solution of the optimization problem.
          */
-        template<std::size_t dim, class optim_solver_t>
-        void extra_steps_after_solve(const std::vector<neighbor<dim>>& contacts,
-                                     optim_solver_t& optim_solver);
+        template <std::size_t dim, class optim_solver_t>
+        void extra_steps_after_solve(const contact_container_t& contacts, optim_solver_t& optim_solver);
         /**
          * @brief Get the number of rows in the matrix.
          *
@@ -110,7 +115,7 @@ namespace scopi
          * @return Number of rows in the matrix.
          */
         template <std::size_t dim>
-        std::size_t number_row_matrix(const std::vector<neighbor<dim>>& contacts) const;
+        std::size_t number_row_matrix(const contact_container_t& contacts) const;
         /**
          * @brief Whether the optimization problem should be solved.
          *
@@ -123,39 +128,37 @@ namespace scopi
          * @tparam dim Dimension (2 or 3).
          * @param contacts [in] Array of contacts.
          */
-        template<std::size_t dim>
-        void create_vector_distances(const std::vector<neighbor<dim>>& contacts);
+        template <std::size_t dim>
+        void create_vector_distances(const contact_container_t& contacts);
 
         bool should_solve() const;
-
     };
 
-    template<std::size_t dim, class optim_solver_t>
-    void DryWithFriction::extra_steps_before_solve(const std::vector<neighbor<dim>>&, optim_solver_t&)
+    template <std::size_t dim, class optim_solver_t>
+    void DryWithFriction::extra_steps_before_solve(const contact_container_t&, optim_solver_t&)
     {
         this->m_should_solve = true;
     }
 
-    template<std::size_t dim, class optim_solver_t>
-    void DryWithFriction::extra_steps_after_solve(const std::vector<neighbor<dim>>&,
-                                                  optim_solver_t&)
+    template <std::size_t dim, class optim_solver_t>
+    void DryWithFriction::extra_steps_after_solve(const contact_container_t&, optim_solver_t&)
     {
         this->m_should_solve = false;
     }
+
     template <std::size_t dim>
-    std::size_t DryWithFriction::number_row_matrix(const std::vector<neighbor<dim>>& contacts) const
+    std::size_t DryWithFriction::number_row_matrix(const contact_container_t& contacts) const
     {
-        return 4*contacts.size();
+        return 4 * contacts.size();
     }
 
-    template<std::size_t dim>
-    void DryWithFriction::create_vector_distances(const std::vector<neighbor<dim>>& contacts)
+    template <std::size_t dim>
+    void DryWithFriction::create_vector_distances(const contact_container_t& contacts)
     {
-        this->m_distances = xt::zeros<double>({4*contacts.size()});
+        this->m_distances = xt::zeros<double>({4 * contacts.size()});
         for (std::size_t i = 0; i < contacts.size(); ++i)
         {
-            this->m_distances[4*i] = contacts[i].dij;
+            this->m_distances[4 * i] = contacts[i].dij;
         }
     }
 }
-

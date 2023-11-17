@@ -4,13 +4,16 @@
 #include <chrono>
 #include <vector>
 
-#include <xtensor/xfixed.hpp>
 #include <xtensor-blas/xlinalg.hpp>
+#include <xtensor/xfixed.hpp>
+#include <xtensor/xio.hpp>
 
-#include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Log.h>
 
-
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <iostream>
 /////////////////////////////
 // Functions for the timer //
 /////////////////////////////
@@ -45,9 +48,7 @@ double toc();
  *
  * @return
  */
-std::vector<double> create_binit(std::vector<double> binit, int n,
-  double theta_g, double theta_d, double rx, double ry, double e);
-
+std::vector<double> create_binit(std::vector<double> binit, int n, double theta_g, double theta_d, double rx, double ry, double e);
 
 /**
  * @brief Sign function.
@@ -58,7 +59,7 @@ std::vector<double> create_binit(std::vector<double> binit, int n,
  */
 int sign(double val);
 
-template<typename F, typename DF, typename U, typename A>
+template <typename F, typename DF, typename U, typename A>
 /**
  * @brief Newton method (with linesearch).
  *
@@ -74,38 +75,43 @@ template<typename F, typename DF, typename U, typename A>
  *
  * @return
  */
-auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double ftol, const double xtol){
-  // std::cout << "newton_method : u0 = " << u0 << std::endl;
-  // std::cout << "newton_method : args = " << args << std::endl;
-  int cc = 0;
-  auto u = u0;
-  while (cc<itermax) {
-    auto d = xt::linalg::solve(grad_f(u,args), -f(u,args));
-    auto var = xt::linalg::norm(d);
-    if (var < xtol) {
-      // std::cout << "newton_method : cvgce (xtol) after " << cc << " iterations => RETURN u = " << u << std::endl;
-      return std::make_tuple(u,cc);
+auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double ftol, const double xtol)
+{
+    // std::cout << "newton_method : u0 = " << u0 << std::endl;
+    // std::cout << "newton_method : args = " << args << std::endl;
+    int cc = 0;
+    auto u = u0;
+    while (cc < itermax)
+    {
+        auto d   = xt::linalg::solve(grad_f(u, args), -f(u, args));
+        auto var = xt::linalg::norm(d);
+        if (var < xtol)
+        {
+            // std::cout << "newton_method : cvgce (xtol) after " << cc << " iterations => RETURN u = " << u << std::endl;
+            return std::make_tuple(u, cc);
+        }
+        // std::cout << "newton_method : iteration " << cc << " => d = " << d << " var = " << var << std::endl;
+        // linesearch
+        double t  = 1;
+        auto ferr = xt::linalg::norm(f(u, args));
+        // std::cout << "newton_method : iteration " << cc << " => ferr = " << ferr << std::endl;
+        if (ferr < ftol)
+        {
+            // std::cout << "newton_method : cvgce (ftol) after " << cc << " iterations => RETURN u = " << u << std::endl;
+            return std::make_tuple(u, cc);
+        }
+        while ((xt::linalg::norm(f(u + t * d, args)) > ferr) && (t > 0.01))
+        {
+            t -= 0.01;
+        }
+        // std::cout << "newton_method : iteration " << cc << " => t = " << t << std::endl;
+        u += t * d;
+        // std::cout << "newton_method : iteration " << cc << " => u = " << u << std::endl;
+        cc += 1;
     }
-    // std::cout << "newton_method : iteration " << cc << " => d = " << d << " var = " << var << std::endl;
-    // linesearch
-    double t = 1;
-    auto ferr = xt::linalg::norm(f(u,args));
-    // std::cout << "newton_method : iteration " << cc << " => ferr = " << ferr << std::endl;
-    if (ferr < ftol) {
-      // std::cout << "newton_method : cvgce (ftol) after " << cc << " iterations => RETURN u = " << u << std::endl;
-      return std::make_tuple(u,cc);
-    }
-    while ((xt::linalg::norm(f(u+t*d,args)) > ferr) && (t>0.01)){
-        t -= 0.01;
-    }
-    // std::cout << "newton_method : iteration " << cc << " => t = " << t << std::endl;
-    u += t * d;
-    // std::cout << "newton_method : iteration " << cc << " => u = " << u << std::endl;
-    cc += 1;
-  }
-  PLOG_ERROR << "newton_method : !!!!!! FAILED !!!!!! after " << cc << " iterations => RETURN u = " << u;
+    PLOG_ERROR << "newton_method : !!!!!! FAILED !!!!!! after " << cc << " iterations => RETURN u = " << u;
 
-  return std::make_tuple(u,-1);
+    return std::make_tuple(u, -1);
 }
 
 namespace scopi
@@ -143,19 +149,24 @@ namespace scopi
         template <class E>
         cross_t cross_product_impl(std::integral_constant<std::size_t, 2>, const E& e)
         {
-            return {{     0,    0,  e(1)},
-                    {     0,    0, -e(0)},
-                    { -e(1), e(0),     0}};
+            return {
+                {0,     0,    e(1) },
+                {0,     0,    -e(0)},
+                {-e(1), e(0), 0    }
+            };
         }
 
         template <class E>
         cross_t cross_product_impl(std::integral_constant<std::size_t, 3>, const E& e)
         {
-            return {{     0, -e(2),  e(1)},
-                    {  e(2),     0, -e(0)},
-                    { -e(1),  e(0),     0}};
+            return {
+                {0,     -e(2), e(1) },
+                {e(2),  0,     -e(0)},
+                {-e(1), e(0),  0    }
+            };
         }
     }
+
     /**
      * @brief
      *
@@ -173,15 +184,15 @@ namespace scopi
         return detail::cross_product_impl(std::integral_constant<std::size_t, dim>{}, e);
     }
 
-    template<class matrix, class vector>
+    template <class matrix, class vector>
     inline vector MatMatVecMult(const matrix& A, const matrix& B, const vector& v)
     {
         vector out;
         for (std::size_t iv = 0; iv < 3; ++iv)
         {
-            out(iv) = A(iv, 0)*(B(0, 0)*v(0)+B(0, 1)*v(1)+B(0, 2)*v(2))
-                    + A(iv, 1)*(B(1, 0)*v(0)+B(1, 1)*v(1)+B(1, 2)*v(2))
-                    + A(iv, 2)*(B(2, 0)*v(0)+B(2, 1)*v(1)+B(2, 2)*v(2));
+            out(iv) = A(iv, 0) * (B(0, 0) * v(0) + B(0, 1) * v(1) + B(0, 2) * v(2))
+                    + A(iv, 1) * (B(1, 0) * v(0) + B(1, 1) * v(1) + B(1, 2) * v(2))
+                    + A(iv, 2) * (B(2, 0) * v(0) + B(2, 1) * v(1) + B(2, 2) * v(2));
         }
         return out;
     }
@@ -205,14 +216,13 @@ namespace scopi
      */
     const xt::xtensor_fixed<double, xt::xshape<3>>& get_omega(const xt::xtensor_fixed<double, xt::xshape<3>>& w);
 
-
-    template<std::size_t dim>
+    template <std::size_t dim>
     class BoxDomain;
 
-    template<std::size_t dim>
+    template <std::size_t dim>
     class scopi_container;
 
-    template<std::size_t dim>
+    template <std::size_t dim>
     void add_objects_from_periodicity(const BoxDomain<dim>& box, scopi_container<dim>& particles, double dmax)
     {
         using position_t = typename scopi_container<dim>::position_type;
@@ -220,14 +230,14 @@ namespace scopi
         {
             if (box.is_periodic(d))
             {
-                for (std::size_t io=0; io < particles.size(/*with_periodic = */ false); ++io)
+                for (std::size_t io = 0; io < particles.size(/*with_periodic = */ false); ++io)
                 {
-                    for (std::size_t offset = particles.offset(io); offset < particles.offset(io+1); ++offset)
+                    for (std::size_t offset = particles.offset(io); offset < particles.offset(io + 1); ++offset)
                     {
                         auto& pos = particles.pos()[offset];
                         if (pos[d] - dmax < box.lower_bound(d))
                         {
-                            auto size = particles.offset(io+1) - particles.offset(io);
+                            auto size = particles.offset(io + 1) - particles.offset(io);
                             std::vector<position_t> new_pos(size);
                             for (std::size_t i = 0, ii = particles.offset(io); i < size; ++i, ++ii)
                             {
@@ -242,4 +252,15 @@ namespace scopi
             }
         }
     }
+
+    template <class out_t, typename... Args>
+    void print_indented(out_t& out, int indent, fmt::format_string<Args...> format_str, Args&&... args)
+    {
+        out << fmt::format("{:{}}", "", indent) << fmt::format(format_str, std::forward<Args>(args)...) << std::endl;
+    }
 }
+
+template <typename T>
+struct fmt::formatter<T, std::enable_if_t<std::is_base_of_v<xt::xexpression<T>, T>, char>> : ostream_formatter
+{
+};

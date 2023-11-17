@@ -3,8 +3,15 @@
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xio.hpp>
 
+#include <fmt/color.h>
+#include <fmt/format.h>
+
+#include "../contact/property.hpp"
+#include "../utils.hpp"
+
 namespace scopi
 {
+
     /**
      * @brief Structure of a neighbor.
      *
@@ -13,9 +20,10 @@ namespace scopi
      *
      * @tparam dim Dimension (2 or 3).
      */
-    template<std::size_t dim>
+    template <std::size_t dim, class problem_t_>
     struct neighbor
     {
+        using problem_t = problem_t_;
         /**
          * @brief Index of the particle \c i.
          */
@@ -40,10 +48,12 @@ namespace scopi
          * @brief Point in particle \c j which realizes the distance between the two particles.
          */
         xt::xtensor_fixed<double, xt::xshape<dim>> pj;
+
+        contact_property<problem_t> property;
     };
 
     /**
-     * @brief 
+     * @brief
      *
      * \todo Write documentation.
      *
@@ -51,18 +61,20 @@ namespace scopi
      * @param out
      * @param neigh
      *
-     * @return 
+     * @return
      */
-    template<std::size_t dim>
-    std::ostream& operator<<(std::ostream& out, const neighbor<dim>& neigh)
+    template <std::size_t dim, class problem_t>
+    std::ostream& operator<<(std::ostream& out, const neighbor<dim, problem_t>& neigh)
     {
-        out << "neighbor:" << std::endl;
-        out << "\ti: " << neigh.i << std::endl;
-        out << "\tj: " << neigh.j << std::endl;
-        out << "\tpi: " << neigh.pi << std::endl;
-        out << "\tpj: " << neigh.pj << std::endl;
-        out << "\tnij: " << neigh.nij << std::endl;
-        out << "\tdij: " << neigh.dij;
+        out << fmt::format(fg(fmt::color::steel_blue) | fmt::emphasis::bold, "contact") << std::endl;
+        print_indented(out, 4, "{:<12} : {}", "i", neigh.i);
+        print_indented(out, 4, "{:<12} : {}", "j", neigh.j);
+        print_indented(out, 4, "{:<12} : {}", "pi", neigh.pi);
+        print_indented(out, 4, "{:<12} : {}", "pj", neigh.pj);
+        print_indented(out, 4, "{:<12} : {}", "normal", neigh.nij);
+        print_indented(out, 4, "{:<12} : {}", "distance", neigh.dij);
+        print_indented(out, 4, "{:<12} :", "property");
+        to_stream(out, 8, neigh.property);
         return out;
     }
 }
