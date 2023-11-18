@@ -54,17 +54,25 @@ namespace scopi
         LagrangeMultiplier(const Contacts& contacts)
             : base(contacts)
         {
+            m_local_work  = xt::zeros<double>({size()});
+            m_global_work = xt::zeros<double>({3 * contacts.size()});
         }
 
-        auto global2local(const xt::xtensor<double, 1>& x) const
+        const auto& global2local(const xt::xtensor<double, 1>& x) const
         {
             assert(x.size() == 3 * this->m_contacts.size());
-            xt::xtensor<double, 1> out = xt::empty<double>({this->m_contacts.size()});
+            // xt::xtensor<double, 1> out = xt::empty<double>({this->m_contacts.size()});
             for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
             {
-                out[i] = xt::linalg::dot(xt::view(x, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
+                // m_local_work[i] = xt::linalg::dot(xt::view(x, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
+
+                m_local_work[i] = 0;
+                for (std::size_t d = 0; d < dim; ++d)
+                {
+                    m_local_work[i] += x[3 * i + d] * this->m_contacts[i].nij[d];
+                }
             }
-            return out;
+            return m_local_work;
         }
 
         auto local2global(const xt::xtensor<double, 1>& x) const
@@ -73,7 +81,11 @@ namespace scopi
             xt::xtensor<double, 1> out = xt::empty<double>({3 * this->m_contacts.size()});
             for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
             {
-                xt::view(out, xt::range(3 * i, 3 * i + dim)) = x[i] * this->m_contacts[i].nij;
+                for (std::size_t d = 0; d < dim; ++d)
+                {
+                    out(3 * i + d) = x[i] * this->m_contacts[i].nij(d);
+                }
+                // xt::view(out, xt::range(3 * i, 3 * i + dim)) = x[i] * this->m_contacts[i].nij;
             }
             return out;
         }
@@ -87,6 +99,11 @@ namespace scopi
         {
             lambda = xt::maximum(lambda, 0.);
         }
+
+      private:
+
+        mutable xt::xtensor<double, 1> m_local_work;
+        mutable xt::xtensor<double, 1> m_global_work;
     };
 
     template <std::size_t dim_, class Contacts>

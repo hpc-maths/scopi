@@ -68,32 +68,72 @@ namespace scopi
             std::size_t rot_offset    = 3 * m_particles.nb_active();
             std::size_t row           = 0;
 
+            // for (auto& c : m_contacts)
+            // {
+            //     auto view = xt::view(m_work, xt::range(row, row + 3));
+            //     if (c.i >= active_offset)
+            //     {
+            //         std::size_t start = (c.i - active_offset) * 3;
+            //         auto v_i          = xt::view(u, xt::range(start, start + 3));
+
+            //         start += rot_offset;
+            //         auto omega_i = xt::view(u, xt::range(start, start + 3));
+            //         auto rij_i   = c.pi - m_particles.pos()(c.i);
+            //         auto Ri      = rotation_matrix<3>(m_particles.q()(c.i));
+
+            //         view += v_i - detail::cross<dim>(rij_i, detail::mat_mult(Ri, omega_i));
+            //     }
+            //     if (c.j >= active_offset)
+            //     {
+            //         std::size_t start = (c.j - active_offset) * 3;
+            //         auto v_j          = xt::view(u, xt::range(start, start + 3));
+
+            //         start += rot_offset;
+            //         auto omega_j = xt::view(u, xt::range(start, start + 3));
+            //         auto rij_j   = c.pj - m_particles.pos()(c.j);
+            //         auto Rj      = rotation_matrix<3>(m_particles.q()(c.j));
+
+            //         view -= v_j - detail::cross<dim>(rij_j, detail::mat_mult(Rj, omega_j));
+            //     }
+            //     row += 3;
+            // }
+
+            auto pos = m_particles.pos();
+            auto q   = m_particles.q();
             for (auto& c : m_contacts)
             {
                 auto view = xt::view(m_work, xt::range(row, row + 3));
                 if (c.i >= active_offset)
                 {
-                    std::size_t start = (c.i - active_offset) * 3;
-                    auto v_i          = xt::view(u, xt::range(start, start + 3));
+                    std::size_t start                            = (c.i - active_offset) * 3;
+                    xt::xtensor_fixed<double, xt::xshape<3>> v_i = xt::view(u, xt::range(start, start + 3));
 
                     start += rot_offset;
-                    auto omega_i = xt::view(u, xt::range(start, start + 3));
-                    auto rij_i   = c.pi - m_particles.pos()(c.i);
-                    auto Ri      = rotation_matrix<3>(m_particles.q()(c.i));
+                    xt::xtensor_fixed<double, xt::xshape<3>> omega_i = xt::view(u, xt::range(start, start + 3));
+                    xt::xtensor_fixed<double, xt::xshape<3>> rij_i   = c.pi - pos(c.i);
+                    auto Ri                                          = rotation_matrix<3>(q(c.i));
 
-                    view += v_i - detail::cross<dim>(rij_i, detail::mat_mult(Ri, omega_i));
+                    auto cross = detail::cross<dim>(rij_i, detail::mat_mult(Ri, omega_i));
+                    for (std::size_t d = 0; d < 3; ++d)
+                    {
+                        view(d) += v_i(d) - cross(d);
+                    }
                 }
                 if (c.j >= active_offset)
                 {
-                    std::size_t start = (c.j - active_offset) * 3;
-                    auto v_j          = xt::view(u, xt::range(start, start + 3));
+                    std::size_t start                            = (c.j - active_offset) * 3;
+                    xt::xtensor_fixed<double, xt::xshape<3>> v_j = xt::view(u, xt::range(start, start + 3));
 
                     start += rot_offset;
-                    auto omega_j = xt::view(u, xt::range(start, start + 3));
-                    auto rij_j   = c.pj - m_particles.pos()(c.j);
-                    auto Rj      = rotation_matrix<3>(m_particles.q()(c.j));
+                    xt::xtensor_fixed<double, xt::xshape<3>> omega_j = xt::view(u, xt::range(start, start + 3));
+                    xt::xtensor_fixed<double, xt::xshape<3>> rij_j   = c.pj - pos(c.j);
+                    auto Rj                                          = rotation_matrix<3>(q(c.j));
 
-                    view -= v_j - detail::cross<dim>(rij_j, detail::mat_mult(Rj, omega_j));
+                    auto cross = detail::cross<dim>(rij_j, detail::mat_mult(Rj, omega_j));
+                    for (std::size_t d = 0; d < 3; ++d)
+                    {
+                        view(d) -= v_j(d) - cross(d);
+                    }
                 }
                 row += 3;
             }
@@ -128,6 +168,43 @@ namespace scopi
             std::size_t rot_offset    = 3 * m_particles.nb_active();
             std::size_t row           = 0;
 
+            // for (auto& c : m_contacts)
+            // {
+            //     auto f_view = xt::view(f, xt::range(row, row + 3));
+
+            //     if (c.i >= active_offset)
+            //     {
+            //         std::size_t start = (c.i - active_offset) * 3;
+            //         auto v_i          = xt::view(m_work, xt::range(start, start + 3));
+
+            //         v_i += f_view;
+
+            //         start += rot_offset;
+            //         auto omega_i = xt::view(m_work, xt::range(start, start + 3));
+            //         auto rij_i   = c.pi - m_particles.pos()(c.i);
+            //         auto R_i     = rotation_matrix<3>(m_particles.q()(c.i));
+
+            //         omega_i += detail::mat_mult(xt::transpose(R_i), detail::cross<dim>(rij_i, f_view));
+            //     }
+            //     if (c.j >= active_offset)
+            //     {
+            //         std::size_t start = (c.j - active_offset) * 3;
+            //         auto v_j          = xt::view(m_work, xt::range(start, start + 3));
+
+            //         v_j -= f_view;
+
+            //         start += rot_offset;
+            //         auto omega_j = xt::view(m_work, xt::range(start, start + 3));
+            //         auto rij_j   = c.pj - m_particles.pos()(c.j);
+            //         auto R_j     = rotation_matrix<3>(m_particles.q()(c.j));
+
+            //         omega_j -= detail::mat_mult(xt::transpose(R_j), detail::cross<dim>(rij_j, f_view));
+            //     }
+            //     row += 3;
+            // }
+
+            auto pos = m_particles.pos();
+            auto q   = m_particles.q();
             for (auto& c : m_contacts)
             {
                 auto f_view = xt::view(f, xt::range(row, row + 3));
@@ -137,28 +214,36 @@ namespace scopi
                     std::size_t start = (c.i - active_offset) * 3;
                     auto v_i          = xt::view(m_work, xt::range(start, start + 3));
 
-                    v_i += f_view;
-
                     start += rot_offset;
-                    auto omega_i = xt::view(m_work, xt::range(start, start + 3));
-                    auto rij_i   = c.pi - m_particles.pos()(c.i);
-                    auto R_i     = rotation_matrix<3>(m_particles.q()(c.i));
+                    auto omega_i                                   = xt::view(m_work, xt::range(start, start + 3));
+                    xt::xtensor_fixed<double, xt::xshape<3>> rij_i = c.pi - pos(c.i);
+                    auto R_i                                       = rotation_matrix<3>(q(c.i));
 
-                    omega_i += detail::mat_mult(xt::transpose(R_i), detail::cross<dim>(rij_i, f_view));
+                    xt::xtensor_fixed<double, xt::xshape<3>> result = detail::mat_mult(xt::transpose(R_i), detail::cross<dim>(rij_i, f_view));
+                    for (std::size_t d = 0; d < 3; ++d)
+                    {
+                        v_i(d) += f_view(d);
+                        omega_i(d) += result(d);
+                    }
+                    // omega_i += result;
                 }
                 if (c.j >= active_offset)
                 {
                     std::size_t start = (c.j - active_offset) * 3;
                     auto v_j          = xt::view(m_work, xt::range(start, start + 3));
 
-                    v_j -= f_view;
-
                     start += rot_offset;
-                    auto omega_j = xt::view(m_work, xt::range(start, start + 3));
-                    auto rij_j   = c.pj - m_particles.pos()(c.j);
-                    auto R_j     = rotation_matrix<3>(m_particles.q()(c.j));
+                    auto omega_j                                   = xt::view(m_work, xt::range(start, start + 3));
+                    xt::xtensor_fixed<double, xt::xshape<3>> rij_j = c.pj - pos(c.j);
+                    auto R_j                                       = rotation_matrix<3>(q(c.j));
 
-                    omega_j -= detail::mat_mult(xt::transpose(R_j), detail::cross<dim>(rij_j, f_view));
+                    xt::xtensor_fixed<double, xt::xshape<3>> result = detail::mat_mult(xt::transpose(R_j), detail::cross<dim>(rij_j, f_view));
+                    for (std::size_t d = 0; d < 3; ++d)
+                    {
+                        v_j(d) -= f_view(d);
+                        omega_j(d) -= result(d);
+                    }
+                    // omega_j -= result;
                 }
                 row += 3;
             }

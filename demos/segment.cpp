@@ -71,12 +71,13 @@ int main(int argc, char** argv)
     using solver_type  = scopi::ScopiSolver<dim, problem_t, optim_solver, contact_t, vap_t>;
     solver_type solver(particles, dt);
 
-    auto params                = solver.get_params();
-    params.optim_params.alpha  = 0.2 / (dt * dt);
-    params.contact_params.dmax = 4 * max_radius;
+    auto params = solver.get_params();
+    // params.optim_params.alpha           = 0.2 / (dt * dt);
+    params.optim_params.dynamic_descent = true;
+    params.contact_params.dmax          = 4 * max_radius;
 
-    solver.init_options(app);
-    CLI11_PARSE(app, argc, argv);
+    // solver.init_options(app);
+    // CLI11_PARSE(app, argc, argv);
 
     solver.run(total_it);
 

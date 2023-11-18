@@ -256,6 +256,7 @@ namespace scopi
     void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::run(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
+        write_output_files(old_contacts, m_current_save++);
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
