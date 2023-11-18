@@ -4,6 +4,7 @@
 
 #include "../contact/property.hpp"
 #include "../objects/neighbor.hpp"
+#include "../utils.hpp"
 #include "lagrange_multiplier.hpp"
 #include "minimization_problem.hpp"
 
@@ -73,6 +74,7 @@ namespace scopi
         template <std::size_t dim, class problem_t>
         void run(const scopi_container<dim>& particles, const std::vector<neighbor<dim, problem_t>>& contacts, std::size_t)
         {
+            tic();
             std::size_t active_offset = particles.nb_inactive();
             m_u.resize({particles.nb_active(), 3});
             m_omega.resize({particles.nb_active(), 3});
@@ -86,24 +88,20 @@ namespace scopi
 
                 auto velocities = min_p.velocities(m_lambda);
 
-                PLOG_INFO << "m_u " << m_u << " " << particles.v() << std::endl;
-
                 for (std::size_t i = 0; i < particles.nb_active(); ++i)
                 {
                     for (std::size_t d = 0; d < dim; ++d)
                     {
-                        m_u(i, d) = particles.v()(i + particles.nb_inactive())(d) + m_dt * velocities(i * 3 + d);
-                        PLOG_INFO << "Loic " << m_u(i, d) << " " << particles.v()(i + particles.nb_active()) << " " << velocities(i * 3 + d)
-                                  << " " << particles.v()(i + particles.nb_active())(d) << std::endl;
+                        m_u(i, d) = particles.v()(i + active_offset)(d) + m_dt * velocities(i * 3 + d);
+
                         if constexpr (dim == 3)
                         {
-                            m_omega(i, d) = particles.omega()(i + particles.nb_active())(d)
-                                          + m_dt * velocities((i + particles.nb_active()) * 3 + d);
+                            m_omega(i, d) = particles.omega()(i + active_offset)(d) + m_dt * velocities((i + active_offset) * 3 + d);
                         }
                     }
                     if constexpr (dim == 2)
                     {
-                        m_omega(i, 2) = particles.omega()(i + particles.nb_active()) + m_dt * velocities((i + particles.nb_active()) * 3 + 2);
+                        m_omega(i, 2) = particles.omega()(i + active_offset) + m_dt * velocities((i + active_offset) * 3 + 2);
                     }
                 }
             }
@@ -125,7 +123,8 @@ namespace scopi
                     }
                 }
             }
-            PLOG_INFO << "m_u " << m_u << " " << particles.v() << std::endl;
+            auto duration = toc();
+            PLOG_INFO << "----> CPUTIME : solve OptimGradient = " << duration << std::endl;
         }
 
         template <class Contacts>

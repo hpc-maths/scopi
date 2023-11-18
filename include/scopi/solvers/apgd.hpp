@@ -81,7 +81,6 @@ namespace scopi
                 std::swap(lambda_n, lambda_np1);
             }
             PLOG_INFO << fmt::format("pgd converged in {} iterations.", ite) << std::endl;
-            PLOG_INFO << fmt::format("lambda: {}", lambda_n) << std::endl;
             return lambda_n;
         }
 
@@ -170,8 +169,8 @@ namespace scopi
                 // PLOG_INFO << fmt::format("dG: {}", xt::norm_linf(dG)) << std::endl;
                 // PLOG_INFO << fmt::format("lambda_n: {}", xt::norm_linf(lambda_np1)) << std::endl;
 
-                // if (xt::norm_l2(lambda_np1 - lambda_n)[0] < m_params.tolerance)
-                if (xt::norm_linf(dG)[0] < m_params.tolerance || xt::norm_linf(lambda_np1)[0] < m_params.tolerance)
+                if (xt::norm_l2(lambda_np1 - lambda_n)[0] < m_params.tolerance)
+                // if (xt::norm_linf(dG)[0] < m_params.tolerance || xt::norm_linf(lambda_np1)[0] < m_params.tolerance)
                 {
                     std::swap(lambda_n, lambda_np1);
                     break;

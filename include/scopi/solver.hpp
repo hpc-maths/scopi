@@ -50,19 +50,17 @@ namespace scopi
      * @param wadapt [in] \f$N \times 3\f$ array that contains the new velocity, where \f$N\f$ is the total number of particles.
      */
     template <std::size_t dim, class xt_container>
-    inline std::enable_if_t<dim == 2, void>
-    update_velocity_omega(double dt, scopi_container<dim>& particles, std::size_t i, const xt_container& wadapt)
+    inline std::enable_if_t<dim == 2, void> update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt_container& wadapt)
     {
-        particles.omega()(i + particles.nb_inactive()) += dt * wadapt(i, 2);
+        particles.omega()(i + particles.nb_inactive()) = wadapt(i, 2);
     }
 
     template <std::size_t dim, class xt_container>
-    inline std::enable_if_t<dim == 3, void>
-    update_velocity_omega(double dt, scopi_container<dim>& particles, std::size_t i, const xt_container& wadapt)
+    inline std::enable_if_t<dim == 3, void> update_velocity_omega(scopi_container<dim>& particles, std::size_t i, const xt_container& wadapt)
     {
         for (std::size_t d = 0; d < 3; ++d)
         {
-            particles.omega()(i + particles.nb_inactive())(d) += dt * wadapt(i, d);
+            particles.omega()(i + particles.nb_inactive())(d) = wadapt(i, d);
         }
     }
 
@@ -92,7 +90,7 @@ namespace scopi
      */
     template <std::size_t dim,
               class problem_type      = NoFriction,
-              class optim_solver_type = OptimGradient<pgd>,
+              class optim_solver_type = OptimGradient<apgd>,
               class contact_type      = contact_kdtree,
               class vap_type          = vap_fixed>
     class ScopiSolver
@@ -258,7 +256,6 @@ namespace scopi
     void ScopiSolver<dim, problem_t, optim_solver_t, contact_t, vap_t>::run(std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
-
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
@@ -271,10 +268,6 @@ namespace scopi
                 transfer(old_contacts, contacts);
             }
 
-            if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
-            {
-                write_output_files(contacts, m_current_save++);
-            }
             m_vap.set_a_priori_velocity(m_particles, contacts);
             m_optim_solver.extra_steps_before_solve(contacts);
             while (m_optim_solver.should_solve())
@@ -285,6 +278,11 @@ namespace scopi
             m_optim_solver.update_contact_properties(contacts);
             update_velocity();
             move_active_particles();
+
+            if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
+            {
+                write_output_files(contacts, m_current_save++);
+            }
             std::swap(old_contacts, contacts);
         }
     }
@@ -382,8 +380,8 @@ namespace scopi
         {
             nl::json contact;
 
-            // contact["i"] = contacts[i].i;
-            // contact["j"] = contacts[i].j;
+            contact["i"]   = contacts[i].i;
+            contact["j"]   = contacts[i].j;
             contact["pi"]  = contacts[i].pi;
             contact["pj"]  = contacts[i].pj;
             contact["nij"] = contacts[i].nij;
@@ -500,10 +498,9 @@ namespace scopi
             {
                 m_particles.v()(i + active_offset)(d) = uadapt(i, d);
             }
-            update_velocity_omega(m_dt, m_particles, i, wadapt);
+            update_velocity_omega(m_particles, i, wadapt);
         }
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : update velocity = " << duration;
-        PLOG_INFO << "New velocities: " << m_particles.v() << std::endl;
     }
 }

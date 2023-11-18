@@ -208,7 +208,7 @@ namespace scopi
             {
                 query_pt[d] = particles.pos()(i)(d);
             }
-            PLOG_INFO << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
+            PLOG_DEBUG << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
             std::vector<std::pair<std::size_t, double>> ret_matches;
 

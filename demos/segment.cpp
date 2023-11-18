@@ -3,10 +3,12 @@
 #include <CLI/CLI.hpp>
 
 #include <scopi/contact/contact_brute_force.hpp>
+#include <scopi/objects/types/plan.hpp>
 #include <scopi/objects/types/segment.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/property.hpp>
 #include <scopi/solver.hpp>
+#include <scopi/vap/vap_fpd.hpp>
 
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
@@ -28,7 +30,7 @@ int main(int argc, char** argv)
     app.add_option("--nparts", n_parts, "Number of particles")->capture_default_str();
     app.add_option("--nite", total_it, "Number of iterations")->capture_default_str();
     app.add_option("--dt", dt, "Time step")->capture_default_str();
-    // CLI11_PARSE(app, argc, argv);
+    CLI11_PARSE(app, argc, argv);
 
     scopi::segment<dim> seg1(scopi::type::position_t<dim>{0., 1.}, scopi::type::position_t<dim>{0.4, 1.});
     scopi::segment<dim> seg2(scopi::type::position_t<dim>{0.6, 1.}, scopi::type::position_t<dim>{1., 1.});
@@ -62,7 +64,11 @@ int main(int argc, char** argv)
                             prop);
     }
 
-    using solver_type = scopi::ScopiSolver<dim>;
+    using problem_t    = scopi::NoFriction;
+    using optim_solver = scopi::OptimGradient<scopi::apgd>;
+    using contact_t    = scopi::contact_kdtree;
+    using vap_t        = scopi::vap_fixed;
+    using solver_type  = scopi::ScopiSolver<dim, problem_t, optim_solver, contact_t, vap_t>;
     solver_type solver(particles, dt);
 
     auto params                = solver.get_params();

@@ -137,28 +137,28 @@ namespace scopi
                     std::size_t start = (c.i - active_offset) * 3;
                     auto v_i          = xt::view(m_work, xt::range(start, start + 3));
 
-                    v_i = f_view;
+                    v_i += f_view;
 
                     start += rot_offset;
                     auto omega_i = xt::view(m_work, xt::range(start, start + 3));
                     auto rij_i   = c.pi - m_particles.pos()(c.i);
                     auto R_i     = rotation_matrix<3>(m_particles.q()(c.i));
 
-                    omega_i = detail::mat_mult(xt::transpose(R_i), detail::cross<dim>(rij_i, f_view));
+                    omega_i += detail::mat_mult(xt::transpose(R_i), detail::cross<dim>(rij_i, f_view));
                 }
                 if (c.j >= active_offset)
                 {
                     std::size_t start = (c.j - active_offset) * 3;
                     auto v_j          = xt::view(m_work, xt::range(start, start + 3));
 
-                    v_j = -f_view;
+                    v_j -= f_view;
 
                     start += rot_offset;
                     auto omega_j = xt::view(m_work, xt::range(start, start + 3));
                     auto rij_j   = c.pj - m_particles.pos()(c.j);
                     auto R_j     = rotation_matrix<3>(m_particles.q()(c.j));
 
-                    omega_j = -detail::mat_mult(xt::transpose(R_j), detail::cross<dim>(rij_j, f_view));
+                    omega_j -= detail::mat_mult(xt::transpose(R_j), detail::cross<dim>(rij_j, f_view));
                 }
                 row += 3;
             }

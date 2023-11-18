@@ -62,7 +62,8 @@ namespace scopi
         // std::cout << "normal " << normal << std::endl;
         // std::cout << "U " << U << std::endl;
         // std::cout << "D " << D.mat_mult(normal) << std::endl;
-        // std::cout << "A " << A.mat_mult(U) << std::endl;
+        // std::cout << "dt " << dt << std::endl;
+        // std::cout << "A " << dt * A.mat_mult(U) << std::endl;
 
         xt::xtensor<double, 1> value = D.mat_mult(normal) + dt * A.mat_mult(U);
         return value;
@@ -83,6 +84,7 @@ namespace scopi
 
         inline auto operator()(const xt::xtensor<double, 1>& lambda) const
         {
+            // std::cout << std::endl << "lambda " << lambda << std::endl;
             // std::cout << std::endl << "m_At lambda " << m_AT.mat_mult(lambda) << std::endl;
             // std::cout << std::endl << "invM  " << m_invM << std::endl;
             // std::cout << std::endl << "m_A  " << m_A.mat_mult(m_invM * m_AT.mat_mult(lambda)) << std::endl;
@@ -114,7 +116,7 @@ namespace scopi
             , m_C(CVector(dt, contacts, particles))
             , m_lagrange(make_lagrange_multplier<Particles::dim, Problem>(contacts))
         {
-            PLOG_INFO << "m_C " << m_C << " " << m_lagrange.global2local(m_C) << std::endl;
+            PLOG_DEBUG << "m_C " << m_C << " " << m_lagrange.global2local(m_C) << std::endl;
         }
 
         inline xt::xtensor<double, 1> gradient(const xt::xtensor<double, 1>& lambda) const
