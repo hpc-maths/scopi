@@ -48,6 +48,10 @@ namespace scopi
          * @brief Point in particle \c j which realizes the distance between the two particles.
          */
         xt::xtensor_fixed<double, xt::xshape<dim>> pj;
+        /**
+         * @brief The s for contact \c i \c j in fixed point algorithm
+         */
+        double sij;
 
         contact_property<problem_t> property;
     };

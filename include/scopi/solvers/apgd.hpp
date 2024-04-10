@@ -102,8 +102,8 @@ namespace scopi
 
         double alpha         = 0.05;
         double max_ite       = 10000;
-        double tolerance     = 1e-6;
-        bool dynamic_descent = false;
+        double tolerance     = 1e-7;
+        bool dynamic_descent = true;
     };
 
     class apgd
@@ -155,7 +155,7 @@ namespace scopi
                 if (m_params.dynamic_descent)
                 {
                     while (min_p(lambda_np1)
-                           >= min_p(y_n) + xt::linalg::dot(dG, lambda_np1 - y_n)[0] + 0.5 * lipsch * xt::norm_l2(lambda_np1 - y_n)[0])
+                           >= min_p(y_n) + xt::linalg::dot(dG, lambda_np1 - y_n)[0] + 0.5 * lipsch * std::pow(xt::norm_l2(lambda_np1 - y_n)[0],2))
                     {
                         lipsch *= 2;
                         alpha                   = 1. / lipsch;

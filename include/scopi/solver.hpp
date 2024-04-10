@@ -274,7 +274,7 @@ namespace scopi
             while (m_optim_solver.should_solve())
             {
                 m_optim_solver.run(m_particles, contacts, nite);
-                m_optim_solver.extra_steps_after_solve(contacts);
+                m_optim_solver.extra_steps_after_solve(contacts, m_particles);
             }
             m_optim_solver.update_contact_properties(contacts);
             update_velocity();
@@ -387,7 +387,8 @@ namespace scopi
             contact["pj"]  = contacts[i].pj;
             contact["nij"] = contacts[i].nij;
             contact["dij"] = contacts[i].dij;
-            // contact["gamma"] = contacts[i].property.gamma;
+            contact["gamma"] = contacts[i].property.gamma;
+            contact["gamma_min"] = contacts[i].property.gamma_min;
 
             json_output["contacts"].push_back(contact);
         }
