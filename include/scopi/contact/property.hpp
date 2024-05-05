@@ -14,7 +14,15 @@ namespace scopi
     {
     };
 
+    class FrictionFixedPoint
+    {
+    };
+
     class Viscous
+    {
+    };
+    
+    class ViscousFriction
     {
     };
 
@@ -24,12 +32,26 @@ namespace scopi
     template <>
     struct contact_property<NoFriction>
     {
+        double gamma     = 0;//Pour l'affichage
+        double gamma_min = -2.;//Pour l'affichage
     };
 
     template <>
     struct contact_property<Friction>
     {
         double mu = 0.1;
+        double gamma     = 0;//Pour l'affichage
+        double gamma_min = -2.;//Pour l'affichage
+    };
+
+    template <>
+    struct contact_property<FrictionFixedPoint>
+    {
+        double mu = 0.5;
+        double fixed_point_tol = 1e-6;
+        double fixed_point_max_iter = 1000;
+        double gamma     = 0;//Pour l'affichage
+        double gamma_min = -2.;//Pour l'affichage
     };
 
     template <>
@@ -37,6 +59,17 @@ namespace scopi
     {
         double gamma     = 0;
         double gamma_min = -2.;
+        double gamma_tol = 1e-6;
+    };
+
+    template <>
+    struct contact_property<ViscousFriction>
+    {
+        double mu = 0.5;
+        double fixed_point_tol = 1e-3;
+        double fixed_point_max_iter = 1000;
+        double gamma     = 0;
+        double gamma_min = -1.4;
         double gamma_tol = 1e-6;
     };
 

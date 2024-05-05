@@ -114,7 +114,7 @@ namespace scopi
         inline minimization_problem(double dt, const Contacts& contacts, const Particles& particles)
             : m_Q(dt, contacts, particles)
             , m_C(CVector(dt, contacts, particles))
-            , m_lagrange(make_lagrange_multplier<Particles::dim, Problem>(contacts))
+            , m_lagrange(make_lagrange_multplier<Particles::dim, Problem>(contacts, dt))
         {
             PLOG_DEBUG << "m_C " << m_C << " " << m_lagrange.global2local(m_C) << std::endl;
         }
@@ -124,14 +124,13 @@ namespace scopi
             // std::cout << "local2global " << m_lagrange.local2global(lambda) << std::endl;
             // std::cout << "Q " << m_Q(m_lagrange.local2global(lambda)) << std::endl;
             // std::cout << "Q +C" << m_Q(m_lagrange.local2global(lambda) + m_C) << std::endl;
-
-            return m_lagrange.global2local(m_Q(m_lagrange.local2global(lambda)) + m_C);
+            return m_lagrange.global2local(m_Q(m_lagrange.local2global(lambda)) + m_C) + m_lagrange.S_Vector();
         }
 
         inline double operator()(const xt::xtensor<double, 1>& lambda) const
         {
             auto lambda_global = m_lagrange.local2global(lambda);
-            return xt::linalg::dot(lambda_global, 0.5 * m_Q(lambda_global) + m_C)[0];
+            return xt::linalg::dot(lambda_global, 0.5 * m_Q(lambda_global) + m_C)[0]+xt::linalg::dot(lambda,m_lagrange.S_Vector())[0];
         }
 
         inline auto velocities(const xt::xtensor<double, 1>& lambda) const
