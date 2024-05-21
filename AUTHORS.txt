@@ -1,0 +1,13 @@
+# This is the list of scopi's significant contributors.
+#
+# This does not necessarily list everyone who has contributed code,
+# especially since many employees of one corporation may be contributing.
+# To see the full list of contributors, see the revision history in
+# source control.
+
+in last name alphabetical order:
+  Hélène Bloch
+  Sylvain Faure
+  Loïc Gouarin
+  Quentin Houssier
+  Aline Lefebvre-Lepot
