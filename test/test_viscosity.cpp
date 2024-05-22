@@ -13,34 +13,34 @@
 
 namespace scopi {
 
-    template <class solver_t>
-    void set_params_test(OptimParams<solver_t>&)
+    template <class params_t>
+    void set_params_test(params_t&)
     {}
 
-    void set_params_test_uzawa(OptimParamsUzawaBase& params)
-    {
-        params.rho = 200.;
-    }
+//     void set_params_test_uzawa(OptimParamsUzawaBase& params)
+//     {
+//         params.rho = 200.;
+//     }
 
-#ifdef SCOPI_USE_MKL
-    template <>
-    void set_params_test<OptimUzawaMkl<ViscousWithoutFriction<2>>>(OptimParams<OptimUzawaMkl<ViscousWithoutFriction<2>>>& params)
-    {
-        set_params_test_uzawa(params);
-    }
-#endif
-#ifdef SCOPI_USE_TBB
-    template <>
-    void set_params_test<OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<2>>>(OptimParams<OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<2>>>& params)
-    {
-        set_params_test_uzawa(params);
-    }
-#endif
-    template <>
-    void set_params_test<OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<2>>>(OptimParams<OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<2>>>& params)
-    {
-        set_params_test_uzawa(params);
-    }
+// #ifdef SCOPI_USE_MKL
+//     template <>
+//     void set_params_test<OptimUzawaMkl<ViscousWithoutFriction<2>>>(OptimParams<OptimUzawaMkl<ViscousWithoutFriction<2>>>& params)
+//     {
+//         set_params_test_uzawa(params);
+//     }
+// #endif
+// #ifdef SCOPI_USE_TBB
+//     template <>
+//     void set_params_test<OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<2>>>(OptimParams<OptimUzawaMatrixFreeTbb<ViscousWithoutFriction<2>>>& params)
+//     {
+//         set_params_test_uzawa(params);
+//     }
+// #endif
+//     template <>
+//     void set_params_test<OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<2>>>(OptimParams<OptimUzawaMatrixFreeOmp<ViscousWithoutFriction<2>>>& params)
+//     {
+//         set_params_test_uzawa(params);
+//     }
 
     TEST_CASE_TEMPLATE_DEFINE("sphere plan viscosity", SolverType, sphere_plan_viscosity)
     {
@@ -64,14 +64,14 @@ namespace scopi {
         SolverType solver(particles, dt);
         auto params = solver.get_params();
         set_params_test(params.optim_params);
-        params.solver_params.output_frequency = 188;
+        params.solver_params.output_frequency = 1;
         solver.run(150);
         particles.f()(1)(1) *= -1.;
         solver.run(189, 150);
 
         CHECK(diffFile("./Results/scopi_objects_0188.json", "../test/references/sphere_plan_viscosity.json", tolerance));
     }
-    TEST_CASE_TEMPLATE_APPLY(sphere_plan_viscosity, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plan_viscosity, solver_dry_without_friction_t<2, >);
 
     TEST_CASE_TEMPLATE_DEFINE("sphere plan viscosity friction vertical", SolverType, sphere_plan_viscosity_friction_vertical)
     {
@@ -93,8 +93,8 @@ namespace scopi {
 
         SolverType solver(particles, dt);
         auto params = solver.get_params();
-        params.problem_params.mu = 0.1;
-        params.solver_params.output_frequency = total_it-1;
+        // params.problem_params.mu = 0.1;
+        params.solver_params.output_frequency = 1;
         solver.run(total_it);
         particles.f()(1)(1) *= -1.;
         solver.run(2*total_it, total_it);
@@ -122,8 +122,8 @@ namespace scopi {
         particles.push_back(s, prop.force({{g, -g}}));
 
         SolverType solver(particles, dt);
-        auto params = solver.get_params();
-        params.problem_params.mu = 0.1;
+        // auto params = solver.get_params();
+        // params.problem_params.mu = 0.1;
         solver.run(total_it);
         particles.f()(1)(1) *= -1.;
         solver.run(2*total_it, total_it);

@@ -31,9 +31,9 @@ namespace scopi
         particles.push_back(s1);
         particles.push_back(s2);
 
-        ContactsParams<contact_brute_force> params;
+        ContactsParams<contact_brute_force<NoFriction>> params;
         contact_brute_force cont(params);
-        auto contacts = cont.run<NoFriction>(particles, 0);
+        auto contacts = cont.run(particles, 0);
 
         AMatrix a(contacts, particles);
         ATMatrix at(contacts, particles);
@@ -64,9 +64,9 @@ namespace scopi
         particles.push_back(plan, scopi::property<dim>().deactivate());
         particles.push_back(sphere, scopi::property<dim>().mass(1).moment_inertia(0.1));
 
-        ContactsParams<contact_brute_force> params;
-        contact_brute_force cont(params);
-        auto contacts = cont.run<NoFriction>(particles, 0);
+        ContactsParams<contact_brute_force<NoFriction>> params;
+        contact_brute_force<NoFriction> cont(params);
+        auto contacts = cont.run(particles, 0);
 
         AMatrix a(contacts, particles);
         xt::xtensor<double, 1> u = xt::ones<double>({6 * particles.nb_active()});

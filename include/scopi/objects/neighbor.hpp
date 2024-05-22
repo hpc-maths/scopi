@@ -54,6 +54,19 @@ namespace scopi
         double sij;
 
         contact_property<problem_t> property;
+
+        auto to_json() const
+        {
+            return nl::json{
+                {"i",        i                 },
+                {"j",        j                 },
+                {"pi",       pi                },
+                {"pj",       pj                },
+                {"normal",   nij               },
+                {"distance", dij               },
+                {"property", property.to_json()}
+            };
+        }
     };
 
     /**

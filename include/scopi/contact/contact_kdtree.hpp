@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../box.hpp"
+#include "../scopi.hpp"
 #include "../utils.hpp"
 #include "base.hpp"
 #include <CLI/CLI.hpp>
@@ -14,6 +15,7 @@
 namespace scopi
 {
 
+    template <class problem_t>
     class contact_kdtree;
 
     /**
@@ -21,15 +23,26 @@ namespace scopi
      *
      * Specialization of ContactsParams.
      */
-    template <>
-    struct ContactsParams<contact_kdtree>
+    template <class problem_t>
+    struct ContactsParams<contact_kdtree<problem_t>>
     {
         /**
          * @brief Default constructor.
          */
-        ContactsParams();
+        ContactsParams()
+            : dmax(2.)
+            , kd_tree_radius(17.)
+        {
+        }
 
-        void init_options(CLI::App& app);
+        void init_options()
+        {
+            auto& app = get_app();
+            auto opt  = app.add_option_group("KD tree options");
+            opt->add_option("--dmax", dmax, "Maximum distance between two neighboring particles")->capture_default_str();
+            opt->add_option("--kd-radius", kd_tree_radius, "Kd-tree radius")->capture_default_str();
+        }
+
         /**
          * @brief Maximum distance between two neighboring particles.
          *
@@ -130,25 +143,25 @@ namespace scopi
      *
      * Use a Kd-tree to select particles close enough the compute the exact distance.
      */
-    class contact_kdtree : public contact_base<contact_kdtree>
+    template <class problem_t>
+    class contact_kdtree : public contact_base<contact_kdtree<problem_t>>
     {
       public:
 
         /**
          * @brief Alias for the base class contact_base.
          */
-        using base_type = contact_base<contact_kdtree>;
+        using base_type = contact_base<contact_kdtree<problem_t>>;
 
         /**
          * @brief Constructor.
          *
          * @param params [in] Parameters.
          */
-        contact_kdtree(const ContactsParams<contact_kdtree>& params = ContactsParams<contact_kdtree>());
-        /**
-         * @brief Get the number of exact distances computed.
-         */
-        std::size_t get_nMatches() const;
+        contact_kdtree(const ContactsParams<contact_kdtree<problem_t>>& params = ContactsParams<contact_kdtree<problem_t>>())
+            : base_type(params)
+        {
+        }
 
         /**
          * @brief Compute neighboring particles.
@@ -167,8 +180,13 @@ namespace scopi
          *
          * @return Array of neighbors.
          */
-        template <class problem_t, std::size_t dim>
+        template <std::size_t dim>
         auto run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
+
+        auto& default_contact_property()
+        {
+            return m_default_contact_property;
+        }
 
       private:
 
@@ -176,10 +194,12 @@ namespace scopi
          * @brief Number of exact distances computed.
          */
         std::size_t m_nMatches;
+        contact_property<problem_t> m_default_contact_property;
     };
 
-    template <class problem_t, std::size_t dim>
-    auto contact_kdtree::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
+    template <class problem_t>
+    template <std::size_t dim>
+    auto contact_kdtree<problem_t>::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
         // std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
 
@@ -219,7 +239,7 @@ namespace scopi
                 std::size_t j = ret_matches[ic].first + particles.offset(active_ptr);
                 if (i < j)
                 {
-                    compute_exact_distance<problem_t>(box, particles, i, j, contacts, this->m_params.dmax);
+                    compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
                     m_nMatches++;
                 }
             }
@@ -230,7 +250,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance<problem_t>(box, particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
             }
         }
 

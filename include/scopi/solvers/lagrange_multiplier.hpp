@@ -186,7 +186,7 @@ namespace scopi
         {
             return m_size;
         }
-        
+
         const auto& S_Vector() const
         {
             return m_S_Vector;
@@ -266,7 +266,7 @@ namespace scopi
             }
         }
         private:
-        
+
         xt::xtensor<double, 1> m_S_Vector;
     };
 
@@ -279,7 +279,7 @@ namespace scopi
 
         using base = LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, FrictionFixedPoint, Contacts>>;
 
-        LagrangeMultiplier(const Contacts& contacts, double dt)
+        LagrangeMultiplier(const Contacts& contacts, [[maybe_unused]] double dt)
             : base(contacts)
         {
             m_S_Vector = xt::zeros<double>({size()});
@@ -338,7 +338,7 @@ namespace scopi
             }
         }
         private:
-        
+
         xt::xtensor<double, 1> m_S_Vector;
     };
 
@@ -482,7 +482,7 @@ namespace scopi
                         lambda_visqu = xt::maximum(lambda_visqu, 0.);
                         row +=2;
                     }
-                    else 
+                    else
                     {
                         auto lambda_i =  xt::view(lambda, xt::range(row, row + 1 + dim));
                         auto lambda_f_i = xt::view(lambda, xt::range(row + 1, row+ 1 + dim));
@@ -542,6 +542,6 @@ namespace scopi
     {
         return LagrangeMultiplier<dim, Type, Contacts>(contacts, dt);
     }
-    
-    
+
+
 }

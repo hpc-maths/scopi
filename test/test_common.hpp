@@ -4,27 +4,24 @@
 
 #include <scopi/solver.hpp>
 
-#include <scopi/solvers/OptimMosek.hpp>
-#include <scopi/solvers/OptimScs.hpp>
-#ifdef SCOPI_USE_MKL
-#include <scopi/solvers/OptimUzawaMkl.hpp>
-#include <scopi/solvers/OptimProjectedGradient.hpp>
-#include <scopi/solvers/gradient/pgd.hpp>
-#include <scopi/solvers/gradient/apgd.hpp>
-#include <scopi/solvers/gradient/apgd_as.hpp>
-#include <scopi/solvers/gradient/apgd_ar.hpp>
-#include <scopi/solvers/gradient/apgd_asr.hpp>
-#endif
-#include <scopi/solvers/OptimUzawaMatrixFreeOmp.hpp>
-#include <scopi/solvers/OptimUzawaMatrixFreeTbb.hpp>
+// #include <scopi/solvers/OptimMosek.hpp>
+// #include <scopi/solvers/OptimScs.hpp>
+// #ifdef SCOPI_USE_MKL
+// #include <scopi/solvers/OptimUzawaMkl.hpp>
+// #include <scopi/solvers/OptimProjectedGradient.hpp>
+// #include <scopi/solvers/gradient/pgd.hpp>
+// #include <scopi/solvers/gradient/apgd.hpp>
+// #include <scopi/solvers/gradient/apgd_as.hpp>
+// #include <scopi/solvers/gradient/apgd_ar.hpp>
+// #include <scopi/solvers/gradient/apgd_asr.hpp>
+// #endif
+// #include <scopi/solvers/OptimUzawaMatrixFreeOmp.hpp>
+// #include <scopi/solvers/OptimUzawaMatrixFreeTbb.hpp>
+#include <scopi/solvers/OptimGradient.hpp>
+#include <scopi/solvers/apgd.hpp>
 
 #include <scopi/contact/contact_kdtree.hpp>
 #include <scopi/contact/contact_brute_force.hpp>
-
-#include <scopi/problems/DryWithoutFriction.hpp>
-#include <scopi/problems/DryWithFriction.hpp>
-#include <scopi/problems/ViscousWithoutFriction.hpp>
-#include <scopi/problems/ViscousWithFriction.hpp>
 
 #include <scopi/vap/vap_fixed.hpp>
 #include <scopi/vap/vap_fpd.hpp>
@@ -36,25 +33,25 @@ namespace scopi
     struct solver
     {
         using type = std::tuple<
-#ifdef SCOPI_USE_MKL
-            ScopiSolver<dim, OptimUzawaMkl<problem>, contact, vap>,
-            ScopiSolver<dim, OptimProjectedGradient<problem, pgd>, contact, vap>,
-            ScopiSolver<dim, OptimProjectedGradient<problem, apgd>, contact, vap>,
-            ScopiSolver<dim, OptimProjectedGradient<problem, apgd_as>, contact, vap>,
-            ScopiSolver<dim, OptimProjectedGradient<problem, apgd_ar>, contact, vap>,
-            ScopiSolver<dim, OptimProjectedGradient<problem, apgd_asr>, contact, vap>,
-#endif
-#ifdef SCOPI_USE_TBB
-            ScopiSolver<dim, OptimUzawaMatrixFreeTbb<problem>, contact, vap>,
-#endif
-#ifdef SCOPI_USE_MOSEK
-            ScopiSolver<dim, OptimMosek<problem>, contact, vap>,
-            // ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap>, // friction with mu = 0
-#endif
-#ifdef SCOPI_USE_SCS
-            ScopiSolver<dim, OptimScs<problem>, contact, vap>
-#endif
-            ScopiSolver<dim, OptimUzawaMatrixFreeOmp<problem>, contact, vap>
+// #ifdef SCOPI_USE_MKL
+//             ScopiSolver<dim, OptimUzawaMkl<problem>, contact, vap>,
+//             ScopiSolver<dim, OptimProjectedGradient<problem, pgd>, contact, vap>,
+//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd>, contact, vap>,
+//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_as>, contact, vap>,
+//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_ar>, contact, vap>,
+//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_asr>, contact, vap>,
+// #endif
+// #ifdef SCOPI_USE_TBB
+//             ScopiSolver<dim, OptimUzawaMatrixFreeTbb<problem>, contact, vap>,
+// #endif
+// #ifdef SCOPI_USE_MOSEK
+//             ScopiSolver<dim, OptimMosek<problem>, contact, vap>,
+//             // ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap>, // friction with mu = 0
+// #endif
+// #ifdef SCOPI_USE_SCS
+//             ScopiSolver<dim, OptimScs<problem>, contact, vap>
+// #endif
+            ScopiSolver<dim, problem, OptimGradient<apgd>, contact, vap>
         >;
     };
 
@@ -65,12 +62,12 @@ namespace scopi
     using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
 
     template<std::size_t dim, class vap = vap_fixed>
-    using solver_dry_without_friction_t = tuple_cat_t<solver_t<dim, DryWithoutFriction, contact_kdtree, vap>,
-                                                      solver_t<dim, DryWithoutFriction, contact_brute_force, vap>>;
+    using solver_dry_without_friction_t = tuple_cat_t<solver_t<dim, NoFriction, contact_kdtree<NoFriction>, vap>,
+                                                      solver_t<dim, NoFriction, contact_brute_force, vap>>;
 
     template<std::size_t dim, class vap>
-    using solver_dry_with_friction_t = std::tuple<ScopiSolver<dim, OptimMosek<DryWithFriction>, contact_kdtree, vap>,
-                                                  ScopiSolver<dim, OptimMosek<DryWithFriction>, contact_brute_force, vap>>;
+    using solver_dry_with_friction_t = std::tuple<ScopiSolver<dim, Friction, OptimGradient<apgd>, contact_kdtree, vap>,
+                                                  ScopiSolver<dim, Friction, OptimGradient<apgd>, contact_brute_force, vap>>;
 
 
 
@@ -146,7 +143,7 @@ namespace scopi
     _doctest_subcase_idx = 0;
 // }
 #define TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact, vap) \
-    TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::solver<scopi::problem>, scopi::contact, scopi::vap>)
+    TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::problem, scopi::OptimGradient<scopi::apgd>, scopi::contact, scopi::vap>)
 #define TYPE_TO_STRING_CONTACTS_VAP(solver, problem, dim)\
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fixed); \
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fpd); \
@@ -161,7 +158,7 @@ namespace scopi
 //     TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_brute_force, vap_fixed); \
 //     TYPE_TO_STRING_ONE_SOLVER_PROJECTED_GRADIENT(solver, problem, projection, dim, contact_brute_force, vap_fpd);
 
-TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, DryWithoutFriction, 2)
+// TYPE_TO_STRING_CONTACTS_VAP(OptimMosek, DryWithoutFriction, 2)
 // TYPE_TO_STRING_CONTACTS_VAP(OptimScs, DryWithoutFriction, 2)
 // #ifdef SCOPI_USE_MKL
 // TYPE_TO_STRING_CONTACTS_VAP(OptimUzawaMkl, DryWithoutFriction, 2)

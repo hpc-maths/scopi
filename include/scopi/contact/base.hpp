@@ -32,9 +32,9 @@ namespace scopi
         {
         }
 
-        void init_options(CLI::App& app)
+        void init_options()
         {
-            m_params.init_options(app);
+            m_params.init_options();
         }
 
         /**
@@ -46,7 +46,7 @@ namespace scopi
          *
          * @return Array of neighbors.
          */
-        template <class problem_t, std::size_t dim>
+        template <std::size_t dim>
         auto run(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
 
         /**
@@ -58,7 +58,7 @@ namespace scopi
          *
          * @return Array of neighbors.
          */
-        template <class problem_t, std::size_t dim>
+        template <std::size_t dim>
         auto run(scopi_container<dim>& particles, std::size_t active_ptr);
 
         params_t& get_params();
@@ -69,17 +69,17 @@ namespace scopi
     };
 
     template <class D>
-    template <class problem_t, std::size_t dim>
+    template <std::size_t dim>
     auto contact_base<D>::run(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
-        return this->derived_cast().template run_impl<problem_t>(box, particles, active_ptr);
+        return this->derived_cast().run_impl(box, particles, active_ptr);
     }
 
     template <class D>
-    template <class problem_t, std::size_t dim>
+    template <std::size_t dim>
     auto contact_base<D>::run(scopi_container<dim>& particles, std::size_t active_ptr)
     {
-        return this->derived_cast().template run_impl<problem_t>(BoxDomain<dim>(), particles, active_ptr);
+        return this->derived_cast().run_impl(BoxDomain<dim>(), particles, active_ptr);
     }
 
     template <class D>
@@ -93,18 +93,20 @@ namespace scopi
      *
      * @tparam dim Dimension (2 or 3).
      * @param particles [in] Array of particles.
+     * @param contacts [inout] Array of neighbors, if the distance between the two particles is small enough, add a neighbor in this array.
+     * @param dmax [in] Maximum distance to consider two particles to be neighbors.
      * @param i [in] Index of the first particle.
      * @param j [in] Index of the second particle.
-     * @param contacts [out] Array of neighbors, if the distance between the two particles is small enough, add a neighbor in this array.
-     * @param dmax [in] Maximum distance to consider two particles to be neighbors.
+     * @param default_contact_property [in] Default contact property.
      */
     template <class problem_t, std::size_t dim>
     void compute_exact_distance(const BoxDomain<dim>& box,
                                 scopi_container<dim>& particles,
+                                std::vector<neighbor<dim, problem_t>>& contacts,
+                                double dmax,
                                 std::size_t i,
                                 std::size_t j,
-                                std::vector<neighbor<dim, problem_t>>& contacts,
-                                double dmax)
+                                contact_property<problem_t>& default_contact_property)
     {
         std::size_t o1 = particles.object_index(i);
         std::size_t o2 = particles.object_index(j);
@@ -114,8 +116,9 @@ namespace scopi
 
         if (neigh.dij < dmax && (i < particles.periodic_ptr() || j < particles.periodic_ptr()))
         {
-            neigh.i = (i < particles.periodic_ptr()) ? i : particles.periodic_index(i - particles.periodic_ptr());
-            neigh.j = (j < particles.periodic_ptr()) ? j : particles.periodic_index(j - particles.periodic_ptr());
+            neigh.i        = (i < particles.periodic_ptr()) ? i : particles.periodic_index(i - particles.periodic_ptr());
+            neigh.j        = (j < particles.periodic_ptr()) ? j : particles.periodic_index(j - particles.periodic_ptr());
+            neigh.property = default_contact_property;
 
             for (std::size_t d = 0; d < dim; ++d)
             {

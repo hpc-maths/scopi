@@ -2,6 +2,7 @@
 #include "utils.hpp"
 
 #include <scopi/contact/contact_brute_force.hpp>
+#include <scopi/contact/property.hpp>
 #include <scopi/container.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/objects/types/superellipsoid.hpp>
@@ -33,11 +34,9 @@ namespace scopi
         particles.push_back(s2);
         particles.push_back(s3);
 
-        ContactsParams<contact_brute_force> params;
+        ContactsParams<contact_brute_force<NoFriction>> params;
         contact_brute_force cont(params);
-        auto contacts = cont.run<Viscous>(particles, 0);
-
-        std::cout << contacts[0] << std::endl;
+        auto contacts = cont.run(particles, 0);
 
         SUBCASE("nbContacts")
         {

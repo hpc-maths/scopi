@@ -186,6 +186,8 @@ namespace scopi
 
         SolverType solver(particles, dt);
         set_params(solver, total_it);
+        auto params = solver.get_params();
+        params.solver_params.output_frequency = 1;
         solver.run(total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));

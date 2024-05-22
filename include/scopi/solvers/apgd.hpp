@@ -8,6 +8,8 @@
 #include <xtensor/xnorm.hpp>
 #include <xtensor/xtensor.hpp>
 
+#include "../scopi.hpp"
+
 namespace scopi
 {
 
@@ -16,9 +18,10 @@ namespace scopi
 
     struct pgd_params
     {
-        void init_options(CLI::App& app)
+        void init_options()
         {
-            auto opt = app.add_option_group("PGD options");
+            auto& app = get_app();
+            auto opt  = app.add_option_group("PGD options");
             opt->add_option("--pgd-alpha", alpha, "descent coefficient")->capture_default_str();
             opt->add_option("--pgd-max-ite", max_ite, "Maximum number of iterations")->capture_default_str();
             opt->add_option("--pgd-tolerance", tolerance, "Tolerance")->capture_default_str();
@@ -40,9 +43,9 @@ namespace scopi
         {
         }
 
-        void init_options(CLI::App& app)
+        void init_options()
         {
-            m_params.init_options(app);
+            m_params.init_options();
         }
 
         params_t& get_params()
@@ -91,9 +94,10 @@ namespace scopi
 
     struct apgd_params
     {
-        void init_options(CLI::App& app)
+        void init_options()
         {
-            auto opt = app.add_option_group("APGD options");
+            auto& app = get_app();
+            auto opt  = app.add_option_group("APGD options");
             opt->add_option("--apgd-alpha", alpha, "descent coefficient")->capture_default_str();
             opt->add_option("--apgd-max-ite", max_ite, "Maximum number of iterations")->capture_default_str();
             opt->add_option("--apgd-tolerance", tolerance, "Tolerance")->capture_default_str();
@@ -117,9 +121,9 @@ namespace scopi
         {
         }
 
-        void init_options(CLI::App& app)
+        void init_options()
         {
-            m_params.init_options(app);
+            m_params.init_options();
         }
 
         params_t& get_params()
@@ -154,8 +158,8 @@ namespace scopi
 
                 if (m_params.dynamic_descent)
                 {
-                    while (min_p(lambda_np1)
-                           >= min_p(y_n) + xt::linalg::dot(dG, lambda_np1 - y_n)[0] + 0.5 * lipsch * std::pow(xt::norm_l2(lambda_np1 - y_n)[0],2))
+                    while (min_p(lambda_np1) >= min_p(y_n) + xt::linalg::dot(dG, lambda_np1 - y_n)[0]
+                                                    + 0.5 * lipsch * std::pow(xt::norm_l2(lambda_np1 - y_n)[0], 2))
                     {
                         lipsch *= 2;
                         alpha                   = 1. / lipsch;

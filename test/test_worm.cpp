@@ -12,15 +12,15 @@
 
 namespace scopi
 {
-    template <class solver_t>
-    void set_params_test(OptimParams<solver_t>&)
+    template <class params_t>
+    void set_params_test(params_t&)
     {}
 
-    template <>
-    void set_params_test<OptimMosek<DryWithoutFriction>>(OptimParams<OptimMosek<DryWithoutFriction>>& params)
-    {
-        params.change_default_tol_mosek = false;
-    }
+    // template <>
+    // void set_params_test<OptimMosek<DryWithoutFriction>>(OptimParams<OptimMosek<DryWithoutFriction>>& params)
+    // {
+    //     params.change_default_tol_mosek = false;
+    // }
 
     TEST_CASE("Worm 2D")
     {

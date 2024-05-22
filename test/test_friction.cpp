@@ -30,7 +30,7 @@ namespace scopi {
 
         SolverType solver(particles, dt);
         auto params = solver.get_params();
-        params.problem_params.mu = mu;
+        // params.contact_params.mu = mu;
         params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
@@ -75,7 +75,7 @@ namespace scopi {
 
         SolverType solver(particles, dt);
         auto params = solver.get_params();
-        params.problem_params.mu = mu;
+        // params.contact_params.mu = mu;
         params.solver_params.output_frequency = total_it-1;
         solver.run(total_it);
 
@@ -117,7 +117,7 @@ namespace scopi {
 
         SolverType solver(particles, dt);
         auto params = solver.get_params();
-        params.problem_params.mu = mu;
+        // params.contact_params.mu = mu;
         params.solver_params.output_frequency = std::size_t(-1);
         solver.run(total_it);
 
