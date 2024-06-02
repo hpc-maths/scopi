@@ -2,4 +2,3 @@ npm install
 puis
 node main.js
 enfin ouvrir http://localhost:8080/ avec firefox...
-

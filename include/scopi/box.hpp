@@ -7,7 +7,8 @@ namespace scopi
     template <std::size_t dim>
     class BoxDomain
     {
-    public:
+      public:
+
         BoxDomain();
         BoxDomain(const std::array<double, dim>& min_corner, const std::array<double, dim>& max_corner);
 
@@ -24,7 +25,8 @@ namespace scopi
         double lower_bound(std::size_t axis) const;
         double upper_bound(std::size_t axis) const;
 
-    private:
+      private:
+
         std::array<double, dim> m_min_corner;
         std::array<double, dim> m_max_corner;
         std::array<bool, dim> m_periodic;
@@ -38,8 +40,8 @@ namespace scopi
 
     template <std::size_t dim>
     BoxDomain<dim>::BoxDomain(const std::array<double, dim>& min_corner, const std::array<double, dim>& max_corner)
-    : m_min_corner(min_corner)
-    , m_max_corner(max_corner)
+        : m_min_corner(min_corner)
+        , m_max_corner(max_corner)
     {
         m_periodic.fill(false);
     }
@@ -54,14 +56,14 @@ namespace scopi
     template <std::size_t dim>
     BoxDomain<dim>& BoxDomain<dim>::with_periodicity(std::size_t axis)
     {
-        m_periodic[axis]=true;
+        m_periodic[axis] = true;
         return *this;
     }
 
     template <std::size_t dim>
     BoxDomain<dim>& BoxDomain<dim>::with_periodicity(const std::initializer_list<::size_t>& axis)
     {
-        for(auto a: axis)
+        for (auto a : axis)
         {
             m_periodic[a] = true;
         }
@@ -72,7 +74,6 @@ namespace scopi
     const std::array<bool, dim>& BoxDomain<dim>::is_periodic() const
     {
         return m_periodic;
-
     }
 
     template <std::size_t dim>
@@ -86,7 +87,6 @@ namespace scopi
     {
         return m_min_corner;
     }
-
 
     template <std::size_t dim>
     const std::array<double, dim>& BoxDomain<dim>::max_corner() const

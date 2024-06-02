@@ -5,8 +5,8 @@
 #include <xtensor/xio.hpp>
 #include <xtensor/xview.hpp>
 
-#include "base.hpp"
 #include "../../quaternion.hpp"
+#include "base.hpp"
 
 namespace scopi
 {
@@ -20,10 +20,10 @@ namespace scopi
      * @tparam dim Dimension (2 or 3).
      * @tparam owner
      */
-    template<std::size_t dim, bool owner=true>
-    class plan: public object<dim, owner>
+    template <std::size_t dim, bool owner = true>
+    class plan : public object<dim, owner>
     {
-    public:
+      public:
 
         /**
          * @brief Alias for the base class object.
@@ -44,7 +44,7 @@ namespace scopi
          * @param pos [in] Position of a point in the plane.
          * @param angle [in] Angle of the rotation.
          */
-        plan(position_type pos, double angle=0);
+        plan(position_type pos, double angle = 0);
         /**
          * @brief Constructor with given rotation.
          *
@@ -58,24 +58,24 @@ namespace scopi
          */
         auto rotation() const;
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @param b
          *
-         * @return 
+         * @return
          */
         auto point(const double b) const; // dim = 2
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
          * @param a
          * @param b
          *
-         * @return 
+         * @return
          */
         auto point(const double a, const double b) const; // dim = 3
         /**
@@ -83,11 +83,11 @@ namespace scopi
          */
         auto normal() const;
         /**
-         * @brief 
+         * @brief
          *
          * \todo Write documentation.
          *
-         * @return 
+         * @return
          */
         virtual std::unique_ptr<base_constructor<dim>> construct() const override;
         /**
@@ -99,12 +99,12 @@ namespace scopi
          */
         virtual std::size_t hash() const override;
 
-    private:
+      private:
 
         /**
          * @brief Create the hash of the plane.
          *
-         * Two planes with the same dimension have the same hash. 
+         * Two planes with the same dimension have the same hash.
          */
         void create_hash();
 
@@ -117,52 +117,52 @@ namespace scopi
     /////////////////////////
     // plan implementation //
     /////////////////////////
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     plan<dim, owner>::plan(position_type pos, double angle)
-    : base_type(pos, {quaternion(angle)}, 1)
+        : base_type(pos, {quaternion(angle)}, 1)
     {
         create_hash();
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     auto plan<dim, owner>::rotation() const
     {
         return rotation_matrix<dim>(this->q());
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     plan<dim, owner>::plan(position_type pos, quaternion_type q)
-    : base_type(pos, q, 1)
+        : base_type(pos, q, 1)
     {
         create_hash();
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     auto plan<dim, owner>::normal() const
     {
         auto rotation = rotation_matrix<dim>(this->q(0));
         return xt::eval(xt::view(rotation, xt::all(), 0));
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     std::unique_ptr<base_constructor<dim>> plan<dim, owner>::construct() const
     {
         return make_object_constructor<plan<dim, false>>();
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     void plan<dim, owner>::print() const
     {
         std::cout << "plan<" << dim << ">()\n";
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     std::size_t plan<dim, owner>::hash() const
     {
         return m_hash;
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     void plan<dim, owner>::create_hash()
     {
         std::stringstream ss;
@@ -170,22 +170,22 @@ namespace scopi
         m_hash = std::hash<std::string>{}(ss.str());
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     auto plan<dim, owner>::point(const double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = 0;
         pt(1) = b;
-        return xt::flatten(xt::eval(xt::linalg::dot(rotation_matrix<dim>(this->q()),pt) + this->pos()));
+        return xt::flatten(xt::eval(xt::linalg::dot(rotation_matrix<dim>(this->q()), pt) + this->pos()));
     }
 
-    template<std::size_t dim, bool owner>
+    template <std::size_t dim, bool owner>
     auto plan<dim, owner>::point(const double a, const double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = 0;
         pt(1) = a;
         pt(2) = b;
-        return xt::flatten(xt::eval(xt::linalg::dot(rotation_matrix<dim>(this->q()),pt) + this->pos()));
+        return xt::flatten(xt::eval(xt::linalg::dot(rotation_matrix<dim>(this->q()), pt) + this->pos()));
     }
 }

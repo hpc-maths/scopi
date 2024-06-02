@@ -1,9 +1,9 @@
 #include "doctest/doctest.h"
 #include "utils.hpp"
 
+#include <scopi/container.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/objects/types/superellipsoid.hpp>
-#include <scopi/container.hpp>
 
 #include <scopi/vap/vap_fpd.hpp>
 
@@ -12,21 +12,37 @@ namespace scopi
     TEST_CASE("Container 2d")
     {
         static constexpr std::size_t dim = 2;
-        superellipsoid<dim> s1({{-0.2, 0.1}}, {quaternion(PI/3)}, {{.2, .05}}, 1);
-        sphere<dim> s2({{ 0.2,  0.05}}, {quaternion(PI/2)}, 0.1);
-        auto p = property<dim>().omega(PI/3)
-                                .desired_omega(PI/12);
+        superellipsoid<dim> s1(
+            {
+                {-0.2, 0.1}
+        },
+            {quaternion(PI / 3)},
+            {{.2, .05}},
+            1);
+        sphere<dim> s2(
+            {
+                {0.2, 0.05}
+        },
+            {quaternion(PI / 2)},
+            0.1);
+        auto p = property<dim>().omega(PI / 3).desired_omega(PI / 12);
         scopi_container<dim> particles;
-        particles.push_back(s1, p.velocity({{0.1, 0.2}})
-                                   .desired_velocity({{0.01, 0.02}})
-                                   .force({{1., 2.}})
-                                   .mass(1.)
-                                   .moment_inertia(0.1));
-        particles.push_back(s2, p.velocity({{0.4, 0.5}})
-                                   .desired_velocity({{0.04, 0.05}})
-                                   .force({{4., 5.}})
-                                   .mass(2.)
-                                   .moment_inertia(0.3));
+        particles.push_back(s1,
+                            p.velocity({
+                                           {0.1, 0.2}
+        })
+                                .desired_velocity({{0.01, 0.02}})
+                                .force({{1., 2.}})
+                                .mass(1.)
+                                .moment_inertia(0.1));
+        particles.push_back(s2,
+                            p.velocity({
+                                           {0.4, 0.5}
+        })
+                                .desired_velocity({{0.04, 0.05}})
+                                .force({{4., 5.}})
+                                .mass(2.)
+                                .moment_inertia(0.3));
 
         SUBCASE("size")
         {
@@ -45,14 +61,14 @@ namespace scopi
         SUBCASE("q")
         {
             auto q = particles.q();
-            REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(3.)/2.));
+            REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(3.) / 2.));
             REQUIRE(q(0)(1) == doctest::Approx(0.));
             REQUIRE(q(0)(2) == doctest::Approx(0.));
-            REQUIRE(q(0)(3) == doctest::Approx(1./2.));
-            REQUIRE(q(1)(0) == doctest::Approx(std::sqrt(2.)/2.));
+            REQUIRE(q(0)(3) == doctest::Approx(1. / 2.));
+            REQUIRE(q(1)(0) == doctest::Approx(std::sqrt(2.) / 2.));
             REQUIRE(q(1)(1) == doctest::Approx(0.));
             REQUIRE(q(1)(2) == doctest::Approx(0.));
-            REQUIRE(q(1)(3) == doctest::Approx(std::sqrt(2.)/2.));
+            REQUIRE(q(1)(3) == doctest::Approx(std::sqrt(2.) / 2.));
         }
 
         SUBCASE("f")
@@ -89,15 +105,15 @@ namespace scopi
         SUBCASE("omega")
         {
             auto omega = particles.omega();
-            REQUIRE(omega(0) == doctest::Approx(PI/3.));
-            REQUIRE(omega(1) == doctest::Approx(PI/3.));
+            REQUIRE(omega(0) == doctest::Approx(PI / 3.));
+            REQUIRE(omega(1) == doctest::Approx(PI / 3.));
         }
 
         SUBCASE("desired_omega")
         {
             auto desired_omega = particles.desired_omega();
-            REQUIRE(desired_omega(0) == doctest::Approx(PI/12.));
-            REQUIRE(desired_omega(1) == doctest::Approx(PI/12.));
+            REQUIRE(desired_omega(0) == doctest::Approx(PI / 12.));
+            REQUIRE(desired_omega(1) == doctest::Approx(PI / 12.));
         }
 
         SUBCASE("vd")
@@ -123,22 +139,50 @@ namespace scopi
     TEST_CASE("Container 3d")
     {
         static constexpr std::size_t dim = 3;
-        superellipsoid<dim> s1({{-0.2, 0.1, 0.}}, {quaternion(PI/3)}, {{.2, .05, 0.01}}, {{1, 1}});
-        sphere<dim> s2({{ 0.2,  0.05, 0.}}, {quaternion(PI/2)}, 0.1);
-        auto p = property<dim>().omega({{PI/3, PI/4, PI/5}})
-                                .desired_omega({{PI/12, PI/15, PI/18}});
+        superellipsoid<dim> s1(
+            {
+                {-0.2, 0.1, 0.}
+        },
+            {quaternion(PI / 3)},
+            {{.2, .05, 0.01}},
+            {{1, 1}});
+        sphere<dim> s2(
+            {
+                {0.2, 0.05, 0.}
+        },
+            {quaternion(PI / 2)},
+            0.1);
+        auto p = property<dim>()
+                     .omega({
+                         {PI / 3, PI / 4, PI / 5}
+        })
+                     .desired_omega({{PI / 12, PI / 15, PI / 18}});
         scopi_container<dim> particles;
-        particles.push_back(s1, p.velocity({{0.1, 0.2, 0.3}})
-                                   .desired_velocity({{0.01, 0.02, 0.03}})
-                                   .force({{1., 2., 3,}})
-                                   .mass(1.)
-                                   .moment_inertia({{0.1, 0.2, 0.3}}));
+        particles.push_back(s1,
+                            p.velocity({
+                                           {0.1, 0.2, 0.3}
+        })
+                                .desired_velocity({{0.01, 0.02, 0.03}})
+                                .force({{
+                                    1.,
+                                    2.,
+                                    3,
+                                }})
+                                .mass(1.)
+                                .moment_inertia({{0.1, 0.2, 0.3}}));
 
-        particles.push_back(s2, p.velocity({{0.4, 0.5, 0.6}})
-                                   .desired_velocity({{0.04, 0.05, 0.06}})
-                                   .force({{4., 5., 6,}})
-                                   .mass(2.)
-                                   .moment_inertia({0.1, 0.1, 0.1}));
+        particles.push_back(s2,
+                            p.velocity({
+                                           {0.4, 0.5, 0.6}
+        })
+                                .desired_velocity({{0.04, 0.05, 0.06}})
+                                .force({{
+                                    4.,
+                                    5.,
+                                    6,
+                                }})
+                                .mass(2.)
+                                .moment_inertia({0.1, 0.1, 0.1}));
 
         SUBCASE("size")
         {
@@ -159,14 +203,14 @@ namespace scopi
         SUBCASE("q")
         {
             auto q = particles.q();
-            REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(3.)/2.));
+            REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(3.) / 2.));
             REQUIRE(q(0)(1) == doctest::Approx(0.));
             REQUIRE(q(0)(2) == doctest::Approx(0.));
-            REQUIRE(q(0)(3) == doctest::Approx(1./2.));
-            REQUIRE(q(1)(0) == doctest::Approx(std::sqrt(2.)/2.));
+            REQUIRE(q(0)(3) == doctest::Approx(1. / 2.));
+            REQUIRE(q(1)(0) == doctest::Approx(std::sqrt(2.) / 2.));
             REQUIRE(q(1)(1) == doctest::Approx(0.));
             REQUIRE(q(1)(2) == doctest::Approx(0.));
-            REQUIRE(q(1)(3) == doctest::Approx(std::sqrt(2.)/2.));
+            REQUIRE(q(1)(3) == doctest::Approx(std::sqrt(2.) / 2.));
         }
 
         SUBCASE("f")
@@ -212,23 +256,23 @@ namespace scopi
         SUBCASE("omega")
         {
             auto omega = particles.omega();
-            REQUIRE(omega(0)[0] == doctest::Approx(PI/3.));
-            REQUIRE(omega(0)[1] == doctest::Approx(PI/4.));
-            REQUIRE(omega(0)[2] == doctest::Approx(PI/5.));
-            REQUIRE(omega(1)[0] == doctest::Approx(PI/3.));
-            REQUIRE(omega(1)[1] == doctest::Approx(PI/4.));
-            REQUIRE(omega(1)[2] == doctest::Approx(PI/5.));
+            REQUIRE(omega(0)[0] == doctest::Approx(PI / 3.));
+            REQUIRE(omega(0)[1] == doctest::Approx(PI / 4.));
+            REQUIRE(omega(0)[2] == doctest::Approx(PI / 5.));
+            REQUIRE(omega(1)[0] == doctest::Approx(PI / 3.));
+            REQUIRE(omega(1)[1] == doctest::Approx(PI / 4.));
+            REQUIRE(omega(1)[2] == doctest::Approx(PI / 5.));
         }
 
         SUBCASE("desired_omega")
         {
             auto desired_omega = particles.desired_omega();
-            REQUIRE(desired_omega(0)[0] == doctest::Approx(PI/12.));
-            REQUIRE(desired_omega(0)[1] == doctest::Approx(PI/15.));
-            REQUIRE(desired_omega(0)[2] == doctest::Approx(PI/18.));
-            REQUIRE(desired_omega(1)[0] == doctest::Approx(PI/12.));
-            REQUIRE(desired_omega(1)[1] == doctest::Approx(PI/15.));
-            REQUIRE(desired_omega(1)[2] == doctest::Approx(PI/18.));
+            REQUIRE(desired_omega(0)[0] == doctest::Approx(PI / 12.));
+            REQUIRE(desired_omega(0)[1] == doctest::Approx(PI / 15.));
+            REQUIRE(desired_omega(0)[2] == doctest::Approx(PI / 18.));
+            REQUIRE(desired_omega(1)[0] == doctest::Approx(PI / 12.));
+            REQUIRE(desired_omega(1)[1] == doctest::Approx(PI / 15.));
+            REQUIRE(desired_omega(1)[2] == doctest::Approx(PI / 18.));
         }
 
         SUBCASE("vd")
@@ -253,9 +297,9 @@ namespace scopi
         SUBCASE("moments fpd superellipsoid")
         {
             auto cross_product_superellipsoid = cross_product_vap_fpd(particles, 0);
-            REQUIRE(cross_product_superellipsoid(0) == doctest::Approx(PI*PI/20.*0.1));
-            REQUIRE(cross_product_superellipsoid(1) == doctest::Approx(-PI*PI/15.*0.2));
-            REQUIRE(cross_product_superellipsoid(2) == doctest::Approx(PI*PI/12.*0.1));
+            REQUIRE(cross_product_superellipsoid(0) == doctest::Approx(PI * PI / 20. * 0.1));
+            REQUIRE(cross_product_superellipsoid(1) == doctest::Approx(-PI * PI / 15. * 0.2));
+            REQUIRE(cross_product_superellipsoid(2) == doctest::Approx(PI * PI / 12. * 0.1));
         }
     }
 }

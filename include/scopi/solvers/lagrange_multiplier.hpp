@@ -54,7 +54,7 @@ namespace scopi
         LagrangeMultiplier(const Contacts& contacts, double)
             : base(contacts)
         {
-            m_S_Vector = xt::zeros<double>({size()});
+            m_S_Vector    = xt::zeros<double>({size()});
             m_local_work  = xt::zeros<double>({size()});
             m_global_work = xt::zeros<double>({3 * contacts.size()});
         }
@@ -95,6 +95,7 @@ namespace scopi
         {
             return this->m_contacts.size();
         }
+
         const auto& S_Vector() const
         {
             return m_S_Vector;
@@ -265,13 +266,15 @@ namespace scopi
                 }
             }
         }
-        private:
+
+      private:
 
         xt::xtensor<double, 1> m_S_Vector;
     };
 
     template <std::size_t dim_, class Contacts>
-    class LagrangeMultiplier<dim_, FrictionFixedPoint, Contacts> : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, FrictionFixedPoint, Contacts>>
+    class LagrangeMultiplier<dim_, FrictionFixedPoint, Contacts>
+        : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, FrictionFixedPoint, Contacts>>
     {
       public:
 
@@ -286,9 +289,8 @@ namespace scopi
             for (std::size_t i = 0, row = 0; i < this->m_contacts.size(); ++i, row += 3)
             {
                 auto S_i = xt::view(m_S_Vector, xt::range(row, row + dim));
-                S_i = this->m_contacts[i].sij * this->m_contacts[i].nij;
+                S_i      = this->m_contacts[i].sij * this->m_contacts[i].nij;
             }
-
         }
 
         auto global2local(const xt::xtensor<double, 1>& x) const
@@ -337,13 +339,15 @@ namespace scopi
                 }
             }
         }
-        private:
+
+      private:
 
         xt::xtensor<double, 1> m_S_Vector;
     };
 
     template <std::size_t dim_, class Contacts>
-    class LagrangeMultiplier<dim_, ViscousFriction, Contacts> : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, ViscousFriction, Contacts>>
+    class LagrangeMultiplier<dim_, ViscousFriction, Contacts>
+        : public LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, ViscousFriction, Contacts>>
     {
       public:
 
@@ -359,7 +363,7 @@ namespace scopi
             {
                 if (this->m_contacts[i].property.gamma < -this->m_contacts[i].property.gamma_tol)
                 {
-                    if(this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
+                    if (this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
                     {
                         m_size += 2;
                     }
@@ -373,20 +377,20 @@ namespace scopi
                     ++m_size;
                 }
             }
-            m_S_Vector = xt::zeros<double>({size()});
+            m_S_Vector      = xt::zeros<double>({size()});
             std::size_t row = 0;
             for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
             {
                 if (this->m_contacts[i].property.gamma < -this->m_contacts[i].property.gamma_tol)
                 {
-                    if(this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
+                    if (this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
                     {
                         row += 2;
                     }
                     else
                     {
-                        auto S_i = xt::view(m_S_Vector, xt::range(row+1, row+1 + dim));
-                        S_i = dt*this->m_contacts[i].property.mu*this->m_contacts[i].sij * this->m_contacts[i].nij;
+                        auto S_i = xt::view(m_S_Vector, xt::range(row + 1, row + 1 + dim));
+                        S_i      = dt * this->m_contacts[i].property.mu * this->m_contacts[i].sij * this->m_contacts[i].nij;
                         row += 4;
                     }
                 }
@@ -395,29 +399,28 @@ namespace scopi
                     ++row;
                 }
             }
-
         }
 
         auto global2local(const xt::xtensor<double, 1>& x) const
         {
             assert(x.size() == 3 * this->m_contacts.size());
             xt::xtensor<double, 1> out = xt::zeros<double>({size()});
-            std::size_t row = 0;
+            std::size_t row            = 0;
             for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
             {
                 if (this->m_contacts[i].property.gamma < -this->m_contacts[i].property.gamma_tol)
                 {
-                    if(this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
+                    if (this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
                     {
-                        out[row]   =  xt::linalg::dot(xt::view(x, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
-                        out[row+1] = -xt::linalg::dot(xt::view(x, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
-                        row+=2;
+                        out[row]     = xt::linalg::dot(xt::view(x, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
+                        out[row + 1] = -xt::linalg::dot(xt::view(x, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
+                        row += 2;
                     }
                     else
                     {
                         out[row] = -xt::linalg::dot(xt::view(x, xt::range(3 * i, 3 * i + dim)), this->m_contacts[i].nij)[0];
-                        xt::view(out, xt::range(row+1, row+1+dim)) = xt::view(x, xt::range(3 * i, 3 * i + dim));
-                        row +=4;
+                        xt::view(out, xt::range(row + 1, row + 1 + dim)) = xt::view(x, xt::range(3 * i, 3 * i + dim));
+                        row += 4;
                     }
                 }
                 else
@@ -433,20 +436,21 @@ namespace scopi
         {
             assert(x.size() == size());
             xt::xtensor<double, 1> out = xt::zeros<double>({3 * this->m_contacts.size()});
-            std::size_t row = 0;
+            std::size_t row            = 0;
             for (std::size_t i = 0; i < this->m_contacts.size(); ++i)
             {
                 if (this->m_contacts[i].property.gamma < -this->m_contacts[i].property.gamma_tol)
                 {
-                    if(this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
+                    if (this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
                     {
-                        xt::view(out, xt::range(3 * i, 3 * i + dim)) = (x[row] - x[row+1]) * this->m_contacts[i].nij;
-                        row +=2;
+                        xt::view(out, xt::range(3 * i, 3 * i + dim)) = (x[row] - x[row + 1]) * this->m_contacts[i].nij;
+                        row += 2;
                     }
                     else
                     {
-                         xt::view(out, xt::range(3 * i, 3 * i + dim)) = (- x[row]) * this->m_contacts[i].nij + xt::view(x, xt::range(row+1, row+1+dim)) ;
-                         row+=4;
+                        xt::view(out, xt::range(3 * i, 3 * i + dim)) = (-x[row]) * this->m_contacts[i].nij
+                                                                     + xt::view(x, xt::range(row + 1, row + 1 + dim));
+                        row += 4;
                     }
                 }
                 else
@@ -476,22 +480,22 @@ namespace scopi
             {
                 if (this->m_contacts[i].property.gamma < -this->m_contacts[i].property.gamma_tol)
                 {
-                    if(this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
+                    if (this->m_contacts[i].property.gamma != this->m_contacts[i].property.gamma_min)
                     {
                         auto lambda_visqu = xt::view(lambda, xt::range(row, row + 2));
-                        lambda_visqu = xt::maximum(lambda_visqu, 0.);
-                        row +=2;
+                        lambda_visqu      = xt::maximum(lambda_visqu, 0.);
+                        row += 2;
                     }
                     else
                     {
-                        auto lambda_i =  xt::view(lambda, xt::range(row, row + 1 + dim));
-                        auto lambda_f_i = xt::view(lambda, xt::range(row + 1, row+ 1 + dim));
-                        auto lambda_n = xt::linalg::dot(lambda_f_i, this->m_contacts[i].nij)[0];
-                        auto lambda_t = xt::eval(lambda_f_i - lambda_n * this->m_contacts[i].nij);
-                        auto norm     = xt::norm_l2(lambda_t)[0];
-                        double mu     = this->m_contacts[i].property.mu;
-                        xt::xtensor<double, 1> lambda_proj_fric = xt::zeros<double>({1+dim});
-                        auto lambda_fproj = xt::view(lambda_proj_fric, xt::range(1, 1+dim));
+                        auto lambda_i                           = xt::view(lambda, xt::range(row, row + 1 + dim));
+                        auto lambda_f_i                         = xt::view(lambda, xt::range(row + 1, row + 1 + dim));
+                        auto lambda_n                           = xt::linalg::dot(lambda_f_i, this->m_contacts[i].nij)[0];
+                        auto lambda_t                           = xt::eval(lambda_f_i - lambda_n * this->m_contacts[i].nij);
+                        auto norm                               = xt::norm_l2(lambda_t)[0];
+                        double mu                               = this->m_contacts[i].property.mu;
+                        xt::xtensor<double, 1> lambda_proj_fric = xt::zeros<double>({1 + dim});
+                        auto lambda_fproj                       = xt::view(lambda_proj_fric, xt::range(1, 1 + dim));
                         if (norm > mu * lambda_n)
                         {
                             if (lambda_n <= -mu * norm)
@@ -511,9 +515,9 @@ namespace scopi
                             lambda_fproj = lambda_f_i;
                         }
 
-                        xt::xtensor<double, 1> lambda_proj_moins = xt::zeros<double>({1+dim});
-                        lambda_proj_moins[0] = std::max(lambda[row], 0.);
-                        if(xt::norm_l2(xt::eval(lambda_proj_fric-lambda_i))[0]<xt::norm_l2(xt::eval(lambda_proj_moins-lambda_i))[0])
+                        xt::xtensor<double, 1> lambda_proj_moins = xt::zeros<double>({1 + dim});
+                        lambda_proj_moins[0]                     = std::max(lambda[row], 0.);
+                        if (xt::norm_l2(xt::eval(lambda_proj_fric - lambda_i))[0] < xt::norm_l2(xt::eval(lambda_proj_moins - lambda_i))[0])
                         {
                             lambda_i = lambda_proj_fric;
                         }
@@ -521,7 +525,7 @@ namespace scopi
                         {
                             lambda_i = lambda_proj_moins;
                         }
-                        row+=4;
+                        row += 4;
                     }
                 }
                 else
@@ -531,17 +535,17 @@ namespace scopi
                 }
             }
         }
-        private:
+
+      private:
+
         std::size_t m_size;
         xt::xtensor<double, 1> m_S_Vector;
     };
-
 
     template <std::size_t dim, class Type, class Contacts>
     auto make_lagrange_multplier(const Contacts& contacts, double dt)
     {
         return LagrangeMultiplier<dim, Type, Contacts>(contacts, dt);
     }
-
 
 }

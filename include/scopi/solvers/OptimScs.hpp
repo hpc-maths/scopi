@@ -3,12 +3,12 @@
 #ifdef SCOPI_USE_SCS
 #include <scs.h>
 
-#include "OptimBase.hpp"
 #include "../problems/DryWithoutFriction.hpp"
+#include "OptimBase.hpp"
 
 namespace scopi
 {
-    template<class problem_t>
+    template <class problem_t>
     class OptimScs;
 
     /**
@@ -19,7 +19,7 @@ namespace scopi
      *
      * @tparam problem_t Problem to be solved.
      */
-    template<class problem_t>
+    template <class problem_t>
     struct OptimParams<OptimScs<problem_t>>
     {
         /**
@@ -62,15 +62,17 @@ namespace scopi
      * @tparam problem_t Problem to be solved.
      */
     template <class problem_t = DryWithoutFriction>
-    class OptimScs: public OptimBase<OptimScs<problem_t>, problem_t>
+    class OptimScs : public OptimBase<OptimScs<problem_t>, problem_t>
     {
-    private:
+      private:
+
         /**
          * @brief Alias for the base class OptimBase
          */
         using base_type = OptimBase<OptimScs<problem_t>, problem_t>;
 
-    protected:
+      protected:
+
         /**
          * @brief Constructor.
          *
@@ -84,11 +86,10 @@ namespace scopi
          * @param problem_params [in] Parameters for the problem.
          */
         template <std::size_t dim>
-        OptimScs(std::size_t nparts,
-                 double dt,
-                 const scopi_container<dim>& particles);
+        OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles);
 
-    public:
+      public:
+
         /**
          * @brief Solve the optimization problem.
          *
@@ -99,10 +100,10 @@ namespace scopi
          * @return Number of iterations SCS' solver needed to converge.
          */
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts);
+        int solve_optimization_problem_impl(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts);
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns
+         * the velocities solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -110,7 +111,8 @@ namespace scopi
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns
+         * the rotations solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -139,7 +141,8 @@ namespace scopi
          */
         int get_nb_active_contacts_impl() const;
 
-    private:
+      private:
+
         /**
          * @brief Convert a matrix stored in COO format to CSR format.
          *
@@ -154,14 +157,19 @@ namespace scopi
          * @param csr_cols [out] Column's indicies of the CSR storage.
          * @param csr_vals [out] Values of the CSR storage.
          */
-        void coo_to_csr(std::vector<int> coo_rows, std::vector<int> coo_cols, std::vector<double> coo_vals, std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals);
+        void coo_to_csr(std::vector<int> coo_rows,
+                        std::vector<int> coo_cols,
+                        std::vector<double> coo_vals,
+                        std::vector<int>& csr_rows,
+                        std::vector<int>& csr_cols,
+                        std::vector<double>& csr_vals);
 
         /**
          * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{P} \f$.
          *
-         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, 0, \dots, m_{N}, m_{N}, 0, 0, 0, J_0, \dots, 0, 0, J_{N}) \f$,
-         * where \f$ m_i \f$ (resp. \f$ J_i \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
-         * This function set the second part of the matrix.
+         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, 0, \dots, m_{N}, m_{N}, 0, 0, 0, J_0, \dots, 0, 0,
+         * J_{N}) \f$, where \f$ m_i \f$ (resp. \f$ J_i \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$. This function
+         * set the second part of the matrix.
          *
          * @param nparts [in] Number of particles.
          * @param particles [in] Array of particles (for the moments of inertia).
@@ -171,16 +179,15 @@ namespace scopi
         /**
          * @brief 3D implementation to set the moments of inertia in the matrix \f$ \mathbb{P} \f$.
          *
-         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, m_0, \dots, m_{N}, m_{N}, m_{N}, J_0^x, J_0^y, J_0^z, \dots, J_{N}^x, J_{N}^y, J_{N}^z) \f$,
-         * where \f$ m_i \f$ (resp. \f$ \mathbf{J}_i = (J_i^x, J_i^y, J_i^z) \f$) is the mass (resp. moment of inertia) of the particle \f$ i \f$.
-         * This function set the second part of the matrix.
+         * The matrix \f$ \mathbb{P} \f$ is diagonale and \f$ \mathbb{P} = diag(m_0, m_0, m_0, \dots, m_{N}, m_{N}, m_{N}, J_0^x, J_0^y,
+         * J_0^z, \dots, J_{N}^x, J_{N}^y, J_{N}^z) \f$, where \f$ m_i \f$ (resp. \f$ \mathbf{J}_i = (J_i^x, J_i^y, J_i^z) \f$) is the mass
+         * (resp. moment of inertia) of the particle \f$ i \f$. This function set the second part of the matrix.
          *
          * @param nparts [in] Number of particles.
          * @param particles [in] Array of particles (for the moments of inertia).
          * @param index [in] Index of the first row with moments.
          */
         void set_moment_matrix(std::size_t nparts, const scopi_container<3>& particles, std::size_t& index);
-
 
         /**
          * @brief SCS' data structure for the matrix \f$ \mathbb{P} \f$.
@@ -253,9 +260,9 @@ namespace scopi
     };
 
     template <class problem_t>
-    template<std::size_t dim>
-    int OptimScs<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                             const std::vector<neighbor<dim>>& contacts)
+    template <std::size_t dim>
+    int
+    OptimScs<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts)
     {
         tic();
         this->create_matrix_constraint_coo(particles, contacts, 0);
@@ -267,34 +274,34 @@ namespace scopi
         m_A.i = m_A_i.data();
         m_A.p = m_A_p.data();
         m_A.m = contacts.size();
-        m_A.n = 6*this->m_nparts;
+        m_A.n = 6 * this->m_nparts;
 
         m_d.m = this->m_distances.size();
-        m_d.n = 6*this->m_nparts;
+        m_d.n = 6 * this->m_nparts;
         m_d.A = &m_A;
         m_d.P = &m_P;
         m_d.b = this->m_distances.data();
         m_d.c = this->m_c.data();
 
-        m_k.z = 0; // 0 linear equality constraints
-        m_k.l = this->m_distances.size(); // s >= 0
-        m_k.bu = NULL;
-        m_k.bl = NULL;
+        m_k.z     = 0;                        // 0 linear equality constraints
+        m_k.l     = this->m_distances.size(); // s >= 0
+        m_k.bu    = NULL;
+        m_k.bl    = NULL;
         m_k.bsize = 0;
-        m_k.q = NULL;
+        m_k.q     = NULL;
         m_k.qsize = 0;
-        m_k.s = NULL;
+        m_k.s     = NULL;
         m_k.ssize = 0;
-        m_k.ep = 0;
-        m_k.ed = 0;
-        m_k.p = NULL;
+        m_k.ep    = 0;
+        m_k.ed    = 0;
+        m_k.p     = NULL;
         m_k.psize = 0;
 
         m_sol.x = m_sol_x.data();
         m_sol_y.resize(this->m_distances.size());
         m_sol.y = m_sol_y.data();
         m_sol_s.resize(this->m_distances.size());
-        m_sol.s = m_sol_s.data();
+        m_sol.s       = m_sol_s.data();
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : SCS matrix = " << duration;
 
@@ -307,50 +314,48 @@ namespace scopi
     }
 
     template <class problem_t>
-    template<std::size_t dim>
-    OptimScs<problem_t>::OptimScs(std::size_t nparts,
-                                  double dt,
-                                  const scopi_container<dim>& particles)
-    : base_type(nparts, dt, 2*3*nparts, 0)
-    , m_P_x(6*nparts)
-    , m_P_i(6*nparts)
-    , m_P_p(6*nparts+1)
-    , m_A_p(6*nparts+1)
-    , m_sol_x(6*nparts)
+    template <std::size_t dim>
+    OptimScs<problem_t>::OptimScs(std::size_t nparts, double dt, const scopi_container<dim>& particles)
+        : base_type(nparts, dt, 2 * 3 * nparts, 0)
+        , m_P_x(6 * nparts)
+        , m_P_i(6 * nparts)
+        , m_P_p(6 * nparts + 1)
+        , m_A_p(6 * nparts + 1)
+        , m_sol_x(6 * nparts)
     {
         auto active_offset = particles.nb_inactive();
-        std::size_t index = 0;
+        std::size_t index  = 0;
         for (std::size_t i = 0; i < nparts; ++i)
         {
             for (std::size_t d = 0; d < dim; ++d)
             {
-                m_P_i[index] = 3*i + d;
-                m_P_p[index] = 3*i + d;
+                m_P_i[index] = 3 * i + d;
+                m_P_p[index] = 3 * i + d;
                 m_P_x[index] = particles.m()(active_offset + i);
                 index++;
             }
             for (std::size_t d = dim; d < 3; ++d)
             {
-                m_P_i[index] = 3*i + d;
-                m_P_p[index] = 3*i + d;
+                m_P_i[index] = 3 * i + d;
+                m_P_p[index] = 3 * i + d;
                 m_P_x[index] = 0.;
                 index++;
             }
         }
         set_moment_matrix(nparts, particles, index);
-        m_P_p[index] = 6*nparts;
+        m_P_p[index] = 6 * nparts;
 
         m_P.x = m_P_x.data();
         m_P.i = m_P_i.data();
         m_P.p = m_P_p.data();
-        m_P.m = 6*nparts;
-        m_P.n = 6*nparts;
+        m_P.m = 6 * nparts;
+        m_P.n = 6 * nparts;
 
         scs_set_default_settings(&m_stgs);
-        m_stgs.eps_abs = this->m_params.tol;
-        m_stgs.eps_rel = this->m_params.tol;
+        m_stgs.eps_abs    = this->m_params.tol;
+        m_stgs.eps_rel    = this->m_params.tol;
         m_stgs.eps_infeas = this->m_params.tol_infeas;
-        m_stgs.verbose = 0;
+        m_stgs.verbose    = 0;
     }
 
     template <class problem_t>
@@ -362,7 +367,7 @@ namespace scopi
     template <class problem_t>
     double* OptimScs<problem_t>::wadapt_data()
     {
-        return m_sol.x + 3*this->m_nparts;
+        return m_sol.x + 3 * this->m_nparts;
     }
 
     template <class problem_t>
@@ -371,7 +376,7 @@ namespace scopi
         return m_sol.y;
     }
 
-    template<class problem_t>
+    template <class problem_t>
     double* OptimScs<problem_t>::constraint_data_impl()
     {
         return NULL;
@@ -381,9 +386,9 @@ namespace scopi
     int OptimScs<problem_t>::get_nb_active_contacts_impl() const
     {
         int nb_active_contacts = 0;
-        for(int i = 0; i < m_k.l; ++i)
+        for (int i = 0; i < m_k.l; ++i)
         {
-            if(m_sol.y[i] > 0.)
+            if (m_sol.y[i] > 0.)
             {
                 nb_active_contacts++;
             }
@@ -392,13 +397,17 @@ namespace scopi
     }
 
     template <class problem_t>
-    void OptimScs<problem_t>::coo_to_csr(std::vector<int> coo_rows,   std::vector<int> coo_cols,  std::vector<double> coo_vals,
-                                          std::vector<int>& csr_rows, std::vector<int>& csr_cols, std::vector<double>& csr_vals)
+    void OptimScs<problem_t>::coo_to_csr(std::vector<int> coo_rows,
+                                         std::vector<int> coo_cols,
+                                         std::vector<double> coo_vals,
+                                         std::vector<int>& csr_rows,
+                                         std::vector<int>& csr_cols,
+                                         std::vector<double>& csr_vals)
     {
         // https://www-users.cse.umn.edu/~saad/software/SPARSKIT/
-        std::size_t nrow = 6*this->m_nparts;
-        std::size_t nnz = coo_vals.size();
-        csr_rows.resize(nrow+1);
+        std::size_t nrow = 6 * this->m_nparts;
+        std::size_t nnz  = coo_vals.size();
+        csr_rows.resize(nrow + 1);
         std::fill(csr_rows.begin(), csr_rows.end(), 0);
         csr_cols.resize(nnz);
         csr_vals.resize(nnz);
@@ -412,9 +421,9 @@ namespace scopi
         // starting position of each row..
         {
             int k = 0;
-            for (std::size_t j = 0; j < nrow+1; ++j)
+            for (std::size_t j = 0; j < nrow + 1; ++j)
             {
-                int k0 = csr_rows[j];
+                int k0      = csr_rows[j];
                 csr_rows[j] = k;
                 k += k0;
             }
@@ -423,19 +432,19 @@ namespace scopi
         // go through the structure  once more. Fill in output matrix.
         for (std::size_t k = 0; k < nnz; ++k)
         {
-            int i = coo_rows[k];
-            int j = coo_cols[k];
-            double x = coo_vals[k];
-            int iad = csr_rows[i];
+            int i         = coo_rows[k];
+            int j         = coo_cols[k];
+            double x      = coo_vals[k];
+            int iad       = csr_rows[i];
             csr_vals[iad] = x;
             csr_cols[iad] = j;
-            csr_rows[i] = iad+1;
+            csr_rows[i]   = iad + 1;
         }
 
         // shift back iao
         for (std::size_t j = nrow; j >= 1; --j)
         {
-            csr_rows[j] = csr_rows[j-1];
+            csr_rows[j] = csr_rows[j - 1];
         }
         csr_rows[0] = 0;
     }
@@ -448,13 +457,13 @@ namespace scopi
         {
             for (std::size_t d = 0; d < 2; ++d)
             {
-                m_P_i[index] = 3*nparts + 3*i + d;
-                m_P_p[index] = 3*nparts + 3*i + d;
+                m_P_i[index] = 3 * nparts + 3 * i + d;
+                m_P_p[index] = 3 * nparts + 3 * i + d;
                 m_P_x[index] = 0.;
                 index++;
             }
-            m_P_i[index] = 3*nparts + 3*i + 2;
-            m_P_p[index] = 3*nparts + 3*i + 2;
+            m_P_i[index] = 3 * nparts + 3 * i + 2;
+            m_P_p[index] = 3 * nparts + 3 * i + 2;
             m_P_x[index] = particles.j()(active_offset + i);
             index++;
         }
@@ -468,24 +477,26 @@ namespace scopi
         {
             for (std::size_t d = 0; d < 2; ++d)
             {
-                m_P_i[index] = 3*nparts + 3*i + d;
-                m_P_p[index] = 3*nparts + 3*i + d;
+                m_P_i[index] = 3 * nparts + 3 * i + d;
+                m_P_p[index] = 3 * nparts + 3 * i + d;
                 m_P_x[index] = particles.j()(active_offset + i)[d];
                 index++;
             }
         }
     }
 
-    template<class problem_t>
+    template <class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams()
-    : tol(1e-7)
-    , tol_infeas(1e-10)
-    {}
+        : tol(1e-7)
+        , tol_infeas(1e-10)
+    {
+    }
 
-    template<class problem_t>
+    template <class problem_t>
     OptimParams<OptimScs<problem_t>>::OptimParams(const OptimParams<OptimScs<problem_t>>& params)
-    : tol(params.tol)
-    , tol_infeas(params.tol_infeas)
-    {}
+        : tol(params.tol)
+        , tol_infeas(params.tol_infeas)
+    {
+    }
 }
 #endif

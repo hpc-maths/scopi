@@ -130,7 +130,7 @@ namespace scopi
         inline double operator()(const xt::xtensor<double, 1>& lambda) const
         {
             auto lambda_global = m_lagrange.local2global(lambda);
-            return xt::linalg::dot(lambda_global, 0.5 * m_Q(lambda_global) + m_C)[0]+xt::linalg::dot(lambda,m_lagrange.S_Vector())[0];
+            return xt::linalg::dot(lambda_global, 0.5 * m_Q(lambda_global) + m_C)[0] + xt::linalg::dot(lambda, m_lagrange.S_Vector())[0];
         }
 
         inline auto velocities(const xt::xtensor<double, 1>& lambda) const

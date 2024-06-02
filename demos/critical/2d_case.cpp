@@ -13,9 +13,9 @@
 int main()
 {
     constexpr std::size_t dim = 2;
-    double PI = xt::numeric_constants<double>::PI;
-    double dt = .01;
-    std::size_t total_it = 1000;//50000;
+    double PI                 = xt::numeric_constants<double>::PI;
+    double dt                 = .01;
+    std::size_t total_it      = 1000; // 50000;
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
@@ -26,54 +26,67 @@ int main()
     // std::uniform_real_distribution<double> distrib_gp2(-10.0,-2.0);
     // std::uniform_real_distribution<double> distrib_y(-10.0,10.0);
     // std::uniform_real_distribution<double> distrib_rot(0,PI);
-    std::uniform_real_distribution<double> distrib_e(0.6,1.);
-    std::uniform_real_distribution<double> distrib_r(0.2,1.0);
-    std::uniform_real_distribution<double> distrib_r2(0.2,1.0);
-    std::uniform_real_distribution<double> distrib_x(-1400.0,1400.0);
-    std::uniform_real_distribution<double> distrib_y(-1400.0,1400.0);
-    std::uniform_real_distribution<double> distrib_rot(0,PI);
+    std::uniform_real_distribution<double> distrib_e(0.6, 1.);
+    std::uniform_real_distribution<double> distrib_r(0.2, 1.0);
+    std::uniform_real_distribution<double> distrib_r2(0.2, 1.0);
+    std::uniform_real_distribution<double> distrib_x(-1400.0, 1400.0);
+    std::uniform_real_distribution<double> distrib_y(-1400.0, 1400.0);
+    std::uniform_real_distribution<double> distrib_rot(0, PI);
     // std::uniform_real_distribution<double> distrib_rot(PI/4,PI/4);
-
-
 
     int n = 2000;
     // int n = 10;
 
-    for (int i=0;i<n;++i){
+    for (int i = 0; i < n; ++i)
+    {
+        // double e = distrib_e(generator);
+        double r         = distrib_r(generator);
+        double r2        = distrib_r2(generator);
+        double x         = distrib_x(generator);
+        double y         = distrib_y(generator);
+        double rot       = distrib_rot(generator);
+        double dist_orig = std::sqrt(x * x + y * y);
 
-      // double e = distrib_e(generator);
-      double r = distrib_r(generator);
-      double r2 = distrib_r2(generator);
-      double x = distrib_x(generator);
-      double y = distrib_y(generator);
-      double rot = distrib_rot(generator);
-      double dist_orig = std::sqrt(x*x+y*y);
+        scopi::sphere<dim> s1(
+            {
+                {x, y}
+        },
+            {scopi::quaternion(rot)},
+            r);
+        // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
+        particles.push_back(s1,
+                            prop.desired_velocity({
+                                {-x / dist_orig, -y / dist_orig}
+        }));
 
-      scopi::sphere<dim> s1( {{x, y}}, {scopi::quaternion(rot)}, r);
-      // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
-      particles.push_back(s1, prop.desired_velocity({{-x/dist_orig, -y/dist_orig}}));
+        // e = distrib_e(generator);
+        r         = distrib_r(generator);
+        r2        = distrib_r2(generator);
+        x         = distrib_x(generator);
+        y         = distrib_y(generator);
+        rot       = distrib_rot(generator);
+        dist_orig = std::sqrt(x * x + y * y);
+        scopi::sphere<dim> s2(
+            {
+                {x, y}
+        },
+            {scopi::quaternion(rot)},
+            r);
+        // scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r}}, {{1}});
+        particles.push_back(s2,
+                            prop.desired_velocity({
+                                {-x / dist_orig, -y / dist_orig}
+        }));
 
-      // e = distrib_e(generator);
-      r = distrib_r(generator);
-      r2 = distrib_r2(generator);
-      x = distrib_x(generator);
-      y = distrib_y(generator);
-      rot = distrib_rot(generator);
-      dist_orig = std::sqrt(x*x+y*y);
-      scopi::sphere<dim> s2( {{x, y}}, {scopi::quaternion(rot)}, r);
-      // scopi::superellipsoid<dim> s2({ {x, y}}, {scopi::quaternion(rot)}, {{r, r}}, {{1}});
-      particles.push_back(s2, prop.desired_velocity({{-x/dist_orig, -y/dist_orig}}));
-
-      // e = distrib_e(generator);
-      // r = distrib_r(generator);
-      // r2 = distrib_r2(generator);
-      // x = distrib_x(generator);
-      // y = distrib_y(generator);
-      // rot = distrib_rot(generator);
-      // dist_orig = std::sqrt(x*x+y*y);
-      // scopi::superellipsoid<dim> s3({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{e}});
-      // particles.push_back(s3, prop.desired_velocity({{-x/dist_orig, -y/dist_orig}}));
-
+        // e = distrib_e(generator);
+        // r = distrib_r(generator);
+        // r2 = distrib_r2(generator);
+        // x = distrib_x(generator);
+        // y = distrib_y(generator);
+        // rot = distrib_rot(generator);
+        // dist_orig = std::sqrt(x*x+y*y);
+        // scopi::superellipsoid<dim> s3({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{e}});
+        // particles.push_back(s3, prop.desired_velocity({{-x/dist_orig, -y/dist_orig}}));
     }
 
     // for (int i=0;i<n;++i){

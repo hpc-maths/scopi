@@ -36,8 +36,8 @@ animate();
 
 /*
 class ContactsCurve extends THREE.CurvePath {
-	constructor(contacts) {
-		super();
+    constructor(contacts) {
+        super();
         contacts.forEach((obj, index) => {
             const pi = new THREE.Vector3();
             const pj = new THREE.Vector3();
@@ -56,7 +56,7 @@ class ContactsCurve extends THREE.CurvePath {
             super.add(new THREE.LineCurve3(pi, pj));
         });
         console.log(super.curves);
-	}
+    }
 }
 */
 
@@ -250,7 +250,7 @@ function drawObjects() {
 
             // contacts
             if (options.contacts) {
-                
+
                 if(contacts != null)
                 {contacts.forEach((obj, index) => {
                     //console.log(contacts);
@@ -263,7 +263,7 @@ function drawObjects() {
                             points.push(new THREE.Vector3(objects[obj.i].position[0], objects[obj.i].position[1], 0.));
                         }
                         else
-                        { 
+                        {
                             points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], 0.));
                         }
                         if(objects[obj.j].type === "sphere")
@@ -274,13 +274,13 @@ function drawObjects() {
                         {
                             points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], 0.));
                         }
-                        
+
                     }
                     else {
                         points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], obj.pi[2]));
                         points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], obj.pi[2]));
                     }
-                
+
                     var line_geometry = new THREE.BufferGeometry().setFromPoints(points);
                     if(obj.gamma==obj.gamma_min)
                     {
@@ -298,14 +298,14 @@ function drawObjects() {
                             depthTest: false
                         });
                     }
-                    
-                
+
+
                     var line_mesh = new THREE.LineSegments(line_geometry, line_material);
                     scene.add(line_mesh);
 
                     }
                     });
-                    
+
                 }
             }});
 

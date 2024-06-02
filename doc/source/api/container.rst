@@ -14,14 +14,14 @@ Particles and objects
 
 
 Loop on positions of particles::
-    
+
     for (std::size_t p = 0; p < particles.nb_active(); ++p)
     {
        particles.pos()(p) = /* ... */;
     }
 
 Loop on objects::
-    
+
     for (std::size_t o = 0; o < particles.size(); ++o)
     {
        particles[o] = /* ... */;
@@ -53,4 +53,3 @@ Loop on positions of particles in object::
         container:objects0 -> container:particles0 [label="offset "]
         container:particles1 -> container:objects1 [label=" object_index"]
     }
-

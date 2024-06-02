@@ -5,12 +5,13 @@
 #include "../problems/DryWithoutFriction.hpp"
 #include "ConstraintMosek.hpp"
 
-#include <memory>
 #include <fusion.h>
+#include <memory>
 
-namespace scopi{
+namespace scopi
+{
 
-    template<class problem_t>
+    template <class problem_t>
     class OptimMosek;
 
     /**
@@ -21,7 +22,7 @@ namespace scopi{
      *
      * @tparam problem_t Problem to be solved.
      */
-    template<class problem_t>
+    template <class problem_t>
     struct OptimParams<OptimMosek<problem_t>>
     {
         /**
@@ -55,32 +56,33 @@ namespace scopi{
      * See ProblemBase for the notations.
      * Instead of minimizing \f$ \frac{1}{2} \mathbf{u} \mathbb{P} \cdot \mathbf{u} + \mathbf{u} \cdot \mathbf{c} \f$,
      * minimize \f$ \tilde{\mathbf{u}} \cdot \tilde{\mathbf{c}} \f$, with
-     * \f$ \tilde{\mathbf{u}} = (s_0, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, 0) \in \mathbb{R}^{1+6N+6N} \f$.
+     * \f$ \tilde{\mathbf{u}} = (s_0, \mathbf{u}, \mathbf{z}) \in \mathbb{R}^{1+6N+6N} \f$ and \f$ \tilde{\mathbf{c}} = (1, \mathbf{c}, 0)
+     * \in \mathbb{R}^{1+6N+6N} \f$.
      *
-     * Without friction (DryWithoutFriction and ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$, with
-     * \f[
-     *      \begin{aligned}
+     * Without friction (DryWithoutFriction and ViscousWithoutFriction), the constraint is written as \f$ \tilde{\mathbb{B}}
+     * \tilde{\mathbf{u}} \le \mathbf{d} \f$, \f$ \mathbb{A}_z \tilde{\mathbf{u}} = 0 \f$,and \f$ (1, s_0, \mathbf{z}) \in Q_r^{2+6N} \f$,
+     * with \f[ \begin{aligned}
      *          \tilde{\mathbb{B}} &= \left. (\underbrace{0}_{1} | \underbrace{\mathbb{B}}_{6N} | \underbrace{0}_{6N}) \right\} N_c,\\
-     *          \mathbb{A}_z &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\mathbb{P}}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\} 6N.
-     *      \end{aligned}
-     * \f]
-     * \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots + x_n^2 \} \f$, see Mosek's documentation for more details.
-     * Here, \f$ N_c \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0 \f$).
-     * \f$ \mathbb{Id} \f$ is the identity matrix.
+     *          \mathbb{A}_z &= \left. (\underbrace{0}_{1} | \underbrace{\sqrt{\mathbb{P}}}_{6N} | \underbrace{-\mathbb{Id}}_{6N}) \right\}
+     * 6N. \end{aligned} \f] \f$ Q_r^n \f$ is the rotated quadratic cone, \f$ Q_r^n = \{ x \in \mathbb{R}^n, 2 x_1 x_2 \ge x_3^2 + \dots +
+     * x_n^2 \} \f$, see Mosek's documentation for more details. Here, \f$ N_c \f$ is the number of constraints (\f$ D > 0 \f$ and \f$ D < 0
+     * \f$). \f$ \mathbb{Id} \f$ is the identity matrix.
      *
      * With friction, the constraint is written as \f$ \mathbf{d} + \mathbb{B} \mathbf{u} \in \left( Q^4 \right)^{N_c} \f$,
-     * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's documentation for more details.
-     * Each component of \f$ \mathbb{B} \mathbf{u} \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B} \mathbf{u}_{ij}, \mathbb{T} \mathbf{u}_{ij}^1, \mathbb{T} \mathbf{u}_{ij}^2, \mathbb{T} \mathbf{u}_{ij}^3 ) \f$.
-     * \note Similarly to the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \mathbf{u}_{ij}|| \f$, but this resulted in poor performances.
-     * \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \in Q \f$ with appropriate reshape.
-     * Currently, only a part of the matrix is used.
+     * with \f$ Q^n \f$ the quadratic cone, \f$ Q^n = \{ x \in \mathbb{R}^n, x_1 \ge \sqrt{x_2^2 + \dots + x_n^2 } \} \f$, see Mosek's
+     * documentation for more details. Each component of \f$ \mathbb{B} \mathbf{u} \f$ is seen as \f$ (\mathbf{d}_{ij} + \mathbb{B}
+     * \mathbf{u}_{ij}, \mathbb{T} \mathbf{u}_{ij}^1, \mathbb{T} \mathbf{u}_{ij}^2, \mathbb{T} \mathbf{u}_{ij}^3 ) \f$. \note Similarly to
+     * the case without friction, one can try to introduce a new variable \f$ t_{ij} = ||\mathbb{T} \mathbf{u}_{ij}|| \f$, but this resulted
+     * in poor performances. \todo The constraint should be written as \f$ \tilde{\mathbb{B}} \tilde{\mathbf{u}} \in Q \f$ with appropriate
+     * reshape. Currently, only a part of the matrix is used.
      *
      * @tparam problem_t Problem to be solved.
      */
-    template<class problem_t = DryWithoutFriction>
-    class OptimMosek: public OptimBase<OptimMosek<problem_t>, problem_t>
+    template <class problem_t = DryWithoutFriction>
+    class OptimMosek : public OptimBase<OptimMosek<problem_t>, problem_t>
     {
-    public:
+      public:
+
         /**
          * @brief Alias for the base class OptimBase
          */
@@ -99,11 +101,10 @@ namespace scopi{
          * @param problem_params [in] Parameters for the problem.
          */
         template <std::size_t dim>
-        OptimMosek(std::size_t nparts,
-                   double dt,
-                   const scopi_container<dim>& particles);
+        OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles);
 
-    public:
+      public:
+
         /**
          * @brief Solve the optimization problem.
          *
@@ -115,10 +116,10 @@ namespace scopi{
          * @return Number of iterations Mosek's solver needed to converge.
          */
         template <std::size_t dim>
-        int solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                            const std::vector<neighbor<dim>>& contacts);
+        int solve_optimization_problem_impl(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts);
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the velocities solution of the optimization problem.
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns
+         * the velocities solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -126,7 +127,8 @@ namespace scopi{
          */
         double* uadapt_data();
         /**
-         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns the rotations solution of the optimization problem.
+         * @brief \f$ \mathbf{u} \in \mathbb{R}^{6N} \f$ contains the velocities and the rotations of the particles, the function returns
+         * the rotations solution of the optimization problem.
          *
          * \pre \c solve_optimization_problem has to be called before this function.
          *
@@ -154,7 +156,8 @@ namespace scopi{
          */
         int get_nb_active_contacts_impl() const;
 
-    private:
+      private:
+
         /**
          * @brief 2D implementation to set the moments of inertia in the matrix \f$ \mathbb{A}_z \f$.
          *
@@ -195,7 +198,7 @@ namespace scopi{
         /**
          * @brief Mosek's data structure (pointer) to the solution of the optimization problem.
          */
-        std::shared_ptr<monty::ndarray<double,1>> m_Xlvl;
+        std::shared_ptr<monty::ndarray<double, 1>> m_Xlvl;
         /**
          * @brief The constraint depends on the problem, this class help to deal with this.
          *
@@ -212,36 +215,47 @@ namespace scopi{
         std::shared_ptr<monty::ndarray<double, 1>> m_result_gemv;
     };
 
-    template<class problem_t>
-    template<std::size_t dim>
-    int OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles,
-                                                               const std::vector<neighbor<dim>>& contacts)
+    template <class problem_t>
+    template <std::size_t dim>
+    int
+    OptimMosek<problem_t>::solve_optimization_problem_impl(const scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts)
     {
         using namespace mosek::fusion;
         using namespace monty;
 
         tic();
-        Model::t model = new Model("contact"); auto _M = finally([&]() { model->dispose(); });
+        Model::t model = new Model("contact");
+        auto _M        = finally(
+            [&]()
+            {
+                model->dispose();
+            });
         // variables
-        Variable::t X = model->variable("X", 1 + 6*this->m_nparts + 6*this->m_nparts);
+        Variable::t X = model->variable("X", 1 + 6 * this->m_nparts + 6 * this->m_nparts);
 
         // functional to minimize
         auto c_mosek = std::make_shared<ndarray<double, 1>>(this->m_c.data(), shape_t<1>({this->m_c.shape(0)}));
         model->objective("minvar", ObjectiveSense::Minimize, Expr::dot(c_mosek, X));
 
         // constraints
-        m_D_mosek = std::make_shared<monty::ndarray<double, 1>>(this->problem().distances().data(), monty::shape_t<1>(this->problem().distances().shape(0)));
+        m_D_mosek = std::make_shared<monty::ndarray<double, 1>>(this->problem().distances().data(),
+                                                                monty::shape_t<1>(this->problem().distances().shape(0)));
 
         // matrix
         this->problem().create_matrix_constraint_coo(particles, contacts);
-        m_A = Matrix::sparse(this->problem().number_row_matrix(contacts), this->m_constraint.number_col_matrix(),
-                             std::make_shared<ndarray<int, 1>>(this->problem().A_rows().data(), shape_t<1>({this->problem().A_rows().size()})),
-                             std::make_shared<ndarray<int, 1>>(this->problem().A_cols().data(), shape_t<1>({this->problem().A_cols().size()})),
-                             std::make_shared<ndarray<double, 1>>(this->problem().A_values().data(), shape_t<1>({this->problem().A_values().size()})));
+        m_A = Matrix::sparse(
+            this->problem().number_row_matrix(contacts),
+            this->m_constraint.number_col_matrix(),
+            std::make_shared<ndarray<int, 1>>(this->problem().A_rows().data(), shape_t<1>({this->problem().A_rows().size()})),
+            std::make_shared<ndarray<int, 1>>(this->problem().A_cols().data(), shape_t<1>({this->problem().A_cols().size()})),
+            std::make_shared<ndarray<double, 1>>(this->problem().A_values().data(), shape_t<1>({this->problem().A_values().size()})));
 
         this->m_constraint.add_constraints(m_D_mosek, m_A, X, model, contacts);
         Constraint::t qc2 = model->constraint("qc2", Expr::mul(m_Az, X), Domain::equalsTo(0.));
-        Constraint::t qc3 = model->constraint("qc3", Expr::vstack(1, X->index(0), X->slice(1 + 6*this->m_nparts, 1 + 6*this->m_nparts + 6*this->m_nparts)), Domain::inRotatedQCone());
+        Constraint::t qc3 = model->constraint(
+            "qc3",
+            Expr::vstack(1, X->index(0), X->slice(1 + 6 * this->m_nparts, 1 + 6 * this->m_nparts + 6 * this->m_nparts)),
+            Domain::inRotatedQCone());
 
         // int thread_qty = std::max(atoi(std::getenv("OMP_NUM_THREADS")), 0);
         // model->setSolverParam("numThreads", thread_qty);
@@ -254,8 +268,12 @@ namespace scopi{
         }
 
         // model->setSolverParam("intpntCoTolDfeas", 1e-6);
-        model->setLogHandler([](const std::string & msg) {PLOG_VERBOSE << msg << std::flush; } );
-        //solve
+        model->setLogHandler(
+            [](const std::string& msg)
+            {
+                PLOG_VERBOSE << msg << std::flush;
+            });
+        // solve
         model->solve();
 
         m_Xlvl = X->level();
@@ -276,13 +294,11 @@ namespace scopi{
         return model->getSolverIntInfo("intpntIter");
     }
 
-    template<class problem_t>
+    template <class problem_t>
     template <std::size_t dim>
-    OptimMosek<problem_t>::OptimMosek(std::size_t nparts,
-                                      double dt,
-                                      const scopi_container<dim>& particles)
-    : base_type(nparts, dt, 1 + 2*3*nparts + 2*3*nparts, 1)
-    , m_constraint(this->problem())
+    OptimMosek<problem_t>::OptimMosek(std::size_t nparts, double dt, const scopi_container<dim>& particles)
+        : base_type(nparts, dt, 1 + 2 * 3 * nparts + 2 * 3 * nparts, 1)
+        , m_constraint(this->problem())
     {
         using namespace mosek::fusion;
         using namespace monty;
@@ -294,73 +310,76 @@ namespace scopi{
         std::vector<int> Az_cols;
         std::vector<double> Az_values;
 
-        Az_rows.reserve(6*nparts*2);
-        Az_cols.reserve(6*nparts*2);
-        Az_values.reserve(6*nparts*2);
+        Az_rows.reserve(6 * nparts * 2);
+        Az_cols.reserve(6 * nparts * 2);
+        Az_values.reserve(6 * nparts * 2);
 
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
             for (std::size_t d = 0; d < dim; ++d)
             {
-                Az_rows.push_back(3*i + d);
-                Az_cols.push_back(1 + 3*i + d);
+                Az_rows.push_back(3 * i + d);
+                Az_cols.push_back(1 + 3 * i + d);
                 Az_values.push_back(std::sqrt(particles.m()(active_offset + i)));
-                Az_rows.push_back(3*i + d);
-                Az_cols.push_back(1 + 6*nparts + 3*i + d);
+                Az_rows.push_back(3 * i + d);
+                Az_cols.push_back(1 + 6 * nparts + 3 * i + d);
                 Az_values.push_back(-1.);
             }
         }
 
         set_moment_mass_matrix(nparts, Az_rows, Az_cols, Az_values, particles);
 
-        m_Az = Matrix::sparse(6*nparts, 1 + 6*nparts + 6*nparts,
+        m_Az = Matrix::sparse(6 * nparts,
+                              1 + 6 * nparts + 6 * nparts,
                               std::make_shared<ndarray<int, 1>>(Az_rows.data(), shape_t<1>(Az_rows.size())),
                               std::make_shared<ndarray<int, 1>>(Az_cols.data(), shape_t<1>(Az_cols.size())),
                               std::make_shared<ndarray<double, 1>>(Az_values.data(), shape_t<1>(Az_values.size())));
     }
 
-    template<class problem_t>
+    template <class problem_t>
     double* OptimMosek<problem_t>::uadapt_data()
     {
         return m_Xlvl->raw() + 1;
     }
 
-    template<class problem_t>
+    template <class problem_t>
     double* OptimMosek<problem_t>::wadapt_data()
     {
-        return m_Xlvl->raw() + 1 + 3*this->m_nparts;
+        return m_Xlvl->raw() + 1 + 3 * this->m_nparts;
     }
 
-    template<class problem_t>
+    template <class problem_t>
     double* OptimMosek<problem_t>::lagrange_multiplier_data()
     {
         return this->m_constraint.m_dual->raw();
     }
 
-    template<class problem_t>
+    template <class problem_t>
     double* OptimMosek<problem_t>::constraint_data_impl()
     {
         using namespace monty;
-        auto u = std::make_shared<monty::ndarray<double, 1>>(m_Xlvl->raw()+1, shape_t<1>(m_A->numColumns()));
+        auto u        = std::make_shared<monty::ndarray<double, 1>>(m_Xlvl->raw() + 1, shape_t<1>(m_A->numColumns()));
         m_result_gemv = std::make_shared<monty::ndarray<double, 1>>(m_D_mosek->raw(), shape_t<1>(m_A->numRows()));
-        mosek::LinAlg::gemv(false, m_A->numRows(), m_A->numColumns(), -1., m_A->transpose()->getDataAsArray(), u, 1.,  m_result_gemv);
+        mosek::LinAlg::gemv(false, m_A->numRows(), m_A->numColumns(), -1., m_A->transpose()->getDataAsArray(), u, 1., m_result_gemv);
         return m_result_gemv->raw();
     }
 
-    template<class problem_t>
+    template <class problem_t>
     int OptimMosek<problem_t>::get_nb_active_contacts_impl() const
     {
         int nb_active_contacts = 0;
         for (auto x : *(this->m_constraint.m_dual))
         {
-            if(std::abs(x) > 1e-3)
+            if (std::abs(x) > 1e-3)
+            {
                 nb_active_contacts++;
+            }
         }
         return nb_active_contacts;
     }
 
-    template<class problem_t>
+    template <class problem_t>
     void OptimMosek<problem_t>::set_moment_mass_matrix(std::size_t nparts,
                                                        std::vector<int>& Az_rows,
                                                        std::vector<int>& Az_cols,
@@ -370,17 +389,17 @@ namespace scopi{
         auto active_offset = particles.nb_inactive();
         for (std::size_t i = 0; i < nparts; ++i)
         {
-            Az_rows.push_back(3*nparts + 3*i + 2);
-            Az_cols.push_back(1 + 3*nparts + 3*i + 2);
+            Az_rows.push_back(3 * nparts + 3 * i + 2);
+            Az_cols.push_back(1 + 3 * nparts + 3 * i + 2);
             Az_values.push_back(std::sqrt(particles.j()(active_offset + i)));
 
-            Az_rows.push_back(3*nparts + 3*i + 2);
-            Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + 2);
+            Az_rows.push_back(3 * nparts + 3 * i + 2);
+            Az_cols.push_back(1 + 6 * nparts + 3 * nparts + 3 * i + 2);
             Az_values.push_back(-1);
         }
     }
 
-    template<class problem_t>
+    template <class problem_t>
     void OptimMosek<problem_t>::set_moment_mass_matrix(std::size_t nparts,
                                                        std::vector<int>& Az_rows,
                                                        std::vector<int>& Az_cols,
@@ -392,25 +411,27 @@ namespace scopi{
         {
             for (std::size_t d = 0; d < 3; ++d)
             {
-                Az_rows.push_back(3*nparts + 3*i + d);
-                Az_cols.push_back(1 + 3*nparts + 3*i + d);
+                Az_rows.push_back(3 * nparts + 3 * i + d);
+                Az_cols.push_back(1 + 3 * nparts + 3 * i + d);
                 Az_values.push_back(std::sqrt(particles.j()(active_offset + i)[d]));
 
-                Az_rows.push_back(3*nparts + 3*i + d);
-                Az_cols.push_back( 1 + 6*nparts + 3*nparts + 3*i + d);
+                Az_rows.push_back(3 * nparts + 3 * i + d);
+                Az_cols.push_back(1 + 6 * nparts + 3 * nparts + 3 * i + d);
                 Az_values.push_back(-1);
             }
         }
     }
 
-    template<class problem_t>
+    template <class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams(const OptimParams<OptimMosek<problem_t>>& params)
-    : change_default_tol_mosek(params.change_default_tol_mosek)
-    {}
+        : change_default_tol_mosek(params.change_default_tol_mosek)
+    {
+    }
 
-    template<class problem_t>
+    template <class problem_t>
     OptimParams<OptimMosek<problem_t>>::OptimParams()
-    : change_default_tol_mosek(true)
-    {}
+        : change_default_tol_mosek(true)
+    {
+    }
 }
 #endif
