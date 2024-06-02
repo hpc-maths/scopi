@@ -1,5 +1,5 @@
-#include "doctest/doctest.h"
 #include "utils.hpp"
+#include <doctest/doctest.h>
 
 #include <scopi/contact/property.hpp>
 #include <scopi/container.hpp>

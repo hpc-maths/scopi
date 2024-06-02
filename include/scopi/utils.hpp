@@ -237,17 +237,17 @@ namespace scopi
                 {
                     for (std::size_t offset = particles.offset(io); offset < particles.offset(io + 1); ++offset)
                     {
-                        auto& pos = particles.pos()[offset];
-                        if (pos[d] - dmax < box.lower_bound(d))
+                        const auto& p_pos = particles.pos()[offset];
+                        if (p_pos[d] - dmax < box.lower_bound(d))
                         {
                             auto size = particles.offset(io + 1) - particles.offset(io);
-                            std::vector<position_t> new_pos(size);
+                            std::vector<position_t> newp_pos(size);
                             for (std::size_t i = 0, ii = particles.offset(io); i < size; ++i, ++ii)
                             {
-                                new_pos[i] = particles.pos()[ii];
-                                new_pos[i][d] += box.upper_bound(d) - box.lower_bound(d);
+                                newp_pos[i] = particles.pos()[ii];
+                                newp_pos[i][d] += box.upper_bound(d) - box.lower_bound(d);
                             }
-                            particles.push_back(io, new_pos);
+                            particles.push_back(io, newp_pos);
                             break;
                         }
                     }

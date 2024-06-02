@@ -1,6 +1,6 @@
-#include "doctest/doctest.h"
 #include "utils.hpp"
 #include <cstddef>
+#include <doctest/doctest.h>
 
 #include <scopi/contact/contact_kdtree.hpp>
 #include <scopi/contact/property.hpp>

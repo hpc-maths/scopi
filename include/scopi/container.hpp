@@ -398,12 +398,12 @@ namespace scopi
     template <std::size_t dim>
     void scopi_container<dim>::push_back(std::size_t io, const std::vector<position_type>& pos)
     {
-        assert(io >= 0 && io < m_periodic_obj_ptr);
+        assert(io < m_periodic_obj_ptr);
         m_periodic_added = true;
 
-        std::size_t size = m_offset[io + 1] - m_offset[io];
-        m_offset.push_back(m_offset.back() + size);
-        for (std::size_t i = 0, ii = m_offset[io]; i < size; ++i, ++ii)
+        std::size_t object_size = m_offset[io + 1] - m_offset[io];
+        m_offset.push_back(m_offset.back() + object_size);
+        for (std::size_t i = 0, ii = m_offset[io]; i < object_size; ++i, ++ii)
         {
             m_positions.push_back(pos[i]);
             m_quaternions.push_back(m_quaternions[ii]);
@@ -582,16 +582,15 @@ namespace scopi
     void scopi_container<dim>::reset_periodic()
     {
         m_periodic_indices.clear();
-        std::size_t size = m_periodic_ptr;
-        m_positions.resize(size);
-        m_quaternions.resize(size);
-        m_velocities.resize(size);
-        m_desired_velocities.resize(size);
-        m_omega.resize(size);
-        m_desired_omega.resize(size);
-        m_forces.resize(size);
-        m_masses.resize(size);
-        m_moments_inertia.resize(size);
+        m_positions.resize(m_periodic_ptr);
+        m_quaternions.resize(m_periodic_ptr);
+        m_velocities.resize(m_periodic_ptr);
+        m_desired_velocities.resize(m_periodic_ptr);
+        m_omega.resize(m_periodic_ptr);
+        m_desired_omega.resize(m_periodic_ptr);
+        m_forces.resize(m_periodic_ptr);
+        m_masses.resize(m_periodic_ptr);
+        m_moments_inertia.resize(m_periodic_ptr);
 
         m_offset.resize(m_periodic_obj_ptr + 1);
         m_shapes_id.resize(m_periodic_obj_ptr);

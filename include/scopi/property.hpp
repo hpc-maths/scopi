@@ -188,7 +188,7 @@ namespace scopi
         /**
          * @brief Mass.
          */
-        mass_type m_m;
+        mass_type m_m = 1.0;
         /**
          * @brief Moment of inertia
          */

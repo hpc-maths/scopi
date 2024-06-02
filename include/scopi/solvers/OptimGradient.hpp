@@ -343,10 +343,10 @@ namespace scopi
       private:
 
         method_t m_method;
-        bool m_should_solve;
+        bool m_should_solve = false;
         xt::xtensor<double, 2> m_u;
         xt::xtensor<double, 2> m_omega;
         xt::xtensor<double, 1> m_lambda;
-        std::size_t Niter_fixed_point;
+        std::size_t Niter_fixed_point = 0;
     };
 }

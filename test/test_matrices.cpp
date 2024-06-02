@@ -1,6 +1,6 @@
-#include "doctest/doctest.h"
+#include <doctest/doctest.h>
 
-#include "xtensor-blas/xlinalg.hpp"
+#include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xtensor.hpp>
@@ -9,6 +9,8 @@
 #include <scopi/container.hpp>
 #include <scopi/matrix/velocities.hpp>
 #include <scopi/objects/types/sphere.hpp>
+
+#include "utils.hpp"
 
 namespace scopi
 {
@@ -54,7 +56,6 @@ namespace scopi
                 {2., 1.}
         },
             0.5);
-        double PI = xt::numeric_constants<double>::PI;
         scopi::plan<dim> plan(
             {
                 {0., 0.}
@@ -69,9 +70,8 @@ namespace scopi
         auto contacts = cont.run(particles, 0);
 
         AMatrix a(contacts, particles);
-        xt::xtensor<double, 1> u = xt::ones<double>({6 * particles.nb_active()});
-        u                        = {0.187562190766376, -1.184390935327111, 0., 0., 0., -0.00453709103433};
-        auto sol                 = a.mat_mult(u);
+        xt::xtensor<double, 1> u{0.187562190766376, -1.184390935327111, 0., 0., 0., -0.00453709103433};
+        auto sol = a.mat_mult(u);
         REQUIRE(sol[0] == doctest::Approx(-0.18595809));
         REQUIRE(sol[1] == doctest::Approx(1.18278683));
     }

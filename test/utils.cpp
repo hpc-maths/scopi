@@ -13,7 +13,7 @@ namespace scopi
             nlohmann::json diff       = nlohmann::json::diff(jsonRef["objects"], jsonResult["objects"]);
             if (!diff.empty())
             {
-                for (auto& p : diff)
+                for (const auto& p : diff)
                 {
                     std::string path_ = p["path"];
                     nlohmann::json::json_pointer path(path_);
@@ -42,11 +42,11 @@ namespace scopi
 
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0)
     {
-        double x_normal, theta;
         double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
         if (t > t_impact)
         {
+            double x_normal, theta;
             double v_t_m    = g * t_impact * std::sin(alpha);
             double v_n_m    = -g * t_impact * std::cos(alpha);
             double t2       = (t - t_impact);
@@ -76,11 +76,11 @@ namespace scopi
     std::pair<type::position_t<2>, double>
     analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0)
     {
-        double v_normal, omega;
         double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
         if (t > t_impact)
         {
+            double v_normal, omega;
             double v_t_m = g * t_impact * std::sin(alpha);
             double v_n_m = -g * t_impact * std::cos(alpha);
             double t2    = (t - t_impact);

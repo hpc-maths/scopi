@@ -5,9 +5,9 @@
 #include "../utils.hpp"
 #include "base.hpp"
 
-#include "plog/Initializers/RollingFileInitializer.h"
 #include <cstddef>
 #include <locale>
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 namespace scopi

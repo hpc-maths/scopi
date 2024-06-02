@@ -134,16 +134,16 @@ namespace scopi
 
         auto pos() const;
         auto pos();
-        auto internal_pos() const;
-        auto internal_pos();
+        auto& internal_pos() const;
+        auto& internal_pos();
 
         auto pos(std::size_t i) const;
         auto pos(std::size_t i);
 
         auto q() const;
         auto q();
-        auto internal_q() const;
-        auto internal_q();
+        auto& internal_q() const;
+        auto& internal_q();
 
         auto q(std::size_t i) const;
         auto q(std::size_t i);
@@ -181,13 +181,13 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::internal_pos() const
+    inline auto& object_container<dim, owner>::internal_pos() const
     {
         return m_pos;
     }
 
     template <std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::internal_pos()
+    inline auto& object_container<dim, owner>::internal_pos()
     {
         return m_pos;
     }
@@ -217,13 +217,13 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::internal_q() const
+    inline auto& object_container<dim, owner>::internal_q() const
     {
         return m_q;
     }
 
     template <std::size_t dim, bool owner>
-    inline auto object_container<dim, owner>::internal_q()
+    inline auto& object_container<dim, owner>::internal_q()
     {
         return m_q;
     }
@@ -259,8 +259,6 @@ namespace scopi
         using base_type                  = object_container<dim, owner>;
         using position_type              = typename base_type::position_type;
         using quaternion_type            = typename base_type::quaternion_type;
-
-        virtual ~object() = default;
 
         object(object&&)                 = delete;
         object& operator=(const object&) = delete;

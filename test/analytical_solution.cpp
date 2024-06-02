@@ -131,11 +131,11 @@ namespace scopi
     std::pair<type::position_t<2>, double>
     analytical_solution_sphere_plan_friction(double alpha, double mu, double t, double r, double g, double y0)
     {
-        double x_tangent, theta;
         double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
         if (t > t_impact)
         {
+            double x_tangent, theta;
             double v_t_m     = g * t_impact * std::sin(alpha);
             double v_n_m     = -g * t_impact * std::cos(alpha);
             double t2        = (t - t_impact);
@@ -165,11 +165,11 @@ namespace scopi
     std::pair<type::position_t<2>, double>
     analytical_solution_sphere_plan_velocity_friction(double alpha, double mu, double t, double r, double g, double y0)
     {
-        double v_tangent, omega;
         double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> v;
         if (t > t_impact)
         {
+            double v_tangent, omega;
             double v_t_m = g * t_impact * std::sin(alpha);
             double v_n_m = -g * t_impact * std::cos(alpha);
             double t2    = (t - t_impact);
@@ -205,7 +205,6 @@ namespace scopi
                                                                                                      double gamma_min,
                                                                                                      double t_inv)
     {
-        double omega;
         double t_impact    = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         double t_gamma_min = -gamma_min / (g * std::cos(alpha));
         double gamma_inv;
@@ -218,7 +217,6 @@ namespace scopi
         {
             gamma_inv = -g * t_inv * std::cos(alpha);
         }
-        double t_unstick = t_inv - gamma_inv / (g * std::cos(alpha));
         if (t < t_impact)
         {
             v[1] = -g * t * std::cos(alpha);
@@ -233,6 +231,7 @@ namespace scopi
         }
         else if (t < t_inv)
         {
+            double omega;
             double v_t_gamma_min = -gamma_min * std::tan(alpha);
             double t2            = (t - t_gamma_min);
             if (std::tan(alpha) <= 3 * mu)
@@ -261,6 +260,7 @@ namespace scopi
         }
         else
         {
+            double t_unstick     = t_inv - gamma_inv / (g * std::cos(alpha));
             double v_t_gamma_min = -gamma_min * std::tan(alpha);
             double t2            = (t_inv - t_gamma_min);
             double vt_tinv;
@@ -315,7 +315,6 @@ namespace scopi
         {
             gamma_inv = -g * t_inv * std::cos(alpha);
         }
-        double t_unstick = t_inv - gamma_inv / (g * std::cos(alpha));
 
         if (t < t_impact)
         {
@@ -363,6 +362,7 @@ namespace scopi
         }
         else
         {
+            double t_unstick     = t_inv - gamma_inv / (g * std::cos(alpha));
             double v_t_gamma_min = -gamma_min * std::tan(alpha);
             double x_t_gamma_min = g * (std::pow(t_gamma_min, 2)) * std::sin(alpha) / 2;
             double omega_tinv;

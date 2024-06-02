@@ -13,7 +13,7 @@
 #include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
 
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 using namespace std;

@@ -5,7 +5,7 @@
 #include <omp.h>
 #include <tbb/tbb.h>
 
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>

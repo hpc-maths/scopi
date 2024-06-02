@@ -1,5 +1,5 @@
-#include "plog/Initializers/RollingFileInitializer.h"
 #include <cstddef>
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 #include <scopi/objects/types/plan.hpp>
 #include <scopi/objects/types/sphere.hpp>

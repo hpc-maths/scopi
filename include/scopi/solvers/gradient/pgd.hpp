@@ -1,8 +1,8 @@
 #pragma once
 
 #ifdef SCOPI_USE_MKL
-#include "plog/Initializers/RollingFileInitializer.h"
 #include <mkl_spblas.h>
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xnoalias.hpp>

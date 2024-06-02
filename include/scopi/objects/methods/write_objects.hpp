@@ -18,7 +18,7 @@
 #include "../types/superellipsoid.hpp"
 #include "../types/worm.hpp"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 namespace nl = nlohmann;
 

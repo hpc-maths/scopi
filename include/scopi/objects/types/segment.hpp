@@ -150,8 +150,8 @@ namespace scopi
     template <std::size_t dim, bool owner>
     auto segment<dim, owner>::normal() const
     {
-        auto rotation = rotation_matrix<dim>(this->q(0));
-        return xt::eval(xt::view(rotation, xt::all(), 0));
+        auto matrix = rotation_matrix<dim>(this->q(0));
+        return xt::eval(xt::view(matrix, xt::all(), 0));
     }
 
     template <std::size_t dim, bool owner>

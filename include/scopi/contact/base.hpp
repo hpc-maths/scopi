@@ -157,7 +157,7 @@ namespace scopi
     {
         std::sort(contacts.begin(),
                   contacts.end(),
-                  [](auto& a, auto& b)
+                  [](const auto& a, const auto& b)
                   {
                       if (a.i < b.i)
                       {

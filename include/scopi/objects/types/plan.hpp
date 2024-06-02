@@ -44,14 +44,14 @@ namespace scopi
          * @param pos [in] Position of a point in the plane.
          * @param angle [in] Angle of the rotation.
          */
-        plan(position_type pos, double angle = 0);
+        explicit plan(position_type pos, double angle = 0);
         /**
          * @brief Constructor with given rotation.
          *
          * @param pos [in] Position of a point in the plane.
          * @param q [in] Quaternion describing the rotation of the plane.
          */
-        plan(position_type pos, quaternion_type q);
+        explicit plan(position_type pos, quaternion_type q);
 
         /**
          * @brief Get the rotation matrix of the plane.
@@ -140,8 +140,8 @@ namespace scopi
     template <std::size_t dim, bool owner>
     auto plan<dim, owner>::normal() const
     {
-        auto rotation = rotation_matrix<dim>(this->q(0));
-        return xt::eval(xt::view(rotation, xt::all(), 0));
+        auto matrix = rotation_matrix<dim>(this->q(0));
+        return xt::eval(xt::view(matrix, xt::all(), 0));
     }
 
     template <std::size_t dim, bool owner>

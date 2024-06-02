@@ -1,9 +1,9 @@
-#include "doctest/doctest.h"
-#include "utils.hpp"
-
+#include <algorithm>
+#include <doctest/doctest.h>
+#include <scopi/quaternion.hpp>
 #include <xtensor/xadapt.hpp>
 
-#include <scopi/quaternion.hpp>
+#include "utils.hpp"
 
 namespace scopi
 {
@@ -29,10 +29,13 @@ namespace scopi
     TEST_CASE("normalize not-normalized quaternion")
     {
         auto q = quaternion(PI / 3.);
-        for (auto& elt : q)
-        {
-            elt *= 2.;
-        }
+        std::transform(q.begin(),
+                       q.end(),
+                       q.begin(),
+                       [](const auto& elt)
+                       {
+                           return elt * 2.;
+                       });
         normalize(q);
         REQUIRE(q(0) == doctest::Approx(std::sqrt(3.) / 2.));
         REQUIRE(q(1) == 0.);

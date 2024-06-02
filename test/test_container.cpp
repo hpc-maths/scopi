@@ -1,5 +1,5 @@
-#include "doctest/doctest.h"
 #include "utils.hpp"
+#include <doctest/doctest.h>
 
 #include <scopi/container.hpp>
 #include <scopi/objects/types/sphere.hpp>

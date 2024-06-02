@@ -1,5 +1,5 @@
-#include "doctest/doctest.h"
 #include "utils.hpp"
+#include <doctest/doctest.h>
 
 #include <scopi/contact/contact_brute_force.hpp>
 #include <scopi/contact/property.hpp>

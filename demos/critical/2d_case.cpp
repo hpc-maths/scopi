@@ -41,7 +41,6 @@ int main()
     {
         // double e = distrib_e(generator);
         double r         = distrib_r(generator);
-        double r2        = distrib_r2(generator);
         double x         = distrib_x(generator);
         double y         = distrib_y(generator);
         double rot       = distrib_rot(generator);
@@ -53,6 +52,7 @@ int main()
         },
             {scopi::quaternion(rot)},
             r);
+        // double r2        = distrib_r2(generator);
         // scopi::superellipsoid<dim> s1({ {x, y}}, {scopi::quaternion(rot)}, {{r, r2}}, {{1}});
         particles.push_back(s1,
                             prop.desired_velocity({
@@ -61,7 +61,6 @@ int main()
 
         // e = distrib_e(generator);
         r         = distrib_r(generator);
-        r2        = distrib_r2(generator);
         x         = distrib_x(generator);
         y         = distrib_y(generator);
         rot       = distrib_rot(generator);

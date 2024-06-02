@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "../../quaternion.hpp"
 #include "../../types.hpp"
 #include "base.hpp"
@@ -450,13 +452,14 @@ namespace scopi
             as.push_back(a + pi / 2);
             as.push_back(a - pi);
             as.push_back(a - pi / 2);
-            for (std::size_t i = 0; i < as.size(); ++i)
-            {
-                if (std::abs(as[i]) < 1.0e-6)
+            std::replace_if(
+                as.begin(),
+                as.end(),
+                [](double a)
                 {
-                    as[i] = 0.01;
-                }
-            }
+                    return std::abs(a) < 1.0e-6;
+                },
+                0.01);
         }
         return as;
     }
@@ -503,13 +506,14 @@ namespace scopi
             as.push_back(a + pi / 2);
             as.push_back(a - pi);
             as.push_back(a - pi / 2);
-            for (std::size_t i = 0; i < as.size(); ++i)
-            {
-                if (std::abs(as[i]) < 1.0e-6)
+            std::replace_if(
+                as.begin(),
+                as.end(),
+                [](double a)
                 {
-                    as[i] = 0.01;
-                }
-            }
+                    return std::abs(a) < 1.0e-6;
+                },
+                0.01);
         }
         return as;
     }

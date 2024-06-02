@@ -288,8 +288,7 @@ namespace scopi
             m_S_Vector = xt::zeros<double>({size()});
             for (std::size_t i = 0, row = 0; i < this->m_contacts.size(); ++i, row += 3)
             {
-                auto S_i = xt::view(m_S_Vector, xt::range(row, row + dim));
-                S_i      = this->m_contacts[i].sij * this->m_contacts[i].nij;
+                xt::view(m_S_Vector, xt::range(row, row + dim)) = this->m_contacts[i].sij * this->m_contacts[i].nij;
             }
         }
 
@@ -389,8 +388,8 @@ namespace scopi
                     }
                     else
                     {
-                        auto S_i = xt::view(m_S_Vector, xt::range(row + 1, row + 1 + dim));
-                        S_i      = dt * this->m_contacts[i].property.mu * this->m_contacts[i].sij * this->m_contacts[i].nij;
+                        xt::view(m_S_Vector, xt::range(row + 1, row + 1 + dim)) = dt * this->m_contacts[i].property.mu
+                                                                                * this->m_contacts[i].sij * this->m_contacts[i].nij;
                         row += 4;
                     }
                 }
@@ -538,7 +537,7 @@ namespace scopi
 
       private:
 
-        std::size_t m_size;
+        std::size_t m_size = 0;
         xt::xtensor<double, 1> m_S_Vector;
     };
 

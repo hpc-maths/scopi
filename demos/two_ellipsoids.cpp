@@ -1,6 +1,6 @@
 #include <xtensor/xmath.hpp>
 
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 #include <scopi/objects/types/superellipsoid.hpp>
