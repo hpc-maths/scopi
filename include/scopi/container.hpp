@@ -10,11 +10,11 @@
 
 #include <xtensor/xadapt.hpp>
 
-#include "objects/types/base.hpp"
-#include "objects/methods/select.hpp"
-#include "types.hpp"
-#include "property.hpp"
 #include "crtp.hpp"
+#include "objects/methods/select.hpp"
+#include "objects/types/base.hpp"
+#include "property.hpp"
+#include "types.hpp"
 
 namespace scopi
 {
@@ -28,18 +28,19 @@ namespace scopi
      * Array of particles.
      *
      * Inactive particles are placed at the begining of the container.
-     * Fictive particles for periodic boundary conditions are placed at the end of the container.
+     * Fictive particles for periodic boundary conditions are placed at the end
+     * of the container.
      *
-     * In the following, "particle" means a base object (sphere, superellipsoid or plan) and an "object" can be a more complex object, such as a worm.
+     * In the following, "particle" means a base object (sphere, superellipsoid
+     * or plan) and an "object" can be a more complex object, such as a worm.
      * Particles are objects.
      *
      * @tparam dim Dimension (2 or 3).
      */
-    template<std::size_t dim>
-    class scopi_container
-    {
-    public:
-
+    template<std::size_t Dim>
+    class scopi_container {
+      public:
+        static constexpr std::size_t dim = Dim;
         /**
          * @brief Alias for the type of the position.
          */
@@ -83,7 +84,9 @@ namespace scopi
          *
          * @return Object.
          */
-        std::unique_ptr<object<dim, false>> operator[](std::size_t i);
+        std::unique_ptr<object<Dim, false>> operator[](std::size_t i);
+        const std::unique_ptr<object<Dim, false>>
+        operator[](std::size_t i) const;
 
         /**
          * @brief Appends the given element value to the end of the container.
@@ -91,24 +94,29 @@ namespace scopi
          * @param s [in] Object to append.
          * @param p [in] Properties of the object (see property.hpp).
          */
-        void push_back(const object<dim>& s, const property<dim>& p = property<dim>());
+        void push_back(const object<dim> &s,
+                       const property<dim> &p = property<dim>());
         /**
-         * @brief Copy a particle that was already in the container with a new position.
+         * @brief Copy a particle that was already in the container with a new
+         * position.
          *
          * The original particle remains unchanged.
-         * All the other physical properties of the particle are copied, only the position is different.
-         * Used for periodic boundary conditions.
+         * All the other physical properties of the particle are copied, only
+         * the position is different. Used for periodic boundary conditions.
          *
          * @param i [in] Index of the particle to copy.
          * @param pos [in] Position of the new particle.
          */
-        void push_back(std::size_t i, const std::vector<position_type>& pos);
+        void push_back(std::size_t i, const std::vector<position_type> &pos);
 
         /**
          * @brief Increase the capacity of the container.
          *
-         * Increase the capacity of the container (the total number of particles that the container can hold without requiring reallocation) to a value that's greater or equal to \c size.
-         * If \c size is greater than the current capacity, new storage is allocated, otherwise the function does nothing.
+         * Increase the capacity of the container (the total number of particles
+         * that the container can hold without requiring reallocation) to a
+         * value that's greater or equal to \c size. If \c size is greater than
+         * the current capacity, new storage is allocated, otherwise the
+         * function does nothing.
          *
          * \c reserve does not change the size of the container.
          *
@@ -200,7 +208,7 @@ namespace scopi
         /**
          * @brief Number of objects in the container.
          */
-        std::size_t size(bool with_periodic=true) const;
+        std::size_t size(bool with_periodic = true) const;
         /**
          * @brief Number of active particles in the container.
          */
@@ -213,7 +221,8 @@ namespace scopi
         /**
          * @brief Convert a particle index into an object index.
          *
-         * The particle \c i is part of the object \c j, where \c j is the index of an object.
+         * The particle \c i is part of the object \c j, where \c j is the index
+         * of an object.
          *
          * @param i [in] Index of a particle.
          *
@@ -237,50 +246,50 @@ namespace scopi
         std::size_t periodic_ptr() const;
         std::size_t periodic_index(std::size_t i) const;
 
-    private:
-
+      private:
         /**
          * @brief
          *
          * \todo Write documentation.
          */
-        std::map<std::size_t, std::unique_ptr<base_constructor<dim>>> m_shape_map;
+        std::map<std::size_t, std::unique_ptr<base_constructor<dim>>>
+            m_shape_map;
         /**
          * @brief Array of particles' positions.
          */
-        std::vector<position_type> m_positions;  // pos()
+        std::vector<position_type> m_positions; // pos()
         /**
          * @brief Array of particles' quaternions.
          */
-        std::vector<quaternion_type> m_quaternions;  // q()
+        std::vector<quaternion_type> m_quaternions; // q()
         /**
          * @brief Array of particles' forces.
          */
-        std::vector<force_type> m_forces;  // f()
+        std::vector<force_type> m_forces; // f()
         /**
          * @brief Array of particles' masses.
          */
-        std::vector<mass_type> m_masses;  // m()
+        std::vector<mass_type> m_masses; // m()
         /**
          * @brief Array of particles' moments of inertia.
          */
-        std::vector<moment_type> m_moments_inertia;  // j()
+        std::vector<moment_type> m_moments_inertia; // j()
         /**
          * @brief Array of particles' velocities.
          */
-        std::vector<velocity_type> m_velocities;  // v()
+        std::vector<velocity_type> m_velocities; // v()
         /**
          * @brief Array of particles' desired velocities.
          */
-        std::vector<velocity_type> m_desired_velocities;  // vd()
+        std::vector<velocity_type> m_desired_velocities; // vd()
         /**
          * @brief Array of particles' rotations.
          */
-        std::vector<rotation_type> m_omega;  // omega()
+        std::vector<rotation_type> m_omega; // omega()
         /**
          * @brief Array of particles' desired rotations.
          */
-        std::vector<rotation_type> m_desired_omega;  // desired_omega()
+        std::vector<rotation_type> m_desired_omega; // desired_omega()
         /**
          * @brief Array of particles' hashes.
          */
@@ -288,12 +297,15 @@ namespace scopi
         /**
          * @brief Array of objetcts' offsets.
          *
-         * If the container is (obj_0, obj_1, ...), then <tt>m\_offset[j]</tt> = \f$\sum_{i = 0}^{j-1}{obj\_i.size()}\f$ for j > 0 and <tt>m_offset[0] = 0</tt>.
+         * If the container is (obj_0, obj_1, ...), then <tt>m\_offset[j]</tt> =
+         * \f$\sum_{i = 0}^{j-1}{obj\_i.size()}\f$ for j > 0 and <tt>m_offset[0]
+         * = 0</tt>.
          *
          */
         std::vector<std::size_t> m_offset;
         /**
-         * @brief Indices of particles that are duplicated for periodic boundary conditions.
+         * @brief Indices of particles that are duplicated for periodic boundary
+         * conditions.
          */
         std::vector<std::size_t> m_periodic_indices;
 
@@ -316,20 +328,29 @@ namespace scopi
 
     template<std::size_t dim>
     scopi_container<dim>::scopi_container()
-    : m_periodic_ptr(0)
-    , m_periodic_obj_ptr(0)
-    , m_nb_inactive_core_objects(0)
-    , m_periodic_added(false)
+        : m_periodic_ptr(0), m_periodic_obj_ptr(0),
+          m_nb_inactive_core_objects(0), m_periodic_added(false)
     {}
 
     template<std::size_t dim>
-    std::unique_ptr<object<dim, false>> scopi_container<dim>::operator[](std::size_t i)
+    std::unique_ptr<object<dim, false>>
+    scopi_container<dim>::operator[](std::size_t i)
     {
-        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]], &m_quaternions[m_offset[i]]);
+        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]],
+                                              &m_quaternions[m_offset[i]]);
     }
 
     template<std::size_t dim>
-    void scopi_container<dim>::push_back(const object<dim>& s, const property<dim>& p)
+    const std::unique_ptr<object<dim, false>>
+    scopi_container<dim>::operator[](std::size_t i) const
+    {
+        return (*m_shape_map[m_shapes_id[i]])(&m_positions[m_offset[i]],
+                                              &m_quaternions[m_offset[i]]);
+    }
+
+    template<std::size_t dim>
+    void scopi_container<dim>::push_back(const object<dim> &s,
+                                         const property<dim> &p)
     {
         assert(!m_periodic_added);
 
@@ -342,7 +363,7 @@ namespace scopi
             m_offset.push_back(m_offset.back() + s.size());
         }
 
-        for(std::size_t i = 0; i< s.size(); ++i)
+        for (std::size_t i = 0; i < s.size(); ++i)
         {
             m_positions.push_back(s.pos(i));
             m_quaternions.push_back(s.q(i));
@@ -360,14 +381,16 @@ namespace scopi
             m_nb_inactive_core_objects += s.size();
             if (m_nb_inactive_core_objects != m_positions.size())
             {
-                throw std::runtime_error("All the obstacles must be pushed before the active particles.");
+                throw std::runtime_error("All the obstacles must be pushed "
+                                         "before the active particles.");
             }
         }
 
         auto it = m_shape_map.find(s.hash());
         if (it == m_shape_map.end())
         {
-            m_shape_map.insert(std::make_pair(s.hash(), std::move(s.construct())));
+            m_shape_map.insert(
+                std::make_pair(s.hash(), std::move(s.construct())));
         }
 
         m_shapes_id.push_back(s.hash());
@@ -376,7 +399,8 @@ namespace scopi
     }
 
     template<std::size_t dim>
-    void scopi_container<dim>::push_back(std::size_t io, const std::vector<position_type>& pos)
+    void scopi_container<dim>::push_back(std::size_t io,
+                                         const std::vector<position_type> &pos)
     {
         assert(io >= 0 && io < m_periodic_obj_ptr);
         m_periodic_added = true;
@@ -398,7 +422,6 @@ namespace scopi
         }
 
         m_shapes_id.push_back(m_shapes_id[io]);
-
     }
 
     template<std::size_t dim>
@@ -418,7 +441,7 @@ namespace scopi
     template<std::size_t dim>
     std::size_t scopi_container<dim>::size(bool with_periodic) const
     {
-        return (with_periodic) ? m_shapes_id.size(): m_periodic_obj_ptr;
+        return (with_periodic) ? m_shapes_id.size() : m_periodic_obj_ptr;
     }
 
     template<std::size_t dim>
@@ -438,13 +461,16 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::pos() const
     {
-        return xt::adapt(reinterpret_cast<const position_type*>(m_positions.data()), {m_positions.size()});
+        return xt::adapt(
+            reinterpret_cast<const position_type *>(m_positions.data()),
+            {m_positions.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::pos()
     {
-        return xt::adapt(reinterpret_cast<position_type*>(m_positions.data()), {m_positions.size()});
+        return xt::adapt(reinterpret_cast<position_type *>(m_positions.data()),
+                         {m_positions.size()});
     }
 
     // rotation
@@ -452,13 +478,17 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::q() const
     {
-        return xt::adapt(reinterpret_cast<const quaternion_type*>(m_quaternions.data()), {m_quaternions.size()});
+        return xt::adapt(
+            reinterpret_cast<const quaternion_type *>(m_quaternions.data()),
+            {m_quaternions.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::q()
     {
-        return xt::adapt(reinterpret_cast<quaternion_type*>(m_quaternions.data()), {m_quaternions.size()});
+        return xt::adapt(
+            reinterpret_cast<quaternion_type *>(m_quaternions.data()),
+            {m_quaternions.size()});
     }
 
     // velocity
@@ -466,13 +496,16 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::v() const
     {
-        return xt::adapt(reinterpret_cast<const velocity_type*>(m_velocities.data()), {m_velocities.size()});
+        return xt::adapt(
+            reinterpret_cast<const velocity_type *>(m_velocities.data()),
+            {m_velocities.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::v()
     {
-        return xt::adapt(reinterpret_cast<velocity_type*>(m_velocities.data()), {m_velocities.size()});
+        return xt::adapt(reinterpret_cast<velocity_type *>(m_velocities.data()),
+                         {m_velocities.size()});
     }
 
     // desired velocity
@@ -480,13 +513,17 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::vd() const
     {
-        return xt::adapt(reinterpret_cast<const velocity_type*>(m_desired_velocities.data()), {m_desired_velocities.size()});
+        return xt::adapt(reinterpret_cast<const velocity_type *>(
+                             m_desired_velocities.data()),
+                         {m_desired_velocities.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::vd()
     {
-        return xt::adapt(reinterpret_cast<velocity_type*>(m_desired_velocities.data()), {m_desired_velocities.size()});
+        return xt::adapt(
+            reinterpret_cast<velocity_type *>(m_desired_velocities.data()),
+            {m_desired_velocities.size()});
     }
 
     // omega
@@ -494,13 +531,16 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::omega() const
     {
-        return xt::adapt(reinterpret_cast<const rotation_type*>(m_omega.data()), {m_omega.size()});
+        return xt::adapt(
+            reinterpret_cast<const rotation_type *>(m_omega.data()),
+            {m_omega.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::omega()
     {
-        return xt::adapt(reinterpret_cast<rotation_type*>(m_omega.data()), {m_omega.size()});
+        return xt::adapt(reinterpret_cast<rotation_type *>(m_omega.data()),
+                         {m_omega.size()});
     }
 
     // desired velocity
@@ -508,13 +548,17 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::desired_omega() const
     {
-        return xt::adapt(reinterpret_cast<const rotation_type*>(m_desired_omega.data()), {m_desired_omega.size()});
+        return xt::adapt(
+            reinterpret_cast<const rotation_type *>(m_desired_omega.data()),
+            {m_desired_omega.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::desired_omega()
     {
-        return xt::adapt(reinterpret_cast<rotation_type*>(m_desired_omega.data()), {m_desired_omega.size()});
+        return xt::adapt(
+            reinterpret_cast<rotation_type *>(m_desired_omega.data()),
+            {m_desired_omega.size()});
     }
 
     // force
@@ -522,13 +566,15 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::f() const
     {
-        return xt::adapt(reinterpret_cast<const force_type*>(m_forces.data()), {m_forces.size()});
+        return xt::adapt(reinterpret_cast<const force_type *>(m_forces.data()),
+                         {m_forces.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::f()
     {
-        return xt::adapt(reinterpret_cast<force_type*>(m_forces.data()), {m_forces.size()});
+        return xt::adapt(reinterpret_cast<force_type *>(m_forces.data()),
+                         {m_forces.size()});
     }
 
     // mass
@@ -536,13 +582,15 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::m() const
     {
-        return xt::adapt(reinterpret_cast<const mass_type*>(m_masses.data()), {m_masses.size()});
+        return xt::adapt(reinterpret_cast<const mass_type *>(m_masses.data()),
+                         {m_masses.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::m()
     {
-        return xt::adapt(reinterpret_cast<mass_type*>(m_masses.data()), {m_masses.size()});
+        return xt::adapt(reinterpret_cast<mass_type *>(m_masses.data()),
+                         {m_masses.size()});
     }
 
     // moment of inertia
@@ -550,13 +598,17 @@ namespace scopi
     template<std::size_t dim>
     auto scopi_container<dim>::j() const
     {
-        return xt::adapt(reinterpret_cast<const moment_type*>(m_moments_inertia.data()), {m_moments_inertia.size()});
+        return xt::adapt(
+            reinterpret_cast<const moment_type *>(m_moments_inertia.data()),
+            {m_moments_inertia.size()});
     }
 
     template<std::size_t dim>
     auto scopi_container<dim>::j()
     {
-        return xt::adapt(reinterpret_cast<moment_type*>(m_moments_inertia.data()), {m_moments_inertia.size()});
+        return xt::adapt(
+            reinterpret_cast<moment_type *>(m_moments_inertia.data()),
+            {m_moments_inertia.size()});
     }
 
     template<std::size_t dim>
@@ -574,7 +626,7 @@ namespace scopi
         m_masses.resize(size);
         m_moments_inertia.resize(size);
 
-        m_offset.resize(m_periodic_obj_ptr+1);
+        m_offset.resize(m_periodic_obj_ptr + 1);
         m_shapes_id.resize(m_periodic_obj_ptr);
 
         m_periodic_added = false;
@@ -596,7 +648,7 @@ namespace scopi
     std::size_t scopi_container<dim>::object_index(std::size_t i) const
     {
         auto lower = std::upper_bound(m_offset.cbegin(), m_offset.cend(), i);
-        return std::distance(m_offset.cbegin(), lower)-1;
+        return std::distance(m_offset.cbegin(), lower) - 1;
     }
 
     template<std::size_t dim>
@@ -605,4 +657,4 @@ namespace scopi
         return m_offset[i];
     }
 
-}
+} // namespace scopi

@@ -13,7 +13,7 @@ namespace scopi
      *
      * Defined for compatibility.
      */
-    template<>
+    template <>
     struct VapParams<vap_fixed>
     {
     };
@@ -23,9 +23,10 @@ namespace scopi
      *
      * The a priori velocity (direction and norm) is fixed at the begining of the simulation and does not change.
      */
-    class vap_fixed: public vap_base<vap_fixed>
+    class vap_fixed : public vap_base<vap_fixed>
     {
-    public:
+      public:
+
         /**
          * @brief Alias for the base class vap_base.
          */
@@ -37,8 +38,8 @@ namespace scopi
          * @param particles [out] Array of particles.
          * @param contacts [in] Array of contacts.
          */
-        template <std::size_t dim>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts);
+        template <std::size_t dim, class Contacts>
+        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts& contacts);
 
         /**
          * @brief Constructor.
@@ -50,12 +51,15 @@ namespace scopi
          * @param params Parameters (for compatibility).
          */
         vap_fixed(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt);
-
     };
 
-    template <std::size_t dim>
-    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>&, const std::vector<neighbor<dim>>&)
+    template <std::size_t dim, class Contacts>
+    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts&)
     {
-
+        for (std::size_t i = m_active_ptr; i < m_active_ptr + m_Nactive; ++i)
+        {
+            particles.v()(i)     = particles.vd()(i);
+            particles.omega()(i) = particles.desired_omega()(i);
+        }
     }
 }

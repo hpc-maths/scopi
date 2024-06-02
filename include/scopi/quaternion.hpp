@@ -1,7 +1,7 @@
 #pragma once
 
-#include <xtensor/xfixed.hpp>
 #include <xtensor-blas/xlinalg.hpp>
+#include <xtensor/xfixed.hpp>
 
 #include "types.hpp"
 
@@ -49,7 +49,7 @@ namespace scopi
      *
      * @return Quaternion representing the rotation.
      */
-    type::quaternion_t quaternion(double angle=0);
+    type::quaternion_t quaternion(double angle = 0);
 
     /**
      * @brief Compute the conjugate of \c q.
@@ -77,15 +77,27 @@ namespace scopi
             out[1][1] = 1-2*w*w;
             return out;
             */
-            return { { 1-2*w*w,  -2*x*w },
-                     {   2*x*w, 1-2*w*w } };
+            return {
+                {1 - 2 * w * w, -2 * x * w   },
+                {2 * x * w,     1 - 2 * w * w}
+            };
         }
 
         template <class q_t>
         type::matrix_rotation_t<3> rotation_matrix_impl(const q_t& q, std::integral_constant<std::size_t, 3>)
         {
+            // auto q1 = q(0);
+            // auto q2 = q(1); // x*x + y*y + z*z + w*w = 1
+            // auto q3 = q(2);
+            // auto q0 = q(3);
+            // return {
+            //     {q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3, 2 * q1 * q2 - 2 * q0 * q3,             2 * q1 * q3 + 2 * q0 * q2            },
+            //     {2 * q1 * q2 + 2 * q0 * q3,             q0 * q0 - q1 * q1 + q2 * q2 - q3 * q3, 2 * q2 * q3 - 2 * q0 * q1            },
+            //     {2 * q1 * q3 - 2 * q0 * q2,             2 * q2 * q3 + 2 * q0 * q1,             q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3}
+            // };
+
             auto x = q(0);
-            auto y = q(1);  // x*x + y*y + z*z + w*w = 1
+            auto y = q(1); // x*x + y*y + z*z + w*w = 1
             auto z = q(2);
             auto w = q(3);
             // [[ q0**2+q1**2-q2**2-q3**2, 2*q1*q2-2*q0*q3, 2*q1*q3+2*q0*q2 ],
@@ -104,9 +116,11 @@ namespace scopi
             out[2][2] =   1-2*y*y-2*z*z;
             return out;
             */
-            return { { 1-2*z*z-2*w*w,   2*y*z-2*x*w,   2*y*w+2*x*z },
-                     {   2*y*z+2*x*w, 1-2*y*y-2*w*w,   2*z*w-2*x*y },
-                     {   2*y*w-2*x*z,   2*z*w+2*x*y, 1-2*y*y-2*z*z } };
+            return {
+                {1 - 2 * z * z - 2 * w * w, 2 * y * z - 2 * x * w,     2 * y * w + 2 * x * z    },
+                {2 * y * z + 2 * x * w,     1 - 2 * y * y - 2 * w * w, 2 * z * w - 2 * x * y    },
+                {2 * y * w - 2 * x * z,     2 * z * w + 2 * x * y,     1 - 2 * y * y - 2 * z * z}
+            };
         }
     }
 
@@ -119,8 +133,9 @@ namespace scopi
     /**
      * @brief Compute the multiplication between two quaternions.
      *
-     * If \f$ q_1 = (q_1^0, \vec{q_0}) \f$ and \f$ q_2 = (q_2^0, \vec{q_2}) \f$, with \f$ q_1^0, q_2^0 \in \mathbb{R} \f$ and \f$ \vec{q_1}, \vec{q_2} \in \mathcal{R}^3 \f$, then
-     * \f$ q_1 \circ q_2 = (q_1^0 q_2^0 - \vec{q_1} \cdot \vec{q_2}, q_1^0 \vec{q_2} + q_2^0 \vec{q_1} + \vec{q_1} \land \vec{q_2}) \f$.
+     * If \f$ q_1 = (q_1^0, \vec{q_0}) \f$ and \f$ q_2 = (q_2^0, \vec{q_2}) \f$, with \f$ q_1^0, q_2^0 \in \mathbb{R} \f$ and \f$ \vec{q_1},
+     * \vec{q_2} \in \mathcal{R}^3 \f$, then \f$ q_1 \circ q_2 = (q_1^0 q_2^0 - \vec{q_1} \cdot \vec{q_2}, q_1^0 \vec{q_2} + q_2^0 \vec{q_1}
+     * + \vec{q_1} \land \vec{q_2}) \f$.
      *
      * @param q1 [in] Quaternion.
      * @param q2 [in] Quaternion.

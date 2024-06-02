@@ -4,6 +4,7 @@ set(SCOPI_EXAMPLES
    two_ellipsoids_asymmetrical_3d.cpp
    two_ellipsoids_spheres_2d.cpp
    two_ellipsoids_spheres_3d.cpp
+   test_quentin.cpp
    two_spheres.cpp
    two_spheres_periodic.cpp
    sphere_plan.cpp

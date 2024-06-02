@@ -1,17 +1,19 @@
 #pragma once
 
-#include "base.hpp"
 #include "../box.hpp"
+#include "../scopi.hpp"
 #include "../utils.hpp"
+#include "base.hpp"
 
+#include "plog/Initializers/RollingFileInitializer.h"
 #include <cstddef>
 #include <locale>
 #include <plog/Log.h>
-#include "plog/Initializers/RollingFileInitializer.h"
 
 namespace scopi
 {
 
+    template <class problem_t>
     class contact_brute_force;
 
     /**
@@ -19,15 +21,23 @@ namespace scopi
      *
      * Specialization of ContactsParams.
      */
-    template<>
-    struct ContactsParams<contact_brute_force>
+    template <class problem_t>
+    struct ContactsParams<contact_brute_force<problem_t>>
     {
         /**
          * @brief Default constructor.
          */
-        ContactsParams();
+        ContactsParams()
+            : dmax(2.)
+        {
+        }
 
-        void init_options(CLI::App& app);
+        void init_options()
+        {
+            auto& app = get_app();
+            auto opt  = app.add_option_group("Brute force contact options");
+            opt->add_option("--dmax", dmax, "Maximum distance between two neighboring particles")->capture_default_str();
+        }
 
         /**
          * @brief Maximum distance between two neighboring particles.
@@ -43,20 +53,25 @@ namespace scopi
      *
      * Contacts between particles are computed using brute force algorithm.
      */
-    class contact_brute_force: public contact_base<contact_brute_force>
+    template <class problem_t>
+    class contact_brute_force : public contact_base<contact_brute_force<problem_t>>
     {
-    public:
+      public:
+
         /**
          * @brief Alias for the base class contact_base.
          */
-        using base_type = contact_base<contact_brute_force>;
+        using base_type = contact_base<contact_brute_force<problem_t>>;
 
         /**
          * @brief Constructor.
          *
          * @param params [in] Parameters.
          */
-        contact_brute_force(const ContactsParams<contact_brute_force>& params = ContactsParams<contact_brute_force>());
+        contact_brute_force(const ContactsParams<contact_brute_force<problem_t>>& params = ContactsParams<contact_brute_force<problem_t>>())
+            : base_type(params)
+        {
+        }
 
         /**
          * @brief Compute contacts between particles using brute force algorithm.
@@ -73,24 +88,31 @@ namespace scopi
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        std::vector<neighbor<dim>> run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
+        auto run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
 
+        contact_property<problem_t> m_default_contact_property;
+
+        auto& default_contact_property()
+        {
+            return m_default_contact_property;
+        }
     };
 
+    template <class problem_t>
     template <std::size_t dim>
-    std::vector<neighbor<dim>> contact_brute_force::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
+    auto contact_brute_force<problem_t>::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
     {
-        std::vector<neighbor<dim>> contacts;
+        std::vector<neighbor<dim, problem_t>> contacts;
 
         add_objects_from_periodicity(box, particles, this->m_params.dmax);
 
         tic();
-        #pragma omp parallel for
+#pragma omp parallel for
         for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
             }
         }
 
@@ -99,7 +121,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance(box, particles, i, j, contacts, this->m_params.dmax);
+                compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
             }
         }
 
@@ -114,6 +136,5 @@ namespace scopi
         particles.reset_periodic();
 
         return contacts;
-
     }
 }

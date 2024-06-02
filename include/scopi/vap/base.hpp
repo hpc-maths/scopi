@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../container.hpp"
-#include "../utils.hpp"
-#include "../params.hpp"
 #include "../objects/neighbor.hpp"
+#include "../params.hpp"
+#include "../utils.hpp"
 #include <vector>
 
 namespace scopi
@@ -14,9 +14,10 @@ namespace scopi
      * @tparam D Class that implements the a priori velocity.
      */
     template <class D>
-    class vap_base: public crtp_base<D>
+    class vap_base : public crtp_base<D>
     {
-    public:
+      public:
+
         using params_t = VapParams<D>;
 
         /**
@@ -26,8 +27,8 @@ namespace scopi
          * @param particles [out] Array of particles.
          * @param contacts [in] Array of contacts.
          */
-        template <std::size_t dim>
-        void set_a_priori_velocity(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts);
+        template <std::size_t dim, class Contacts>
+        void set_a_priori_velocity(scopi_container<dim>& particles, const Contacts& contacts);
         /**
          * @brief Constructor.
          *
@@ -39,7 +40,8 @@ namespace scopi
 
         params_t& get_params();
 
-    protected:
+      protected:
+
         /**
          * @brief Number of active particles.
          */
@@ -53,22 +55,23 @@ namespace scopi
          */
         double m_dt;
 
-    private:
-        params_t m_params;
+      private:
 
+        params_t m_params;
     };
 
     template <class D>
     vap_base<D>::vap_base(std::size_t Nactive, std::size_t active_ptr, double dt)
-    : m_Nactive(Nactive)
-    , m_active_ptr(active_ptr)
-    , m_dt(dt)
-    , m_params()
-    {}
+        : m_Nactive(Nactive)
+        , m_active_ptr(active_ptr)
+        , m_dt(dt)
+        , m_params()
+    {
+    }
 
     template <class D>
-    template <std::size_t dim>
-    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts)
+    template <std::size_t dim, class Contacts>
+    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles, const Contacts& contacts)
     {
         tic();
         this->derived_cast().set_a_priori_velocity_impl(particles, contacts);

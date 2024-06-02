@@ -1,13 +1,16 @@
 #pragma once
 
 #include <cstddef>
-#include <iostream>
 #include <filesystem>
+#include <iostream>
 
 #include <CLI/CLI.hpp>
 
-#include <plog/Log.h>
 #include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Log.h>
+
+#include "contact/property.hpp"
+#include "utils.hpp"
 
 namespace scopi
 {
@@ -19,10 +22,11 @@ namespace scopi
      *
      * @tparam solver_t Type of the solver.
      */
-    template<class optim_t>
+    template <class optim_t>
     struct OptimParams
     {
-    private:
+      private:
+
         /**
          * @brief Constructor.
          */
@@ -37,10 +41,11 @@ namespace scopi
      *
      * @tparam problem_t Type of the problem.
      */
-    template<class problem_t>
+    template <class problem_t>
     struct ProblemParams
     {
-    private:
+      private:
+
         /**
          * @brief Constructor.
          */
@@ -55,10 +60,11 @@ namespace scopi
      *
      * @tparam contact_t Type of the contacts.
      */
-    template<class contact_t>
+    template <class contact_t>
     struct ContactsParams
     {
-    private:
+      private:
+
         /**
          * @brief Constructor.
          */
@@ -73,10 +79,11 @@ namespace scopi
      *
      * @tparam vap_t Type of the a priori velocity.
      */
-    template<class vap_t>
+    template <class vap_t>
     struct VapParams
     {
-    private:
+      private:
+
         /**
          * @brief Constructor.
          */
@@ -94,7 +101,7 @@ namespace scopi
          */
         ScopiParams();
 
-        void init_options(CLI::App& app);
+        void init_options();
 
         /**
          * @brief Frequency to write the output files.
@@ -135,24 +142,24 @@ namespace scopi
      *
      * @tparam solver_t Type of the optimization solver.
      */
-    template<class solver_t>
+    template <class solver_t>
     struct Params
     {
-        using solver_params_t = ScopiParams;
-        using optim_params_t = typename solver_t::optim_solver_t::params_t;
-        using problem_params_t = typename solver_t::optim_solver_t::problem_t::params_t;
-        using contact_params_t = typename solver_t::contact_t::params_t;
-        using vap_params_t = typename solver_t::vap_t::params_t;
+        using solver_params_t            = ScopiParams;
+        using optim_params_t             = typename solver_t::optim_solver_t::params_t;
+        using problem_t                  = typename solver_t::problem_t;
+        using default_contact_property_t = contact_property<problem_t>;
+        using contact_method_params_t    = typename solver_t::contact_method_t::params_t;
+        using vap_params_t               = typename solver_t::vap_t::params_t;
 
         /**
          * @brief Default constructor.
          */
         Params(solver_params_t& solver_params,
                optim_params_t& optim_params,
-               problem_params_t& problem_params,
-               contact_params_t& contact_params,
-               vap_params_t& vap_params
-        );
+               default_contact_property_t& default_contact_property,
+               contact_method_params_t& contact_method_params,
+               vap_params_t& vap_params);
 
         /**
          * @brief Parameters for the optimization solver.
@@ -161,11 +168,11 @@ namespace scopi
         /**
          * @brief Parameters for the problem.
          */
-        problem_params_t& problem_params;
+        default_contact_property_t& default_contact_property;
         /**
          * @brief Parameters for the contacts.
          */
-        contact_params_t& contact_params;
+        contact_method_params_t& contact_method_params;
         /**
          * @brief Parameters for the a priori velocity.
          */
@@ -176,19 +183,17 @@ namespace scopi
         solver_params_t& solver_params;
     };
 
-    template<class solver_t>
+    template <class solver_t>
     Params<solver_t>::Params(solver_params_t& solver_params,
                              optim_params_t& optim_params,
-                             problem_params_t& problem_params,
-                             contact_params_t& contact_params,
-                             vap_params_t& vap_params
-    )
-    : optim_params(optim_params)
-    , problem_params(problem_params)
-    , contact_params(contact_params)
-    , vap_params(vap_params)
-    , solver_params(solver_params)
-    {}
+                             default_contact_property_t& default_contact_property,
+                             contact_method_params_t& contact_method_params,
+                             vap_params_t& vap_params)
+        : optim_params(optim_params)
+        , default_contact_property(default_contact_property)
+        , contact_method_params(contact_method_params)
+        , vap_params(vap_params)
+        , solver_params(solver_params)
+    {
+    }
 }
-
-

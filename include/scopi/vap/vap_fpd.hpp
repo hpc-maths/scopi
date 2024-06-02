@@ -13,7 +13,7 @@ namespace scopi
      *
      * Defined for compatibility.
      */
-    template<>
+    template <>
     struct VapParams<vap_fpd>
     {
     };
@@ -25,9 +25,10 @@ namespace scopi
      * and
      * \f$ \vec{\omega'}^{desired} = \vec{\omega'}^n + \Delta t \vec{\omega'}^n \land ( \mathbb{J} \vec{\omega'}^n ) \f$.
      */
-    class vap_fpd: public vap_base<vap_fpd>
+    class vap_fpd : public vap_base<vap_fpd>
     {
-    public:
+      public:
+
         using base_type = vap_base<vap_fpd>;
         /**
          * @brief Compute the a priori velocity using the fundamental principle of dynamics.
@@ -38,8 +39,8 @@ namespace scopi
          * @param particles [out] Array of particles.
          * @param contacts [in] Array of contacts.
          */
-        template <std::size_t dim>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>& contacts);
+        template <std::size_t dim, class Contacts>
+        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts& contacts);
 
         /**
          * @brief Constructor.
@@ -51,7 +52,6 @@ namespace scopi
          * @param params Parameters (for compatibility).
          */
         vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt);
-
     };
 
     /**
@@ -77,14 +77,15 @@ namespace scopi
      */
     type::moment_t<3> cross_product_vap_fpd(const scopi_container<3>& particles, std::size_t i);
 
-    template <std::size_t dim>
-    void vap_fpd::set_a_priori_velocity_impl(scopi_container<dim>& particles, const std::vector<neighbor<dim>>&)
+    template <std::size_t dim, class Contacts>
+    void vap_fpd::set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts&)
     {
-        #pragma omp parallel for
-        for (std::size_t i=0; i<m_Nactive; ++i)
+#pragma omp parallel for
+        for (std::size_t i = m_active_ptr; i < m_active_ptr + m_Nactive; ++i)
         {
-            particles.vd()(m_active_ptr + i) = particles.v()(m_active_ptr + i) + m_dt*particles.f()(m_active_ptr + i)/particles.m()(m_active_ptr + i);
-            particles.desired_omega()(m_active_ptr + i) = particles.omega()(m_active_ptr + i) + cross_product_vap_fpd(particles, m_active_ptr + i);
+            particles.v()(i) += m_dt * particles.f()(i) / particles.m()(i);
+            //check cross_product (division by J in the formula missing) and add a torque
+            particles.omega()(i) += cross_product_vap_fpd(particles, i);
         }
     }
 

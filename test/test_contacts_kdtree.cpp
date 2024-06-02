@@ -6,6 +6,7 @@
 #include <scopi/objects/types/superellipsoid.hpp>
 #include <scopi/container.hpp>
 #include <scopi/contact/contact_kdtree.hpp>
+#include <scopi/contact/property.hpp>
 
 namespace scopi
 {
@@ -23,20 +24,14 @@ namespace scopi
         particles.push_back(s2);
         particles.push_back(s3);
 
-        ContactsParams<contact_kdtree> params;
+        ContactsParams<contact_kdtree<NoFriction>> params;
         params.kd_tree_radius = 100.;
         contact_kdtree cont(params);
         auto contacts = cont.run(particles, 0);
-        std::size_t nMatches = cont.get_nMatches();
 
         SUBCASE("nbContacts")
         {
             CHECK(contacts.size() == 1);
-        }
-
-        SUBCASE("nbComputedDistances")
-        {
-            CHECK(nMatches == 2);
         }
 
         SUBCASE("particles in contact")

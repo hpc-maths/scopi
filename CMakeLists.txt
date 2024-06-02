@@ -50,8 +50,8 @@ find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
 find_package(CLI11 REQUIRED)
 
-# find_package(plog REQUIRED)
-# find_package(nanoflann)
+find_package(plog REQUIRED)
+# find_package(nanoflann REQUIRED)
 
 # section needed to use xtensor-blas
 # see https://xtensor-blas.readthedocs.io/en/latest/performance.html
@@ -102,16 +102,16 @@ endif()
 set(CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
-    src/contact/contact_brute_force.cpp
-    src/contact/contact_kdtree.cpp
-    src/problems/DryWithoutFriction.cpp
-    src/problems/DryWithFriction.cpp
-    src/problems/DryWithFrictionBase.cpp
-    src/problems/DryWithFrictionFixedPoint.cpp
-    src/solvers/ConstraintMosek.cpp
-    src/solvers/OptimUzawaBase.cpp
-    src/solvers/OptimProjectedGradient.cpp
-    src/solvers/projection.cpp
+    # src/contact/contact_brute_force.cpp
+    # src/contact/contact_kdtree.cpp
+    # src/problems/DryWithoutFriction.cpp
+    # src/problems/DryWithFriction.cpp
+    # src/problems/DryWithFrictionBase.cpp
+    # src/problems/DryWithFrictionFixedPoint.cpp
+    # src/solvers/ConstraintMosek.cpp
+    # src/solvers/OptimUzawaBase.cpp
+    # src/solvers/OptimProjectedGradient.cpp
+    # src/solvers/projection.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/vap/vap_projection.cpp
@@ -132,7 +132,7 @@ target_link_libraries(scopi PUBLIC xtensor
     fmt::fmt
     CLI11::CLI11
 
-    # plog::plog
+    plog::plog
     # nanoflann::nanoflann
     ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 

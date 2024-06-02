@@ -241,7 +241,7 @@ function drawObjects() {
             if (options.radiuses) {
                 const line_geometry_rot = new THREE.BufferGeometry().setFromPoints(rot);
                 const line_material_rot = new THREE.LineBasicMaterial({
-                    color: 'blue',
+                    color: 'white',
                     depthTest: false
                 });
                 var line_mesh_rot = new THREE.LineSegments(line_geometry_rot, line_material_rot);
@@ -250,24 +250,64 @@ function drawObjects() {
 
             // contacts
             if (options.contacts) {
-                const points = [];
-                contacts.forEach((obj, index) => {
+                
+                if(contacts != null)
+                {contacts.forEach((obj, index) => {
+                    //console.log(contacts);
+                    const points = [];
+                    if(obj.gamma<0)
+                    {
                     if (obj.pi.length == 2) {
-                        points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], 0.));
-                        points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], 0.));
+                        if(objects[obj.i].type === "sphere")
+                        {
+                            points.push(new THREE.Vector3(objects[obj.i].position[0], objects[obj.i].position[1], 0.));
+                        }
+                        else
+                        { 
+                            points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], 0.));
+                        }
+                        if(objects[obj.j].type === "sphere")
+                        {
+                            points.push(new THREE.Vector3(objects[obj.j].position[0], objects[obj.j].position[1], 0.));
+                        }
+                        else
+                        {
+                            points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], 0.));
+                        }
+                        
                     }
                     else {
                         points.push(new THREE.Vector3(obj.pi[0], obj.pi[1], obj.pi[2]));
                         points.push(new THREE.Vector3(obj.pj[0], obj.pj[1], obj.pi[2]));
                     }
-                });
-                const line_geometry = new THREE.BufferGeometry().setFromPoints(points);
-                const line_material = new THREE.LineBasicMaterial({
-                    color: 'green',
-                });
-                var line_mesh = new THREE.LineSegments(line_geometry, line_material);
-                scene.add(line_mesh);
-            }
+                
+                    var line_geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    if(obj.gamma==obj.gamma_min)
+                    {
+                        var line_material = new THREE.LineBasicMaterial({
+                            color: 'yellow',
+                            linewidth: 10,
+                            depthTest: false
+                        });
+                    }
+                    else
+                    {
+                        var line_material = new THREE.LineBasicMaterial({
+                            color: '#FE01CC',
+                            linewidth: 10,
+                            depthTest: false
+                        });
+                    }
+                    
+                
+                    var line_mesh = new THREE.LineSegments(line_geometry, line_material);
+                    scene.add(line_mesh);
+
+                    }
+                    });
+                    
+                }
+            }});
 
             /*
             const path = new ContactsCurve(contacts);
@@ -287,8 +327,6 @@ function drawObjects() {
             // The X axis is red. The Y axis is green. The Z axis is blue.
             // const axesHelper = new THREE.AxesHelper( 5 );
             // scene.add( axesHelper );
-
-        });
 
         const ext = (oFiles[options.current_frame].name.match(/\.[0-9a-z]{1,5}$/i) || [""])[0].substring(1);
         if (ext == 'json')
