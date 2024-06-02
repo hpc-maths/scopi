@@ -9,6 +9,7 @@
 #include <xtensor/xtensor.hpp>
 
 #include "../scopi.hpp"
+#include "../utils.hpp"
 
 namespace scopi
 {
@@ -22,9 +23,12 @@ namespace scopi
         {
             auto& app = get_app();
             auto opt  = app.add_option_group("PGD options");
-            opt->add_option("--pgd-alpha", alpha, "descent coefficient")->capture_default_str();
-            opt->add_option("--pgd-max-ite", max_ite, "Maximum number of iterations")->capture_default_str();
-            opt->add_option("--pgd-tolerance", tolerance, "Tolerance")->capture_default_str();
+            if (!check_option(app, "--pgd-alpha"))
+            {
+                opt->add_option("--pgd-alpha", alpha, "descent coefficient")->capture_default_str();
+                opt->add_option("--pgd-max-ite", max_ite, "Maximum number of iterations")->capture_default_str();
+                opt->add_option("--pgd-tolerance", tolerance, "Tolerance")->capture_default_str();
+            }
         }
 
         double alpha     = 0.05;
@@ -98,10 +102,13 @@ namespace scopi
         {
             auto& app = get_app();
             auto opt  = app.add_option_group("APGD options");
-            opt->add_option("--apgd-alpha", alpha, "descent coefficient")->capture_default_str();
-            opt->add_option("--apgd-max-ite", max_ite, "Maximum number of iterations")->capture_default_str();
-            opt->add_option("--apgd-tolerance", tolerance, "Tolerance")->capture_default_str();
-            opt->add_flag("--apgd-dynamic", dynamic_descent, "Adaptive descent coefficient")->capture_default_str();
+            if (!check_option(app, "--apgd-alpha"))
+            {
+                opt->add_option("--apgd-alpha", alpha, "descent coefficient")->capture_default_str();
+                opt->add_option("--apgd-max-ite", max_ite, "Maximum number of iterations")->capture_default_str();
+                opt->add_option("--apgd-tolerance", tolerance, "Tolerance")->capture_default_str();
+                opt->add_flag("--apgd-dynamic", dynamic_descent, "Adaptive descent coefficient")->capture_default_str();
+            }
         }
 
         double alpha         = 0.05;

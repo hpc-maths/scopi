@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../box.hpp"
+#include "../scopi.hpp"
 #include "../utils.hpp"
 #include "base.hpp"
 
@@ -31,9 +32,10 @@ namespace scopi
         {
         }
 
-        void init_options(CLI::App& app)
+        void init_options()
         {
-            auto opt = app.add_option_group("Brute force contact options");
+            auto& app = get_app();
+            auto opt  = app.add_option_group("Brute force contact options");
             opt->add_option("--dmax", dmax, "Maximum distance between two neighboring particles")->capture_default_str();
         }
 

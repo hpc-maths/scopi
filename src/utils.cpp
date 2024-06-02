@@ -62,4 +62,14 @@ namespace scopi
     {
         return w;
     }
+
+    bool check_option(const CLI::App& app, const std::string& option)
+    {
+        return !app.get_options(
+                       [&](const CLI::Option* opt)
+                       {
+                           return opt->get_name() == option;
+                       })
+                    .empty();
+    }
 }

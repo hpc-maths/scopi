@@ -2,18 +2,21 @@
 
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <vector>
 
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xio.hpp>
 
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
-#include <iostream>
+
+#include <CLI/CLI.hpp>
+
 /////////////////////////////
 // Functions for the timer //
 /////////////////////////////
@@ -258,6 +261,15 @@ namespace scopi
     {
         out << fmt::format("{:{}}", "", indent) << fmt::format(format_str, std::forward<Args>(args)...) << std::endl;
     }
+
+    /**
+     * @brief Check if an option is present in the CLI app.
+     *
+     * @param app CLI app.
+     * @param option Option to check.
+     * @return true if the option is present, false otherwise.
+     */
+    bool check_option(const CLI::App& app, const std::string& option);
 }
 
 template <typename T>

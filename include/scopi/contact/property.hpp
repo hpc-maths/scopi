@@ -41,7 +41,7 @@ namespace scopi
     template <>
     struct contact_property<NoFriction>
     {
-        auto to_json()
+        auto to_json() const
         {
             return nl::json{
                 {"type", "no friction"},
@@ -61,13 +61,8 @@ namespace scopi
     {
         contact_property()
         {
-            auto& sub = get_contact_subcommand();
-            if (sub.get_options(
-                       [](const CLI::Option* opt)
-                       {
-                           return opt->get_name() == "--mu";
-                       })
-                    .empty())
+            auto& sub = get_app();
+            if (!check_option(sub, "--mu"))
             {
                 sub.add_option("--mu", mu, "Damping coefficient")->capture_default_str();
             }
@@ -89,13 +84,8 @@ namespace scopi
     {
         contact_property()
         {
-            auto& sub = get_contact_subcommand();
-            if (sub.get_options(
-                       [](const CLI::Option* opt)
-                       {
-                           return opt->get_name() == "--fixed-point-tol";
-                       })
-                    .empty())
+            auto& sub = get_app();
+            if (!check_option(sub, "--fixed-point-tol"))
             {
                 sub.add_option("--fixed-point-tol", fixed_point_tol, "Fixed point tolerance")->capture_default_str();
                 sub.add_option("--fixed-point-max-iter", fixed_point_max_iter, "Fixed point max iterations")->capture_default_str();
@@ -120,13 +110,8 @@ namespace scopi
     {
         contact_property()
         {
-            auto& sub = get_contact_subcommand();
-            if (sub.get_options(
-                       [](const CLI::Option* opt)
-                       {
-                           return opt->get_name() == "--gamma";
-                       })
-                    .empty())
+            auto& sub = get_app();
+            if (!check_option(sub, "--gamma"))
             {
                 sub.add_option("--gamma", gamma, "Damping coefficient")->capture_default_str();
                 sub.add_option("--gamma-min", gamma_min, "Damping coefficient")->capture_default_str();
