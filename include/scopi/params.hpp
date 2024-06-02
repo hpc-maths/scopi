@@ -10,6 +10,7 @@
 #include <plog/Log.h>
 
 #include "contact/property.hpp"
+#include "utils.hpp"
 
 namespace scopi
 {

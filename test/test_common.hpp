@@ -1,6 +1,6 @@
 #pragma once
-#include <tuple>
 #include "doctest/doctest.h"
+#include <tuple>
 
 #include <scopi/solver.hpp>
 
@@ -20,8 +20,8 @@
 #include <scopi/solvers/OptimGradient.hpp>
 #include <scopi/solvers/apgd.hpp>
 
-#include <scopi/contact/contact_kdtree.hpp>
 #include <scopi/contact/contact_brute_force.hpp>
+#include <scopi/contact/contact_kdtree.hpp>
 
 #include <scopi/vap/vap_fixed.hpp>
 #include <scopi/vap/vap_fpd.hpp>
@@ -29,48 +29,44 @@
 namespace scopi
 {
 
-    template<std::size_t dim, class problem, class contact, class vap>
+    template <std::size_t dim, class problem, template <class> class contact, class vap>
     struct solver
     {
         using type = std::tuple<
-// #ifdef SCOPI_USE_MKL
-//             ScopiSolver<dim, OptimUzawaMkl<problem>, contact, vap>,
-//             ScopiSolver<dim, OptimProjectedGradient<problem, pgd>, contact, vap>,
-//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd>, contact, vap>,
-//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_as>, contact, vap>,
-//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_ar>, contact, vap>,
-//             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_asr>, contact, vap>,
-// #endif
-// #ifdef SCOPI_USE_TBB
-//             ScopiSolver<dim, OptimUzawaMatrixFreeTbb<problem>, contact, vap>,
-// #endif
-// #ifdef SCOPI_USE_MOSEK
-//             ScopiSolver<dim, OptimMosek<problem>, contact, vap>,
-//             // ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap>, // friction with mu = 0
-// #endif
-// #ifdef SCOPI_USE_SCS
-//             ScopiSolver<dim, OptimScs<problem>, contact, vap>
-// #endif
-            ScopiSolver<dim, problem, OptimGradient<apgd>, contact, vap>
-        >;
+            // #ifdef SCOPI_USE_MKL
+            //             ScopiSolver<dim, OptimUzawaMkl<problem>, contact, vap>,
+            //             ScopiSolver<dim, OptimProjectedGradient<problem, pgd>, contact, vap>,
+            //             ScopiSolver<dim, OptimProjectedGradient<problem, apgd>, contact, vap>,
+            //             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_as>, contact, vap>,
+            //             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_ar>, contact, vap>,
+            //             ScopiSolver<dim, OptimProjectedGradient<problem, apgd_asr>, contact, vap>,
+            // #endif
+            // #ifdef SCOPI_USE_TBB
+            //             ScopiSolver<dim, OptimUzawaMatrixFreeTbb<problem>, contact, vap>,
+            // #endif
+            // #ifdef SCOPI_USE_MOSEK
+            //             ScopiSolver<dim, OptimMosek<problem>, contact, vap>,
+            //             // ScopiSolver<dim, OptimMosek<DryWithFriction>, contact, vap>, // friction with mu = 0
+            // #endif
+            // #ifdef SCOPI_USE_SCS
+            //             ScopiSolver<dim, OptimScs<problem>, contact, vap>
+            // #endif
+            ScopiSolver<dim, problem, OptimGradient<apgd>, contact, vap>>;
     };
 
-    template<std::size_t dim, class problem, class contact, class vap>
+    template <std::size_t dim, class problem, template <class> class contact, class vap>
     using solver_t = typename solver<dim, problem, contact, vap>::type;
 
-    template<typename ... input_t>
+    template <typename... input_t>
     using tuple_cat_t = decltype(std::tuple_cat(std::declval<input_t>()...));
 
-    template<std::size_t dim, class vap = vap_fixed>
-    using solver_dry_without_friction_t = tuple_cat_t<solver_t<dim, NoFriction, contact_kdtree<NoFriction>, vap>,
+    template <std::size_t dim, class vap = vap_fixed>
+    using solver_dry_without_friction_t = tuple_cat_t<solver_t<dim, NoFriction, contact_kdtree, vap>,
                                                       solver_t<dim, NoFriction, contact_brute_force, vap>>;
 
-    template<std::size_t dim, class vap>
+    template <std::size_t dim, class vap>
     using solver_dry_with_friction_t = std::tuple<ScopiSolver<dim, Friction, OptimGradient<apgd>, contact_kdtree, vap>,
                                                   ScopiSolver<dim, Friction, OptimGradient<apgd>, contact_brute_force, vap>>;
-
-
-
 
 }
 
@@ -134,19 +130,24 @@ namespace scopi
 // #define SOLVER_VISCOUS_WITH_FRICTION(dim, contact, vap) \
 //     ScopiSolver<dim, OptimMosek<ViscousWithFriction<dim>>, contact, vap>
 
-#define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container) \
-    static size_t _doctest_subcase_idx = 0; \
-    std::for_each(data_container.begin(), data_container.end(), [&](const auto& in) {  \
-            DOCTEST_SUBCASE((std::string(#data_container "[") + \
-                        std::to_string(_doctest_subcase_idx++) + "]").c_str()) { data = in; } \
-                        }); \
+#define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container)                                                                   \
+    static size_t _doctest_subcase_idx = 0;                                                                                      \
+    std::for_each(data_container.begin(),                                                                                        \
+                  data_container.end(),                                                                                          \
+                  [&](const auto& in)                                                                                            \
+                  {                                                                                                              \
+                      DOCTEST_SUBCASE((std::string(#data_container "[") + std::to_string(_doctest_subcase_idx++) + "]").c_str()) \
+                      {                                                                                                          \
+                          data = in;                                                                                             \
+                      }                                                                                                          \
+                  });                                                                                                            \
     _doctest_subcase_idx = 0;
 // }
 #define TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact, vap) \
     TYPE_TO_STRING(scopi::ScopiSolver<dim, scopi::problem, scopi::OptimGradient<scopi::apgd>, scopi::contact, scopi::vap>)
-#define TYPE_TO_STRING_CONTACTS_VAP(solver, problem, dim)\
-    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fixed); \
-    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fpd); \
+#define TYPE_TO_STRING_CONTACTS_VAP(solver, problem, dim)                            \
+    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fixed);      \
+    TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_kdtree, vap_fpd);        \
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_brute_force, vap_fixed); \
     TYPE_TO_STRING_ONE_SOLVER(solver, problem, dim, contact_brute_force, vap_fpd);
 

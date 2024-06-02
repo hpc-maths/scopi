@@ -10,13 +10,13 @@
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xio.hpp>
 
+#include "../dispatch.hpp"
+#include "../neighbor.hpp"
+#include "../types/plan.hpp"
+#include "../types/segment.hpp"
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
 #include "../types/worm.hpp"
-#include "../types/plan.hpp"
-#include "../types/segment.hpp"
-#include "../neighbor.hpp"
-#include "../dispatch.hpp"
 
 #include "nlohmann/json.hpp"
 
@@ -36,16 +36,16 @@ namespace scopi
      *
      * @return nlohmann json object.
      */
-    template<std::size_t dim>
-    nl::json write_objects(const sphere<dim, false>& s, std::size_t id)
+    template <std::size_t dim>
+    nl::json write_objects(const sphere<dim, false>& s, [[maybe_unused]] std::size_t id)
     {
         nl::json object;
 
-        object["type"] = "sphere";
-        object["id"] = id;
-        object["position"] = s.pos();
-        object["radius"] = s.radius();
-        object["rotation"] = xt::flatten(s.rotation());
+        object["type"]       = "sphere";
+        object["id"]         = id;
+        object["position"]   = s.pos();
+        object["radius"]     = s.radius();
+        object["rotation"]   = xt::flatten(s.rotation());
         object["quaternion"] = s.q();
 
         return object;
@@ -64,7 +64,6 @@ namespace scopi
         // return ssss;
     }
 
-
     // SUPERELLIPSOID
     /**
      * @brief Write the elements of a superellipsoid in json format.
@@ -74,17 +73,17 @@ namespace scopi
      *
      * @return nlohmann json object.
      */
-    template<std::size_t dim>
+    template <std::size_t dim>
     nl::json write_objects(const superellipsoid<dim, false>& s, std::size_t id)
     {
         nl::json object;
 
-        object["type"] = "superellipsoid";
-        object["id"] = id;
-        object["position"] = s.pos();
-        object["radius"] = s.radius();
+        object["type"]       = "superellipsoid";
+        object["id"]         = id;
+        object["position"]   = s.pos();
+        object["radius"]     = s.radius();
         object["squareness"] = s.squareness();
-        object["rotation"] = xt::flatten(s.rotation());
+        object["rotation"]   = xt::flatten(s.rotation());
         object["quaternion"] = s.q();
 
         return object;
@@ -115,33 +114,33 @@ namespace scopi
      *
      * @return nlohmann json object.
      */
-    template<std::size_t dim>
-    nl::json write_objects(const plan<dim, false>& p, std::size_t id)
+    template <std::size_t dim>
+    nl::json write_objects(const plan<dim, false>& p, [[maybe_unused]] std::size_t id)
     {
         nl::json object;
 
-        object["type"] = "plan";
-        object["id"] = id;
-        object["position"] = p.pos();
-        object["normal"] = p.normal();
-        object["rotation"] = xt::flatten(p.rotation());
+        object["type"]       = "plan";
+        object["id"]         = id;
+        object["position"]   = p.pos();
+        object["normal"]     = p.normal();
+        object["rotation"]   = xt::flatten(p.rotation());
         object["quaternion"] = p.q();
 
         return object;
 
-      // std::cout << "write_objects : PLAN" << std::endl;
-      // std::stringstream ss;
-      // std::regex xp1("\\{|\\}");
-      // std::regex xp2("\\.,");
-      // std::regex xp3("\\.\\]");
-      // ss << std::scientific << std::setprecision(14) <<
-      //   "\"type\": \"plane\", " <<
-      //   "\"position\": [" << p.pos() << "], " <<
-      //   "\"normal\": [" << p.normal() << "], " <<
-      //   "\"rotation\": ["  << xt::flatten(p.rotation()) <<
-      //   "]";
-      // auto ssss = std::regex_replace(std::regex_replace(std::regex_replace(ss.str(), xp1, ""), xp2, ".0,"), xp3, ".0]");
-      // return ssss;
+        // std::cout << "write_objects : PLAN" << std::endl;
+        // std::stringstream ss;
+        // std::regex xp1("\\{|\\}");
+        // std::regex xp2("\\.,");
+        // std::regex xp3("\\.\\]");
+        // ss << std::scientific << std::setprecision(14) <<
+        //   "\"type\": \"plane\", " <<
+        //   "\"position\": [" << p.pos() << "], " <<
+        //   "\"normal\": [" << p.normal() << "], " <<
+        //   "\"rotation\": ["  << xt::flatten(p.rotation()) <<
+        //   "]";
+        // auto ssss = std::regex_replace(std::regex_replace(std::regex_replace(ss.str(), xp1, ""), xp2, ".0,"), xp3, ".0]");
+        // return ssss;
     }
 
     // SEGMENT
@@ -154,18 +153,18 @@ namespace scopi
      *
      * @return nlohmann json object.
      */
-    template<std::size_t dim>
+    template <std::size_t dim>
     nl::json write_objects(const segment<dim, false>& seg, std::size_t id)
     {
         nl::json object;
 
-        object["type"] = "segment";
-        object["id"] = id;
-        auto extrema = seg.extrema();
-        object["p1"] = extrema[0];
-        object["p2"] = extrema[1];
-        object["normal"] = seg.normal();
-        object["tangent"] = seg.tangent();
+        object["type"]       = "segment";
+        object["id"]         = id;
+        auto extrema         = seg.extrema();
+        object["p1"]         = extrema[0];
+        object["p2"]         = extrema[1];
+        object["normal"]     = seg.normal();
+        object["tangent"]    = seg.tangent();
         object["quaternion"] = seg.q();
 
         return object;
@@ -180,7 +179,7 @@ namespace scopi
      *
      * @return nlohmann json object.
      */
-    template<std::size_t dim>
+    template <std::size_t dim>
     nl::json write_objects(const worm<dim, false>& w, std::size_t id)
     {
         nl::json object;
@@ -188,9 +187,9 @@ namespace scopi
         for (std::size_t i = 0; i < w.size(); ++i)
         {
             nl::json json_worm;
-            json_worm["position"] = w.pos(i);
-            json_worm["id"] = id + i;
-            json_worm["radius"] = w.radius();
+            json_worm["position"]   = w.pos(i);
+            json_worm["id"]         = id + i;
+            json_worm["radius"]     = w.radius();
             json_worm["quaternion"] = w.q(i);
             object["worm"].push_back(json_worm);
         }
@@ -255,15 +254,9 @@ namespace scopi
      * @tparam dim Dimension (2 or 3).
      */
     template <std::size_t dim>
-    using write_objects_dispatcher = unit_static_dispatcher
-    <
+    using write_objects_dispatcher = unit_static_dispatcher<
         write_objects_functor<dim>,
         const object<dim, false>,
-        mpl::vector<const sphere<dim, false>,
-                    const superellipsoid<dim, false>,
-                    const worm<dim, false>,
-                    const plan<dim, false>,
-                    const segment<dim, false>>,
-        typename write_objects_functor<dim>::return_type
-    >;
+        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const worm<dim, false>, const plan<dim, false>, const segment<dim, false>>,
+        typename write_objects_functor<dim>::return_type>;
 }

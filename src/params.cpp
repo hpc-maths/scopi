@@ -16,13 +16,13 @@ namespace scopi
     {
         auto& app = get_app();
         auto opt  = app.add_option_group("Output scopi options");
-        if (!check_option(sub, "--path"))
+        if (!check_option(app, "--path"))
         {
-            sub.add_option("--path", path, "Path where to store the results")->capture_default_str();
-            sub.add_option("--filename", filename, "Name of the outputs")->capture_default_str();
-            sub.add_option("--freq", output_frequency, "Output frequency (in iterations)")->capture_default_str();
-            sub.add_flag("--write-velocity", write_velocity, "Write the velocity of objects")->capture_default_str();
-            sub.add_flag("--binary-output", binary_output, "Write bson output file instead of json")->capture_default_str();
+            opt->add_option("--path", path, "Path where to store the results")->capture_default_str();
+            opt->add_option("--filename", filename, "Name of the outputs")->capture_default_str();
+            opt->add_option("--freq", output_frequency, "Output frequency (in iterations)")->capture_default_str();
+            opt->add_flag("--write-velocity", write_velocity, "Write the velocity of objects")->capture_default_str();
+            opt->add_flag("--binary-output", binary_output, "Write bson output file instead of json")->capture_default_str();
         }
     }
 

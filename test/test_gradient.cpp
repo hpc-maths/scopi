@@ -211,10 +211,10 @@ namespace scopi
         params.solver_params.filename         = "sphere_plan_friction_mu01";
 
         // mu01
-
+        params.default_contact_property.mu = 0.1;
         solver.run(Tf / dt);
 
-        CHECK(diffFile("./Results/sphere_plan_friction_mu01_0002.json", "../test/references/sphere_plan_friction_mu01.json", tol));
+        CHECK(diffFile("./Results/sphere_plan_friction_mu01_0200.json", "../test/references/sphere_plan_friction_mu01.json", tol));
     }
 
     TEST_CASE("sphere - plan friction fixed point")
@@ -261,11 +261,12 @@ namespace scopi
         params.optim_params.alpha           = 0.01;
         params.optim_params.dynamic_descent = true;
 
-        double mu = 0.5;
-        // fixed_point_tol = 1e-6;
-        // fixed_point_max_iter = 1000;
-        params.solver_params.output_frequency = total_it - 1;
-        params.solver_params.filename         = "sphere_plan_friction_fixed_point";
+        double mu                                            = 0.5;
+        params.solver_params.output_frequency                = total_it - 1;
+        params.solver_params.filename                        = "sphere_plan_friction_fixed_point";
+        params.default_contact_property.mu                   = mu;
+        params.default_contact_property.fixed_point_tol      = 1e-6;
+        params.default_contact_property.fixed_point_max_iter = 1000;
         solver.run(total_it);
 
         auto pos              = particles.pos();
@@ -335,13 +336,14 @@ namespace scopi
         params.solver_params.output_frequency = total_it - 1;
         params.solver_params.filename         = "sphere_plan_viscous_friction_mu05";
 
-        double mu                = 0.5;
-        params.contact_params.mu = mu;
-        // double fixed_point_tol = 1e-3;
-        // double fixed_point_max_iter = 1000;
-        // double gamma     = 0;
-        double gamma_min = -1.4;
-        // double gamma_tol = 1e-6;
+        double mu                                            = 0.5;
+        params.default_contact_property.mu                   = mu;
+        params.default_contact_property.fixed_point_tol      = 1e-3;
+        params.default_contact_property.fixed_point_max_iter = 1000;
+        params.default_contact_property.gamma                = 0;
+        double gamma_min                                     = -1.4;
+        params.default_contact_property.gamma_min            = gamma_min;
+        params.default_contact_property.gamma_tol            = 1e-6;
 
         solver.run(total_it);
         particles.f()(1)  = {-g * sin(alpha), g * cos(alpha)};
@@ -443,7 +445,7 @@ namespace scopi
         params.solver_params.output_frequency = Tf / dt - 1;
         params.solver_params.filename         = "3spheres_nofriction";
         solver.run(Tf / dt);
-        CHECK(diffFile("./Results/3spheres_nofriction_0002.json", "../test/references/3spheres_nofriction.json", tol));
+        CHECK(diffFile("./Results/3spheres_nofriction_0060.json", "../test/references/3spheres_nofriction.json", tol));
     }
 
     TEST_CASE("3 Spheres Viscous")
@@ -505,7 +507,7 @@ namespace scopi
         // double gamma_min = -2.;
         // double gamma_tol = 1e-6;
         solver.run(Tf / dt);
-        CHECK(diffFile("./Results/3spheres_viscous_0002.json", "../test/references/3spheres_viscous.json", tol));
+        CHECK(diffFile("./Results/3spheres_viscous_0070.json", "../test/references/3spheres_viscous.json", tol));
     }
 
     TEST_CASE("3 Spheres Friction Fixed Point")
@@ -564,10 +566,11 @@ namespace scopi
         params.solver_params.filename         = "3spheres_friction_fp";
 
         // mu05
-        // fixed_point_tol = 1e-6;
-        // fixed_point_max_iter = 1000;
+        params.default_contact_property.mu                   = 0.5;
+        params.default_contact_property.fixed_point_tol      = 1e-6;
+        params.default_contact_property.fixed_point_max_iter = 1000;
         solver.run(Tf / dt);
-        CHECK(diffFile("./Results/3spheres_friction_fp_0002.json", "../test/references/3spheres_friction_fp.json", tol));
+        CHECK(diffFile("./Results/3spheres_friction_fp_0070.json", "../test/references/3spheres_friction_fp.json", tol));
     }
 
     TEST_CASE("3 Spheres Viscous Friction")
@@ -625,13 +628,13 @@ namespace scopi
         params.solver_params.output_frequency = Tf / dt - 1;
         params.solver_params.filename         = "3spheres_viscous_friction";
 
-        // double mu = 0.5;
-        // double fixed_point_tol = 1e-3;
-        // double fixed_point_max_iter = 1000;
-        // double gamma     = 0;
-        // double gamma_min = -1.4;
-        // double gamma_tol = 1e-6;
+        params.default_contact_property.mu                   = 0.5;
+        params.default_contact_property.fixed_point_tol      = 1e-3;
+        params.default_contact_property.fixed_point_max_iter = 1000;
+        params.default_contact_property.gamma                = 0;
+        params.default_contact_property.gamma_min            = -1.4;
+        params.default_contact_property.gamma_tol            = 1e-6;
         solver.run(Tf / dt);
-        CHECK(diffFile("./Results/3spheres_viscous_friction_0002.json", "../test/references/3spheres_viscous_friction.json", tol));
+        CHECK(diffFile("./Results/3spheres_viscous_friction_0070.json", "../test/references/3spheres_viscous_friction.json", tol));
     }
 }
