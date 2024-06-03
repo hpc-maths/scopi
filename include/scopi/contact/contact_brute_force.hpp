@@ -5,9 +5,9 @@
 #include "../utils.hpp"
 #include "base.hpp"
 
-#include "plog/Initializers/RollingFileInitializer.h"
 #include <cstddef>
 #include <locale>
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 namespace scopi
@@ -27,7 +27,7 @@ namespace scopi
         /**
          * @brief Default constructor.
          */
-        ContactsParams()
+        ContactsParams() // cppcheck-suppress uninitMemberVar
             : dmax(2.)
         {
         }
@@ -68,7 +68,8 @@ namespace scopi
          *
          * @param params [in] Parameters.
          */
-        contact_brute_force(const ContactsParams<contact_brute_force<problem_t>>& params = ContactsParams<contact_brute_force<problem_t>>())
+        explicit contact_brute_force(
+            const ContactsParams<contact_brute_force<problem_t>>& params = ContactsParams<contact_brute_force<problem_t>>())
             : base_type(params)
         {
         }

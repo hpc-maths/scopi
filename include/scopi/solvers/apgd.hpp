@@ -42,7 +42,7 @@ namespace scopi
 
         using params_t = pgd_params;
 
-        pgd(const params_t& params = params_t())
+        explicit pgd(const params_t& params = params_t())
             : m_params(params)
         {
         }
@@ -123,7 +123,7 @@ namespace scopi
 
         using params_t = apgd_params;
 
-        apgd(const params_t& params = params_t())
+        explicit apgd(const params_t& params = params_t())
             : m_params(params)
         {
         }

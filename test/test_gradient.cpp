@@ -26,7 +26,6 @@ namespace scopi
 
         scopi_container<dim> particles;
 
-        double PI            = xt::numeric_constants<double>::PI;
         double radius        = 1.;
         double g             = 1.;
         double dt            = 0.01;
@@ -93,7 +92,6 @@ namespace scopi
 
         scopi_container<dim> particles;
 
-        double PI            = xt::numeric_constants<double>::PI;
         double radius        = 1.;
         double g             = 1.;
         double dt            = 0.01;
@@ -168,7 +166,6 @@ namespace scopi
 
         scopi_container<dim> particles;
 
-        double PI = xt::numeric_constants<double>::PI;
         plan<dim> plan(
             {
                 {0., 0.}
@@ -223,7 +220,6 @@ namespace scopi
 
         scopi_container<dim> particles;
 
-        double PI            = xt::numeric_constants<double>::PI;
         double radius        = 1.;
         double g             = 1.;
         double dt            = 0.01;
@@ -296,7 +292,6 @@ namespace scopi
 
         scopi_container<dim> particles;
 
-        double PI            = xt::numeric_constants<double>::PI;
         double radius        = 1.;
         double g             = 1.;
         double dt            = 0.01;

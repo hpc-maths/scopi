@@ -9,7 +9,6 @@ namespace scopi
     // : m_nparticles(nparticles)
     // {}
 
-
     // std::size_t ConstraintMosek<DryWithoutFriction>::number_col_matrix() const
     // {
     //     return  6*m_nparticles;
@@ -21,14 +20,9 @@ namespace scopi
     //     m_dual = m_qc1->dual();
     // }
 
-
-
-
-
     // ConstraintMosek<DryWithFriction>::ConstraintMosek(std::size_t nparticles)
     // : m_nparticles(nparticles)
     // {}
-
 
     // std::size_t ConstraintMosek<DryWithFriction>::number_col_matrix() const
     // {
@@ -46,10 +40,6 @@ namespace scopi
     //         m_dual->raw()[i] = -m_qc1->dual()->raw()[4*i];
     //     }
     // }
-
-
-
-
 
     // ConstraintMosek<DryWithFrictionFixedPoint>::ConstraintMosek(std::size_t nparticles)
     // : m_nparticles(nparticles)

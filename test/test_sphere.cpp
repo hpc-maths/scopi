@@ -1,4 +1,4 @@
-#include "doctest/doctest.h"
+#include <doctest/doctest.h>
 #include <random>
 
 #include "test_common.hpp"
@@ -191,11 +191,11 @@ namespace scopi
             {quaternion(PI / 3)},
             0.1);
 
-        auto rotation_matrix = s.rotation();
-        REQUIRE(rotation_matrix(0, 0) == doctest::Approx(1. / 2.));
-        REQUIRE(rotation_matrix(0, 1) == doctest::Approx(-std::sqrt(3.) / 2.));
-        REQUIRE(rotation_matrix(1, 0) == doctest::Approx(std::sqrt(3.) / 2.));
-        REQUIRE(rotation_matrix(1, 1) == doctest::Approx(1. / 2.));
+        auto matrix = s.rotation();
+        REQUIRE(matrix(0, 0) == doctest::Approx(1. / 2.));
+        REQUIRE(matrix(0, 1) == doctest::Approx(-std::sqrt(3.) / 2.));
+        REQUIRE(matrix(1, 0) == doctest::Approx(std::sqrt(3.) / 2.));
+        REQUIRE(matrix(1, 1) == doctest::Approx(1. / 2.));
     }
 
     TEST_CASE("Sphere 3D")
@@ -326,16 +326,16 @@ namespace scopi
             {quaternion(PI / 3)},
             0.1);
 
-        auto rotation_matrix = s.rotation();
-        REQUIRE(rotation_matrix(0, 0) == doctest::Approx(1. / 2.));
-        REQUIRE(rotation_matrix(0, 1) == doctest::Approx(-std::sqrt(3.) / 2.));
-        REQUIRE(rotation_matrix(0, 2) == doctest::Approx(0.));
-        REQUIRE(rotation_matrix(1, 0) == doctest::Approx(std::sqrt(3.) / 2.));
-        REQUIRE(rotation_matrix(1, 1) == doctest::Approx(1. / 2.));
-        REQUIRE(rotation_matrix(1, 2) == doctest::Approx(0.));
-        REQUIRE(rotation_matrix(2, 0) == doctest::Approx(0.));
-        REQUIRE(rotation_matrix(2, 1) == doctest::Approx(0.));
-        REQUIRE(rotation_matrix(2, 2) == doctest::Approx(1.));
+        auto matrix = s.rotation();
+        REQUIRE(matrix(0, 0) == doctest::Approx(1. / 2.));
+        REQUIRE(matrix(0, 1) == doctest::Approx(-std::sqrt(3.) / 2.));
+        REQUIRE(matrix(0, 2) == doctest::Approx(0.));
+        REQUIRE(matrix(1, 0) == doctest::Approx(std::sqrt(3.) / 2.));
+        REQUIRE(matrix(1, 1) == doctest::Approx(1. / 2.));
+        REQUIRE(matrix(1, 2) == doctest::Approx(0.));
+        REQUIRE(matrix(2, 0) == doctest::Approx(0.));
+        REQUIRE(matrix(2, 1) == doctest::Approx(0.));
+        REQUIRE(matrix(2, 2) == doctest::Approx(1.));
     }
 
     TEST_CASE_TEMPLATE_DEFINE("two spheres asymetrical", SolverType, two_spheres_asymetrical)

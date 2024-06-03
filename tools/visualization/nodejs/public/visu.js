@@ -514,7 +514,7 @@ document.getElementById("filepicker").addEventListener("change", function (event
   function update() {
     // if ( keyboard.pressed("z") )
     // {
-    // 	// do something
+    //  // do something
     // }
     controls.update();
     update_json_data();

@@ -4,16 +4,19 @@
 namespace scopi
 {
     ProblemParams<DryWithFriction>::ProblemParams()
-    : mu(0.)
-    {}
+        : mu(0.)
+    {
+    }
 
     ProblemParams<DryWithFriction>::ProblemParams(const ProblemParams<DryWithFriction>& params)
-    : mu(params.mu)
-    {}
+        : mu(params.mu)
+    {
+    }
 
     DryWithFriction::DryWithFriction(std::size_t nparticles, double dt)
-    : DryWithFrictionBase(nparticles, dt)
-    {}
+        : DryWithFrictionBase(nparticles, dt)
+    {
+    }
 
     bool DryWithFriction::should_solve() const
     {

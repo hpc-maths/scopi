@@ -8,7 +8,7 @@ OptimProjectedGradient class
 
 print_csr_matrix function
 =========================
-   
+
 .. doxygenfunction:: scopi::print_csr_matrix
    :project: scopi
 

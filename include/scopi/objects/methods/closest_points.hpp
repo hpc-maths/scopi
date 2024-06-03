@@ -240,8 +240,8 @@ namespace scopi
         neigh.pj  = s2.point(u(1));
         neigh.nij = s2.normal(u(1));
         // neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
-        auto sign = xt::sign(xt::eval(xt::linalg::dot(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), xt::flatten(neigh.nij))));
-        neigh.dij = sign(0) * xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
+        auto xtsign = xt::sign(xt::eval(xt::linalg::dot(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), xt::flatten(neigh.nij))));
+        neigh.dij   = xtsign(0) * xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
         // std::cout << "pi = " << neigh.pi << " pj = " << neigh.pj << std::endl;
         // std::cout << "nij = " << neigh.nij << " dij = " << neigh.dij << std::endl;
 
@@ -721,11 +721,11 @@ namespace scopi
         {
             exit(0);
         }
-        neigh.pi  = s1.point(u(0), u(1));
-        neigh.pj  = s2.point(u(2), u(3));
-        neigh.nij = s2.normal(u(2), u(3));
-        auto sign = xt::sign(xt::eval(xt::linalg::dot(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), xt::flatten(neigh.nij))));
-        neigh.dij = sign(0) * xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
+        neigh.pi    = s1.point(u(0), u(1));
+        neigh.pj    = s2.point(u(2), u(3));
+        neigh.nij   = s2.normal(u(2), u(3));
+        auto xtsign = xt::sign(xt::eval(xt::linalg::dot(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), xt::flatten(neigh.nij))));
+        neigh.dij   = xtsign(0) * xt::linalg::norm(xt::flatten(neigh.pi) - xt::flatten(neigh.pj), 2);
         // std::cout << "pi = " << neigh.pi << " pj = " << neigh.pj << std::endl;
         // std::cout << "nij = " << neigh.nij << " dij = " << neigh.dij << std::endl;
         // std::cout << "dij = " << neigh.dij << std::endl;
@@ -776,12 +776,12 @@ namespace scopi
 
         // plan2sphs.n
         auto plan_to_sphere = xt::eval(xt::linalg::dot(s_pos - p_pos, normal));
-        auto sign           = xt::sign(plan_to_sphere);
+        auto xtsign         = xt::sign(plan_to_sphere);
 
         neighbor<dim, problem_t> neigh;
-        neigh.pi  = s_pos - sign * s.radius() * normal;
+        neigh.pi  = s_pos - xtsign * s.radius() * normal;
         neigh.pj  = s_pos - plan_to_sphere * normal;
-        neigh.nij = sign * normal;
+        neigh.nij = xtsign * normal;
         neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
@@ -848,11 +848,11 @@ namespace scopi
         {
             auto normal            = seg.normal();
             auto segment_to_sphere = xt::eval(xt::linalg::dot(s_pos - seg.pos(0), normal));
-            auto sign              = xt::sign(segment_to_sphere);
+            auto xtsign            = xt::sign(segment_to_sphere);
 
-            neigh.pi  = s_pos - sign * s.radius() * normal;
+            neigh.pi  = s_pos - xtsign * s.radius() * normal;
             neigh.pj  = s_pos - segment_to_sphere * normal;
-            neigh.nij = sign * normal;
+            neigh.nij = xtsign * normal;
             neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         }
         return neigh;

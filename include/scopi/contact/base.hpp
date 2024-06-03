@@ -27,7 +27,7 @@ namespace scopi
         /**
          * @brief Default constructor.
          */
-        contact_base(const params_t& params)
+        explicit contact_base(const params_t& params)
             : m_params(params)
         {
         }
@@ -157,7 +157,7 @@ namespace scopi
     {
         std::sort(contacts.begin(),
                   contacts.end(),
-                  [](auto& a, auto& b)
+                  [](const auto& a, const auto& b)
                   {
                       if (a.i < b.i)
                       {

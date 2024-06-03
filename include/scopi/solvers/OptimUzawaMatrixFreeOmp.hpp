@@ -7,7 +7,7 @@
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xview.hpp>
 
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 #include "../quaternion.hpp"

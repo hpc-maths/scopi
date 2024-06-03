@@ -6,7 +6,7 @@
 
 #include <CLI/CLI.hpp>
 
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 #include "contact/property.hpp"

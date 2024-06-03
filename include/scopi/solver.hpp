@@ -15,7 +15,7 @@
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 #include "container.hpp"
@@ -247,7 +247,7 @@ namespace scopi
     {
         std::unordered_map<std::pair<std::size_t, std::size_t>, std::size_t, pairhash> indices;
         std::size_t index = 0;
-        for (auto& c : m_old_contacts)
+        for (const auto& c : m_old_contacts)
         {
             indices[{c.i, c.j}] = index++;
         }
@@ -392,7 +392,7 @@ namespace scopi
 
         json_output["contacts"] = {};
 
-        for (auto& c : contacts)
+        for (const auto& c : contacts)
         {
             json_output["contacts"].push_back(c.to_json());
         }
@@ -454,7 +454,7 @@ namespace scopi
                     std::size_t minus = 0;
                     for (std::size_t offset = m_particles.offset(io); offset < m_particles.offset(io + 1); ++offset)
                     {
-                        auto& p = m_particles.pos()[offset];
+                        const auto& p = m_particles.pos()[offset];
                         if (p[d] > m_box.upper_bound(d))
                         {
                             plus++;

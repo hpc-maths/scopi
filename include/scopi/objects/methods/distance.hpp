@@ -3,15 +3,15 @@
 #include <xtensor-blas/xlinalg.hpp>
 
 #include "../dispatch.hpp"
-#include "../types/sphere.hpp"
-#include "../types/superellipsoid.hpp"
 #include "../types/globule.hpp"
 #include "../types/plan.hpp"
+#include "../types/sphere.hpp"
+#include "../types/superellipsoid.hpp"
 
 namespace scopi
 {
     // SUPERELLIPSOID - SUPERELLIPSOID
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const superellipsoid<dim, false> s1, const superellipsoid<dim, false> s2)
     {
         std::cout << "distance : SUPERELLIPSOID - SUPERELLIPSOID" << std::endl;
@@ -19,7 +19,7 @@ namespace scopi
     }
 
     // SPHERE - SPHERE
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const sphere<dim, false> s1, const sphere<dim, false> s2)
     {
         std::cout << "distance : SPHERE - SPHERE" << std::endl;
@@ -27,7 +27,7 @@ namespace scopi
     }
 
     // PLAN - PLAN
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const plan<dim, false>, const plan<dim, false>)
     {
         std::cout << "distance : PLAN - PLAN" << std::endl;
@@ -35,7 +35,7 @@ namespace scopi
     }
 
     // GLOBULE - GLOBULE
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const globule<dim, false>, const globule<dim, false>)
     {
         std::cout << "distance : GLOBULE - GLOBULE" << std::endl;
@@ -43,7 +43,7 @@ namespace scopi
     }
 
     // SPHERE - SUPERELLIPSOID
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const sphere<dim, false>, const superellipsoid<dim, false>)
     {
         std::cout << "distance : SPHERE - SUPERELLIPSOID" << std::endl;
@@ -51,7 +51,7 @@ namespace scopi
     }
 
     // SPHERE - GLOBULE
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const sphere<dim, false>, const globule<dim, false>)
     {
         std::cout << "distance : SPHERE - GLOBULE" << std::endl;
@@ -59,7 +59,7 @@ namespace scopi
     }
 
     // SPHERE - PLAN
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const sphere<dim, false>, const plan<dim, false>)
     {
         std::cout << "distance : SPHERE - PLAN" << std::endl;
@@ -67,7 +67,7 @@ namespace scopi
     }
 
     // SUPERELLIPSOID - GLOBULE
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const superellipsoid<dim, false>, const globule<dim, false>)
     {
         std::cout << "distance : SUPERELLIPSOID - GLOBULE" << std::endl;
@@ -75,7 +75,7 @@ namespace scopi
     }
 
     // SUPERELLIPSOID - PLAN
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const superellipsoid<dim, false>, const plan<dim, false>)
     {
         std::cout << "distance : SUPERELLIPSOID - PLAN" << std::endl;
@@ -83,7 +83,7 @@ namespace scopi
     }
 
     // GLOBULE - PLAN
-    template<std::size_t dim>
+    template <std::size_t dim>
     double distance(const globule<dim, false>, const plan<dim, false>)
     {
         std::cout << "distance : GLOBULE - PLAN" << std::endl;
@@ -100,7 +100,7 @@ namespace scopi
             return distance(obj1, obj2);
         }
 
-        template<std::size_t dim>
+        template <std::size_t dim>
         return_type on_error(const object<dim, false>&, const object<dim, false>&) const
         {
             return 0;
@@ -108,15 +108,10 @@ namespace scopi
     };
 
     template <std::size_t dim>
-    using distance_dispatcher = double_static_dispatcher
-    <
+    using distance_dispatcher = double_static_dispatcher<
         distance_functor,
         const object<dim, false>,
-        mpl::vector<const sphere<dim, false>,
-                    const superellipsoid<dim, false>,
-                    const globule<dim, false>,
-                    const plan<dim, false>>,
+        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const globule<dim, false>, const plan<dim, false>>,
         typename distance_functor::return_type,
-        symmetric_dispatch
-    >;
+        symmetric_dispatch>;
 }

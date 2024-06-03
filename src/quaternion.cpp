@@ -11,10 +11,10 @@ namespace scopi
 
     type::quaternion_t quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<3>>& axes)
     {
-        type::quaternion_t out = { std::cos(angle/2)
-                               , std::sin(angle/2)*axes[0]
-                               , std::sin(angle/2)*axes[1]
-                               , std::sin(angle/2)*axes[2] };
+        type::quaternion_t out = {std::cos(angle / 2),
+                                  std::sin(angle / 2) * axes[0],
+                                  std::sin(angle / 2) * axes[1],
+                                  std::sin(angle / 2) * axes[2]};
         // type::quaternion_t out = { std::sin(angle/2)*axes[0]
         //                        , std::sin(angle/2)*axes[1]
         //                        , std::sin(angle/2)*axes[2]
@@ -106,15 +106,15 @@ namespace scopi
         */
 
         type::quaternion_t result;
-        result[0] = q1[0]*q2[0];
+        result[0] = q1[0] * q2[0];
         for (std::size_t d = 0; d < 3; ++d)
         {
-            result[0] -= q1[d+1] * q2[d+1];
-            result[d+1] = q1[0]*q2[d+1] + q2[0]*q1[d+1] ;
+            result[0] -= q1[d + 1] * q2[d + 1];
+            result[d + 1] = q1[0] * q2[d + 1] + q2[0] * q1[d + 1];
         }
-        result[1] += (q1[2]*q2[3] - q1[3]*q2[2]);
-        result[2] += (q1[3]*q2[1] - q1[1]*q2[3]);
-        result[3] += (q1[1]*q2[2] - q1[2]*q2[1]);
+        result[1] += (q1[2] * q2[3] - q1[3] * q2[2]);
+        result[2] += (q1[3] * q2[1] - q1[1] * q2[3]);
+        result[3] += (q1[1] * q2[2] - q1[2] * q2[1]);
 
         return result;
     }

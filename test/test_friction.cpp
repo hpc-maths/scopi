@@ -1,5 +1,5 @@
-#include "doctest/doctest.h"
 #include <cstddef>
+#include <doctest/doctest.h>
 #include <random>
 
 #include "test_common.hpp"

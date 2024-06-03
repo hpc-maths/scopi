@@ -6,8 +6,8 @@
 #include "base.hpp"
 #include <CLI/CLI.hpp>
 
-#include "plog/Initializers/RollingFileInitializer.h"
 #include <cstddef>
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
 
 #include <nanoflann.hpp>
@@ -29,7 +29,7 @@ namespace scopi
         /**
          * @brief Default constructor.
          */
-        ContactsParams()
+        ContactsParams() // cppcheck-suppress uninitMemberVar
             : dmax(2.)
             , kd_tree_radius(17.)
         {
@@ -49,7 +49,7 @@ namespace scopi
          * Default value: 2.
          * \note \c dmax > 0
          */
-        double dmax;
+        double dmax = 2.;
         /**
          * @brief Kd-tree radius.
          *
@@ -158,8 +158,9 @@ namespace scopi
          *
          * @param params [in] Parameters.
          */
-        contact_kdtree(const ContactsParams<contact_kdtree<problem_t>>& params = ContactsParams<contact_kdtree<problem_t>>())
+        explicit contact_kdtree(const ContactsParams<contact_kdtree<problem_t>>& params = ContactsParams<contact_kdtree<problem_t>>())
             : base_type(params)
+            , m_nMatches(0)
         {
         }
 

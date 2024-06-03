@@ -1,10 +1,10 @@
 #include <CLI/CLI.hpp>
 
 #include <scopi/objects/types/worm.hpp>
-#include <scopi/solver.hpp>
 #include <scopi/property.hpp>
+#include <scopi/solver.hpp>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     plog::init(plog::info, "three_worms.log");
 
@@ -12,23 +12,23 @@ int main(int argc, char **argv)
 
     constexpr std::size_t dim = 2;
 
-    double dt = .01;
+    double dt            = .01;
     std::size_t total_it = 500;
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(0.1);
 
-    double radius = .01;
+    double radius          = .01;
     std::size_t nb_spheres = 6;
     std::vector<scopi::type::position_t<dim>> pos1(nb_spheres), pos2(nb_spheres), pos3(nb_spheres);
     std::vector<scopi::type::quaternion_t> q(nb_spheres);
-    for(std::size_t i = 0; i < pos1.size(); ++i)
+    for (std::size_t i = 0; i < pos1.size(); ++i)
     {
-        pos1[i](0) = 0.42 + 0.52 - i*2*radius;
+        pos1[i](0) = 0.42 + 0.52 - i * 2 * radius;
         pos1[i][1] = .495;
-        pos2[i][0] = 0.58 - 0.48 + i*2*radius;
+        pos2[i][0] = 0.58 - 0.48 + i * 2 * radius;
         pos2[i][1] = .505;
         pos3[i][0] = .5 - 0.48;
-        pos3[i][1] = 0.5 - i*2*radius;
+        pos3[i][1] = 0.5 - i * 2 * radius;
 
         // pos1[i](0) = 0.42 - i*2*radius;
         // pos1[i][1] = .495;

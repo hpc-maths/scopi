@@ -12,10 +12,10 @@ namespace scopi
      *
      * @tparam dim Dimension (2 or 3).
      */
-    template<std::size_t dim>
+    template <std::size_t dim>
     class property
     {
-    public:
+      public:
 
         /**
          * @brief Alias for the type of the position.
@@ -136,7 +136,7 @@ namespace scopi
          *
          * @return Property with the new moment of inertia.
          */
-        property& moment_inertia(const moment_type& m); 
+        property& moment_inertia(const moment_type& m);
         /**
          * @brief Get the moment of inertia.
          *
@@ -163,7 +163,8 @@ namespace scopi
          */
         bool is_active() const;
 
-    private:
+      private:
+
         /**
          * @brief Velocity.
          */
@@ -187,7 +188,7 @@ namespace scopi
         /**
          * @brief Mass.
          */
-        mass_type m_m;
+        mass_type m_m = 1.0;
         /**
          * @brief Moment of inertia
          */

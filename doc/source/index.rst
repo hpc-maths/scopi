@@ -20,17 +20,17 @@ The table below summarizes the different combinations.
 +=========================================+============+=================+============================+===================================================+
 | DryWithoutFriction                      | YES        | YES             | YES                        | YES                                               |
 +-----------------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
-| DryWithFriction                         | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
+| DryWithFriction                         | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |
 +-----------------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
-| DryWithFrictionFixedPoint               | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
+| DryWithFrictionFixedPoint               | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |
 +-----------------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
 | ViscousWithoutFriction                  | YES        | YES             | YES                        | YES                                               |
 +-----------------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
-| ViscousWithFriction                     | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
+| ViscousWithFriction                     | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |
 +-----------------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
-| ViscousWithFrictionFixedPoint           | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
+| ViscousWithFrictionFixedPoint           | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |
 +-----------------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
-| ViscousWithFrictionFixedPointProjection | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |      
+| ViscousWithFrictionFixedPointProjection | YES        | NO [#Friction]_ | NO                         | NO [#Friction]_                                   |
 +-----------------------------------------+------------+-----------------+----------------------------+---------------------------------------------------+
 
 .. [#OptimUzawa] OptimUzawaMkl, OptimUzawaMatrixFreeOmp, and OptimUzawaMatrixFreeTbb.

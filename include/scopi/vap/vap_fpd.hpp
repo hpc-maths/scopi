@@ -84,7 +84,7 @@ namespace scopi
         for (std::size_t i = m_active_ptr; i < m_active_ptr + m_Nactive; ++i)
         {
             particles.v()(i) += m_dt * particles.f()(i) / particles.m()(i);
-            //check cross_product (division by J in the formula missing) and add a torque
+            // check cross_product (division by J in the formula missing) and add a torque
             particles.omega()(i) += cross_product_vap_fpd(particles, i);
         }
     }

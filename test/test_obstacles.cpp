@@ -1,15 +1,16 @@
-#include "doctest/doctest.h"
+#include <doctest/doctest.h>
 #include <random>
-#include<xtensor/xmath.hpp>
+#include <xtensor/xmath.hpp>
 
+// #include "analytical_solution.hpp"
 #include "test_common.hpp"
 #include "utils.hpp"
 
-#include <scopi/objects/types/sphere.hpp>
-#include <scopi/objects/types/plan.hpp>
-#include <scopi/vap/vap_fpd.hpp>
 #include <scopi/container.hpp>
+#include <scopi/objects/types/plan.hpp>
+#include <scopi/objects/types/sphere.hpp>
 #include <scopi/solver.hpp>
+#include <scopi/vap/vap_fpd.hpp>
 
 namespace scopi
 {
@@ -22,38 +23,45 @@ namespace scopi
         REQUIRE(pos(1)(1) == doctest::Approx(1.));
 
         auto q = particles.q();
-        REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(2.)/2.));
+        REQUIRE(q(0)(0) == doctest::Approx(std::sqrt(2.) / 2.));
         REQUIRE(q(0)(1) == doctest::Approx(0.));
         REQUIRE(q(0)(2) == doctest::Approx(0.));
-        REQUIRE(q(0)(3) == doctest::Approx(std::sqrt(2.)/2.));
+        REQUIRE(q(0)(3) == doctest::Approx(std::sqrt(2.) / 2.));
         REQUIRE(q(1)(0) == doctest::Approx(1.));
         REQUIRE(q(1)(1) == doctest::Approx(0.));
         REQUIRE(q(1)(2) == doctest::Approx(0.));
         REQUIRE(q(1)(3) == doctest::Approx(0.));
     }
 
-    template<class solver_t>
+    template <class solver_t>
     void set_params(solver_t& solver, std::size_t total_it)
     {
-        auto params = solver.get_params();
-        params.solver_params.output_frequency = total_it-1;
+        auto params                           = solver.get_params();
+        params.solver_params.output_frequency = total_it - 1;
     }
 
     TEST_CASE_TEMPLATE_DEFINE("sphere plan", SolverType, sphere_plan)
     {
         static constexpr std::size_t dim = 2;
 
-        double dt = .005;
+        double dt            = .005;
         std::size_t total_it = 100;
-        double radius = 1.;
+        double radius        = 1.;
 
-        sphere<dim> s({{0., radius}}, radius);
-        plan<dim> p({{ 0.,  0.}}, PI/2.);
+        sphere<dim> s(
+            {
+                {0., radius}
+        },
+            radius);
+        plan<dim> p(
+            {
+                {0., 0.}
+        },
+            PI / 2.);
         auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
-
 
         SUBCASE("fixed")
         {
@@ -66,7 +74,10 @@ namespace scopi
 
         SUBCASE("velocity")
         {
-            particles.push_back(s, prop.desired_velocity({{0., -1.}}));
+            particles.push_back(s,
+                                prop.desired_velocity({
+                                    {0., -1.}
+            }));
             SolverType solver(particles, dt);
             solver.run(total_it);
             set_params(solver, total_it);
@@ -78,18 +89,29 @@ namespace scopi
     {
         static constexpr std::size_t dim = 2;
 
-        double dt = .005;
+        double dt            = .005;
         std::size_t total_it = 100;
-        double radius = 1.;
+        double radius        = 1.;
 
-        sphere<dim> s({{0., radius}}, radius);
-        plan<dim> p({{ 0.,  0.}}, PI/2.);
+        sphere<dim> s(
+            {
+                {0., radius}
+        },
+            radius);
+        plan<dim> p(
+            {
+                {0., 0.}
+        },
+            PI / 2.);
         auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
 
-        particles.push_back(s, prop.force({{0., -1.}}));
+        particles.push_back(s,
+                            prop.force({
+                                {0., -1.}
+        }));
         SolverType solver(particles, dt);
         solver.run(total_it);
         set_params(solver, total_it);
@@ -118,12 +140,20 @@ namespace scopi
     TEST_CASE_TEMPLATE_DEFINE("sphere sphere fixed", SolverType, sphere_sphere_fixed)
     {
         static constexpr std::size_t dim = 2;
-        double dt = .005;
-        std::size_t total_it = 100;
-        double radius = 1.;
+        double dt                        = .005;
+        std::size_t total_it             = 100;
+        double radius                    = 1.;
 
-        sphere<dim> obstacle({{ 0.,  0.}}, radius);
-        sphere<dim> sphere({{ 0.,  2.}}, radius);
+        sphere<dim> obstacle(
+            {
+                {0., 0.}
+        },
+            radius);
+        sphere<dim> sphere(
+            {
+                {0., 2.}
+        },
+            radius);
         auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
         scopi_container<dim> particles;
@@ -140,7 +170,10 @@ namespace scopi
 
         SUBCASE("velocity")
         {
-            particles.push_back(sphere, prop.desired_velocity({{0., -1.}}));
+            particles.push_back(sphere,
+                                prop.desired_velocity({
+                                    {0., -1.}
+            }));
             SolverType solver(particles, dt);
             solver.run(total_it);
             set_params(solver, total_it);
@@ -151,18 +184,29 @@ namespace scopi
     TEST_CASE_TEMPLATE_DEFINE("sphere sphere fixed force", SolverType, sphere_sphere_fixed_force)
     {
         static constexpr std::size_t dim = 2;
-        double dt = .005;
-        std::size_t total_it = 100;
-        double radius = 1.;
+        double dt                        = .005;
+        std::size_t total_it             = 100;
+        double radius                    = 1.;
 
-        sphere<dim> obstacle({{ 0.,  0.}}, radius);
-        sphere<dim> sphere({{ 0.,  2.}}, radius);
+        sphere<dim> obstacle(
+            {
+                {0., 0.}
+        },
+            radius);
+        sphere<dim> sphere(
+            {
+                {0., 2.}
+        },
+            radius);
         auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
         scopi_container<dim> particles;
         particles.push_back(obstacle, property<dim>().deactivate());
 
-        particles.push_back(sphere, prop.force({{0., -1.}}));
+        particles.push_back(sphere,
+                            prop.force({
+                                {0., -1.}
+        }));
         SolverType solver(particles, dt);
         solver.run(total_it);
         set_params(solver, total_it);
@@ -172,21 +216,32 @@ namespace scopi
     TEST_CASE_TEMPLATE_DEFINE("sphere sphere moving", SolverType, sphere_sphere_moving)
     {
         static constexpr std::size_t dim = 2;
-        double dt = .005;
-        std::size_t total_it = 100;
-        double radius = 1.;
+        double dt                        = .005;
+        std::size_t total_it             = 100;
+        double radius                    = 1.;
 
-        sphere<dim> obstacle({{ 0.,  0.}}, radius);
-        sphere<dim> sphere({{ 1.,  std::sqrt(3.)}}, radius);
+        sphere<dim> obstacle(
+            {
+                {0., 0.}
+        },
+            radius);
+        sphere<dim> sphere(
+            {
+                {1., std::sqrt(3.)}
+        },
+            radius);
         auto prop = property<dim>().mass(1.).moment_inertia(0.1);
 
         scopi_container<dim> particles;
         particles.push_back(obstacle, property<dim>().deactivate());
-        particles.push_back(sphere, prop.force({{0., -10.}}));
+        particles.push_back(sphere,
+                            prop.force({
+                                {0., -10.}
+        }));
 
         SolverType solver(particles, dt);
         set_params(solver, total_it);
-        auto params = solver.get_params();
+        auto params                           = solver.get_params();
         params.solver_params.output_frequency = 1;
         solver.run(total_it);
 
@@ -196,45 +251,55 @@ namespace scopi
     TEST_CASE_TEMPLATE_DEFINE("sphere inclined plan", SolverType, sphere_inclined_plan)
     {
         std::tuple<double, double, double, double> data;
-        std::vector<std::tuple<double, double, double, double>>
-            data_container({std::make_tuple(PI/6., 0.000998789, 0., 0.0010002),
-                            std::make_tuple(PI/4., 0.00100008, 0., 0.00100119),
-                            std::make_tuple(PI/3., 0.00100105, 0., 0.0010027)});
+        std::vector<std::tuple<double, double, double, double>> data_container({std::make_tuple(PI / 6., 0.000998789, 0., 0.0010002),
+                                                                                std::make_tuple(PI / 4., 0.00100008, 0., 0.00100119),
+                                                                                std::make_tuple(PI / 3., 0.00100105, 0., 0.0010027)});
 
         DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container);
 
         static constexpr std::size_t dim = 2;
-        double radius = 1.;
-        double g = 1.;
-        double dt = 0.01;
-        std::size_t total_it = 1000;
-        double h = 2.*radius;
-        double alpha = std::get<0>(data);
+        double radius                    = 1.;
+        double g                         = 1.;
+        double dt                        = 0.01;
+        std::size_t total_it             = 1000;
+        double h                         = 2. * radius;
+        double alpha                     = std::get<0>(data);
 
-        auto prop = property<dim>().mass(1.).moment_inertia(1.*radius*radius/2.);
-        plan<dim> p({{0., 0.}}, PI/2.-alpha);
-        sphere<dim> s({{h*std::sin(alpha), h*std::cos(alpha)}}, radius);
+        auto prop = property<dim>().mass(1.).moment_inertia(1. * radius * radius / 2.);
+        plan<dim> p(
+            {
+                {0., 0.}
+        },
+            PI / 2. - alpha);
+        sphere<dim> s(
+            {
+                {h * std::sin(alpha), h * std::cos(alpha)}
+        },
+            radius);
 
         scopi_container<dim> particles;
         particles.push_back(p, property<dim>().deactivate());
-        particles.push_back(s, prop.force({{0., -g}}));
+        particles.push_back(s,
+                            prop.force({
+                                {0., -g}
+        }));
 
         SolverType solver(particles, dt);
         solver.run(total_it);
         set_params(solver, total_it);
 
-        auto pos = particles.pos();
-        auto q = particles.q();
-        auto tmp = analytical_solution_sphere_plan(alpha, 0., dt*(total_it+1), radius, g, h);
+        auto pos            = particles.pos();
+        auto q              = particles.q();
+        auto tmp            = analytical_solution_sphere_plan(alpha, 0., dt * (total_it + 1), radius, g, h);
         auto pos_analytical = tmp.first;
-        auto q_analytical = quaternion(tmp.second);
-        double error_pos = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
-        double error_q = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
-        auto v = particles.v();
-        auto omega = particles.omega();
-        tmp = analytical_solution_sphere_plan_velocity(alpha, 0., dt*(total_it+1), radius, g, h);
-        auto v_analytical = tmp.first;
-        double error_v = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
+        auto q_analytical   = quaternion(tmp.second);
+        double error_pos    = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
+        double error_q      = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
+        auto v              = particles.v();
+        auto omega          = particles.omega();
+        tmp                 = analytical_solution_sphere_plan_velocity(alpha, 0., dt * (total_it + 1), radius, g, h);
+        auto v_analytical   = tmp.first;
+        double error_v      = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
 
         REQUIRE(error_pos == doctest::Approx(std::get<1>(data)));
         REQUIRE(error_q == doctest::Approx(std::get<2>(data)));

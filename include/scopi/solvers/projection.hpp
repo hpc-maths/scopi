@@ -1,16 +1,17 @@
 #pragma once
 
 // #include <mkl_spblas.h>
-#include <xtensor/xadapt.hpp>
-#include <xtensor/xview.hpp>
-#include <xtensor/xnoalias.hpp>
+#include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
-#include "plog/Initializers/RollingFileInitializer.h"
+#include <xtensor/xadapt.hpp>
+#include <xtensor/xnoalias.hpp>
+#include <xtensor/xview.hpp>
 
 #include "../problems/DryWithoutFriction.hpp"
 #include "../problems/ViscousWithoutFriction.hpp"
 
-namespace scopi{
+namespace scopi
+{
     /**
      * @brief Projection \f$ \Pi \f$ on the linear cone for gradients-like algorithm.
      *
@@ -20,7 +21,8 @@ namespace scopi{
      */
     template <class problem_t>
     class projection
-    {};
+    {
+    };
 
     /**
      * @brief Specialization of \c projection for \c DryWithoutFriction.
@@ -30,7 +32,8 @@ namespace scopi{
     template <>
     class projection<DryWithoutFriction>
     {
-    protected:
+      protected:
+
         /**
          * @brief Projection on \f$ \mathbb{R}^+ \f$.
          *
@@ -49,7 +52,8 @@ namespace scopi{
     template <std::size_t dim>
     class projection<ViscousWithoutFriction<dim>>
     {
-    protected:
+      protected:
+
         /**
          * @brief Projection on \f$ \mathbb{R}^+ \f$.
          *
@@ -63,6 +67,6 @@ namespace scopi{
     template <std::size_t dim>
     xt::xtensor<double, 1> projection<ViscousWithoutFriction<dim>>::projection_cone(const xt::xtensor<double, 1>& l)
     {
-        return xt::maximum( l, 0);
+        return xt::maximum(l, 0);
     }
 }
