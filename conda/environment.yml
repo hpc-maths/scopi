@@ -12,3 +12,4 @@ dependencies:
   - plog
   - doctest
   - cli11
+  - ninja
