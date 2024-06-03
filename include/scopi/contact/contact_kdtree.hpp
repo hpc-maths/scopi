@@ -231,9 +231,9 @@ namespace scopi
             }
             PLOG_DEBUG << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
-            std::vector<std::pair<std::size_t, double>> ret_matches;
+            std::vector<nanoflann::ResultItem<std::size_t, double>> ret_matches;
 
-            auto nMatches_loc = index.radiusSearch(query_pt, this->m_params.kd_tree_radius, ret_matches, nanoflann::SearchParams());
+            auto nMatches_loc = index.radiusSearch(query_pt, this->m_params.kd_tree_radius, ret_matches, nanoflann::SearchParameters());
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic)
             {
