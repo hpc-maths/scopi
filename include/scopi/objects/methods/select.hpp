@@ -28,7 +28,7 @@ namespace scopi
 
     struct index
     {
-        index(std::size_t ii)
+        explicit index(std::size_t ii)
             : i(ii)
         {
         }

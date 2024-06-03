@@ -29,7 +29,7 @@ namespace scopi
         /**
          * @brief Default constructor.
          */
-        ContactsParams()
+        ContactsParams() // cppcheck-suppress uninitMemberVar
             : dmax(2.)
             , kd_tree_radius(17.)
         {
@@ -158,7 +158,7 @@ namespace scopi
          *
          * @param params [in] Parameters.
          */
-        contact_kdtree(const ContactsParams<contact_kdtree<problem_t>>& params = ContactsParams<contact_kdtree<problem_t>>())
+        explicit contact_kdtree(const ContactsParams<contact_kdtree<problem_t>>& params = ContactsParams<contact_kdtree<problem_t>>())
             : base_type(params)
             , m_nMatches(0)
         {

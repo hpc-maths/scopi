@@ -35,6 +35,8 @@ namespace scopi
     template <std::size_t dim>
     BoxDomain<dim>::BoxDomain()
     {
+        m_min_corner.fill(0.0);
+        m_max_corner.fill(0.0);
         m_periodic.fill(false);
     }
 

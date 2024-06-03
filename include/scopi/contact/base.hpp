@@ -27,7 +27,7 @@ namespace scopi
         /**
          * @brief Default constructor.
          */
-        contact_base(const params_t& params)
+        explicit contact_base(const params_t& params)
             : m_params(params)
         {
         }

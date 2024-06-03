@@ -262,7 +262,7 @@ namespace scopi
     {
       public:
 
-        DMatrix(const Contacts_t& contacts)
+        explicit DMatrix(const Contacts_t& contacts)
             : m_contacts{contacts}
             , m_work{xt::zeros<double>({3 * contacts.size()})}
         {

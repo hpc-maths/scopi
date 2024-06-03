@@ -30,7 +30,7 @@ namespace scopi
 
       protected:
 
-        LagrangeMultiplierBase(const Contacts& contacts)
+        explicit LagrangeMultiplierBase(const Contacts& contacts)
             : m_contacts(contacts)
         {
         }
@@ -354,7 +354,7 @@ namespace scopi
 
         using base = LagrangeMultiplierBase<Contacts, LagrangeMultiplier<dim_, ViscousFriction, Contacts>>;
 
-        LagrangeMultiplier(const Contacts& contacts, double dt)
+        LagrangeMultiplier(const Contacts& contacts, double dt) // cppcheck-suppress uninitMemberVar
             : base(contacts)
         {
             m_size = 0;
