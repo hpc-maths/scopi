@@ -167,11 +167,11 @@ jobs:
         run: |
           cmake --build build --target all --parallel 4
 
-      - name: Test with googletest
+      - name: Run tests
         shell: bash -l {0}
         run: |
           # export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
-          ./build/tests/test_scopi
+          ./build/test/test_scopi
 
   macos-mamba:
     needs: [pre-commit, cppcheck]
@@ -214,4 +214,4 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          ./build/tests/test_scopi
+          ./build/test/test_scopi
