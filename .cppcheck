@@ -1,7 +1,7 @@
 *:src/minpack.cpp
 *:include/scopi/minpack.hpp
 normalCheckLevelMaxBranches
-unusedFunction:test/*
+//unusedFunction:test/*
 missingIncludeSystem
 duplInheritedMember
 unusedFunction
