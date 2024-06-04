@@ -171,7 +171,8 @@ jobs:
         shell: bash -l {0}
         run: |
           # export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
-          ./build/test/test_scopi
+          cd build
+          ./test/test_scopi
 
   macos-mamba:
     needs: [pre-commit, cppcheck]
@@ -214,4 +215,5 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          ./build/test/test_scopi
+          cd build
+          ./test/test_scopi
