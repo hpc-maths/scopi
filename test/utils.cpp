@@ -6,28 +6,39 @@ namespace scopi
     {
         std::ifstream fileRef(filenameRef);
         std::ifstream fileResult(filenameResult);
-        if (fileRef && fileResult)
+
+        if (fileRef.is_open() && fileResult.is_open())
         {
             nlohmann::json jsonRef    = nlohmann::json::parse(fileRef);
             nlohmann::json jsonResult = nlohmann::json::parse(fileResult);
             nlohmann::json diff       = nlohmann::json::diff(jsonRef["objects"], jsonResult["objects"]);
+
             if (!diff.empty())
             {
                 for (const auto& p : diff)
                 {
                     std::string path_ = p["path"];
                     nlohmann::json::json_pointer path(path_);
+
                     if (jsonRef["objects"][path].is_number_float() && jsonResult["objects"][path].is_number_float())
                     {
-                        if (std::abs(static_cast<double>(jsonRef["objects"][path]) - static_cast<double>(jsonResult["objects"][path])) > tol)
+                        double error = std::abs(static_cast<double>(jsonRef["objects"][path])
+                                                - static_cast<double>(jsonResult["objects"][path]));
+                        if (error > tol)
                         {
-                            std::cerr << path << " " << jsonRef["objects"][path] << " " << jsonResult["objects"][path] << std::endl;
+                            std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
+                            std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
+                            std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;
+                            std::cerr << "\tError: " << error << std::endl;
+                            std::cerr << "\tTolerance: " << tol << std::endl;
                             return false;
                         }
                     }
                     else
                     {
-                        std::cerr << path << std::endl;
+                        std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
+                        std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
+                        std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;
                         return false;
                     }
                 }
@@ -36,6 +47,14 @@ namespace scopi
         }
         else
         {
+            if (!fileRef.is_open())
+            {
+                std::cerr << "failed to open the reference file " << filenameRef << std::endl;
+            }
+            if (!fileResult.is_open())
+            {
+                std::cerr << "failed to open the reference file " << filenameResult << std::endl;
+            }
             return false;
         }
     }
