@@ -265,7 +265,6 @@ namespace scopi
         object& operator=(object&&)      = delete;
 
         object(position_type pos, quaternion_type q, std::size_t size);
-        ~object() = default;
 
       protected:
 
