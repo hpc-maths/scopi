@@ -132,11 +132,11 @@ namespace scopi
         /**
          * @brief Set the moment of inertia.
          *
-         * @param m [in] New moment of inertia.
+         * @param j [in] New moment of inertia.
          *
          * @return Property with the new moment of inertia.
          */
-        property& moment_inertia(const moment_type& m);
+        property& moment_inertia(const moment_type& j);
         /**
          * @brief Get the moment of inertia.
          *

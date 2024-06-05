@@ -25,13 +25,13 @@ namespace scopi
 
     type::quaternion_t quaternion(double angle, const xt::xtensor_fixed<double, xt::xshape<2>>& axes)
     {
-        xt::xtensor_fixed<double, xt::xshape<3>> new_axes{axes[0], axes[1], 1};
+        const xt::xtensor_fixed<double, xt::xshape<3>> new_axes{axes[0], axes[1], 1};
         return quaternion(angle, new_axes);
     }
 
     type::quaternion_t quaternion(double angle)
     {
-        xt::xtensor_fixed<double, xt::xshape<3>> axes{0, 0, 1};
+        const xt::xtensor_fixed<double, xt::xshape<3>> axes{0, 0, 1};
         return quaternion(angle, axes);
     }
 

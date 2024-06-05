@@ -36,8 +36,8 @@ namespace scopi
 
         object_base() = default;
 
-        object_base(const object_base&) = default;
-        object_base(object_base&&)      = default;
+        object_base(const object_base&)     = default;
+        object_base(object_base&&) noexcept = default;
     };
 
     namespace detail
@@ -265,6 +265,7 @@ namespace scopi
         object& operator=(object&&)      = delete;
 
         object(position_type pos, quaternion_type q, std::size_t size);
+        ~object() = default;
 
       protected:
 

@@ -24,18 +24,18 @@ namespace scopi
     template <class problem_t>
     struct ContactsParams<contact_brute_force<problem_t>>
     {
-        /**
-         * @brief Default constructor.
-         */
-        ContactsParams() // cppcheck-suppress uninitMemberVar
-            : dmax(2.)
-        {
-        }
+        // /**
+        //  * @brief Default constructor.
+        //  */
+        // ContactsParams() // cppcheck-suppress uninitMemberVar
+        //     : dmax(2.)
+        // {
+        // }
 
         void init_options()
         {
             auto& app = get_app();
-            auto opt  = app.add_option_group("Brute force contact options");
+            auto* opt = app.add_option_group("Brute force contact options");
             opt->add_option("--dmax", dmax, "Maximum distance between two neighboring particles")->capture_default_str();
         }
 
@@ -45,7 +45,7 @@ namespace scopi
          * Default value: 2.
          * \note \c dmax > 0
          */
-        double dmax;
+        double dmax{2.};
     };
 
     /**
@@ -105,7 +105,7 @@ namespace scopi
     {
         std::vector<neighbor<dim, problem_t>> contacts;
 
-        add_objects_from_periodicity(box, particles, this->m_params.dmax);
+        add_objects_from_periodicity(box, particles, this->get_params().dmax);
 
         tic();
 #pragma omp parallel for
@@ -113,7 +113,7 @@ namespace scopi
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
+                compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
             }
         }
 
@@ -122,7 +122,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
+                compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
             }
         }
 

@@ -78,7 +78,7 @@ template <typename F, typename DF, typename U, typename A>
  *
  * @return
  */
-auto newton_method(U u0, F f, DF grad_f, A args, const int itermax, const double ftol, const double xtol)
+auto newton_method(U u0, F f, DF grad_f, A args, int itermax, double ftol, double xtol)
 {
     // std::cout << "newton_method : u0 = " << u0 << std::endl;
     // std::cout << "newton_method : args = " << args << std::endl;

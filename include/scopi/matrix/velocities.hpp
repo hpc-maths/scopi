@@ -1,9 +1,12 @@
 #pragma once
 
 #include <xtensor-blas/xlinalg.hpp>
+#include <xtensor/xfixed.hpp>
 #include <xtensor/xnoalias.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
+
+#include "../quaternion.hpp"
 
 namespace scopi
 {

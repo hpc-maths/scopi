@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <limits>
 
 #include <fmt/format.h>
 
@@ -69,7 +70,7 @@ namespace scopi
          *
          * @return
          */
-        auto point(const double b) const; // dim = 2
+        auto point(double b) const; // dim = 2
         /**
          * @brief
          *
@@ -80,7 +81,7 @@ namespace scopi
          *
          * @return
          */
-        auto point(const double a, const double b) const; // dim = 3
+        auto point(double a, double b) const; // dim = 3
         /**
          * @brief Outer normal to the segment.
          */
@@ -96,15 +97,15 @@ namespace scopi
          *
          * @return
          */
-        virtual std::unique_ptr<base_constructor<dim>> construct() const override;
+        std::unique_ptr<base_constructor<dim>> construct() const override;
         /**
          * @brief Print the elements of the segment on standard output.
          */
-        virtual void print() const override;
+        void print() const override;
         /**
          * @brief Get the hash of the segment.
          */
-        virtual std::size_t hash() const override;
+        std::size_t hash() const override;
 
       private:
 
@@ -116,10 +117,13 @@ namespace scopi
         void create_hash();
 
         /**
+         * @brief Length of the segment.
+         */
+        double m_length;
+        /**
          * @brief Hash of the segment.
          */
-        std::size_t m_hash;
-        double m_length;
+        std::size_t m_hash{std::numeric_limits<std::size_t>::min()};
     };
 
     /////////////////////////
@@ -197,7 +201,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto segment<dim, owner>::point(const double b) const
+    auto segment<dim, owner>::point(double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = 0;
@@ -206,7 +210,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto segment<dim, owner>::point(const double a, const double b) const
+    auto segment<dim, owner>::point(double a, double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = 0;

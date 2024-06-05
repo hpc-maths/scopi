@@ -167,7 +167,7 @@ int viscous_plan_sphere(int argc, char** argv)
 
     scopi::scopi_container<dim> particles;
 
-    double PI = xt::numeric_constants<double>::PI;
+    const double PI = xt::numeric_constants<double>::PI;
     scopi::plan<dim> plan(
         {
             {0., 0.}

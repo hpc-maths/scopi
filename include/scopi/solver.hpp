@@ -207,8 +207,7 @@ namespace scopi
     ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::ScopiSolver(const BoxDomain<dim>& box,
                                                                                       scopi_container<dim>& particles,
                                                                                       double dt)
-        : m_params()
-        , m_box(box)
+        : m_box(box)
         , m_particles(particles)
         , m_dt(dt)
         , m_optim_solver(particles.nb_active(), dt, particles)
@@ -220,9 +219,7 @@ namespace scopi
 
     template <std::size_t dim, class problem_t, class optim_solver_t, template <class> class contact_method_t, class vap_t>
     ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
-        : m_params()
-        , m_box()
-        , m_particles(particles)
+        : m_particles(particles)
         , m_dt(dt)
         , m_optim_solver(particles.nb_active(), dt, particles)
         , m_contact_method()

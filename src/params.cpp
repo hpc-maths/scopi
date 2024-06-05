@@ -15,7 +15,7 @@ namespace scopi
     void ScopiParams::init_options()
     {
         auto& app = get_app();
-        auto opt  = app.add_option_group("Output scopi options");
+        auto* opt = app.add_option_group("Output scopi options");
         if (!check_option(app, "--path"))
         {
             opt->add_option("--path", path, "Path where to store the results")->capture_default_str();

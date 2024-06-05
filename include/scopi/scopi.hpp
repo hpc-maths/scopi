@@ -24,7 +24,7 @@ namespace scopi
         return app;
     }
 
-    inline auto& initialize(std::string description = "")
+    inline auto& initialize(const std::string& description = "")
     {
         auto& app = get_app();
         app.description(description);

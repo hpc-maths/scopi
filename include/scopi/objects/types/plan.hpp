@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <limits>
+
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xview.hpp>
@@ -66,7 +68,7 @@ namespace scopi
          *
          * @return
          */
-        auto point(const double b) const; // dim = 2
+        auto point(double b) const; // dim = 2
         /**
          * @brief
          *
@@ -77,7 +79,7 @@ namespace scopi
          *
          * @return
          */
-        auto point(const double a, const double b) const; // dim = 3
+        auto point(double a, double b) const; // dim = 3
         /**
          * @brief Outer normal to the plane.
          */
@@ -89,15 +91,15 @@ namespace scopi
          *
          * @return
          */
-        virtual std::unique_ptr<base_constructor<dim>> construct() const override;
+        std::unique_ptr<base_constructor<dim>> construct() const override;
         /**
          * @brief Print the elements of the plane on standard output.
          */
-        virtual void print() const override;
+        void print() const override;
         /**
          * @brief Get the hash of the plane.
          */
-        virtual std::size_t hash() const override;
+        std::size_t hash() const override;
 
       private:
 
@@ -111,7 +113,7 @@ namespace scopi
         /**
          * @brief Hash of the plane.
          */
-        std::size_t m_hash;
+        std::size_t m_hash{std::numeric_limits<std::size_t>::min()};
     };
 
     /////////////////////////
@@ -171,7 +173,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto plan<dim, owner>::point(const double b) const
+    auto plan<dim, owner>::point(double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = 0;
@@ -180,7 +182,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto plan<dim, owner>::point(const double a, const double b) const
+    auto plan<dim, owner>::point(double a, double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = 0;
