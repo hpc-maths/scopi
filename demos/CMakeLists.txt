@@ -17,7 +17,7 @@ set(SCOPI_EXAMPLES
    # pile_of_sand_spheres.cpp
    # pile_of_sand_superellipsoids.cpp
    segment.cpp
-   worms_simulation.cpp
+   # worms_simulation.cpp
 )
 
 include(generator)
