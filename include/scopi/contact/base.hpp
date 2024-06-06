@@ -63,7 +63,7 @@ namespace scopi
 
         params_t& get_params();
 
-      protected:
+      private:
 
         params_t m_params;
     };
@@ -163,13 +163,12 @@ namespace scopi
                       {
                           return true;
                       }
-                      else
+
+                      if (a.i == b.i)
                       {
-                          if (a.i == b.i)
-                          {
-                              return a.j < b.j;
-                          }
+                          return a.j < b.j;
                       }
+
                       return false;
                   });
     }

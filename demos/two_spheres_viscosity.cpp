@@ -12,10 +12,10 @@ int main()
 
     constexpr std::size_t dim = 2;
 
-    double dt            = .001;
-    std::size_t total_it = 3000;
+    const double dt            = .001;
+    const std::size_t total_it = 3000;
 
-    double r = 0.1;
+    const double r = 0.1;
     scopi::scopi_container<dim> particles;
     auto prop = scopi::property<dim>().mass(1.).moment_inertia(1. * r * r / 2.);
 

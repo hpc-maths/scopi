@@ -36,8 +36,8 @@ namespace scopi
 
         object_base() = default;
 
-        object_base(const object_base&) = default;
-        object_base(object_base&&)      = default;
+        object_base(const object_base&)     = default;
+        object_base(object_base&&) noexcept = default;
     };
 
     namespace detail

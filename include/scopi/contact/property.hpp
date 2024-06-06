@@ -41,19 +41,12 @@ namespace scopi
     template <>
     struct contact_property<NoFriction>
     {
-        auto to_json() const
+        static auto to_json()
         {
             return nl::json{
                 {"type", "no friction"},
             };
         }
-    };
-
-    inline auto& get_contact_subcommand()
-    {
-        auto& app            = get_app();
-        static CLI::App* sub = app.add_subcommand("contact-property", "This subcommand allows to define the default property of a contact");
-        return *sub;
     };
 
     template <>
@@ -138,11 +131,11 @@ namespace scopi
     struct contact_property<FrictionFixedPoint> : public contact_property<Friction>,
                                                   contact_property<FixedPoint>
     {
-        contact_property()
-            : contact_property<Friction>()
-            , contact_property<FixedPoint>()
-        {
-        }
+        // contact_property()
+        //     : contact_property<Friction>()
+        //     , contact_property<FixedPoint>()
+        // {
+        // }
 
         auto to_json() const
         {
@@ -160,12 +153,12 @@ namespace scopi
                                                contact_property<Friction>,
                                                contact_property<FixedPoint>
     {
-        contact_property()
-            : contact_property<Viscous>()
-            , contact_property<Friction>()
-            , contact_property<FixedPoint>()
-        {
-        }
+        // contact_property()
+        //     : contact_property<Viscous>()
+        //     , contact_property<Friction>()
+        //     , contact_property<FixedPoint>()
+        // {
+        // }
 
         auto to_json() const
         {

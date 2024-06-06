@@ -26,19 +26,19 @@ namespace scopi
     template <class problem_t>
     struct ContactsParams<contact_kdtree<problem_t>>
     {
-        /**
-         * @brief Default constructor.
-         */
-        ContactsParams() // cppcheck-suppress uninitMemberVar
-            : dmax(2.)
-            , kd_tree_radius(17.)
-        {
-        }
+        // /**
+        //  * @brief Default constructor.
+        //  */
+        // ContactsParams() // cppcheck-suppress uninitMemberVar
+        //     : dmax(2.)
+        //     , kd_tree_radius(17.)
+        // {
+        // }
 
         void init_options()
         {
             auto& app = get_app();
-            auto opt  = app.add_option_group("KD tree options");
+            auto* opt = app.add_option_group("KD tree options");
             opt->add_option("--dmax", dmax, "Maximum distance between two neighboring particles")->capture_default_str();
             opt->add_option("--kd-radius", kd_tree_radius, "Kd-tree radius")->capture_default_str();
         }
@@ -49,7 +49,7 @@ namespace scopi
          * Default value: 2.
          * \note \c dmax > 0
          */
-        double dmax = 2.;
+        double dmax{2.};
         /**
          * @brief Kd-tree radius.
          *
@@ -57,7 +57,7 @@ namespace scopi
          * \c j is less than \c kdtree_radius. For a sphere or a superellipsoid, this point is the center. For a plan, it is the point used
          * to construct it. \note \c kd_tree_radius > 0
          */
-        double kd_tree_radius;
+        double kd_tree_radius{17.};
     };
 
     /**
@@ -160,7 +160,6 @@ namespace scopi
          */
         explicit contact_kdtree(const ContactsParams<contact_kdtree<problem_t>>& params = ContactsParams<contact_kdtree<problem_t>>())
             : base_type(params)
-            , m_nMatches(0)
         {
         }
 
@@ -194,7 +193,7 @@ namespace scopi
         /**
          * @brief Number of exact distances computed.
          */
-        std::size_t m_nMatches;
+        std::size_t m_nMatches{0};
         contact_property<problem_t> m_default_contact_property;
     };
 
@@ -206,7 +205,7 @@ namespace scopi
 
         std::vector<neighbor<dim, problem_t>> contacts;
 
-        add_objects_from_periodicity(box, particles, this->m_params.dmax);
+        add_objects_from_periodicity(box, particles, this->get_params().dmax);
 
         // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
         tic();
@@ -224,23 +223,26 @@ namespace scopi
 
         for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
         {
-            double query_pt[dim];
+            std::array<double, dim> query_pt;
             for (std::size_t d = 0; d < dim; ++d)
             {
                 query_pt[d] = particles.pos()(i)(d);
             }
             PLOG_DEBUG << "i = " << i << " query_pt = " << query_pt[0] << " " << query_pt[1] << std::endl;
 
-            std::vector<std::pair<std::size_t, double>> ret_matches;
+            std::vector<nanoflann::ResultItem<std::size_t, double>> ret_matches;
 
-            auto nMatches_loc = index.radiusSearch(query_pt, this->m_params.kd_tree_radius, ret_matches, nanoflann::SearchParams());
+            auto nMatches_loc = index.radiusSearch(query_pt.data(),
+                                                   this->get_params().kd_tree_radius,
+                                                   ret_matches,
+                                                   nanoflann::SearchParameters());
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic)
             {
                 std::size_t j = ret_matches[ic].first + particles.offset(active_ptr);
                 if (i < j)
                 {
-                    compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
+                    compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
                     m_nMatches++;
                 }
             }
@@ -251,7 +253,7 @@ namespace scopi
         {
             for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
             {
-                compute_exact_distance<problem_t>(box, particles, contacts, this->m_params.dmax, i, j, m_default_contact_property);
+                compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
             }
         }
 

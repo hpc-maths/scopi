@@ -2,55 +2,73 @@
 
 namespace scopi
 {
-    bool diffFile(std::string filenameRef, std::string filenameResult, double tol)
+    bool diffFile(const std::string& filenameRef, const std::string& filenameResult, double tol)
     {
         std::ifstream fileRef(filenameRef);
         std::ifstream fileResult(filenameResult);
-        if (fileRef && fileResult)
+
+        if (fileRef.is_open() && fileResult.is_open())
         {
             nlohmann::json jsonRef    = nlohmann::json::parse(fileRef);
             nlohmann::json jsonResult = nlohmann::json::parse(fileResult);
-            nlohmann::json diff       = nlohmann::json::diff(jsonRef["objects"], jsonResult["objects"]);
+            const nlohmann::json diff = nlohmann::json::diff(jsonRef["objects"], jsonResult["objects"]);
+
             if (!diff.empty())
             {
                 for (const auto& p : diff)
                 {
-                    std::string path_ = p["path"];
-                    nlohmann::json::json_pointer path(path_);
+                    const std::string path_ = p["path"];
+                    const nlohmann::json::json_pointer path(path_);
+
                     if (jsonRef["objects"][path].is_number_float() && jsonResult["objects"][path].is_number_float())
                     {
-                        if (std::abs(static_cast<double>(jsonRef["objects"][path]) - static_cast<double>(jsonResult["objects"][path])) > tol)
+                        const double error = std::abs(static_cast<double>(jsonRef["objects"][path])
+                                                      - static_cast<double>(jsonResult["objects"][path]));
+                        if (error > tol)
                         {
-                            std::cerr << path << " " << jsonRef["objects"][path] << " " << jsonResult["objects"][path] << std::endl;
+                            std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
+                            std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
+                            std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;
+                            std::cerr << "\tError: " << error << std::endl;
+                            std::cerr << "\tTolerance: " << tol << std::endl;
                             return false;
                         }
                     }
                     else
                     {
-                        std::cerr << path << std::endl;
+                        std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
+                        std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
+                        std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;
                         return false;
                     }
                 }
             }
             return true;
         }
-        else
+
+        if (!fileRef.is_open())
         {
-            return false;
+            std::cerr << "failed to open the reference file " << filenameRef << std::endl;
         }
+        if (!fileResult.is_open())
+        {
+            std::cerr << "failed to open the reference file " << filenameResult << std::endl;
+        }
+        return false;
     }
 
     std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0)
     {
-        double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
+        const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
         if (t > t_impact)
         {
-            double x_normal, theta;
-            double v_t_m    = g * t_impact * std::sin(alpha);
-            double v_n_m    = -g * t_impact * std::cos(alpha);
-            double t2       = (t - t_impact);
-            double x_impact = g * std::sin(alpha) * t_impact * t_impact / 2.;
+            double x_normal;
+            double theta;
+            const double v_t_m    = g * t_impact * std::sin(alpha);
+            const double v_n_m    = -g * t_impact * std::cos(alpha);
+            const double t2       = (t - t_impact);
+            const double x_impact = g * std::sin(alpha) * t_impact * t_impact / 2.;
             if (std::tan(alpha) <= 3 * mu)
             {
                 x_normal = g * std::sin(alpha) * t2 * t2 / 3. + 2. * v_t_m * t2 / 3. + x_impact;
@@ -65,25 +83,24 @@ namespace scopi
             x(1) = -x_normal * std::sin(alpha) + r * std::cos(alpha);
             return std::make_pair(x, theta);
         }
-        else
-        {
-            x(0) = y0 * std::sin(alpha);
-            x(1) = y0 * std::cos(alpha) - g * t * t / 2.;
-            return std::make_pair(x, 0.);
-        }
+
+        x(0) = y0 * std::sin(alpha);
+        x(1) = y0 * std::cos(alpha) - g * t * t / 2.;
+        return std::make_pair(x, 0.);
     }
 
     std::pair<type::position_t<2>, double>
     analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0)
     {
-        double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
+        const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
         if (t > t_impact)
         {
-            double v_normal, omega;
-            double v_t_m = g * t_impact * std::sin(alpha);
-            double v_n_m = -g * t_impact * std::cos(alpha);
-            double t2    = (t - t_impact);
+            double v_normal;
+            double omega;
+            const double v_t_m = g * t_impact * std::sin(alpha);
+            const double v_n_m = -g * t_impact * std::cos(alpha);
+            const double t2    = (t - t_impact);
             if (std::tan(alpha) <= 3 * mu)
             {
                 v_normal = 2. * g * std::sin(alpha) * t2 / 3. + 2. * v_t_m / 3.;
@@ -98,11 +115,9 @@ namespace scopi
             x[1] = -v_normal * std::sin(alpha);
             return std::make_pair(x, omega);
         }
-        else
-        {
-            x[0] = 0.;
-            x[1] = -g * t;
-            return std::make_pair(x, 0.);
-        }
+
+        x[0] = 0.;
+        x[1] = -g * t;
+        return std::make_pair(x, 0.);
     }
 }

@@ -1,23 +1,15 @@
 name: scopi-env
 channels:
   - conda-forge
-  - intel
 dependencies:
   - cxx-compiler
   - cmake
   - xtensor
   - xtensor-blas
-  - pyvista
-  - imageio-ffmpeg
-  - xsimd
   - fmt
-  - mkl-include
-  - mkl-static
   - nanoflann
   - nlohmann_json
   - plog
   - doctest
-  - mkl
-  - sphinx
-  - breathe
-  - doxygen
+  - cli11
+  - ninja

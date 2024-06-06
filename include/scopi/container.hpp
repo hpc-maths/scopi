@@ -73,11 +73,6 @@ namespace scopi
         using quaternion_type = type::quaternion_t;
 
         /**
-         * @brief Constructor.
-         */
-        scopi_container();
-
-        /**
          * @brief Reconstructs an object.
          *
          * An object can be a sphere, a superellipsoid, a plan, a worm,...
@@ -312,28 +307,19 @@ namespace scopi
         /**
          * @brief Index of the first duplicated particle.
          */
-        std::size_t m_periodic_ptr;
-        std::size_t m_periodic_obj_ptr;
+        std::size_t m_periodic_ptr{0};
+        std::size_t m_periodic_obj_ptr{0};
 
         /**
          * @brief Number of obstacles (inactive particles).
          */
-        std::size_t m_nb_inactive_core_objects;
+        std::size_t m_nb_inactive_core_objects{0};
 
         /**
          * @brief Whether there already is fictive particles in the container.
          */
-        bool m_periodic_added;
+        bool m_periodic_added{false};
     };
-
-    template <std::size_t dim>
-    scopi_container<dim>::scopi_container()
-        : m_periodic_ptr(0)
-        , m_periodic_obj_ptr(0)
-        , m_nb_inactive_core_objects(0)
-        , m_periodic_added(false)
-    {
-    }
 
     template <std::size_t dim>
     std::unique_ptr<object<dim, false>> scopi_container<dim>::operator[](std::size_t i)

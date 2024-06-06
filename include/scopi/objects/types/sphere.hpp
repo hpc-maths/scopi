@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 #include "../../quaternion.hpp"
 #include "base.hpp"
 
@@ -83,7 +85,7 @@ namespace scopi
          *
          * @return (x, y) coordinates of the point.
          */
-        auto point(const double b) const;
+        auto point(double b) const;
         /**
          * @brief Get the coordinates of the point at the surface of the sphere in 3D.
          *
@@ -92,7 +94,7 @@ namespace scopi
          *
          * @return (x, y, z) coordinates of the point.
          */
-        auto point(const double a, const double b) const;
+        auto point(double a, double b) const;
         /**
          * @brief Get the outer normal of the sphere in 2D.
          *
@@ -100,7 +102,7 @@ namespace scopi
          *
          * @return (x, y) coordinates of the normal.
          */
-        auto normal(const double b) const;
+        auto normal(double b) const;
         /**
          * @brief Get the outer normal of the sphere in 3D.
          *
@@ -109,7 +111,7 @@ namespace scopi
          *
          * @return  (x, y, z) coordinates of the normal.
          */
-        auto normal(const double a, const double b) const;
+        auto normal(double a, double b) const;
 
       private:
 
@@ -127,7 +129,7 @@ namespace scopi
         /**
          * @brief Hash of the sphere.
          */
-        mutable std::size_t m_hash;
+        mutable std::size_t m_hash{std::numeric_limits<std::size_t>::min()};
     };
 
     ///////////////////////////
@@ -137,7 +139,6 @@ namespace scopi
     sphere<dim, owner>::sphere(position_type pos, double radius)
         : base_type(pos, {quaternion()}, 1)
         , m_radius(radius)
-        , m_hash(std::numeric_limits<std::size_t>::min())
     {
     }
 
@@ -145,7 +146,6 @@ namespace scopi
     sphere<dim, owner>::sphere(position_type pos, quaternion_type q, double radius)
         : base_type(pos, q, 1)
         , m_radius(radius)
-        , m_hash(std::numeric_limits<std::size_t>::min())
     {
     }
 
@@ -192,7 +192,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto sphere<dim, owner>::point(const double b) const
+    auto sphere<dim, owner>::point(double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = m_radius * std::cos(b);
@@ -201,7 +201,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto sphere<dim, owner>::point(const double a, const double b) const
+    auto sphere<dim, owner>::point(double a, double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = m_radius * std::cos(a) * std::cos(b);
@@ -211,7 +211,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto sphere<dim, owner>::normal(const double b) const
+    auto sphere<dim, owner>::normal(double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> n;
         n(0) = m_radius * std::cos(b);
@@ -222,7 +222,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto sphere<dim, owner>::normal(const double a, const double b) const
+    auto sphere<dim, owner>::normal(double a, double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> n;
         n(0) = std::cos(a) * std::cos(b);

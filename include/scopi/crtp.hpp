@@ -21,8 +21,8 @@ namespace scopi
         crtp_base(const crtp_base&)            = default;
         crtp_base& operator=(const crtp_base&) = default;
 
-        crtp_base(crtp_base&&)            = default;
-        crtp_base& operator=(crtp_base&&) = default;
+        crtp_base(crtp_base&&) noexcept            = default;
+        crtp_base& operator=(crtp_base&&) noexcept = default;
     };
 
     template <class D>

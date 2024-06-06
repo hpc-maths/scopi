@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <limits>
 #include <vector>
 
 #include "../../quaternion.hpp"
@@ -68,15 +69,15 @@ namespace scopi
          *
          * @return
          */
-        virtual std::unique_ptr<base_constructor<dim>> construct() const override;
+        std::unique_ptr<base_constructor<dim>> construct() const override;
         /**
          * @brief Print the elements of the worm on standard output.
          */
-        virtual void print() const override;
+        void print() const override;
         /**
          * @brief Get the hash of the worm.
          */
-        virtual std::size_t hash() const override;
+        std::size_t hash() const override;
 
         /**
          * @brief Get the radius of the spheres in the worm.
@@ -107,7 +108,7 @@ namespace scopi
         /**
          * @brief Hash of the worm.
          */
-        std::size_t m_hash;
+        std::size_t m_hash{std::numeric_limits<std::size_t>::min()};
     };
 
     ////////////////////////////

@@ -1,0 +1,8 @@
+*:src/minpack.cpp
+*:include/scopi/minpack.hpp
+normalCheckLevelMaxBranches
+//unusedFunction:test/*
+missingIncludeSystem
+duplInheritedMember
+unusedFunction
+checkersReport

@@ -25,12 +25,10 @@ namespace scopi
     template <class optim_t>
     struct OptimParams
     {
-      private:
-
         /**
          * @brief Constructor.
          */
-        OptimParams();
+        OptimParams() = delete;
     };
 
     /**
@@ -44,12 +42,10 @@ namespace scopi
     template <class problem_t>
     struct ProblemParams
     {
-      private:
-
         /**
          * @brief Constructor.
          */
-        ProblemParams();
+        ProblemParams() = delete;
     };
 
     /**
@@ -63,12 +59,10 @@ namespace scopi
     template <class contact_t>
     struct ContactsParams
     {
-      private:
-
         /**
          * @brief Constructor.
          */
-        ContactsParams();
+        ContactsParams() = delete;
     };
 
     /**
@@ -82,12 +76,10 @@ namespace scopi
     template <class vap_t>
     struct VapParams
     {
-      private:
-
         /**
          * @brief Constructor.
          */
-        VapParams();
+        VapParams() = delete;
     };
 
     /**

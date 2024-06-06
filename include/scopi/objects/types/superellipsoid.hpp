@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <limits>
 
 #include "../../quaternion.hpp"
 #include "../../types.hpp"
@@ -82,15 +83,15 @@ namespace scopi
          *
          * @return
          */
-        virtual std::unique_ptr<base_constructor<dim>> construct() const override;
+        std::unique_ptr<base_constructor<dim>> construct() const override;
         /**
          * @brief Print the elements of the superellipsoid on standard output.
          */
-        virtual void print() const override;
+        void print() const override;
         /**
          * @brief Get the hash of the superellipsoid.
          */
-        virtual std::size_t hash() const override;
+        std::size_t hash() const override;
         /**
          * @brief Get the rotation matrix of the sphere.
          */
@@ -102,7 +103,7 @@ namespace scopi
          *
          * @return (x, y) coordinates of the point.
          */
-        auto point(const double b) const;
+        auto point(double b) const;
         /**
          * @brief Get the coordinates of the point at the surface of the superellispoid in 3D.
          *
@@ -111,7 +112,7 @@ namespace scopi
          *
          * @return (x, y, z) coordinates of the point.
          */
-        auto point(const double a, const double b) const;
+        auto point(double a, double b) const;
         /**
          * @brief Get the outer normal of the superellipsoid in 2D.
          *
@@ -119,7 +120,7 @@ namespace scopi
          *
          * @return (x, y) coordinates of the normal.
          */
-        auto normal(const double b) const;
+        auto normal(double b) const;
         /**
          * @brief Get the outer normal of the superellipsoid in 3D.
          *
@@ -128,7 +129,7 @@ namespace scopi
          *
          * @return  (x, y, z) coordinates of the normal.
          */
-        auto normal(const double a, const double b) const;
+        auto normal(double a, double b) const;
         /**
          * @brief Get the vector included in the straight line tangent to the superellipsoid in 2D.
          *
@@ -136,7 +137,7 @@ namespace scopi
          *
          * @return (x, y) coordinates of a vector in the tangent straight line.
          */
-        auto tangent(const double b) const;
+        auto tangent(double b) const;
         /**
          * @brief Get the vectors included in the plane tangent to the superellipsoid in 3D.
          *
@@ -145,7 +146,7 @@ namespace scopi
          *
          * @return (x, y, z) coordinates of two vectors in the tangent plane.
          */
-        auto tangents(const double a, const double b) const; // dim = 3
+        auto tangents(double a, double b) const; // dim = 3
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
@@ -155,7 +156,7 @@ namespace scopi
          *
          * @return
          */
-        std::vector<double> binit_xy(const int n) const; // dim = 2 et 3
+        std::vector<double> binit_xy(int n) const; // dim = 2 et 3
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
@@ -165,7 +166,7 @@ namespace scopi
          *
          * @return
          */
-        std::vector<double> ainit_yz(const int n) const; // dim  3
+        std::vector<double> ainit_yz(int n) const; // dim  3
         /**
          * @brief Return a regular angle b distribution, used to initialize newton method.
          *
@@ -175,7 +176,7 @@ namespace scopi
          *
          * @return
          */
-        std::vector<double> ainit_xz(const int n) const; // dim  3
+        std::vector<double> ainit_xz(int n) const; // dim  3
 
       private:
 
@@ -197,7 +198,7 @@ namespace scopi
         /**
          * @brief Hash of the superellipsoid.
          */
-        std::size_t m_hash;
+        std::size_t m_hash{std::numeric_limits<std::size_t>::min()};
     };
 
     ///////////////////////////////////
@@ -278,7 +279,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::point(const double b) const
+    auto superellipsoid<dim, owner>::point(double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = m_radius(0) * sign(std::cos(b)) * std::pow(std::abs(std::cos(b)), m_squareness(0));
@@ -287,7 +288,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::point(const double a, const double b) const
+    auto superellipsoid<dim, owner>::point(double a, double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> pt;
         pt(0) = m_radius(0) * sign(std::cos(a)) * std::pow(std::abs(std::cos(a)), m_squareness(1)) * sign(std::cos(b))
@@ -299,7 +300,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::normal(const double b) const
+    auto superellipsoid<dim, owner>::normal(double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> n;
         n(0) = m_radius(1) * sign(std::cos(b)) * std::pow(std::abs(std::cos(b)), 2 - m_squareness(0));
@@ -310,7 +311,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::normal(const double a, const double b) const
+    auto superellipsoid<dim, owner>::normal(double a, double b) const
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> n;
         n(0) = m_radius(1) * m_radius(2) * sign(std::cos(a)) * std::pow(std::abs(std::cos(a)), 2 - m_squareness(1)) * sign(std::cos(b))
@@ -324,7 +325,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::tangent(const double b) const // 2D
+    auto superellipsoid<dim, owner>::tangent(double b) const // 2D
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> tgt;
         tgt(0) = -m_radius(0) * sign(std::sin(b)) * std::pow(std::abs(std::sin(b)), 2 - m_squareness(0));
@@ -335,7 +336,7 @@ namespace scopi
     }
 
     template <std::size_t dim, bool owner>
-    auto superellipsoid<dim, owner>::tangents(const double a, const double b) const // 3D
+    auto superellipsoid<dim, owner>::tangents(double a, double b) const // 3D
     {
         xt::xtensor_fixed<double, xt::xshape<dim>> tgt1;
         tgt1(0) = -m_radius(0) * sign(std::cos(a)) * sign(std::sin(b)) * std::pow(std::abs(std::sin(b)), 2 - m_squareness(0));
@@ -356,7 +357,7 @@ namespace scopi
 
     // return a regular angle b distribution, used to initialize newton method
     template <std::size_t dim, bool owner>
-    std::vector<double> superellipsoid<dim, owner>::binit_xy(const int n) const
+    std::vector<double> superellipsoid<dim, owner>::binit_xy(int n) const
     {
         const double pi = 4 * std::atan(1);
         std::vector<double> bs;
@@ -365,7 +366,7 @@ namespace scopi
         auto angles = xt::linspace<double>(0, 0.5 * pi, n, true);
         for (std::size_t i = 0; i < angles.size(); i++)
         {
-            double b_ell = angles(i);
+            const double b_ell = angles(i);
             // std::cout << "\nb_ell= " << b_ell << std::endl;
             double x_ell = m_radius(0) * std::cos(b_ell);
             double y_ell = m_radius(1) * std::sin(b_ell);
@@ -412,7 +413,7 @@ namespace scopi
 
     // return a regular angle b distribution, used to initialize newton method
     template <std::size_t dim, bool owner>
-    std::vector<double> superellipsoid<dim, owner>::ainit_yz(const int n) const
+    std::vector<double> superellipsoid<dim, owner>::ainit_yz(int n) const
     {
         const double pi = 4 * std::atan(1);
         std::vector<double> as;
@@ -466,7 +467,7 @@ namespace scopi
 
     // return a regular angle b distribution, used to initialize newton method
     template <std::size_t dim, bool owner>
-    std::vector<double> superellipsoid<dim, owner>::ainit_xz(const int n) const
+    std::vector<double> superellipsoid<dim, owner>::ainit_xz(int n) const
     {
         const double pi = 4 * std::atan(1);
         std::vector<double> as;

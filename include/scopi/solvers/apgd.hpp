@@ -22,7 +22,7 @@ namespace scopi
         void init_options()
         {
             auto& app = get_app();
-            auto opt  = app.add_option_group("PGD options");
+            auto* opt = app.add_option_group("PGD options");
             if (!check_option(app, "--pgd-alpha"))
             {
                 opt->add_option("--pgd-alpha", alpha, "descent coefficient")->capture_default_str();
@@ -31,9 +31,9 @@ namespace scopi
             }
         }
 
-        double alpha     = 0.05;
-        double max_ite   = 10000;
-        double tolerance = 1e-6;
+        double alpha        = 0.05;
+        std::size_t max_ite = 10000;
+        double tolerance    = 1e-6;
     };
 
     class pgd
@@ -101,7 +101,7 @@ namespace scopi
         void init_options()
         {
             auto& app = get_app();
-            auto opt  = app.add_option_group("APGD options");
+            auto* opt = app.add_option_group("APGD options");
             if (!check_option(app, "--apgd-alpha"))
             {
                 opt->add_option("--apgd-alpha", alpha, "descent coefficient")->capture_default_str();
@@ -112,7 +112,7 @@ namespace scopi
         }
 
         double alpha         = 0.05;
-        double max_ite       = 10000;
+        std::size_t max_ite  = 10000;
         double tolerance     = 1e-7;
         bool dynamic_descent = true;
     };

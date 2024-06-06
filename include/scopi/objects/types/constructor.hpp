@@ -34,12 +34,12 @@ namespace scopi
         template <class... CTA>
         object_constructor(CTA&&... args);
 
-        virtual std::unique_ptr<object<dim, false>> operator()(type::position_t<dim>* pos, type::quaternion_t* q) const override;
+        std::unique_ptr<object<dim, false>> operator()(type::position_t<dim>* pos, type::quaternion_t* q) const override;
 
       private:
 
         template <std::size_t... I>
-        auto constructor(type::position_t<dim>* pos, type::quaternion_t* r, std::index_sequence<I...>) const;
+        auto constructor(type::position_t<dim>* pos, type::quaternion_t* q, std::index_sequence<I...>) const;
 
         tuple_type m_extra;
     };

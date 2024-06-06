@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 {
     constexpr std::size_t dim = 2;
     double dt                 = .001;
-    double max_radius         = 0.06;
+    const double max_radius   = 0.06;
     std::size_t total_it      = 100;
     std::size_t n_parts       = 20;
 
