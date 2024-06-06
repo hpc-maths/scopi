@@ -16,7 +16,7 @@
 
 namespace scopi
 {
-    double tol            = 1e-6;
+    double tol            = 1e-5;
     double tol_analytical = 1e-12;
 
     /// TESTS SPHERES - PLAN

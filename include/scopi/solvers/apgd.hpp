@@ -33,7 +33,7 @@ namespace scopi
 
         double alpha        = 0.05;
         std::size_t max_ite = 10000;
-        double tolerance    = 1e-7;
+        double tolerance    = 1e-6;
     };
 
     class pgd
@@ -113,7 +113,7 @@ namespace scopi
 
         double alpha         = 0.05;
         std::size_t max_ite  = 10000;
-        double tolerance     = 1e-8;
+        double tolerance     = 1e-7;
         bool dynamic_descent = true;
     };
 
