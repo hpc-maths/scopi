@@ -1,8 +1,8 @@
 <h1 align="center">
   <a href="https://github.com/hpc-maths/scopi">
     <picture>
-        <source media="(prefers-color-scheme: dark)" height="200" srcset="./doc/source/logo/dark_small.png">
-        <img alt="Text changing depending on mode. Light: 'So light!' Dark: 'So dark!'" height=200 src="./doc/source/logo/light_small.png">
+        <source media="(prefers-color-scheme: dark)" height="300" srcset="./doc/source/logo/dark_small.png">
+        <img alt="Text changing depending on mode. Light: 'So light!' Dark: 'So dark!'" height=300 src="./doc/source/logo/light_small.png">
     </picture>
   </a>
 </h1>
