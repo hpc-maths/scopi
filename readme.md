@@ -59,16 +59,16 @@ In this section, we propose an example of the simulation of two spheres with opp
   scopi::initialize("Two spheres simulation");
   ```
 
-  SCoPI uses [cli11](https://cliutils.github.io/CLI11/book/) to manage command line options. This initialization just adds a title to your command line options. But, we plan to do much more in a near future for this step, so get into the habit of using it.
+  SCoPI uses [cli11](https://cliutils.github.io/CLI11/book/) to manage command line options. This initialization just adds a title to your command line options. But, we plan to do much more soon for this step, so get into the habit of using it.
 
 - Create two spheres
 
-  You have to include `<scopi/scopi.hpp>` file.
+  You have to include `<scopi/objects/types/sphere.hpp>` file.
 
   ```cpp
   constexpr std::size_t dim = 2;
   scopi::sphere<dim> s1({{-0.2, -0.05}}, 0.1);
-  scopi::sphere<dim> s1({{ 0.2,  0.05}}, 0.1);
+  scopi::sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
   ```
 
   We first specify the dimension of our simulation: here is a 2D problem. Then we create two particles represented by spheres. The first argument is the center and the second one is the radius.
@@ -113,27 +113,94 @@ In this section, we propose an example of the simulation of two spheres with opp
   solver.run(total_it);
   ```
 
+  That's it! You have simulated no friction contact of two spheres which is the default behavior.
+
+  The whole source file is
+
+  ```cpp
+  #include <scopi/scopi.hpp>
+  #include <scopi/objects/types/sphere.hpp>
+  #include <scopi/container.hpp>
+  #include <scopi/solver.hpp>
+
+  int main(int argc, char** argv)
+  {
+      scopi::initialize("Two spheres simulation");
+
+      constexpr std::size_t dim = 2;
+      scopi::sphere<dim> s1({{-0.2, -0.05}}, 0.1);
+      scopi::sphere<dim> s2({{ 0.2,  0.05}}, 0.1);
+
+      scopi::scopi_container<dim> particles;
+
+      particles.push_back(s1,
+                          scopi::property<dim>()
+                              .desired_velocity({
+                                  {0.25, 0}
+      })
+                              .mass(1.)
+                              .moment_inertia(0.1));
+      particles.push_back(s2,
+                          scopi::property<dim>()
+                              .desired_velocity({
+                                  {-0.25, 0}
+      })
+                              .mass(1.)
+                              .moment_inertia(0.1));
+
+      double dt = 0.005;
+
+      scopi::ScopiSolver<dim> solver(particles, dt);
+      SCOPI_PARSE(argc, argv);
+
+      std::size_t total_it = 100;
+      solver.run(total_it);
+
+      return 0;
+  }
+  ```
+
+  `SCOPI_PARSE` allows to get access to internal options.
+
+- Compile using CMake
+
+  You can put the script in a file called `two_spheres.cpp` and create a `CMakeLists.txt` file with the following content
+
+  ```cmake
+  find_package(scopi)
+  add_executable(two_spheres two_spheres.cpp)
+  target_link_librairies(two_spheres scopi)
+  ```
+
+  Then, you can compile this C++ script using the bash command lines
+
+  ```bash
+  cmake . -B build -DCMAKE_BUILD_TYPE=Release
+  cmake --build build target all
+  ```
+
+- Run
+
+  ```bash
+  ./two_spheres
+  ```
+
+  If you want to see all the options of your executable
+
+  ```bash
+  ./two_spheres -h
+  ```
+
 ### There's more
 
 If you want to learn more about scopi skills by looking at examples, we encourage you to browse the [demos](./demos) directory.
 
 ## Features
 
-<!-- - [x] Facilitate data manipulation by using the formalism on a uniform Cartesian grid
-- [x] Facilitate the implementation of complex operators between grid levels
-- [x] High memory compression of an adapted mesh
-- [x] Complex mesh creation using a set of meshes
-- [x] Finite volume methods using flux construction
-- [x] Lattice Boltzmann methods examples
-- [ ] Finite difference methods
-- [ ] Discontinuous Galerkin methods
-- [x] Matrix assembling of the discrete operators using PETSc
-- [x] AMR cell-based methods
-- [ ] AMR patch-based and block-based methods
-- [x] MRA cell-based methods
-- [ ] MRA point-based methods
-- [x] HDF5 ouput format support
-- [ ] MPI implementation -->
+- Several objects: sphere, superellipsoid, plan, segment, worms...
+- Several methods to compute the neighbors of an object: brute force or kd tree
+- Several kinds of contact: no friction, friction, viscous, friction and viscous
+- Several methods to solve the problem: projected gradient descent, adaptive projected gradient method
 
 ## Installation
 
@@ -180,7 +247,7 @@ cmake --build ./build --config Release
 
 ## Get help
 
-For a better understanding of all the components of scopi, you can consult the documentation https://scopi.readthedocs.io.
+<!-- For a better understanding of all the components of scopi, you can consult the documentation https://scopi.readthedocs.io. -->
 
 If you have any questions or remarks, you can write a message on [github discussions](https://github.com/hpc-maths/scopi/discussions), and we will be happy to help you or to discuss with you.
 
@@ -210,5 +277,5 @@ See [LICENSE](LICENSE) for more information.
 
 [^1]: Jean, Michel et Moreau, Jean Jacques. Unilaterality and dry friction in the dynamics of rigid body collections. In : 1st contact mechanics international symposium. 1992. p. 31-48.
 [^2]: Maury, Bertrand. A time-stepping scheme for inelastic collisions. Numerische Mathematik, 2006, vol. 102, p. 649-679.
-[^3] Lefebvre, Aline. Numerical simulation of gluey particles. ESAIM: Mathematical Modelling and Numerical Analysis, 2009, vol. 43, no 1, p. 53-80.
-[^4] Seguin, A., Lefebvre-Lepot, Aline, Faure, Sylvain, et Gondret, Philippe. Clustering and flow around a sphere moving into a grain cloud. The European Physical Journal E, 2016, vol. 39, no 6, p. 63.
+[^3]: Lefebvre, Aline. Numerical simulation of gluey particles. ESAIM: Mathematical Modelling and Numerical Analysis, 2009, vol. 43, no 1, p. 53-80.
+[^4]: Seguin, A., Lefebvre-Lepot, Aline, Faure, Sylvain, et Gondret, Philippe. Clustering and flow around a sphere moving into a grain cloud. The European Physical Journal E, 2016, vol. 39, no 6, p. 63.
