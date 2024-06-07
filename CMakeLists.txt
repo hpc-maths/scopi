@@ -28,7 +28,6 @@ OPTION(SCOPI_USE_TBB "enable TBB" OFF)
 OPTION(SCOPI_USE_OPENMP "enable OpenMP" OFF)
 OPTION(SCOPI_USE_MOSEK "enable Mosek" OFF)
 OPTION(SCOPI_USE_SCS "enable SCS" OFF)
-OPTION(SCOPI_USE_MKL "enable MKL" OFF)
 OPTION(BUILD_EXAMPLES "scopi examples" OFF)
 OPTION(BUILD_TESTS "scopi test suite" OFF)
 
@@ -51,7 +50,7 @@ find_package(fmt REQUIRED)
 find_package(CLI11 REQUIRED)
 
 find_package(plog REQUIRED)
-# find_package(nanoflann REQUIRED)
+find_package(nanoflann REQUIRED)
 
 # section needed to use xtensor-blas
 # see https://xtensor-blas.readthedocs.io/en/latest/performance.html
@@ -77,14 +76,6 @@ if(SCOPI_USE_OPENMP)
     find_package(OpenMP REQUIRED)
 endif()
 
-if(SCOPI_USE_MKL)
-    if(SCOPI_USE_TBB)
-        set(MKL_THREAD_LAYER "TBB")
-    endif()
-
-    find_package(MKL REQUIRED)
-endif()
-
 if(SCOPI_USE_MOSEK)
     find_package(MOSEK REQUIRED)
 
@@ -102,16 +93,6 @@ endif()
 set(CMAKE_NO_SYSTEM_FROM_IMPORTED TRUE)
 
 set(SCOPI_SRC
-    # src/contact/contact_brute_force.cpp
-    # src/contact/contact_kdtree.cpp
-    # src/problems/DryWithoutFriction.cpp
-    # src/problems/DryWithFriction.cpp
-    # src/problems/DryWithFrictionBase.cpp
-    # src/problems/DryWithFrictionFixedPoint.cpp
-    # src/solvers/ConstraintMosek.cpp
-    # src/solvers/OptimUzawaBase.cpp
-    # src/solvers/OptimProjectedGradient.cpp
-    # src/solvers/projection.cpp
     src/vap/vap_fixed.cpp
     src/vap/vap_fpd.cpp
     src/vap/vap_projection.cpp
@@ -133,7 +114,7 @@ target_link_libraries(scopi PUBLIC xtensor
     CLI11::CLI11
 
     plog::plog
-    # nanoflann::nanoflann
+    nanoflann::nanoflann
     ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 # set_target_properties(scopi PROPERTIES
@@ -143,10 +124,6 @@ target_link_libraries(scopi PUBLIC xtensor
 # VERSION ${${PROJECT_NAME}_VERSION}
 # SOVERSION ${VERSION_MAJOR}
 # OUTPUT_NAME "libscopi")
-if(SCOPI_USE_MKL)
-    target_link_libraries(scopi PUBLIC MKL::MKL)
-    target_compile_definitions(scopi PUBLIC SCOPI_USE_MKL)
-endif()
 
 if(SCOPI_USE_TBB)
     target_link_libraries(scopi PUBLIC TBB::tbb)
