@@ -48,20 +48,20 @@ if(SCOPI_USE_TBB AND SCOPI_USE_OPENMP)
 
 # Dependencies
 # ============
-set(DEPENDENCIES_CONFIGURED xtensor xtensor-blas nlohmann_json fmt CLI11 plog nanoflann)
+# set(DEPENDENCIES_CONFIGURED xtensor xtensor-blas nlohmann_json fmt CLI11 plog nanoflann)
 
-if(SCOPI_USE_TBB)
-    set(XTENSOR_USE_TBB 1)
-    append(DEPENDENCIES_CONFIGURED TBB)
-endif()
+# if(SCOPI_USE_TBB)
+#     set(XTENSOR_USE_TBB 1)
+#     append(DEPENDENCIES_CONFIGURED TBB)
+# endif()
 
-if(SCOPI_USE_OPENMP)
-    append(DEPENDENCIES_CONFIGURED OpenMP)
-endif()
+# if(SCOPI_USE_OPENMP)
+#     append(DEPENDENCIES_CONFIGURED OpenMP)
+# endif()
 
-foreach(DEPENDENCY ${DEPENDENCIES_CONFIGURED})
-    find_package(${DEPENDENCY} REQUIRED)
-endforeach()
+# foreach(DEPENDENCY ${DEPENDENCIES_CONFIGURED})
+#     find_package(${DEPENDENCY} REQUIRED)
+# endforeach()
 
 set(SCOPI_SRC
     src/vap/vap_fpd.cpp
@@ -72,32 +72,59 @@ set(SCOPI_SRC
     src/utils.cpp
 )
 
-add_library(scopi ${SCOPI_SRC})
+add_library(libscopi ${SCOPI_SRC})
 
-set(SCOPI_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(scopi PUBLIC
-    $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
-    $<INSTALL_INTERFACE:include>)
-
-target_link_libraries(scopi PUBLIC
-    xtensor
-    xtensor-blas
-    nlohmann_json::nlohmann_json
-    fmt::fmt
-    CLI11::CLI11
-    plog::plog
-    nanoflann::nanoflann
+# link project_options/warnings
+target_link_libraries(libscopi
+  PRIVATE scopi_project_options scopi_project_warnings
 )
 
-if(SCOPI_USE_TBB)
-    target_link_libraries(scopi PUBLIC TBB::tbb)
-    target_compile_definitions(scopi PUBLIC SCOPI_USE_TBB)
-endif()
+# Includes:
+target_include_interface_directories(libscopi "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-if(SCOPI_USE_OPENMP)
-    target_link_libraries(scopi PUBLIC OpenMP::OpenMP_CXX)
-    target_compile_definitions(scopi PUBLIC SCOPI_USE_OPENMP)
-endif()
+# Find dependencies:
+target_find_dependencies(libscopi
+  PRIVATE_CONFIG
+  xtensor
+  xtensor-blas
+  nlohmann_json
+  fmt
+  CLI11
+  plog
+  nanoflann
+)
+
+# Link dependencies:
+target_link_system_libraries(libscopi
+  PRIVATE
+  xtensor
+  xtensor-blas
+  nlohmann_json::nlohmann_json
+  fmt::fmt
+  CLI11::CLI11
+  plog::plog
+  nanoflann::nanoflann
+)
+
+# target_link_libraries(scopi PUBLIC
+#     xtensor
+#     xtensor-blas
+#     nlohmann_json::nlohmann_json
+#     fmt::fmt
+#     CLI11::CLI11
+#     plog::plog
+#     nanoflann::nanoflann
+# )
+
+# if(SCOPI_USE_TBB)
+#     target_link_libraries(scopi PUBLIC TBB::tbb)
+#     target_compile_definitions(scopi PUBLIC SCOPI_USE_TBB)
+# endif()
+
+# if(SCOPI_USE_OPENMP)
+#     target_link_libraries(scopi PUBLIC OpenMP::OpenMP_CXX)
+#     target_compile_definitions(scopi PUBLIC SCOPI_USE_OPENMP)
+# endif()
 
 if(BUILD_EXAMPLES)
     add_subdirectory(demos)
@@ -111,7 +138,6 @@ endif()
 
 # Package the project
 package_project(
-  TARGETS scopi
-  INTERFACE_DEPENDENCIES_CONFIGURED ${DEPENDENCIES_CONFIGURED}
-  INTERFACE_INCLUDES ${INCLUDE_DIR}
+  TARGETS libscopi
+  scopi_project_options scopi_project_warnings
 )
