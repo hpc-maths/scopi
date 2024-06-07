@@ -196,7 +196,7 @@ namespace scopi
         /**
          * @brief Time step, fixed during the simulation.
          */
-        double m_dt;
+        double m_dt = 0;
 
         optim_solver_t m_optim_solver;
         contact_method_t m_contact_method;
