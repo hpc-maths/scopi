@@ -1,18 +1,11 @@
-#include <CLI/CLI.hpp>
-#include <cstddef>
-
-#include <scopi/contact/contact_brute_force.hpp>
+#include <scopi/container.hpp>
 #include <scopi/objects/types/worm.hpp>
-#include <scopi/property.hpp>
+#include <scopi/scopi.hpp>
 #include <scopi/solver.hpp>
-#include <scopi/solvers/OptimMosek.hpp>
-#include <xtensor/xmath.hpp>
 
 int main(int argc, char** argv)
 {
-    plog::init(plog::error, "two_worms.log");
-
-    CLI::App app("two spheres with periodic boundary conditions");
+    scopi::initialize("Two worms simulation");
 
     constexpr std::size_t dim = 2;
     double dt                 = .005;
@@ -57,10 +50,10 @@ int main(int argc, char** argv)
     particles.push_back(w1, prop.desired_velocity({-1., 0.}));
     particles.push_back(w2, prop.desired_velocity({1., 0.}));
 
-    scopi::ScopiSolver<dim, scopi::OptimUzawaMatrixFreeOmp<scopi::DryWithoutFriction>, scopi::contact_brute_force> solver(particles, dt);
-    solver.init_options(app);
-    CLI11_PARSE(app, argc, argv);
-    solver.run(total_it);
+    scopi::ScopiSolver<dim> solver(particles);
+    SCOPI_PARSE(argc, argv);
+
+    solver.run(dt, total_it);
 
     return 0;
 }

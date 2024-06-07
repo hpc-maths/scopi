@@ -1,17 +1,13 @@
 #include <scopi/objects/types/plan.hpp>
 #include <scopi/objects/types/sphere.hpp>
-#include <scopi/property.hpp>
+#include <scopi/scopi.hpp>
 #include <scopi/solver.hpp>
-#include <vector>
+#include <scopi/vap/vap_fpd.hpp>
 #include <xtensor/xmath.hpp>
 
-#include <scopi/problems/DryWithFrictionFixedPoint.hpp>
-#include <scopi/solvers/OptimMosek.hpp>
-#include <scopi/vap/vap_fpd.hpp>
-
-int main()
+int main(int argc, char** argv)
 {
-    plog::init(plog::info, "sphere_plan.log");
+    scopi::initialize("sphere plan simulation");
 
     constexpr std::size_t dim = 2;
     double PI                 = xt::numeric_constants<double>::PI;
@@ -43,10 +39,13 @@ int main()
                             {0., -g}
     }));
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFrictionFixedPoint>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles, dt);
-    auto params              = solver.get_params();
-    params.problem_params.mu = 0.1;
-    solver.run(total_it);
+    scopi::ScopiSolver<dim, scopi::FrictionFixedPoint, scopi::OptimGradient<scopi::apgd>, scopi::contact_kdtree, scopi::vap_fpd> solver(
+        particles);
+    auto params                        = solver.get_params();
+    params.default_contact_property.mu = 0.1;
+
+    SCOPI_PARSE(argc, argv);
+    solver.run(dt, total_it);
 
     return 0;
 }

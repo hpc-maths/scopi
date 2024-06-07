@@ -1,41 +1,29 @@
 #include <random>
 
-#include <CLI/CLI.hpp>
-
-#include <scopi/contact/contact_brute_force.hpp>
-#include <scopi/objects/types/plan.hpp>
 #include <scopi/objects/types/segment.hpp>
 #include <scopi/objects/types/sphere.hpp>
-#include <scopi/property.hpp>
 #include <scopi/solver.hpp>
-#include <scopi/vap/vap_fpd.hpp>
-
-#include <plog/Appenders/ColorConsoleAppender.h>
-#include <plog/Formatters/TxtFormatter.h>
-#include <plog/Init.h>
-#include <plog/Log.h>
 
 int main(int argc, char** argv)
 {
     constexpr std::size_t dim = 2;
     double dt                 = .001;
     const double max_radius   = 0.06;
-    std::size_t total_it      = 100;
-    std::size_t n_parts       = 20;
+    std::size_t total_it      = 1000;
+    std::size_t n_parts       = 50;
 
-    static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
-    plog::init(plog::info, &consoleAppender);
-
-    CLI::App app("two segments");
+    scopi::initialize("spheres passing between two segments");
+    auto& app = scopi::get_app();
     app.add_option("--nparts", n_parts, "Number of particles")->capture_default_str();
     app.add_option("--nite", total_it, "Number of iterations")->capture_default_str();
     app.add_option("--dt", dt, "Time step")->capture_default_str();
-    CLI11_PARSE(app, argc, argv);
+
+    scopi::scopi_container<dim> particles;
+    scopi::ScopiSolver<dim> solver(particles);
+    SCOPI_PARSE(argc, argv);
 
     scopi::segment<dim> seg1(scopi::type::position_t<dim>{0., 1.}, scopi::type::position_t<dim>{0.4, 1.});
     scopi::segment<dim> seg2(scopi::type::position_t<dim>{0.6, 1.}, scopi::type::position_t<dim>{1., 1.});
-
-    scopi::scopi_container<dim> particles;
     particles.push_back(seg1, scopi::property<dim>().deactivate());
     particles.push_back(seg2, scopi::property<dim>().deactivate());
 
@@ -64,22 +52,11 @@ int main(int argc, char** argv)
                             prop);
     }
 
-    using problem_t    = scopi::NoFriction;
-    using optim_solver = scopi::OptimGradient<scopi::apgd>;
-    using contact_t    = scopi::contact_kdtree;
-    using vap_t        = scopi::vap_fixed;
-    using solver_type  = scopi::ScopiSolver<dim, problem_t, optim_solver, contact_t, vap_t>;
-    solver_type solver(particles, dt);
+    auto params                                 = solver.get_params();
+    params.contact_method_params.dmax           = 2 * dt;
+    params.contact_method_params.kd_tree_radius = 4 * max_radius;
 
-    auto params = solver.get_params();
-    // params.optim_params.alpha           = 0.2 / (dt * dt);
-    params.optim_params.dynamic_descent = true;
-    params.contact_params.dmax          = 4 * max_radius;
-
-    // solver.init_options(app);
-    // CLI11_PARSE(app, argc, argv);
-
-    solver.run(total_it);
+    solver.run(dt, total_it);
 
     return 0;
 }

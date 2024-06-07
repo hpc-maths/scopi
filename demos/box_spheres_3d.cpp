@@ -1,29 +1,22 @@
-#include <cstddef>
+#include <random>
 #include <scopi/objects/types/plan.hpp>
 #include <scopi/objects/types/sphere.hpp>
-#include <scopi/property.hpp>
 #include <scopi/solver.hpp>
+#include <scopi/vap/vap_fpd.hpp>
 #include <vector>
 #include <xtensor/xmath.hpp>
 
-#include <scopi/contact/contact_brute_force.hpp>
-#include <scopi/solvers/OptimMosek.hpp>
-#include <scopi/solvers/OptimProjectedGradient.hpp>
-#include <scopi/solvers/gradient/apgd_ar.hpp>
-#include <scopi/vap/vap_fpd.hpp>
-
 int main()
 {
-#ifdef SCOPI_USE_MKL
-    plog::init(plog::info, "box_spheres_3d_very_large_apgd_ar.log");
-
     constexpr std::size_t dim = 3;
     double PI                 = xt::numeric_constants<double>::PI;
+    scopi::initialize("Spheres into a box simulation");
 
-    std::size_t total_it = 100;
+    std::size_t total_it = 1000;
     double width_box     = 10.;
-    std::size_t n        = 50; // n^3 spheres
-    double g             = 1.;
+    // std::size_t n        = 50; // n^3 spheres
+    std::size_t n = 10; // n^3 spheres
+    double g      = 1.;
 
     double r0  = width_box / n / 2.;
     double dt  = 0.2 * 0.9 * r0 / (2. * g); ////// dt = 0.2*r/(sqrt(2*width_box*g))
@@ -95,16 +88,15 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd>
-        solver(particles, dt);
-    auto params                           = solver.get_params();
-    params.solver_params.output_frequency = 99;
-    params.optim_params.tol_l             = 1e-3;
-    params.optim_params.rho               = rho;
-    params.contact_params.dmax            = 0.9 * r0;
-    params.contact_params.kd_tree_radius  = params.contact_params.dmax + 2. * 0.9 * r0;
+    scopi::ScopiSolver<dim, scopi::NoFriction, scopi::OptimGradient<scopi::apgd>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles);
+    auto params = solver.get_params();
+    // params.solver_params.output_frequency = 99;
+    params.optim_params.tolerance               = 1e-3;
+    params.optim_params.alpha                   = rho;
+    params.contact_method_params.dmax           = 0.9 * r0;
+    params.contact_method_params.kd_tree_radius = params.contact_method_params.dmax + 2. * 0.9 * r0;
 
-    solver.run(total_it);
-#endif
+    solver.run(dt, total_it);
+
     return 0;
 }

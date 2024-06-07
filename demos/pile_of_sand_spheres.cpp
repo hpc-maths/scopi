@@ -1,18 +1,14 @@
-#include <cstddef>
 #include <scopi/objects/types/plan.hpp>
 #include <scopi/objects/types/sphere.hpp>
-#include <scopi/property.hpp>
 #include <scopi/solver.hpp>
-#include <vector>
+#include <scopi/vap/vap_fpd.hpp>
 #include <xtensor/xmath.hpp>
 
-#include <scopi/contact/contact_brute_force.hpp>
-#include <scopi/solvers/OptimMosek.hpp>
-#include <scopi/vap/vap_fpd.hpp>
+#include <random>
 
-int main()
+int main(int argc, char** argv)
 {
-    plog::init(plog::info, "pile_of_sand_spheres.log");
+    scopi::initialize("Pile of sand");
 
     constexpr std::size_t dim = 3;
     double PI                 = xt::numeric_constants<double>::PI;
@@ -72,11 +68,13 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<scopi::DryWithFriction>, scopi::contact_brute_force, scopi::vap_fpd> solver(particles, dt);
-    auto params                                  = solver.get_params();
-    params.optim_params.change_default_tol_mosek = false;
-    params.problem_params.mu                     = 0.1;
-    solver.run(total_it);
+    scopi::ScopiSolver<dim, scopi::FrictionFixedPoint, scopi::OptimGradient<scopi::apgd>, scopi::contact_kdtree, scopi::vap_fpd> solver(
+        particles);
+    auto params                        = solver.get_params();
+    params.default_contact_property.mu = 0.1;
+
+    SCOPI_PARSE(argc, argv);
+    solver.run(dt, total_it);
 
     return 0;
 }
