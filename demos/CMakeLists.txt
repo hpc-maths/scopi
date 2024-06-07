@@ -1,7 +1,7 @@
 set(SCOPI_EXAMPLES
    two_ellipsoids.cpp
    two_spheres.cpp
-   sphere_plan.cpp
+   sphere_plane.cpp
    two_worms.cpp
    box_spheres_3d.cpp
    pile_of_sand_spheres.cpp
