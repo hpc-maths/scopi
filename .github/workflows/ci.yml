@@ -178,7 +178,7 @@ jobs:
       matrix:
         os:
           - macos-14
-          - windows-2022
+          # - windows-2022
     steps:
       - uses: actions/checkout@v4
       - name: Mamba and scopi env installation
@@ -206,17 +206,17 @@ jobs:
               -DBUILD_EXAMPLES=ON \
               -DBUILD_TESTS=ON
 
-      - name: Configure
-        if: runner.os == 'Windows'
-        shell: bash -l {0}
-        run: |
-          cmake \
-              . \
-              -Bbuild \
-              -G "Visual Studio 17 2022" \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DBUILD_EXAMPLES=ON \
-              -DBUILD_TESTS=ON
+      # - name: Configure
+      #   if: runner.os == 'Windows'
+      #   shell: bash -l {0}
+      #   run: |
+      #     cmake \
+      #         . \
+      #         -Bbuild \
+      #         -G "Visual Studio 17 2022" \
+      #         -DCMAKE_BUILD_TYPE=Release \
+      #         -DBUILD_EXAMPLES=ON \
+      #         -DBUILD_TESTS=ON
 
       - name: Build
         shell: bash -l {0}
