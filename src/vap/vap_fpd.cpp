@@ -3,11 +3,6 @@
 
 namespace scopi
 {
-    vap_fpd::vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t, double dt)
-        : base_type(Nactive, active_ptr, dt)
-    {
-    }
-
     type::moment_t<2> cross_product_vap_fpd(const scopi_container<2>&, std::size_t)
     {
         return 0.;

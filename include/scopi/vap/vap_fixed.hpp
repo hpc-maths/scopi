@@ -39,24 +39,15 @@ namespace scopi
          * @param contacts [in] Array of contacts.
          */
         template <std::size_t dim, class Contacts>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts& contacts);
-
-        /**
-         * @brief Constructor.
-         *
-         * @param Nactive Number of active particles.
-         * @param active_ptr Index of the first active particle.
-         * @param nb_parts Number of objects.
-         * @param dt Time step.
-         * @param params Parameters (for compatibility).
-         */
-        vap_fixed(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt);
+        void set_a_priori_velocity_impl(double dt, scopi_container<dim>& particles, const Contacts& contacts);
     };
 
     template <std::size_t dim, class Contacts>
-    void vap_fixed::set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts&)
+    void vap_fixed::set_a_priori_velocity_impl(double, scopi_container<dim>& particles, const Contacts&)
     {
-        for (std::size_t i = m_active_ptr; i < m_active_ptr + m_Nactive; ++i)
+        auto active_ptr = particles.nb_inactive();
+        auto nb_active  = particles.nb_active();
+        for (std::size_t i = active_ptr; i < active_ptr + nb_active; ++i)
         {
             particles.v()(i)     = particles.vd()(i);
             particles.omega()(i) = particles.desired_omega()(i);

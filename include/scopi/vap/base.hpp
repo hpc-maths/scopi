@@ -28,32 +28,9 @@ namespace scopi
          * @param contacts [in] Array of contacts.
          */
         template <std::size_t dim, class Contacts>
-        void set_a_priori_velocity(scopi_container<dim>& particles, const Contacts& contacts);
-        /**
-         * @brief Constructor.
-         *
-         * @param Nactive Number of active particles.
-         * @param active_ptr Index of the first active particle.
-         * @param dt Time step.
-         */
-        vap_base(std::size_t Nactive, std::size_t active_ptr, double dt);
+        void set_a_priori_velocity(double dt, scopi_container<dim>& particles, const Contacts& contacts);
 
         params_t& get_params();
-
-      protected:
-
-        /**
-         * @brief Number of active particles.
-         */
-        std::size_t m_Nactive;
-        /**
-         * @brief Index of the first active particle.
-         */
-        std::size_t m_active_ptr;
-        /**
-         * @brief Time step.
-         */
-        double m_dt;
 
       private:
 
@@ -61,20 +38,11 @@ namespace scopi
     };
 
     template <class D>
-    vap_base<D>::vap_base(std::size_t Nactive, std::size_t active_ptr, double dt)
-        : m_Nactive(Nactive)
-        , m_active_ptr(active_ptr)
-        , m_dt(dt)
-        , m_params()
-    {
-    }
-
-    template <class D>
     template <std::size_t dim, class Contacts>
-    void vap_base<D>::set_a_priori_velocity(scopi_container<dim>& particles, const Contacts& contacts)
+    void vap_base<D>::set_a_priori_velocity(double dt, scopi_container<dim>& particles, const Contacts& contacts)
     {
         tic();
-        this->derived_cast().set_a_priori_velocity_impl(particles, contacts);
+        this->derived_cast().set_a_priori_velocity_impl(dt, particles, contacts);
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : set vap = " << duration;
     }
