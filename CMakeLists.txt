@@ -45,27 +45,27 @@ if(SCOPI_USE_TBB)
 endif()
 
 find_package(xtensor REQUIRED)
+find_package(xtensor-blas REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
 find_package(CLI11 REQUIRED)
-
 find_package(plog REQUIRED)
 find_package(nanoflann REQUIRED)
 
-# section needed to use xtensor-blas
-# see https://xtensor-blas.readthedocs.io/en/latest/performance.html
-add_definitions(-DHAVE_CBLAS=1)
+# # section needed to use xtensor-blas
+# # see https://xtensor-blas.readthedocs.io/en/latest/performance.html
+# add_definitions(-DHAVE_CBLAS=1)
 
-if(WIN32)
-    find_package(OpenBLAS REQUIRED)
-    set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
-else()
-    find_package(BLAS REQUIRED)
-    find_package(LAPACK REQUIRED)
-endif()
+# if(WIN32)
+#     find_package(OpenBLAS REQUIRED)
+#     set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
+# else()
+#     find_package(BLAS REQUIRED)
+#     find_package(LAPACK REQUIRED)
+# endif()
 
-message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
-message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
+# message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
+# message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
 # end of xtensor-blas section
 if(SCOPI_USE_TBB)
@@ -108,14 +108,16 @@ target_include_directories(scopi PUBLIC
     $<BUILD_INTERFACE:${SCOPI_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(scopi PUBLIC xtensor
+target_link_libraries(scopi PUBLIC
+    xtensor
+    xtensor-blas
     nlohmann_json::nlohmann_json
     fmt::fmt
     CLI11::CLI11
-
     plog::plog
     nanoflann::nanoflann
-    ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+    # ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES}
+)
 
 # set_target_properties(scopi PROPERTIES
 # PUBLIC_HEADER "${SCOPI_HEADERS}"

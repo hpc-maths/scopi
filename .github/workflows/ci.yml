@@ -175,9 +175,14 @@ jobs:
           cd build
           ./test/test_scopi
 
-  macos-mamba:
-    needs: [pre-commit, cppcheck]
-    runs-on: macos-14
+  mamba-build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-14
+          - windows-2022
     steps:
       - uses: actions/checkout@v4
       - name: Mamba and scopi env installation
@@ -186,11 +191,6 @@ jobs:
           environment-file: conda/environment.yml
           environment-name: scopi-env
           cache-environment: true
-
-      - name: Installl cxx compiler
-        shell: bash -l {0}
-        run: |
-          micromamba install -y cxx-compiler
 
       - name: micromamba informations
         shell: bash -l {0}
