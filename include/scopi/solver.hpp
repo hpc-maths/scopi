@@ -114,7 +114,7 @@ namespace scopi
          * @param dt Time step. It is fixed during the simulation.
          * @param params Parameters for the different steps of the algorithm.
          */
-        ScopiSolver(const BoxDomain<dim>& box, scopi_container<dim>& particles);
+        explicit ScopiSolver(const BoxDomain<dim>& box, scopi_container<dim>& particles);
 
         /**
          * @brief Constructor.
@@ -123,7 +123,7 @@ namespace scopi
          * @param dt Time step. It is fixed during the simulation.
          * @param params Parameters for the different steps of the algorithm.
          */
-        ScopiSolver(scopi_container<dim>& particles);
+        explicit ScopiSolver(scopi_container<dim>& particles);
 
         void init_options();
 
