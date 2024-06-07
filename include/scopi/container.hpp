@@ -32,7 +32,7 @@ namespace scopi
      * of the container.
      *
      * In the following, "particle" means a base object (sphere, superellipsoid
-     * or plan) and an "object" can be a more complex object, such as a worm.
+     * or plane) and an "object" can be a more complex object, such as a worm.
      * Particles are objects.
      *
      * @tparam dim Dimension (2 or 3).
@@ -75,7 +75,7 @@ namespace scopi
         /**
          * @brief Reconstructs an object.
          *
-         * An object can be a sphere, a superellipsoid, a plan, a worm,...
+         * An object can be a sphere, a superellipsoid, a plane, a worm,...
          *
          * @param i Index of the object.
          *

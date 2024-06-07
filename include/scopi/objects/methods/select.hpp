@@ -13,7 +13,7 @@
 
 #include "../dispatch.hpp"
 #include "../neighbor.hpp"
-#include "../types/plan.hpp"
+#include "../types/plane.hpp"
 #include "../types/segment.hpp"
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
@@ -50,11 +50,11 @@ namespace scopi
         return std::make_unique<superellipsoid<dim, false>>(s);
     }
 
-    // PLAN
+    // PLANE
     template <std::size_t dim>
-    std::unique_ptr<object<dim, false>> select_object(const plan<dim, false>& s, const std::size_t)
+    std::unique_ptr<object<dim, false>> select_object(const plane<dim, false>& s, const std::size_t)
     {
-        return std::make_unique<plan<dim, false>>(s);
+        return std::make_unique<plane<dim, false>>(s);
     }
 
     // SEGMENT
@@ -92,7 +92,7 @@ namespace scopi
     using select_object_dispatcher = double_static_dispatcher<
         select_object_functor<dim>,
         const object<dim, false>,
-        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const worm<dim, false>, const plan<dim, false>, const segment<dim, false>>,
+        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const worm<dim, false>, const plane<dim, false>, const segment<dim, false>>,
         typename select_object_functor<dim>::return_type,
         antisymmetric_dispatch,
         const index,

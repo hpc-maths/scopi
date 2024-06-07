@@ -56,13 +56,13 @@ namespace scopi
                 {2., 1.}
         },
             0.5);
-        scopi::plan<dim> plan(
+        scopi::plane<dim> plane(
             {
                 {0., 0.}
         },
             PI / 2 - PI / 4);
 
-        particles.push_back(plan, scopi::property<dim>().deactivate());
+        particles.push_back(plane, scopi::property<dim>().deactivate());
         particles.push_back(sphere, scopi::property<dim>().mass(1).moment_inertia(0.1));
 
         ContactsParams<contact_brute_force<NoFriction>> params;

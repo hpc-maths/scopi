@@ -106,7 +106,7 @@ for file in files[::1]:
                     geom["e"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))
                     geom["n"] = obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
                     geom["e+n"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))+obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
-            elif (obj["type"] == "plan"):
+            elif (obj["type"] == "plane"):
                 if (len(obj["position"])==2):  # 2D
                     geom = pv.Plane(
                         center=(obj["position"][0],obj["position"][1],0),
@@ -187,7 +187,7 @@ for file in files[::1]:
                     geom["n"] = obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
                     geom["e+n"] = obj["squareness"][0]*np.ones((np.array(geom.points).shape[0],))+obj["squareness"][1]*np.ones((np.array(geom.points).shape[0],))
 
-            elif (obj["type"] == "plan"):
+            elif (obj["type"] == "plane"):
                 if (len(obj["position"])==2):  # 2D
                     geom = pv.Plane(
                         center=(obj["position"][0],obj["position"][1],0),

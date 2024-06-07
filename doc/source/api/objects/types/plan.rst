@@ -1,6 +1,6 @@
-plan class
+plane class
 ==========
 
-.. doxygenclass:: scopi::plan
+.. doxygenclass:: scopi::plane
    :project: scopi
    :members:

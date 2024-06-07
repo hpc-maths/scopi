@@ -12,7 +12,7 @@
 
 #include "../dispatch.hpp"
 #include "../neighbor.hpp"
-#include "../types/plan.hpp"
+#include "../types/plane.hpp"
 #include "../types/segment.hpp"
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
@@ -104,7 +104,7 @@ namespace scopi
         // return ssss;
     }
 
-    // PLAN
+    // PLANE
     /**
      * @brief
      * @brief Write the elements of a plane in json format.
@@ -115,11 +115,11 @@ namespace scopi
      * @return nlohmann json object.
      */
     template <std::size_t dim>
-    nl::json write_objects(const plan<dim, false>& p, [[maybe_unused]] std::size_t id)
+    nl::json write_objects(const plane<dim, false>& p, [[maybe_unused]] std::size_t id)
     {
         nl::json object;
 
-        object["type"]       = "plan";
+        object["type"]       = "plane";
         object["id"]         = id;
         object["position"]   = p.pos();
         object["normal"]     = p.normal();
@@ -128,7 +128,7 @@ namespace scopi
 
         return object;
 
-        // std::cout << "write_objects : PLAN" << std::endl;
+        // std::cout << "write_objects : PLANE" << std::endl;
         // std::stringstream ss;
         // std::regex xp1("\\{|\\}");
         // std::regex xp2("\\.,");
@@ -257,6 +257,6 @@ namespace scopi
     using write_objects_dispatcher = unit_static_dispatcher<
         write_objects_functor<dim>,
         const object<dim, false>,
-        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const worm<dim, false>, const plan<dim, false>, const segment<dim, false>>,
+        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const worm<dim, false>, const plane<dim, false>, const segment<dim, false>>,
         typename write_objects_functor<dim>::return_type>;
 }

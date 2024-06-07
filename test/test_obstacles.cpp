@@ -7,7 +7,7 @@
 #include "utils.hpp"
 
 #include <scopi/container.hpp>
-#include <scopi/objects/types/plan.hpp>
+#include <scopi/objects/types/plane.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/solver.hpp>
 #include <scopi/vap/vap_fpd.hpp>
@@ -40,7 +40,7 @@ namespace scopi
         params.solver_params.output_frequency = total_it - 1;
     }
 
-    TEST_CASE_TEMPLATE_DEFINE("sphere plan", SolverType, sphere_plan)
+    TEST_CASE_TEMPLATE_DEFINE("sphere plane", SolverType, sphere_plane)
     {
         static constexpr std::size_t dim = 2;
 
@@ -53,7 +53,7 @@ namespace scopi
                 {0., radius}
         },
             radius);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., 0.}
         },
@@ -66,8 +66,8 @@ namespace scopi
         SUBCASE("fixed")
         {
             particles.push_back(s, prop);
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_plan(particles);
         }
@@ -78,14 +78,14 @@ namespace scopi
                                 prop.desired_velocity({
                                     {0., -1.}
             }));
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_plan(particles);
         }
     }
 
-    TEST_CASE_TEMPLATE_DEFINE("sphere plan force", SolverType, sphere_plan_force)
+    TEST_CASE_TEMPLATE_DEFINE("sphere plane force", SolverType, sphere_plane_force)
     {
         static constexpr std::size_t dim = 2;
 
@@ -98,7 +98,7 @@ namespace scopi
                 {0., radius}
         },
             radius);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., 0.}
         },
@@ -112,8 +112,8 @@ namespace scopi
                             prop.force({
                                 {0., -1.}
         }));
-        SolverType solver(particles, dt);
-        solver.run(total_it);
+        SolverType solver(particles);
+        solver.run(dt, total_it);
         set_params(solver, total_it);
         check_result_sphere_plan(particles);
     }
@@ -162,8 +162,8 @@ namespace scopi
         SUBCASE("fixed")
         {
             particles.push_back(sphere, prop);
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_sphere(particles);
         }
@@ -174,8 +174,8 @@ namespace scopi
                                 prop.desired_velocity({
                                     {0., -1.}
             }));
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_sphere(particles);
         }
@@ -207,8 +207,8 @@ namespace scopi
                             prop.force({
                                 {0., -1.}
         }));
-        SolverType solver(particles, dt);
-        solver.run(total_it);
+        SolverType solver(particles);
+        solver.run(dt, total_it);
         set_params(solver, total_it);
         check_result_sphere_sphere(particles);
     }
@@ -239,16 +239,16 @@ namespace scopi
                                 {0., -10.}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         set_params(solver, total_it);
         auto params                           = solver.get_params();
         params.solver_params.output_frequency = 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE_DEFINE("sphere inclined plan", SolverType, sphere_inclined_plan)
+    TEST_CASE_TEMPLATE_DEFINE("sphere inclined plane", SolverType, sphere_inclined_plane)
     {
         std::tuple<double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double>> data_container({std::make_tuple(PI / 6., 0.000998789, 0., 0.0010002),
@@ -266,7 +266,7 @@ namespace scopi
         double alpha                     = std::get<0>(data);
 
         auto prop = property<dim>().mass(1.).moment_inertia(1. * radius * radius / 2.);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., 0.}
         },
@@ -284,20 +284,20 @@ namespace scopi
                                 {0., -g}
         }));
 
-        SolverType solver(particles, dt);
-        solver.run(total_it);
+        SolverType solver(particles);
+        solver.run(dt, total_it);
         set_params(solver, total_it);
 
         auto pos            = particles.pos();
         auto q              = particles.q();
-        auto tmp            = analytical_solution_sphere_plan(alpha, 0., dt * (total_it + 1), radius, g, h);
+        auto tmp            = analytical_solution_sphere_plane(alpha, 0., dt * (total_it + 1), radius, g, h);
         auto pos_analytical = tmp.first;
         auto q_analytical   = quaternion(tmp.second);
         double error_pos    = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
         double error_q      = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
         auto v              = particles.v();
         auto omega          = particles.omega();
-        tmp                 = analytical_solution_sphere_plan_velocity(alpha, 0., dt * (total_it + 1), radius, g, h);
+        tmp                 = analytical_solution_sphere_plane_velocity(alpha, 0., dt * (total_it + 1), radius, g, h);
         auto v_analytical   = tmp.first;
         double error_v      = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
 
@@ -307,11 +307,11 @@ namespace scopi
         REQUIRE(omega(1) == doctest::Approx(0.));
     }
 
-    TEST_CASE_TEMPLATE_APPLY(sphere_plan, solver_dry_without_friction_t<2>);
-    TEST_CASE_TEMPLATE_APPLY(sphere_plan_force, solver_dry_without_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plane, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plane_force, solver_dry_without_friction_t<2, vap_fpd>);
     TEST_CASE_TEMPLATE_APPLY(sphere_sphere_fixed, solver_dry_without_friction_t<2>);
     TEST_CASE_TEMPLATE_APPLY(sphere_sphere_fixed_force, solver_dry_without_friction_t<2, vap_fpd>);
     TEST_CASE_TEMPLATE_APPLY(sphere_sphere_moving, solver_dry_without_friction_t<2, vap_fpd>);
-    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plan, solver_dry_without_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plane, solver_dry_without_friction_t<2, vap_fpd>);
 
 }

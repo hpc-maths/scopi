@@ -43,11 +43,11 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                        = solver.get_params();
         params.default_contact_property.mu = mu;
         // params.solver_params.output_frequency = total_it - 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
     }
@@ -102,16 +102,16 @@ namespace scopi
             }
         }
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                           = solver.get_params();
         params.default_contact_property.mu    = mu;
         params.solver_params.output_frequency = total_it - 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE_DEFINE("sphere inclined plan friction", SolverType, sphere_inclined_plan_friction)
+    TEST_CASE_TEMPLATE_DEFINE("sphere inclined plane friction", SolverType, sphere_inclined_plane_friction)
     {
         std::tuple<double, double, double, double, double, double> data;
         std::vector<std::tuple<double, double, double, double, double, double>> data_container(
@@ -136,7 +136,7 @@ namespace scopi
         double alpha                     = std::get<1>(data);
 
         auto prop = property<dim>().mass(1.).moment_inertia(1. * radius * radius / 2.);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., 0.}
         },
@@ -154,11 +154,11 @@ namespace scopi
                                 {0., -g}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                           = solver.get_params();
         params.default_contact_property.mu    = mu;
         params.solver_params.output_frequency = std::size_t(-1);
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         auto pos              = particles.pos();
         auto q                = particles.q();
@@ -169,7 +169,7 @@ namespace scopi
         double error_q        = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
         auto v                = particles.v();
         auto omega            = particles.omega();
-        tmp                   = analytical_solution_sphere_plan_velocity(alpha, mu, dt * (total_it + 1), radius, g, h);
+        tmp                   = analytical_solution_sphere_plane_velocity(alpha, mu, dt * (total_it + 1), radius, g, h);
         auto v_analytical     = tmp.first;
         double error_v        = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
         auto omega_analytical = tmp.second;
@@ -183,6 +183,6 @@ namespace scopi
 
     TEST_CASE_TEMPLATE_APPLY(two_spheres_asymetrical_friction, solver_dry_with_friction_t<2, vap_fixed>);
     TEST_CASE_TEMPLATE_APPLY(critical_2d_spheres_friction, solver_dry_with_friction_t<2, vap_fixed>);
-    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plan_friction, solver_dry_with_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_inclined_plane_friction, solver_dry_with_friction_t<2, vap_fpd>);
 
 }

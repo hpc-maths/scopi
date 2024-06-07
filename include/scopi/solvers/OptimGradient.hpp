@@ -61,11 +61,9 @@ namespace scopi
         using method_t = Method;
         using params_t = typename method_t::params_t;
 
-        template <std::size_t dim>
-        OptimGradient(std::size_t, double dt, const scopi_container<dim>&)
-            : m_dt(dt)
-            , m_method(method_t())
+        void set_timestep(double dt)
         {
+            m_dt = dt;
         }
 
         void init_options()

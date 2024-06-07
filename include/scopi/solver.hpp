@@ -114,7 +114,7 @@ namespace scopi
          * @param dt Time step. It is fixed during the simulation.
          * @param params Parameters for the different steps of the algorithm.
          */
-        ScopiSolver(const BoxDomain<dim>& box, scopi_container<dim>& particles, double dt);
+        explicit ScopiSolver(const BoxDomain<dim>& box, scopi_container<dim>& particles);
 
         /**
          * @brief Constructor.
@@ -123,7 +123,7 @@ namespace scopi
          * @param dt Time step. It is fixed during the simulation.
          * @param params Parameters for the different steps of the algorithm.
          */
-        ScopiSolver(scopi_container<dim>& particles, double dt);
+        explicit ScopiSolver(scopi_container<dim>& particles);
 
         void init_options();
 
@@ -133,7 +133,7 @@ namespace scopi
          * @param total_it [in] Total number of iterations to perform.
          * @param initial_iter [in] Initial index of iteration. Used for restart or to change external parameters.
          */
-        void run(std::size_t total_it, std::size_t initial_iter = 0);
+        void run(double dt, std::size_t total_it, std::size_t initial_iter = 0);
 
         /**
          * @brief Return the current contacts of the simulation.
@@ -148,6 +148,8 @@ namespace scopi
         params_t get_params();
 
       private:
+
+        void set_timestep(double dt);
 
         /**
          * @brief Move obstacles (particles with an imposed velocity).
@@ -194,7 +196,7 @@ namespace scopi
         /**
          * @brief Time step, fixed during the simulation.
          */
-        double m_dt;
+        double m_dt = 0;
 
         optim_solver_t m_optim_solver;
         contact_method_t m_contact_method;
@@ -205,25 +207,22 @@ namespace scopi
 
     template <std::size_t dim, class problem_t, class optim_solver_t, template <class> class contact_method_t, class vap_t>
     ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::ScopiSolver(const BoxDomain<dim>& box,
-                                                                                      scopi_container<dim>& particles,
-                                                                                      double dt)
+                                                                                      scopi_container<dim>& particles)
         : m_box(box)
         , m_particles(particles)
-        , m_dt(dt)
-        , m_optim_solver(particles.nb_active(), dt, particles)
+        , m_optim_solver()
         , m_contact_method()
-        , m_vap(particles.nb_active(), particles.nb_inactive(), particles.size(), dt)
+        , m_vap()
     {
         init_options();
     }
 
     template <std::size_t dim, class problem_t, class optim_solver_t, template <class> class contact_method_t, class vap_t>
-    ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::ScopiSolver(scopi_container<dim>& particles, double dt)
+    ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::ScopiSolver(scopi_container<dim>& particles)
         : m_particles(particles)
-        , m_dt(dt)
-        , m_optim_solver(particles.nb_active(), dt, particles)
+        , m_optim_solver()
         , m_contact_method()
-        , m_vap(particles.nb_active(), particles.nb_inactive(), particles.size(), dt)
+        , m_vap()
     {
         init_options();
     }
@@ -259,10 +258,19 @@ namespace scopi
     }
 
     template <std::size_t dim, class problem_t, class optim_solver_t, template <class> class contact_method_t, class vap_t>
-    void ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::run(std::size_t total_it, std::size_t initial_iter)
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::set_timestep(double dt)
+    {
+        m_dt = dt;
+    }
+
+    template <std::size_t dim, class problem_t, class optim_solver_t, template <class> class contact_method_t, class vap_t>
+    void ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::run(double dt, std::size_t total_it, std::size_t initial_iter)
     {
         // Time Loop
         write_output_files(m_old_contacts, initial_iter);
+        set_timestep(dt);
+        m_optim_solver.set_timestep(m_dt);
+
         for (std::size_t nite = initial_iter; nite < total_it; ++nite)
         {
             PLOG_INFO << "\n\n------------------- Time iteration ----------------> " << nite;
@@ -275,7 +283,7 @@ namespace scopi
                 transfer(m_old_contacts, contacts);
             }
 
-            m_vap.set_a_priori_velocity(m_particles, contacts);
+            m_vap.set_a_priori_velocity(m_dt, m_particles, contacts);
             m_optim_solver.extra_steps_before_solve(contacts);
             while (m_optim_solver.should_solve())
             {
@@ -422,7 +430,16 @@ namespace scopi
 #pragma omp parallel for
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
-            xt::xtensor_fixed<double, xt::xshape<3>> w({0, 0, m_particles.omega()(i + active_offset)});
+            xt::xtensor_fixed<double, xt::xshape<3>> w;
+            if constexpr (dim == 2)
+            {
+                w = {0, 0, m_particles.omega()(i + active_offset)};
+            }
+            else
+            {
+                w = m_particles.omega()(i + active_offset);
+            }
+
             double normw = xt::linalg::norm(w);
             if (normw == 0)
             {

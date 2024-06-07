@@ -13,7 +13,7 @@
 
 #include "../dispatch.hpp"
 #include "../neighbor.hpp"
-#include "../types/plan.hpp"
+#include "../types/plane.hpp"
 #include "../types/segment.hpp"
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
@@ -732,7 +732,7 @@ namespace scopi
         return neigh;
     }
 
-    // PLAN - PLAN
+    // PLANE - PLANE
     /**
      * @brief Neighbor between two planes.
      *
@@ -747,12 +747,12 @@ namespace scopi
      * @return Neighbor struct for contact between plane \c i and plane \c j.
      */
     template <class problem_t, std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner>& /* p1 */, const plan<dim, owner>& /* p2 */)
+    auto closest_points(const plane<dim, owner>& /* p1 */, const plane<dim, owner>& /* p2 */)
     {
         return neighbor<dim, problem_t>();
     }
 
-    // SPHERE - PLAN
+    // SPHERE - PLANE
     /**
      * @brief Neighbor between a sphere and a plane.
      *
@@ -766,27 +766,27 @@ namespace scopi
      * @return Neighbor struct for contact between sphere \c i and plane \c j.
      */
     template <class problem_t, std::size_t dim, bool owner>
-    auto closest_points(const sphere<dim, owner>& s, const plan<dim, owner>& p)
+    auto closest_points(const sphere<dim, owner>& s, const plane<dim, owner>& p)
     {
-        // std::cout << "closest_points : SPHERE - PLAN" << std::endl;
+        // std::cout << "closest_points : SPHERE - PLANE" << std::endl;
         auto s_pos = s.pos(0);
         auto p_pos = p.pos(0);
 
         auto normal = p.normal();
 
         // plan2sphs.n
-        auto plan_to_sphere = xt::eval(xt::linalg::dot(s_pos - p_pos, normal));
-        auto xtsign         = xt::sign(plan_to_sphere);
+        auto plane_to_sphere = xt::eval(xt::linalg::dot(s_pos - p_pos, normal));
+        auto xtsign          = xt::sign(plane_to_sphere);
 
         neighbor<dim, problem_t> neigh;
         neigh.pi  = s_pos - xtsign * s.radius() * normal;
-        neigh.pj  = s_pos - plan_to_sphere * normal;
+        neigh.pj  = s_pos - plane_to_sphere * normal;
         neigh.nij = xtsign * normal;
         neigh.dij = xt::linalg::dot(neigh.pi - neigh.pj, neigh.nij)[0];
         return neigh;
     }
 
-    // PLAN - SPHERE
+    // PLANE - SPHERE
     /**
      * @brief Neighbor between a plane and a sphere.
      *
@@ -800,7 +800,7 @@ namespace scopi
      * @return Neighbor struct for contact between plane \c i and sphere \c j.
      */
     template <class problem_t, std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner>& p, const sphere<dim, owner>& s)
+    auto closest_points(const plane<dim, owner>& p, const sphere<dim, owner>& s)
     {
         auto neigh = closest_points<problem_t>(s, p);
         neigh.nij *= -1.;
@@ -902,16 +902,16 @@ namespace scopi
     }
 
     template <class problem_t, std::size_t dim, bool owner>
-    auto closest_points(const plan<dim, owner>&, const segment<dim, owner>&)
+    auto closest_points(const plane<dim, owner>&, const segment<dim, owner>&)
     {
-        std::cerr << "closest_points for plan/segment must be implemented" << std::endl;
+        std::cerr << "closest_points for plane/segment must be implemented" << std::endl;
         return neighbor<dim, problem_t>();
     }
 
     template <class problem_t, std::size_t dim, bool owner>
-    auto closest_points(const segment<dim, owner>&, const plan<dim, owner>&)
+    auto closest_points(const segment<dim, owner>&, const plane<dim, owner>&)
     {
-        std::cerr << "closest_points for segment/plan must be implemented" << std::endl;
+        std::cerr << "closest_points for segment/plane must be implemented" << std::endl;
         return neighbor<dim, problem_t>();
     }
 
@@ -1463,7 +1463,7 @@ namespace scopi
         return neigh;
     }
 
-    // SUPERELLIPSOID 3D - PLAN 3D
+    // SUPERELLIPSOID 3D - PLANE 3D
     /**
      * @brief Neighbor between a superellipsoid and a plane in 3D.
      *
@@ -1476,9 +1476,9 @@ namespace scopi
      * @return Neighbor struct for contact between superellipsod \c i and plane \c j.
      */
     template <class problem_t, bool owner>
-    auto closest_points(const superellipsoid<3, owner> s1, const plan<3, owner> p2)
+    auto closest_points(const superellipsoid<3, owner> s1, const plane<3, owner> p2)
     {
-        std::cout << "closest_points : SUPERELLIPSOID 3D - PLAN 3D" << std::endl;
+        std::cout << "closest_points : SUPERELLIPSOID 3D - PLANE 3D" << std::endl;
         double pi = 4 * std::atan(1);
         neighbor<3, problem_t> neigh;
         // Pour déterminer de quel cote on est
@@ -1745,7 +1745,7 @@ namespace scopi
         return neigh;
     }
 
-    // PLAN 3D - SUPERELLIPSOID 3D
+    // PLANE 3D - SUPERELLIPSOID 3D
     /**
      * @brief Neighbor between a plane and a superellipsoid in 3D.
      *
@@ -1759,7 +1759,7 @@ namespace scopi
      * @return Neighbor struct for contact between plane \c i and superellipsoid \c j.
      */
     template <class problem_t, bool owner>
-    auto closest_points(const plan<3, owner> p2, const superellipsoid<3, owner> s1)
+    auto closest_points(const plane<3, owner> p2, const superellipsoid<3, owner> s1)
     {
         auto neigh = closest_points<problem_t>(s1, p2);
         neigh.nij *= -1.;
@@ -1780,7 +1780,7 @@ namespace scopi
      */
     // SUPERELLIPSOID 2D - DROITE 2D
     template <class problem_t, bool owner>
-    auto closest_points(const superellipsoid<2, owner> s1, const plan<2, owner> d2)
+    auto closest_points(const superellipsoid<2, owner> s1, const plane<2, owner> d2)
     {
         // std::cout << "closest_points : SUPERELLIPSOID 2D - DROITE 2D" << std::endl;
         double pi = 4 * std::atan(1);
@@ -1949,7 +1949,7 @@ namespace scopi
      */
     // DROITE 2D - SUPERELLIPSOID 2D
     template <class problem_t, bool owner>
-    auto closest_points(const plan<2, owner> d2, const superellipsoid<2, owner> s1)
+    auto closest_points(const plane<2, owner> d2, const superellipsoid<2, owner> s1)
     {
         auto neigh = closest_points<problem_t>(s1, d2);
         neigh.nij *= -1.;
@@ -2038,7 +2038,7 @@ namespace scopi
     using closest_points_dispatcher = double_static_dispatcher<
         closest_points_functor<problem_t, dim>,
         const object<dim, owner>,
-        mpl::vector<const sphere<dim, owner>, const superellipsoid<dim, owner>, const plan<dim, owner>, const segment<dim, owner>>,
+        mpl::vector<const sphere<dim, owner>, const superellipsoid<dim, owner>, const plane<dim, owner>, const segment<dim, owner>>,
         typename closest_points_functor<problem_t, dim>::return_type,
         antisymmetric_dispatch>;
 }

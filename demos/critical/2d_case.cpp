@@ -116,8 +116,8 @@ int main()
     //
     // }
 
-    scopi::ScopiSolver<dim> solver(particles, dt);
-    solver.run(total_it);
+    scopi::ScopiSolver<dim> solver(particles);
+    solver.run(dt, total_it);
 
     return 0;
 }

@@ -30,7 +30,7 @@
 
 </div>
 
-The open source software SCoPI written in C++ is designed for the Simulation of Interacting Particle Collections. It enables 2D and 3D simulation of particles (with convex shape), interacting with a surrounding medium (obstacles of various types, moving or not, gravity force, possible coupling with a fluid solver) as well as with other particles (inter-particle forces, contacts). The contact model used is of the Contact Dynamics type [^1] [^2]. It can be dry (inelastic, with or without friction) or viscous (modeling the force of lubrication in a viscous fluid [^3]). The algorithms used are implicit and reduce, at each time step, to the solution of a constrained convex problem. The latter can be solved either using the Mosek library, or via projected gradient or accelerated projected gradient algorithms. In the context of an inelastic contact model, it has been used, for example, to study the local rheology of a granular material in front of a towed sphere [^4].
+The open source software SCoPI written in C++ is designed for the Simulation of Interacting Particle Collections. It enables 2D and 3D simulation of particles (with convex regular shape), interacting with a surrounding medium (obstacles of various types, moving or not, gravity force, possible coupling with a fluid solver) as well as with other particles (inter-particle forces, contacts). The contact model used is of the Contact Dynamics type [^1] [^2]. It can be dry (inelastic, with or without friction) or viscous (modeling the force of lubrication in a viscous fluid [^3]). The algorithms used are implicit and reduce, at each time step, to the solution of a constrained convex problem. The latter can be solved either using the Mosek library, or via projected gradient or accelerated projected gradient algorithms. In the context of an inelastic contact model, it has been used, for example, to study the local rheology of a granular material in front of a towed sphere [^4].
 
 <details>
 <summary>Table of Contents</summary>
@@ -73,7 +73,7 @@ In this section, we propose an example of the simulation of two spheres with opp
 
   We first specify the dimension of our simulation: here is a 2D problem. Then we create two particles represented by spheres. The first argument is the center and the second one is the radius.
 
-  SCoPI has other shapes such as superellipsoid, plan, segment and other shapes which are combinations of these.
+  SCoPI has other shapes such as superellipsoid, plane, segment and other shapes which are combinations of these.
 
 - Create the container with all the particles
 
@@ -107,10 +107,10 @@ In this section, we propose an example of the simulation of two spheres with opp
 
   ```cpp
   double dt = 0.005
-  scopi::ScopiSolver<dim> solver(particles, dt);
+  scopi::ScopiSolver<dim> solver(particles);
 
   std::size_t total_it = 100;
-  solver.run(total_it);
+  solver.run(dt, total_it);
   ```
 
   That's it! You have simulated no friction contact of two spheres which is the default behavior.
@@ -150,11 +150,11 @@ In this section, we propose an example of the simulation of two spheres with opp
 
       double dt = 0.005;
 
-      scopi::ScopiSolver<dim> solver(particles, dt);
+      scopi::ScopiSolver<dim> solver(particles);
       SCOPI_PARSE(argc, argv);
 
       std::size_t total_it = 100;
-      solver.run(total_it);
+      solver.run(dt, total_it);
 
       return 0;
   }
@@ -171,6 +171,8 @@ In this section, we propose an example of the simulation of two spheres with opp
   add_executable(two_spheres two_spheres.cpp)
   target_link_librairies(two_spheres scopi)
   ```
+
+  The files must be in the same directory and outside the core scopi project.
 
   Then, you can compile this C++ script using the bash command lines
 
@@ -197,7 +199,7 @@ If you want to learn more about scopi skills by looking at examples, we encourag
 
 ## Features
 
-- Several objects: sphere, superellipsoid, plan, segment, worms...
+- Several objects: sphere, superellipsoid, plane, segment, worms...
 - Several methods to compute the neighbors of an object: brute force or kd tree
 - Several kinds of contact: no friction, friction, viscous, friction and viscous
 - Several methods to solve the problem: projected gradient descent, adaptive projected gradient method

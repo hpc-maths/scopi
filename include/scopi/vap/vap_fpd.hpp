@@ -40,18 +40,7 @@ namespace scopi
          * @param contacts [in] Array of contacts.
          */
         template <std::size_t dim, class Contacts>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts& contacts);
-
-        /**
-         * @brief Constructor.
-         *
-         * @param Nactive Number of active particles.
-         * @param active_ptr Index of the first active particle.
-         * @param nb_parts Number of objects.
-         * @param dt Time step.
-         * @param params Parameters (for compatibility).
-         */
-        vap_fpd(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt);
+        void set_a_priori_velocity_impl(double dt, scopi_container<dim>& particles, const Contacts& contacts);
     };
 
     /**
@@ -78,12 +67,14 @@ namespace scopi
     type::moment_t<3> cross_product_vap_fpd(const scopi_container<3>& particles, std::size_t i);
 
     template <std::size_t dim, class Contacts>
-    void vap_fpd::set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts&)
+    void vap_fpd::set_a_priori_velocity_impl(double dt, scopi_container<dim>& particles, const Contacts&)
     {
+        auto active_ptr = particles.nb_inactive();
+        auto nb_active  = particles.nb_active();
 #pragma omp parallel for
-        for (std::size_t i = m_active_ptr; i < m_active_ptr + m_Nactive; ++i)
+        for (std::size_t i = active_ptr; i < active_ptr + nb_active; ++i)
         {
-            particles.v()(i) += m_dt * particles.f()(i) / particles.m()(i);
+            particles.v()(i) += dt * particles.f()(i) / particles.m()(i);
             // check cross_product (division by J in the formula missing) and add a torque
             particles.omega()(i) += cross_product_vap_fpd(particles, i);
         }

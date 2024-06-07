@@ -80,8 +80,8 @@ int main()
         }));
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimMosek<>> solver(particles, dt);
-    solver.run(total_it);
+    scopi::ScopiSolver<dim, scopi::OptimMosek<>> solver(particles);
+    solver.run(dt, total_it);
 
     return 0;
 }

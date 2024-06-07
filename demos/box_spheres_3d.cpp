@@ -1,29 +1,22 @@
-#include <cstddef>
-#include <scopi/objects/types/plan.hpp>
+#include <random>
+#include <scopi/objects/types/plane.hpp>
 #include <scopi/objects/types/sphere.hpp>
-#include <scopi/property.hpp>
 #include <scopi/solver.hpp>
+#include <scopi/vap/vap_fpd.hpp>
 #include <vector>
 #include <xtensor/xmath.hpp>
 
-#include <scopi/contact/contact_brute_force.hpp>
-#include <scopi/solvers/OptimMosek.hpp>
-#include <scopi/solvers/OptimProjectedGradient.hpp>
-#include <scopi/solvers/gradient/apgd_ar.hpp>
-#include <scopi/vap/vap_fpd.hpp>
-
 int main()
 {
-#ifdef SCOPI_USE_MKL
-    plog::init(plog::info, "box_spheres_3d_very_large_apgd_ar.log");
-
     constexpr std::size_t dim = 3;
     double PI                 = xt::numeric_constants<double>::PI;
+    scopi::initialize("Spheres into a box simulation");
 
-    std::size_t total_it = 100;
+    std::size_t total_it = 1000;
     double width_box     = 10.;
-    std::size_t n        = 50; // n^3 spheres
-    double g             = 1.;
+    // std::size_t n        = 50; // n^3 spheres
+    std::size_t n = 10; // n^3 spheres
+    double g      = 1.;
 
     double r0  = width_box / n / 2.;
     double dt  = 0.2 * 0.9 * r0 / (2. * g); ////// dt = 0.2*r/(sqrt(2*width_box*g))
@@ -38,31 +31,31 @@ int main()
     const xt::xtensor_fixed<double, xt::xshape<dim>> axes_y({0., 1., 0.});
     const xt::xtensor_fixed<double, xt::xshape<dim>> axes_z({0., 0., 1.});
 
-    scopi::plan<dim> p_left(
+    scopi::plane<dim> p_left(
         {
             {0., 0., 0.}
     },
         {scopi::quaternion(0., axes_z)});
     particles.push_back(p_left, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_right(
+    scopi::plane<dim> p_right(
         {
             {width_box + 2 * r0, 0., 0.}
     },
         {scopi::quaternion(0., axes_z)});
     particles.push_back(p_right, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_horizontal(
+    scopi::plane<dim> p_horizontal(
         {
             {0., 0., 0.}
     },
         {scopi::quaternion(PI / 2., axes_z)});
     particles.push_back(p_horizontal, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_front(
+    scopi::plane<dim> p_front(
         {
             {0., 0., 0.}
     },
         {scopi::quaternion(PI / 2., axes_y)});
     particles.push_back(p_front, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_back(
+    scopi::plane<dim> p_back(
         {
             {0., 0., width_box + 2 * r0}
     },
@@ -95,16 +88,15 @@ int main()
         }
     }
 
-    scopi::ScopiSolver<dim, scopi::OptimProjectedGradient<scopi::DryWithoutFriction, scopi::apgd_ar>, scopi::contact_kdtree, scopi::vap_fpd>
-        solver(particles, dt);
-    auto params                           = solver.get_params();
-    params.solver_params.output_frequency = 99;
-    params.optim_params.tol_l             = 1e-3;
-    params.optim_params.rho               = rho;
-    params.contact_params.dmax            = 0.9 * r0;
-    params.contact_params.kd_tree_radius  = params.contact_params.dmax + 2. * 0.9 * r0;
+    scopi::ScopiSolver<dim, scopi::NoFriction, scopi::OptimGradient<scopi::apgd>, scopi::contact_kdtree, scopi::vap_fpd> solver(particles);
+    auto params = solver.get_params();
+    // params.solver_params.output_frequency = 99;
+    params.optim_params.tolerance               = 1e-3;
+    params.optim_params.alpha                   = rho;
+    params.contact_method_params.dmax           = 0.9 * r0;
+    params.contact_method_params.kd_tree_radius = params.contact_method_params.dmax + 2. * 0.9 * r0;
 
-    solver.run(total_it);
-#endif
+    solver.run(dt, total_it);
+
     return 0;
 }

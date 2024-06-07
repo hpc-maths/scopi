@@ -366,10 +366,10 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                           = solver.get_params();
         params.solver_params.output_frequency = 1; // total_it-1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance));
     }
@@ -402,10 +402,10 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                           = solver.get_params();
         params.solver_params.output_frequency = 1; // total_it-1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance));
     }
@@ -459,11 +459,11 @@ namespace scopi
             }
         }
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                           = solver.get_params();
         params.solver_params.output_frequency = 1; // total_it-1;
 
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0019.json", "../test/references/2d_case_spheres.json", tolerance));
     }

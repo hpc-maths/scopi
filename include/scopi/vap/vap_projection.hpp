@@ -37,18 +37,7 @@ namespace scopi
          * @param contacts [in] Array of contacts.
          */
         template <std::size_t dim, class Contacts>
-        void set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts& contacts_pos);
-
-        /**
-         * @brief Constructor.
-         *
-         * @param Nactive Number of active particles.
-         * @param active_ptr Index of the first active particle.
-         * @param nb_parts Number of objects.
-         * @param dt Time step.
-         * @param params Parameters (for compatibility).
-         */
-        vap_projection(std::size_t Nactive, std::size_t active_ptr, std::size_t nb_parts, double dt);
+        void set_a_priori_velocity_impl(double dt, scopi_container<dim>& particles, const Contacts& contacts_pos);
 
         /**
          * @brief Update \c u and \c w.
@@ -75,16 +64,19 @@ namespace scopi
     };
 
     template <std::size_t dim, class Contacts>
-    void vap_projection::set_a_priori_velocity_impl(scopi_container<dim>& particles, const Contacts&)
+    void vap_projection::set_a_priori_velocity_impl(double, scopi_container<dim>& particles, const Contacts&)
     {
+        auto active_ptr = particles.nb_inactive();
+        auto nb_active  = particles.nb_active();
+
 #pragma omp parallel for
-        for (std::size_t i = 0; i < this->m_Nactive; ++i)
+        for (std::size_t i = 0; i < nb_active; ++i)
         {
             for (std::size_t d = 0; d < dim; ++d)
             {
-                particles.vd()(i + this->m_active_ptr)(d) = m_u(i, d);
+                particles.vd()(i + active_ptr)(d) = m_u(i, d);
             }
-            particles.omega()(i + this->m_active_ptr) = m_w(i, 2);
+            particles.omega()(i + active_ptr) = m_w(i, 2);
         }
     }
 

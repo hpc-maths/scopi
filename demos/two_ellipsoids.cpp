@@ -1,15 +1,12 @@
 #include <xtensor/xmath.hpp>
 
-#include <plog/Initializers/RollingFileInitializer.h>
-#include <plog/Log.h>
-
 #include <scopi/objects/types/superellipsoid.hpp>
-#include <scopi/property.hpp>
+#include <scopi/scopi.hpp>
 #include <scopi/solver.hpp>
 
 int main()
 {
-    plog::init(plog::info, "two_ellipsoids.log");
+    scopi::initialize("Two ellipsoids");
 
     constexpr std::size_t dim = 2;
     double PI                 = xt::numeric_constants<double>::PI;
@@ -48,7 +45,7 @@ int main()
     particles.push_back(s1, prop1);
     particles.push_back(s2, prop2);
 
-    scopi::ScopiSolver<dim> solver(particles, dt);
-    solver.run(total_it);
+    scopi::ScopiSolver<dim> solver(particles);
+    solver.run(dt, total_it);
     return 0;
 }

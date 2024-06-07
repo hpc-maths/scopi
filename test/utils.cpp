@@ -57,7 +57,7 @@ namespace scopi
         return false;
     }
 
-    std::pair<type::position_t<2>, double> analytical_solution_sphere_plan(double alpha, double mu, double t, double r, double g, double y0)
+    std::pair<type::position_t<2>, double> analytical_solution_sphere_plane(double alpha, double mu, double t, double r, double g, double y0)
     {
         const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
@@ -90,7 +90,7 @@ namespace scopi
     }
 
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0)
+    analytical_solution_sphere_plane_velocity(double alpha, double mu, double t, double r, double g, double y0)
     {
         const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
