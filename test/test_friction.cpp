@@ -43,11 +43,11 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                        = solver.get_params();
         params.default_contact_property.mu = mu;
         // params.solver_params.output_frequency = total_it - 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical_friction.json", tolerance));
     }
@@ -102,11 +102,11 @@ namespace scopi
             }
         }
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                           = solver.get_params();
         params.default_contact_property.mu    = mu;
         params.solver_params.output_frequency = total_it - 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/2d_case_spheres_friction.json", tolerance));
     }
@@ -154,11 +154,11 @@ namespace scopi
                                 {0., -g}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params                           = solver.get_params();
         params.default_contact_property.mu    = mu;
         params.solver_params.output_frequency = std::size_t(-1);
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         auto pos              = particles.pos();
         auto q                = particles.q();

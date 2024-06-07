@@ -77,13 +77,13 @@ namespace scopi
                                 {g * std::cos(alpha), -g * std::sin(alpha)}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params = solver.get_params();
         set_params_test(params.optim_params);
         params.solver_params.output_frequency = 1;
-        solver.run(150);
+        solver.run(dt, 150);
         particles.f()(1)(1) *= -1.;
-        solver.run(189, 150);
+        solver.run(dt, 189, 150);
 
         CHECK(diffFile("./Results/scopi_objects_0188.json", "../test/references/sphere_plan_viscosity.json", tolerance));
     }
@@ -119,13 +119,13 @@ namespace scopi
                                 {0, -g}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params = solver.get_params();
         // params.problem_params.mu = 0.1;
         params.solver_params.output_frequency = 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
         particles.f()(1)(1) *= -1.;
-        solver.run(2 * total_it, total_it);
+        solver.run(dt, 2 * total_it, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction_vertical.json", tolerance));
     }
@@ -161,12 +161,12 @@ namespace scopi
                                 {g, -g}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         // auto params = solver.get_params();
         // params.problem_params.mu = 0.1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
         particles.f()(1)(1) *= -1.;
-        solver.run(2 * total_it, total_it);
+        solver.run(dt, 2 * total_it, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction.json", tolerance));
     }

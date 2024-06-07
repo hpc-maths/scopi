@@ -66,8 +66,8 @@ namespace scopi
         SUBCASE("fixed")
         {
             particles.push_back(s, prop);
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_plan(particles);
         }
@@ -78,8 +78,8 @@ namespace scopi
                                 prop.desired_velocity({
                                     {0., -1.}
             }));
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_plan(particles);
         }
@@ -112,8 +112,8 @@ namespace scopi
                             prop.force({
                                 {0., -1.}
         }));
-        SolverType solver(particles, dt);
-        solver.run(total_it);
+        SolverType solver(particles);
+        solver.run(dt, total_it);
         set_params(solver, total_it);
         check_result_sphere_plan(particles);
     }
@@ -162,8 +162,8 @@ namespace scopi
         SUBCASE("fixed")
         {
             particles.push_back(sphere, prop);
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_sphere(particles);
         }
@@ -174,8 +174,8 @@ namespace scopi
                                 prop.desired_velocity({
                                     {0., -1.}
             }));
-            SolverType solver(particles, dt);
-            solver.run(total_it);
+            SolverType solver(particles);
+            solver.run(dt, total_it);
             set_params(solver, total_it);
             check_result_sphere_sphere(particles);
         }
@@ -207,8 +207,8 @@ namespace scopi
                             prop.force({
                                 {0., -1.}
         }));
-        SolverType solver(particles, dt);
-        solver.run(total_it);
+        SolverType solver(particles);
+        solver.run(dt, total_it);
         set_params(solver, total_it);
         check_result_sphere_sphere(particles);
     }
@@ -239,11 +239,11 @@ namespace scopi
                                 {0., -10.}
         }));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         set_params(solver, total_it);
         auto params                           = solver.get_params();
         params.solver_params.output_frequency = 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
     }
@@ -284,8 +284,8 @@ namespace scopi
                                 {0., -g}
         }));
 
-        SolverType solver(particles, dt);
-        solver.run(total_it);
+        SolverType solver(particles);
+        solver.run(dt, total_it);
         set_params(solver, total_it);
 
         auto pos            = particles.pos();

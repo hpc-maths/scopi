@@ -512,12 +512,12 @@ namespace scopi
         particles.push_back(w1, prop.desired_velocity({-1., 0.}));
         particles.push_back(w2, prop.desired_velocity({1., 0.}));
 
-        SolverType solver(particles, dt);
+        SolverType solver(particles);
         auto params = solver.get_params();
         set_params_test(params.optim_params);
         params.contact_method_params.dmax = 1.;
         // params.solver_params.output_frequency = total_it - 1;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_worms.json", tolerance));
     }

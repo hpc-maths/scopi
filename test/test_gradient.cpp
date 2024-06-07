@@ -54,7 +54,7 @@ namespace scopi
         using problem_t    = NoFriction;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
         auto params = solver.get_params();
 
         params.optim_params.tolerance       = 1e-7;
@@ -64,7 +64,7 @@ namespace scopi
 
         params.solver_params.output_frequency = total_it - 1;
         params.solver_params.filename         = "sphere_plan_nofriction";
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         auto pos            = particles.pos();
         auto q              = particles.q();
@@ -120,7 +120,7 @@ namespace scopi
         using problem_t    = Viscous;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
         auto params = solver.get_params();
 
         params.optim_params.tolerance       = 1e-7;
@@ -135,10 +135,10 @@ namespace scopi
         double gamma_min = -2.;
         // double gamma_tol = 1e-6;
 
-        solver.run(total_it);
+        solver.run(dt, total_it);
         particles.f()(1)  = {-g * sin(alpha), g * cos(alpha)};
         double total_it_2 = 500;
-        solver.run(total_it_2);
+        solver.run(dt, total_it_2);
 
         auto pos = particles.pos();
         auto q   = particles.q();
@@ -195,7 +195,7 @@ namespace scopi
         using problem_t    = Friction;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
 
         auto params = solver.get_params();
 
@@ -209,7 +209,7 @@ namespace scopi
 
         // mu01
         params.default_contact_property.mu = 0.1;
-        solver.run(Tf / dt);
+        solver.run(dt, Tf / dt);
 
         CHECK(diffFile("./Results/sphere_plan_friction_mu01_0200.json", "../test/references/sphere_plan_friction_mu01.json", tol));
     }
@@ -248,7 +248,7 @@ namespace scopi
         using problem_t    = FrictionFixedPoint;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
 
         auto params = solver.get_params();
 
@@ -263,7 +263,7 @@ namespace scopi
         params.default_contact_property.mu                   = mu;
         params.default_contact_property.fixed_point_tol      = 1e-6;
         params.default_contact_property.fixed_point_max_iter = 1000;
-        solver.run(total_it);
+        solver.run(dt, total_it);
 
         auto pos              = particles.pos();
         auto q                = particles.q();
@@ -320,7 +320,7 @@ namespace scopi
         using problem_t    = ViscousFriction;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
         auto params = solver.get_params();
 
         params.optim_params.tolerance       = 1e-7;
@@ -340,10 +340,10 @@ namespace scopi
         params.default_contact_property.gamma_min            = gamma_min;
         params.default_contact_property.gamma_tol            = 1e-6;
 
-        solver.run(total_it);
+        solver.run(dt, total_it);
         particles.f()(1)  = {-g * sin(alpha), g * cos(alpha)};
         double total_it_2 = 100;
-        solver.run(total_it_2);
+        solver.run(dt, total_it_2);
 
         auto pos              = particles.pos();
         auto q                = particles.q();
@@ -428,7 +428,7 @@ namespace scopi
         using problem_t    = NoFriction;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
 
         auto params = solver.get_params();
 
@@ -439,7 +439,7 @@ namespace scopi
 
         params.solver_params.output_frequency = Tf / dt - 1;
         params.solver_params.filename         = "3spheres_nofriction";
-        solver.run(Tf / dt);
+        solver.run(dt, Tf / dt);
         CHECK(diffFile("./Results/3spheres_nofriction_0060.json", "../test/references/3spheres_nofriction.json", tol));
     }
 
@@ -486,7 +486,7 @@ namespace scopi
         using problem_t    = Viscous;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
 
         auto params = solver.get_params();
 
@@ -501,7 +501,7 @@ namespace scopi
         // double gamma     = 0;
         // double gamma_min = -2.;
         // double gamma_tol = 1e-6;
-        solver.run(Tf / dt);
+        solver.run(dt, Tf / dt);
         CHECK(diffFile("./Results/3spheres_viscous_0070.json", "../test/references/3spheres_viscous.json", tol));
     }
 
@@ -548,7 +548,7 @@ namespace scopi
         using problem_t    = FrictionFixedPoint;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
 
         auto params = solver.get_params();
 
@@ -564,7 +564,7 @@ namespace scopi
         params.default_contact_property.mu                   = 0.5;
         params.default_contact_property.fixed_point_tol      = 1e-6;
         params.default_contact_property.fixed_point_max_iter = 1000;
-        solver.run(Tf / dt);
+        solver.run(dt, Tf / dt);
         CHECK(diffFile("./Results/3spheres_friction_fp_0070.json", "../test/references/3spheres_friction_fp.json", tol));
     }
 
@@ -611,7 +611,7 @@ namespace scopi
         using problem_t    = ViscousFriction;
         using optim_solver = OptimGradient<apgd>;
         using vap_t        = vap_fpd;
-        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles, dt);
+        ScopiSolver<dim, problem_t, optim_solver, contact_kdtree, vap_t> solver(particles);
 
         auto params = solver.get_params();
 
@@ -629,7 +629,7 @@ namespace scopi
         params.default_contact_property.gamma                = 0;
         params.default_contact_property.gamma_min            = -1.4;
         params.default_contact_property.gamma_tol            = 1e-6;
-        solver.run(Tf / dt);
+        solver.run(dt, Tf / dt);
         CHECK(diffFile("./Results/3spheres_viscous_friction_0070.json", "../test/references/3spheres_viscous_friction.json", tol));
     }
 }

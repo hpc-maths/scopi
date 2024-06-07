@@ -287,7 +287,7 @@ namespace scopi
             m_optim_solver.extra_steps_before_solve(contacts);
             while (m_optim_solver.should_solve())
             {
-                m_optim_solver.run(m_particles, contacts, nite);
+                m_optim_solver.run(dt, m_particles, contacts, nite);
                 m_optim_solver.extra_steps_after_solve(contacts, m_particles);
             }
             m_optim_solver.update_contact_properties(contacts);

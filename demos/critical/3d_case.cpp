@@ -95,8 +95,8 @@ int main()
     particles.push_back(s1, prop1);
     particles.push_back(s2, prop2);
 
-    scopi::ScopiSolver<dim> solver(particles, dt);
-    solver.run(total_it);
+    scopi::ScopiSolver<dim> solver(particles);
+    solver.run(dt, total_it);
 
     return 0;
 }

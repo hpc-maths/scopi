@@ -107,10 +107,10 @@ In this section, we propose an example of the simulation of two spheres with opp
 
   ```cpp
   double dt = 0.005
-  scopi::ScopiSolver<dim> solver(particles, dt);
+  scopi::ScopiSolver<dim> solver(particles);
 
   std::size_t total_it = 100;
-  solver.run(total_it);
+  solver.run(dt, total_it);
   ```
 
   That's it! You have simulated no friction contact of two spheres which is the default behavior.
@@ -150,11 +150,11 @@ In this section, we propose an example of the simulation of two spheres with opp
 
       double dt = 0.005;
 
-      scopi::ScopiSolver<dim> solver(particles, dt);
+      scopi::ScopiSolver<dim> solver(particles);
       SCOPI_PARSE(argc, argv);
 
       std::size_t total_it = 100;
-      solver.run(total_it);
+      solver.run(dt, total_it);
 
       return 0;
   }
