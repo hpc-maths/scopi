@@ -1,5 +1,5 @@
 #include <random>
-#include <scopi/objects/types/plan.hpp>
+#include <scopi/objects/types/plane.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/solver.hpp>
 #include <scopi/vap/vap_fpd.hpp>
@@ -31,31 +31,31 @@ int main()
     const xt::xtensor_fixed<double, xt::xshape<dim>> axes_y({0., 1., 0.});
     const xt::xtensor_fixed<double, xt::xshape<dim>> axes_z({0., 0., 1.});
 
-    scopi::plan<dim> p_left(
+    scopi::plane<dim> p_left(
         {
             {0., 0., 0.}
     },
         {scopi::quaternion(0., axes_z)});
     particles.push_back(p_left, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_right(
+    scopi::plane<dim> p_right(
         {
             {width_box + 2 * r0, 0., 0.}
     },
         {scopi::quaternion(0., axes_z)});
     particles.push_back(p_right, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_horizontal(
+    scopi::plane<dim> p_horizontal(
         {
             {0., 0., 0.}
     },
         {scopi::quaternion(PI / 2., axes_z)});
     particles.push_back(p_horizontal, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_front(
+    scopi::plane<dim> p_front(
         {
             {0., 0., 0.}
     },
         {scopi::quaternion(PI / 2., axes_y)});
     particles.push_back(p_front, scopi::property<dim>().deactivate());
-    scopi::plan<dim> p_back(
+    scopi::plane<dim> p_back(
         {
             {0., 0., width_box + 2 * r0}
     },

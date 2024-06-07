@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
 
 #include <scopi/container.hpp>
-#include <scopi/objects/types/plan.hpp>
+#include <scopi/objects/types/plane.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/property.hpp>
 #include <scopi/solver.hpp>
@@ -19,8 +19,8 @@ namespace scopi
     double tol            = 1e-5;
     double tol_analytical = 1e-12;
 
-    /// TESTS SPHERES - PLAN
-    TEST_CASE("sphere - plan without friction")
+    /// TESTS SPHERES - PLANE
+    TEST_CASE("sphere - plane without friction")
     {
         constexpr std::size_t dim = 2;
 
@@ -32,7 +32,7 @@ namespace scopi
         std::size_t total_it = 1000;
         double h             = 2. * radius;
         double alpha         = PI / 4;
-        plan<dim> plan(
+        plane<dim> plane(
             {
                 {0., 0.}
         },
@@ -42,7 +42,7 @@ namespace scopi
                 {0, h}
         },
             radius);
-        particles.push_back(plan, property<dim>().deactivate());
+        particles.push_back(plane, property<dim>().deactivate());
         particles.push_back(sphere,
                             property<dim>()
                                 .mass(1)
@@ -63,19 +63,19 @@ namespace scopi
         params.optim_params.dynamic_descent = true;
 
         params.solver_params.output_frequency = total_it - 1;
-        params.solver_params.filename         = "sphere_plan_nofriction";
+        params.solver_params.filename         = "sphere_plane_nofriction";
         solver.run(dt, total_it);
 
         auto pos            = particles.pos();
         auto q              = particles.q();
-        auto tmp            = analytical_solution_sphere_plan_no_friction(alpha, dt * (total_it), radius, g, h);
+        auto tmp            = analytical_solution_sphere_plane_no_friction(alpha, dt * (total_it), radius, g, h);
         auto pos_analytical = tmp.first;
         auto q_analytical   = quaternion(tmp.second);
         double error_pos    = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
         double error_q      = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
         auto v              = particles.v();
         auto omega          = particles.omega();
-        tmp                 = analytical_solution_sphere_plan_velocity_no_friction(alpha, dt * (total_it), radius, g, h);
+        tmp                 = analytical_solution_sphere_plane_velocity_no_friction(alpha, dt * (total_it), radius, g, h);
         auto v_analytical   = tmp.first;
         double error_v      = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
 
@@ -83,10 +83,10 @@ namespace scopi
         REQUIRE(error_q <= doctest::Approx(1e-3));
         REQUIRE(error_v <= doctest::Approx(tol_analytical));
         REQUIRE(omega(1) == doctest::Approx(0.));
-        // CHECK(diffFile("./Results/sphere_plan_nofriction_0002.json", "../test/references/sphere_plan_nofriction.json", tol));
+        // CHECK(diffFile("./Results/sphere_plane_nofriction_0002.json", "../test/references/sphere_plane_nofriction.json", tol));
     }
 
-    TEST_CASE("sphere - plan viscous without friction")
+    TEST_CASE("sphere - plane viscous without friction")
     {
         constexpr std::size_t dim = 2;
 
@@ -98,7 +98,7 @@ namespace scopi
         std::size_t total_it = 500;
         double h             = 2. * radius;
         double alpha         = PI / 4;
-        plan<dim> plan(
+        plane<dim> plane(
             {
                 {0., 0.}
         },
@@ -108,7 +108,7 @@ namespace scopi
                 {0, h}
         },
             radius);
-        particles.push_back(plan, property<dim>().deactivate());
+        particles.push_back(plane, property<dim>().deactivate());
         particles.push_back(sphere,
                             property<dim>()
                                 .mass(1)
@@ -129,7 +129,7 @@ namespace scopi
         params.optim_params.dynamic_descent = true;
 
         params.solver_params.output_frequency = 1;
-        params.solver_params.filename         = "sphere_plan_viscous";
+        params.solver_params.filename         = "sphere_plane_viscous";
 
         // double gamma     = 0;
         double gamma_min = -2.;
@@ -142,14 +142,14 @@ namespace scopi
 
         auto pos = particles.pos();
         auto q   = particles.q();
-        auto tmp = analytical_solution_sphere_plan_viscous(alpha, dt * (total_it + total_it_2), radius, g, h, gamma_min, dt * (total_it));
+        auto tmp = analytical_solution_sphere_plane_viscous(alpha, dt * (total_it + total_it_2), radius, g, h, gamma_min, dt * (total_it));
         auto pos_analytical = tmp.first;
         auto q_analytical   = quaternion(tmp.second);
         double error_pos    = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
         double error_q      = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
         auto v              = particles.v();
         auto omega          = particles.omega();
-        tmp = analytical_solution_sphere_plan_velocity_viscous(alpha, dt * (total_it + total_it_2), radius, g, h, gamma_min, dt * (total_it));
+        tmp = analytical_solution_sphere_plane_velocity_viscous(alpha, dt * (total_it + total_it_2), radius, g, h, gamma_min, dt * (total_it));
         auto v_analytical = tmp.first;
         double error_v    = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
 
@@ -157,16 +157,16 @@ namespace scopi
         REQUIRE(error_q <= doctest::Approx(1e-3));
         REQUIRE(error_v <= doctest::Approx(1e-3));
         REQUIRE(omega(1) == doctest::Approx(0.));
-        // CHECK(diffFile("./Results/sphere_plan_viscous_0005.json", "../test/references/sphere_plan_viscous.json", tol));
+        // CHECK(diffFile("./Results/sphere_plane_viscous_0005.json", "../test/references/sphere_plane_viscous.json", tol));
     }
 
-    TEST_CASE("sphere - plan friction no fixed point")
+    TEST_CASE("sphere - plane friction no fixed point")
     {
         constexpr std::size_t dim = 2;
 
         scopi_container<dim> particles;
 
-        plan<dim> plan(
+        plane<dim> plane(
             {
                 {0., 0.}
         },
@@ -180,7 +180,7 @@ namespace scopi
         },
             rr);
 
-        particles.push_back(plan, property<dim>().deactivate());
+        particles.push_back(plane, property<dim>().deactivate());
         particles.push_back(sphere,
                             property<dim>()
                                 .mass(1)
@@ -205,16 +205,16 @@ namespace scopi
         params.optim_params.dynamic_descent = true;
 
         params.solver_params.output_frequency = Tf / dt - 1;
-        params.solver_params.filename         = "sphere_plan_friction_mu01";
+        params.solver_params.filename         = "sphere_plane_friction_mu01";
 
         // mu01
         params.default_contact_property.mu = 0.1;
         solver.run(dt, Tf / dt);
 
-        CHECK(diffFile("./Results/sphere_plan_friction_mu01_0200.json", "../test/references/sphere_plan_friction_mu01.json", tol));
+        CHECK(diffFile("./Results/sphere_plane_friction_mu01_0200.json", "../test/references/sphere_plane_friction_mu01.json", tol));
     }
 
-    TEST_CASE("sphere - plan friction fixed point")
+    TEST_CASE("sphere - plane friction fixed point")
     {
         constexpr std::size_t dim = 2;
 
@@ -226,7 +226,7 @@ namespace scopi
         std::size_t total_it = 500;
         double h             = 2. * radius;
         double alpha         = PI / 4;
-        plan<dim> plan(
+        plane<dim> plane(
             {
                 {0., 0.}
         },
@@ -236,7 +236,7 @@ namespace scopi
                 {0, h}
         },
             radius);
-        particles.push_back(plan, property<dim>().deactivate());
+        particles.push_back(plane, property<dim>().deactivate());
         particles.push_back(sphere,
                             property<dim>()
                                 .mass(1)
@@ -259,7 +259,7 @@ namespace scopi
 
         double mu                                            = 0.5;
         params.solver_params.output_frequency                = total_it - 1;
-        params.solver_params.filename                        = "sphere_plan_friction_fixed_point";
+        params.solver_params.filename                        = "sphere_plane_friction_fixed_point";
         params.default_contact_property.mu                   = mu;
         params.default_contact_property.fixed_point_tol      = 1e-6;
         params.default_contact_property.fixed_point_max_iter = 1000;
@@ -267,14 +267,14 @@ namespace scopi
 
         auto pos              = particles.pos();
         auto q                = particles.q();
-        auto tmp              = analytical_solution_sphere_plan_friction(alpha, mu, dt * (total_it), radius, g, h);
+        auto tmp              = analytical_solution_sphere_plane_friction(alpha, mu, dt * (total_it), radius, g, h);
         auto pos_analytical   = tmp.first;
         auto q_analytical     = quaternion(tmp.second);
         double error_pos      = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
         double error_q        = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
         auto v                = particles.v();
         auto omega            = particles.omega();
-        tmp                   = analytical_solution_sphere_plan_velocity_friction(alpha, mu, dt * (total_it), radius, g, h);
+        tmp                   = analytical_solution_sphere_plane_velocity_friction(alpha, mu, dt * (total_it), radius, g, h);
         auto v_analytical     = tmp.first;
         auto omega_analytical = tmp.second;
         double error_v        = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
@@ -283,10 +283,11 @@ namespace scopi
         REQUIRE(error_q <= doctest::Approx(1e-2));
         REQUIRE(error_v <= doctest::Approx(tol_analytical));
         REQUIRE(error_omega <= doctest::Approx(tol_analytical));
-        // CHECK(diffFile("./Results/sphere_plan_friction_fp_mu05_0002.json", "../test/references/sphere_plan_friction_fp_mu05.json", tol));
+        // CHECK(diffFile("./Results/sphere_plane_friction_fp_mu05_0002.json", "../test/references/sphere_plane_friction_fp_mu05.json",
+        // tol));
     }
 
-    TEST_CASE("sphere - plan viscous friction")
+    TEST_CASE("sphere - plane viscous friction")
     {
         constexpr std::size_t dim = 2;
 
@@ -298,7 +299,7 @@ namespace scopi
         std::size_t total_it = 500;
         double h             = 2. * radius;
         double alpha         = PI / 4;
-        plan<dim> plan(
+        plane<dim> plane(
             {
                 {0., 0.}
         },
@@ -308,7 +309,7 @@ namespace scopi
                 {0, h}
         },
             radius);
-        particles.push_back(plan, property<dim>().deactivate());
+        particles.push_back(plane, property<dim>().deactivate());
         particles.push_back(sphere,
                             property<dim>()
                                 .mass(1)
@@ -329,7 +330,7 @@ namespace scopi
         params.optim_params.dynamic_descent = true;
 
         params.solver_params.output_frequency = total_it - 1;
-        params.solver_params.filename         = "sphere_plan_viscous_friction_mu05";
+        params.solver_params.filename         = "sphere_plane_viscous_friction_mu05";
 
         double mu                                            = 0.5;
         params.default_contact_property.mu                   = mu;
@@ -347,28 +348,28 @@ namespace scopi
 
         auto pos              = particles.pos();
         auto q                = particles.q();
-        auto tmp              = analytical_solution_sphere_plan_viscous_friction(alpha,
-                                                                    mu,
-                                                                    dt * (total_it + total_it_2),
-                                                                    radius,
-                                                                    g,
-                                                                    h,
-                                                                    gamma_min,
-                                                                    dt * (total_it));
+        auto tmp              = analytical_solution_sphere_plane_viscous_friction(alpha,
+                                                                     mu,
+                                                                     dt * (total_it + total_it_2),
+                                                                     radius,
+                                                                     g,
+                                                                     h,
+                                                                     gamma_min,
+                                                                     dt * (total_it));
         auto pos_analytical   = tmp.first;
         auto q_analytical     = quaternion(tmp.second);
         double error_pos      = xt::linalg::norm(pos(1) - pos_analytical) / xt::linalg::norm(pos_analytical);
         double error_q        = xt::linalg::norm(q(1) - q_analytical) / xt::linalg::norm(q_analytical);
         auto v                = particles.v();
         auto omega            = particles.omega();
-        tmp                   = analytical_solution_sphere_plan_velocity_viscous_friction(alpha,
-                                                                        mu,
-                                                                        dt * (total_it + total_it_2),
-                                                                        radius,
-                                                                        g,
-                                                                        h,
-                                                                        gamma_min,
-                                                                        dt * (total_it));
+        tmp                   = analytical_solution_sphere_plane_velocity_viscous_friction(alpha,
+                                                                         mu,
+                                                                         dt * (total_it + total_it_2),
+                                                                         radius,
+                                                                         g,
+                                                                         h,
+                                                                         gamma_min,
+                                                                         dt * (total_it));
         auto v_analytical     = tmp.first;
         auto omega_analytical = tmp.second;
         double error_v        = xt::linalg::norm(v(1) - v_analytical) / xt::linalg::norm(v_analytical);
@@ -379,8 +380,8 @@ namespace scopi
         REQUIRE(error_v <= doctest::Approx(1e-3));
         REQUIRE(error_omega <= doctest::Approx(1e-3));
 
-        // CHECK(diffFile("./Results/sphere_plan_viscous_friction_mu05_0005.json",
-        // "../test/references/sphere_plan_viscous_friction_mu05.json", tol));
+        // CHECK(diffFile("./Results/sphere_plane_viscous_friction_mu05_0005.json",
+        // "../test/references/sphere_plane_viscous_friction_mu05.json", tol));
     }
 
     /// TESTS 3 SPHERES

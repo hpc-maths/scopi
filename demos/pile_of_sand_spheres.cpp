@@ -1,4 +1,4 @@
-#include <scopi/objects/types/plan.hpp>
+#include <scopi/objects/types/plane.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/solver.hpp>
 #include <scopi/vap/vap_fpd.hpp>
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
         {0., -g, 0.}
     });
 
-    scopi::plan<dim> p_horizontal(
+    scopi::plane<dim> p_horizontal(
         {
             {0., 0., 0.}
     },

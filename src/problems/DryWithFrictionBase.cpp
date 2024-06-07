@@ -37,7 +37,7 @@ namespace scopi
     }
 
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_velocity(double alpha, double mu, double t, double r, double g, double y0)
+    analytical_solution_sphere_plane_velocity(double alpha, double mu, double t, double r, double g, double y0)
     {
         double v_normal, omega;
         double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));

@@ -59,7 +59,7 @@ Objects
    api/objects/neighbor
    api/objects/types/sphere
    api/objects/types/superellipsoid
-   api/objects/types/plan
+   api/objects/types/plane
    api/objects/types/worm
 
 Problems

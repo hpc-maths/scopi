@@ -177,7 +177,7 @@ function drawObjects() {
             nbSpheres = 0;
 
             objects.forEach((obj, index) => {
-                if (options.show_plan && obj.type === "plan") {
+                if (options.show_plan && obj.type === "plane") {
                     const normal = new THREE.Vector3();
                     const position = new THREE.Vector3();
                     // TODO this is 3D only

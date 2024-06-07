@@ -250,8 +250,8 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.4));
     }
 
-    // distance sphere - plan
-    TEST_CASE("sphere_plan_2d")
+    // distance sphere - plane
+    TEST_CASE("sphere_plane_2d")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -259,7 +259,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0}
         },
@@ -276,7 +276,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_2d_rotation_30_deg")
+    TEST_CASE("sphere_plane_2d_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -287,7 +287,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot}
         },
@@ -304,7 +304,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_2d_rotation_90_deg")
+    TEST_CASE("sphere_plane_2d_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -312,7 +312,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2}
         },
@@ -329,7 +329,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST_CASE("sphere_plan_2d_dispatch")
+    TEST_CASE("sphere_plane_2d_dispatch")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -337,7 +337,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0}
         },
@@ -358,7 +358,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_2d_dispatch_rotation_30_deg")
+    TEST_CASE("sphere_plane_2d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -369,7 +369,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot}
         },
@@ -390,7 +390,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_2d_dispatch_rotation_90_deg")
+    TEST_CASE("sphere_plane_2d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -398,7 +398,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2}
         },
@@ -419,7 +419,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST_CASE("sphere_plan_3d")
+    TEST_CASE("sphere_plane_3d")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -427,7 +427,7 @@ namespace scopi
                 {0.0, 0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0, 0.0}
         },
@@ -447,7 +447,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_3d_rotation_30_deg")
+    TEST_CASE("sphere_plane_3d_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -458,7 +458,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot, 0.}
         },
@@ -478,7 +478,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_3d_rotation_90_deg")
+    TEST_CASE("sphere_plane_3d_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -488,7 +488,7 @@ namespace scopi
                  0, }
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2, 0.}
         },
@@ -508,7 +508,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST_CASE("sphere_plan_3d_dispatch")
+    TEST_CASE("sphere_plane_3d_dispatch")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -516,7 +516,7 @@ namespace scopi
                 {0.0, 0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0, 0.0}
         },
@@ -540,7 +540,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_3d_dispatch_rotation_30_deg")
+    TEST_CASE("sphere_plane_3d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -551,7 +551,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot, 0.}
         },
@@ -575,7 +575,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("sphere_plan_3d_dispatch_rotation_90_deg")
+    TEST_CASE("sphere_plane_3d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -585,7 +585,7 @@ namespace scopi
                  0, }
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2, 0.}
         },
@@ -609,8 +609,8 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    // distance plan - sphere
-    TEST_CASE("plan_sphere_2d")
+    // distance plane - sphere
+    TEST_CASE("plane_sphere_2d")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -618,7 +618,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0}
         },
@@ -635,7 +635,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_2d_rotation_30_deg")
+    TEST_CASE("plane_sphere_2d_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -646,7 +646,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot}
         },
@@ -663,7 +663,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_2d_rotation_90_deg")
+    TEST_CASE("plane_sphere_2d_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -671,7 +671,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2}
         },
@@ -688,7 +688,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST_CASE("plan_sphere_2d_dispatch")
+    TEST_CASE("plane_sphere_2d_dispatch")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -696,7 +696,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0}
         },
@@ -717,7 +717,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_2d_dispatch_rotation_30_deg")
+    TEST_CASE("plane_sphere_2d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -728,7 +728,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot}
         },
@@ -749,7 +749,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_2d_dispatch_rotation_90_deg")
+    TEST_CASE("plane_sphere_2d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 2;
         sphere<dim> s(
@@ -757,7 +757,7 @@ namespace scopi
                 {0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2}
         },
@@ -778,7 +778,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST_CASE("plan_sphere_3d")
+    TEST_CASE("plane_sphere_3d")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -786,7 +786,7 @@ namespace scopi
                 {0.0, 0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0, 0.0}
         },
@@ -806,7 +806,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_3d_rotation_30_deg")
+    TEST_CASE("plane_sphere_3d_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -817,7 +817,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot, 0.}
         },
@@ -837,7 +837,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_3d_rotation_90_deg")
+    TEST_CASE("plane_sphere_3d_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -847,7 +847,7 @@ namespace scopi
                  0, }
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2, 0.}
         },
@@ -867,7 +867,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.1));
     }
 
-    TEST_CASE("plan_sphere_3d_dispatch")
+    TEST_CASE("plane_sphere_3d_dispatch")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -875,7 +875,7 @@ namespace scopi
                 {0.0, 0.0, 0.0}
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0.3, 0.0, 0.0}
         },
@@ -899,7 +899,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_3d_dispatch_rotation_30_deg")
+    TEST_CASE("plane_sphere_3d_dispatch_rotation_30_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -910,7 +910,7 @@ namespace scopi
         double dist   = 0.3;
         double cosRot = std::sqrt(3.) / 2.;
         double sinRot = 1. / 2.;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {dist * cosRot, dist * sinRot, 0.}
         },
@@ -934,7 +934,7 @@ namespace scopi
         REQUIRE(out.dij == doctest::Approx(0.2));
     }
 
-    TEST_CASE("plan_sphere_3d_dispatch_rotation_90_deg")
+    TEST_CASE("plane_sphere_3d_dispatch_rotation_90_deg")
     {
         constexpr std::size_t dim = 3;
         sphere<dim> s(
@@ -944,7 +944,7 @@ namespace scopi
                  0, }
         },
             0.1);
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., -0.2, 0.}
         },
@@ -1771,8 +1771,8 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.5));
     // }
 
-    // // distance superellipsoid - plan
-    // TEST_CASE("superellipsoid_plan_2d" * doctest::may_fail(true))
+    // // distance superellipsoid - plane
+    // TEST_CASE("superellipsoid_plane_2d" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -1783,7 +1783,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2}},
     //         1);
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0}
     //     },
@@ -1800,7 +1800,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("superellipsoid_plan_2d_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("superellipsoid_plane_2d_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -1814,7 +1814,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot}
     //     },
@@ -1831,7 +1831,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("superellipsoid_plan_2d_dispatch" * doctest::may_fail(true))
+    // TEST_CASE("superellipsoid_plane_2d_dispatch" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -1842,7 +1842,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2}},
     //         1);
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0}
     //     },
@@ -1863,7 +1863,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("superellipsoid_plan_2d_dispatch_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("superellipsoid_plane_2d_dispatch_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -1877,7 +1877,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot}
     //     },
@@ -1898,7 +1898,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("superellipsoid_plan_3d" * doctest::may_fail(true))
+    // TEST_CASE("superellipsoid_plane_3d" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -1909,7 +1909,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2, 0.3}},
     //         {1, 1});
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0, 0.0}
     //     },
@@ -1929,7 +1929,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("superellipsoid_plan_3d_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("superellipsoid_plane_3d_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -1943,7 +1943,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot, 0.}
     //     },
@@ -1963,7 +1963,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("superellipsoid_plan_3d_dispatch" * doctest::may_fail(true))
+    // TEST_CASE("superellipsoid_plane_3d_dispatch" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -1974,7 +1974,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2, 0.3}},
     //         {1, 1});
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0, 0.0}
     //     },
@@ -1998,7 +1998,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("superellipsoid_plan_3d_dispatch_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("superellipsoid_plane_3d_dispatch_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -2012,7 +2012,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot, 0.}
     //     },
@@ -2036,8 +2036,8 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // // distance plan - superellipsoid
-    // TEST_CASE("plan_superellipsoid_2d" * doctest::may_fail(true))
+    // // distance plane - superellipsoid
+    // TEST_CASE("plane_superellipsoid_2d" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -2048,7 +2048,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2}},
     //         1);
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0}
     //     },
@@ -2065,7 +2065,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("plan_superellipsoid_2d_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("plane_superellipsoid_2d_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -2079,7 +2079,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot}
     //     },
@@ -2096,7 +2096,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("plan_superellipsoid_2d_dispatch" * doctest::may_fail(true))
+    // TEST_CASE("plane_superellipsoid_2d_dispatch" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -2107,7 +2107,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2}},
     //         1);
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0}
     //     },
@@ -2128,7 +2128,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("plan_superellipsoid_2d_dispatch_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("plane_superellipsoid_2d_dispatch_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 2;
@@ -2142,7 +2142,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot}
     //     },
@@ -2163,7 +2163,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("plan_superellipsoid_3d" * doctest::may_fail(true))
+    // TEST_CASE("plane_superellipsoid_3d" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -2174,7 +2174,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2, 0.3}},
     //         {1, 1});
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0, 0.0}
     //     },
@@ -2194,7 +2194,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("plan_superellipsoid_3d_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("plane_superellipsoid_3d_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -2208,7 +2208,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot, 0.}
     //     },
@@ -2228,7 +2228,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("plan_superellipsoid_3d_dispatch" * doctest::may_fail(true))
+    // TEST_CASE("plane_superellipsoid_3d_dispatch" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -2239,7 +2239,7 @@ namespace scopi
     //         {quaternion(0.)},
     //         {{0.1, 0.2, 0.3}},
     //         {1, 1});
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {0.3, 0.0, 0.0}
     //     },
@@ -2263,7 +2263,7 @@ namespace scopi
     //     REQUIRE(out.dij == doctest::Approx(0.2));
     // }
 
-    // TEST_CASE("plan_superellipsoid_3d_dispatch_rotation_30_deg" * doctest::may_fail(true))
+    // TEST_CASE("plane_superellipsoid_3d_dispatch_rotation_30_deg" * doctest::may_fail(true))
     // {
     //     // FIXME Newton does not converge
     //     constexpr std::size_t dim = 3;
@@ -2277,7 +2277,7 @@ namespace scopi
     //     double dist   = 0.3;
     //     double cosRot = std::sqrt(3.) / 2.;
     //     double sinRot = 1. / 2.;
-    //     plan<dim> p(
+    //     plane<dim> p(
     //         {
     //             {dist * cosRot, dist * sinRot, 0.}
     //     },

@@ -48,7 +48,7 @@ namespace scopi
     //         set_params_test_uzawa(params);
     //     }
 
-    TEST_CASE_TEMPLATE_DEFINE("sphere plan viscosity", SolverType, sphere_plan_viscosity)
+    TEST_CASE_TEMPLATE_DEFINE("sphere plane viscosity", SolverType, sphere_plane_viscosity)
     {
         constexpr std::size_t dim = 2;
 
@@ -61,7 +61,7 @@ namespace scopi
         double dt = 0.05;
 
         scopi_container<dim> particles;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., 0.}
         },
@@ -85,12 +85,12 @@ namespace scopi
         particles.f()(1)(1) *= -1.;
         solver.run(dt, 189, 150);
 
-        CHECK(diffFile("./Results/scopi_objects_0188.json", "../test/references/sphere_plan_viscosity.json", tolerance));
+        CHECK(diffFile("./Results/scopi_objects_0188.json", "../test/references/sphere_plane_viscosity.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE_APPLY(sphere_plan_viscosity, solver_dry_without_friction_t<2>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plane_viscosity, solver_dry_without_friction_t<2>);
 
-    TEST_CASE_TEMPLATE_DEFINE("sphere plan viscosity friction vertical", SolverType, sphere_plan_viscosity_friction_vertical)
+    TEST_CASE_TEMPLATE_DEFINE("sphere plane viscosity friction vertical", SolverType, sphere_plane_viscosity_friction_vertical)
     {
         constexpr std::size_t dim = 2;
 
@@ -103,7 +103,7 @@ namespace scopi
         std::size_t total_it = 100;
 
         scopi_container<dim> particles;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., 0.}
         },
@@ -127,12 +127,12 @@ namespace scopi
         particles.f()(1)(1) *= -1.;
         solver.run(dt, 2 * total_it, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction_vertical.json", tolerance));
+        CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plane_viscosity_friction_vertical.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE_APPLY(sphere_plan_viscosity_friction_vertical, solver_dry_with_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plane_viscosity_friction_vertical, solver_dry_with_friction_t<2, vap_fpd>);
 
-    TEST_CASE_TEMPLATE_DEFINE("sphere plan viscosity friction", SolverType, sphere_plan_viscosity_friction)
+    TEST_CASE_TEMPLATE_DEFINE("sphere plane viscosity friction", SolverType, sphere_plane_viscosity_friction)
     {
         constexpr std::size_t dim = 2;
 
@@ -145,7 +145,7 @@ namespace scopi
         std::size_t total_it = 100;
 
         scopi_container<dim> particles;
-        plan<dim> p(
+        plane<dim> p(
             {
                 {0., 0.}
         },
@@ -168,9 +168,9 @@ namespace scopi
         particles.f()(1)(1) *= -1.;
         solver.run(dt, 2 * total_it, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plan_viscosity_friction.json", tolerance));
+        CHECK(diffFile("./Results/scopi_objects_0199.json", "../test/references/sphere_plane_viscosity_friction.json", tolerance));
     }
 
-    TEST_CASE_TEMPLATE_APPLY(sphere_plan_viscosity_friction, solver_dry_with_friction_t<2, vap_fpd>);
+    TEST_CASE_TEMPLATE_APPLY(sphere_plane_viscosity_friction, solver_dry_with_friction_t<2, vap_fpd>);
 
 }

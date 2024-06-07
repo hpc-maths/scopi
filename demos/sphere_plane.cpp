@@ -1,4 +1,4 @@
-#include <scopi/objects/types/plan.hpp>
+#include <scopi/objects/types/plane.hpp>
 #include <scopi/objects/types/sphere.hpp>
 #include <scopi/scopi.hpp>
 #include <scopi/solver.hpp>
@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv)
 {
-    scopi::initialize("sphere plan simulation");
+    scopi::initialize("sphere plane simulation");
 
     constexpr std::size_t dim = 2;
     double PI                 = xt::numeric_constants<double>::PI;
@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     double alpha         = PI / 6.;
 
     scopi::scopi_container<dim> particles;
-    scopi::plan<dim> p(
+    scopi::plane<dim> p(
         {
             {0., 0.}
     },

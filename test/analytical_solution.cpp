@@ -4,7 +4,7 @@ namespace scopi
 {
     /// Dry without friction
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_velocity_no_friction(double alpha, double t, double r, double g, double y0)
+    analytical_solution_sphere_plane_velocity_no_friction(double alpha, double t, double r, double g, double y0)
     {
         const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> v;
@@ -20,7 +20,7 @@ namespace scopi
         return std::make_pair(v, 0.);
     }
 
-    std::pair<type::position_t<2>, double> analytical_solution_sphere_plan_no_friction(double alpha, double t, double r, double g, double y0)
+    std::pair<type::position_t<2>, double> analytical_solution_sphere_plane_no_friction(double alpha, double t, double r, double g, double y0)
     {
         const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
@@ -38,7 +38,7 @@ namespace scopi
 
     /// Visous without friction
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_velocity_viscous(double alpha, double t, double r, double g, double y0, double gamma_min, double t_inv)
+    analytical_solution_sphere_plane_velocity_viscous(double alpha, double t, double r, double g, double y0, double gamma_min, double t_inv)
     {
         type::position_t<2> v;
         const double t_impact    = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
@@ -80,7 +80,7 @@ namespace scopi
     }
 
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_viscous(double alpha, double t, double r, double g, double y0, double gamma_min, double t_inv)
+    analytical_solution_sphere_plane_viscous(double alpha, double t, double r, double g, double y0, double gamma_min, double t_inv)
     {
         type::position_t<2> x;
         const double t_impact    = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
@@ -128,7 +128,7 @@ namespace scopi
 
     /// Friction
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_friction(double alpha, double mu, double t, double r, double g, double y0)
+    analytical_solution_sphere_plane_friction(double alpha, double mu, double t, double r, double g, double y0)
     {
         const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> x;
@@ -160,7 +160,7 @@ namespace scopi
     }
 
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_velocity_friction(double alpha, double mu, double t, double r, double g, double y0)
+    analytical_solution_sphere_plane_velocity_friction(double alpha, double mu, double t, double r, double g, double y0)
     {
         const double t_impact = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         type::position_t<2> v;
@@ -191,14 +191,14 @@ namespace scopi
     }
 
     /// Viscous with friction
-    std::pair<type::position_t<2>, double> analytical_solution_sphere_plan_velocity_viscous_friction(double alpha,
-                                                                                                     double mu,
-                                                                                                     double t,
-                                                                                                     double r,
-                                                                                                     double g,
-                                                                                                     double y0,
-                                                                                                     double gamma_min,
-                                                                                                     double t_inv)
+    std::pair<type::position_t<2>, double> analytical_solution_sphere_plane_velocity_viscous_friction(double alpha,
+                                                                                                      double mu,
+                                                                                                      double t,
+                                                                                                      double r,
+                                                                                                      double g,
+                                                                                                      double y0,
+                                                                                                      double gamma_min,
+                                                                                                      double t_inv)
     {
         double t_impact    = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));
         double t_gamma_min = -gamma_min / (g * std::cos(alpha));
@@ -295,7 +295,7 @@ namespace scopi
     }
 
     std::pair<type::position_t<2>, double>
-    analytical_solution_sphere_plan_viscous_friction(double alpha, double mu, double t, double r, double g, double y0, double gamma_min, double t_inv)
+    analytical_solution_sphere_plane_viscous_friction(double alpha, double mu, double t, double r, double g, double y0, double gamma_min, double t_inv)
     {
         double angle;
         double t_impact    = std::sqrt(2 * (y0 - r) / (g * std::cos(alpha)));

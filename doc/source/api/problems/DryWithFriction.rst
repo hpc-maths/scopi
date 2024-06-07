@@ -12,7 +12,7 @@ analytical_solution_sphere_plan functions
 .. doxygenfunction:: scopi::analytical_solution_sphere_plan
    :project: scopi
 
-.. doxygenfunction:: scopi::analytical_solution_sphere_plan_velocity
+.. doxygenfunction:: scopi::analytical_solution_sphere_plane_velocity
    :project: scopi
 
 ProblemParams<DryWithFriction> class

@@ -4,7 +4,7 @@
 
 #include "../dispatch.hpp"
 #include "../types/globule.hpp"
-#include "../types/plan.hpp"
+#include "../types/plane.hpp"
 #include "../types/sphere.hpp"
 #include "../types/superellipsoid.hpp"
 
@@ -26,11 +26,11 @@ namespace scopi
         return xt::linalg::norm(s1.pos() - s2.pos()) - s1.radius() - s2.radius();
     }
 
-    // PLAN - PLAN
+    // PLANE - PLANE
     template <std::size_t dim>
-    double distance(const plan<dim, false>, const plan<dim, false>)
+    double distance(const plane<dim, false>, const plane<dim, false>)
     {
-        std::cout << "distance : PLAN - PLAN" << std::endl;
+        std::cout << "distance : PLANE - PLANE" << std::endl;
         return 20;
     }
 
@@ -58,11 +58,11 @@ namespace scopi
         return 50;
     }
 
-    // SPHERE - PLAN
+    // SPHERE - PLANE
     template <std::size_t dim>
-    double distance(const sphere<dim, false>, const plan<dim, false>)
+    double distance(const sphere<dim, false>, const plane<dim, false>)
     {
-        std::cout << "distance : SPHERE - PLAN" << std::endl;
+        std::cout << "distance : SPHERE - PLANE" << std::endl;
         return 60;
     }
 
@@ -74,19 +74,19 @@ namespace scopi
         return 70;
     }
 
-    // SUPERELLIPSOID - PLAN
+    // SUPERELLIPSOID - PLANE
     template <std::size_t dim>
-    double distance(const superellipsoid<dim, false>, const plan<dim, false>)
+    double distance(const superellipsoid<dim, false>, const plane<dim, false>)
     {
-        std::cout << "distance : SUPERELLIPSOID - PLAN" << std::endl;
+        std::cout << "distance : SUPERELLIPSOID - PLANE" << std::endl;
         return 80;
     }
 
-    // GLOBULE - PLAN
+    // GLOBULE - PLANE
     template <std::size_t dim>
-    double distance(const globule<dim, false>, const plan<dim, false>)
+    double distance(const globule<dim, false>, const plane<dim, false>)
     {
-        std::cout << "distance : GLOBULE - PLAN" << std::endl;
+        std::cout << "distance : GLOBULE - PLANE" << std::endl;
         return 90;
     }
 
@@ -111,7 +111,7 @@ namespace scopi
     using distance_dispatcher = double_static_dispatcher<
         distance_functor,
         const object<dim, false>,
-        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const globule<dim, false>, const plan<dim, false>>,
+        mpl::vector<const sphere<dim, false>, const superellipsoid<dim, false>, const globule<dim, false>, const plane<dim, false>>,
         typename distance_functor::return_type,
         symmetric_dispatch>;
 }
