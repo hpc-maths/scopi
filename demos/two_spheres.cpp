@@ -23,25 +23,25 @@ int main(int argc, char** argv)
     scopi::ScopiSolver<dim> solver(particles);
     SCOPI_PARSE(argc, argv);
 
-    particles.push_back(s1,
-                        scopi::property<dim>()
-                            .desired_velocity({
-                                {0.25, 0}
-    })
-                            .mass(1.)
-                            .moment_inertia(0.1));
-    particles.push_back(s2,
-                        scopi::property<dim>()
-                            .desired_velocity({
-                                {-0.25, 0}
-    })
-                            .mass(1.)
-                            .moment_inertia(0.1));
+    // particles.push_back(s1,
+    //                     scopi::property<dim>()
+    //                         .desired_velocity({
+    //                             {0.25, 0}
+    // })
+    //                         .mass(1.)
+    //                         .moment_inertia(0.1));
+    // particles.push_back(s2,
+    //                     scopi::property<dim>()
+    //                         .desired_velocity({
+    //                             {-0.25, 0}
+    // })
+    //                         .mass(1.)
+    //                         .moment_inertia(0.1));
 
-    double dt = 0.005;
+    // double dt = 0.005;
 
-    std::size_t total_it = 100;
-    solver.run(dt, total_it);
+    // std::size_t total_it = 100;
+    // solver.run(dt, total_it);
 
     return 0;
 }
