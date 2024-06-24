@@ -221,7 +221,7 @@ namespace scopi
         m_nMatches = 0;
 #pragma omp parallel for reduction(+ : m_nMatches) // num_threads(1)
 
-        for (std::size_t i = particles.offset(active_ptr); i < particles.pos().size() - 1; ++i)
+        for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
         {
             std::array<double, dim> query_pt;
             for (std::size_t d = 0; d < dim; ++d)
@@ -239,7 +239,7 @@ namespace scopi
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic)
             {
-                std::size_t j = ret_matches[ic].first + particles.offset(active_ptr);
+                std::size_t j = ret_matches[ic].first + particles.offset(particles.object_index(active_ptr));
                 if (i < j)
                 {
                     compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
