@@ -383,16 +383,26 @@ namespace scopi
 
         for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
-            json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i], i));
-        }
-
-        if (m_params.write_velocity)
-        {
-            for (std::size_t i = 0; i < m_particles.size(); ++i)
+            auto offset              = m_particles.offset(i);
+            nl::json object          = write_objects_dispatcher<dim>::dispatch(*m_particles[i], offset);
+            nl::json& prop           = object["properties"];
+            prop["velocity"]         = m_particles.v()(offset);
+            prop["desired_velocity"] = m_particles.vd()(offset);
+            prop["omega"]            = m_particles.omega()(offset);
+            prop["desired_omega"]    = m_particles.desired_omega()(offset);
+            prop["force"]            = m_particles.f()(offset);
+            prop["mass"]             = m_particles.m()(offset);
+            prop["moment_inertia"]   = m_particles.j()(offset);
+            if (offset < m_particles.nb_inactive())
             {
-                json_output["objects"][i]["velocity"]         = m_particles.v()(i);
-                json_output["objects"][i]["rotationvelocity"] = m_particles.omega()(i);
+                prop["active"] = false;
             }
+            else
+            {
+                prop["active"] = true;
+            }
+
+            json_output["objects"].push_back(object);
         }
 
         json_output["contacts"] = {};

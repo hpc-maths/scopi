@@ -9,6 +9,7 @@
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xio.hpp>
+#include <xtensor/xjson.hpp>
 
 #include "../dispatch.hpp"
 #include "../neighbor.hpp"
@@ -43,10 +44,10 @@ namespace scopi
 
         object["type"]       = "sphere";
         object["id"]         = id;
-        object["position"]   = s.pos();
+        object["position"]   = xt::flatten(s.pos());
         object["radius"]     = s.radius();
         object["rotation"]   = xt::flatten(s.rotation());
-        object["quaternion"] = s.q();
+        object["quaternion"] = xt::flatten(s.q());
 
         return object;
         // std::cout << "write_objects : SPHERE" << std::endl;
@@ -80,11 +81,11 @@ namespace scopi
 
         object["type"]       = "superellipsoid";
         object["id"]         = id;
-        object["position"]   = s.pos();
+        object["position"]   = xt::flatten(s.pos());
         object["radius"]     = s.radius();
         object["squareness"] = s.squareness();
         object["rotation"]   = xt::flatten(s.rotation());
-        object["quaternion"] = s.q();
+        object["quaternion"] = xt::flatten(s.q());
 
         return object;
 
@@ -121,10 +122,10 @@ namespace scopi
 
         object["type"]       = "plane";
         object["id"]         = id;
-        object["position"]   = p.pos();
+        object["position"]   = xt::flatten(p.pos());
         object["normal"]     = p.normal();
         object["rotation"]   = xt::flatten(p.rotation());
-        object["quaternion"] = p.q();
+        object["quaternion"] = xt::flatten(p.q());
 
         return object;
 
@@ -165,7 +166,7 @@ namespace scopi
         object["p2"]         = extrema[1];
         object["normal"]     = seg.normal();
         object["tangent"]    = seg.tangent();
-        object["quaternion"] = seg.q();
+        object["quaternion"] = xt::flatten(seg.q());
 
         return object;
     }
@@ -187,10 +188,10 @@ namespace scopi
         for (std::size_t i = 0; i < w.size(); ++i)
         {
             nl::json json_worm;
-            json_worm["position"]   = w.pos(i);
+            json_worm["position"]   = xt::flatten(w.pos(i));
             json_worm["id"]         = id + i;
             json_worm["radius"]     = w.radius();
-            json_worm["quaternion"] = w.q(i);
+            json_worm["quaternion"] = xt::flatten(w.q(i));
             object["worm"].push_back(json_worm);
         }
         return object;
