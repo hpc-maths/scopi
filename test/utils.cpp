@@ -24,13 +24,13 @@ namespace scopi
 
             if (!diff.empty())
             {
+                std::cerr << "reference file: " << filenameRef << std::endl;
+                std::cerr << "output file: " << filenameResult << std::endl;
                 for (const auto& p : diff)
                 {
                     const std::string path_ = p["path"];
                     const nlohmann::json::json_pointer path(path_);
 
-                    std::cerr << "reference file: " << filenameRef << std::endl;
-                    std::cerr << "output file: " << filenameResult << std::endl;
                     if (jsonRef["objects"][path].is_number_float() && jsonResult["objects"][path].is_number_float())
                     {
                         const double error = std::abs(static_cast<double>(jsonRef["objects"][path])
