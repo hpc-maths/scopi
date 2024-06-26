@@ -241,6 +241,8 @@ namespace scopi
         std::size_t periodic_ptr() const;
         std::size_t periodic_index(std::size_t i) const;
 
+        void erase(std::size_t n);
+
       private:
 
         /**
@@ -418,6 +420,36 @@ namespace scopi
         m_forces.reserve(size);
         m_masses.reserve(size);
         m_moments_inertia.reserve(size);
+    }
+
+    template <std::size_t dim>
+    void scopi_container<dim>::erase(std::size_t n)
+    {
+        std::size_t total_size = m_offset[n];
+
+        m_positions.erase(m_positions.begin(), m_positions.begin() + total_size);
+        m_quaternions.erase(m_quaternions.begin(), m_quaternions.begin() + total_size);
+        m_velocities.erase(m_velocities.begin(), m_velocities.begin() + total_size);
+        m_desired_velocities.erase(m_desired_velocities.begin(), m_desired_velocities.begin() + total_size);
+        m_omega.erase(m_omega.begin(), m_omega.begin() + total_size);
+        m_desired_omega.erase(m_desired_omega.begin(), m_desired_omega.begin() + total_size);
+        m_forces.erase(m_forces.begin(), m_forces.begin() + total_size);
+        m_masses.erase(m_masses.begin(), m_masses.begin() + total_size);
+        m_moments_inertia.erase(m_moments_inertia.begin(), m_moments_inertia.begin() + total_size);
+
+        m_nb_inactive_core_objects -= total_size;
+        m_shapes_id.erase(m_shapes_id.begin(), m_shapes_id.begin() + n);
+        m_periodic_ptr -= total_size;
+        m_periodic_obj_ptr -= n;
+
+        m_offset.erase(m_offset.begin(), m_offset.begin() + n);
+        std::transform(m_offset.begin(),
+                       m_offset.end(),
+                       m_offset.begin(),
+                       [total_size](std::size_t o)
+                       {
+                           return o - total_size;
+                       });
     }
 
     template <std::size_t dim>
