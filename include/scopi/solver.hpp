@@ -441,24 +441,29 @@ namespace scopi
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
             xt::xtensor_fixed<double, xt::xshape<3>> w;
+            double normw;
+
             if constexpr (dim == 2)
             {
-                w = {0, 0, m_particles.omega()(i + active_offset)};
+                w     = {0, 0, m_particles.omega()(i + active_offset)};
+                normw = std::abs(m_particles.omega()(i + active_offset));
             }
             else
             {
-                w = m_particles.omega()(i + active_offset);
+                w     = m_particles.omega()(i + active_offset);
+                normw = xt::linalg::norm(w);
             }
 
-            double normw = xt::linalg::norm(w);
             if (normw == 0)
             {
                 normw = 1;
             }
+
             type::quaternion_t expw;
             auto expw_adapt                       = xt::adapt(expw);
             expw_adapt(0)                         = std::cos(0.5 * normw * m_dt);
             xt::view(expw_adapt, xt::range(1, _)) = std::sin(0.5 * normw * m_dt) / normw * w;
+
             for (std::size_t d = 0; d < dim; ++d)
             {
                 m_particles.pos()(i + active_offset)(d) += m_dt * m_particles.v()(i + active_offset)(d);
