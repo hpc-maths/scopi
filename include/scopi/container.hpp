@@ -443,10 +443,13 @@ namespace scopi
         m_periodic_obj_ptr -= n;
 
         m_offset.erase(m_offset.begin(), m_offset.begin() + n);
-        for (auto& o : m_offset)
-        {
-            o -= total_size;
-        }
+        std::transform(m_offset.begin(),
+                       m_offset.end(),
+                       m_offset.begin(),
+                       [total_size](std::size_t o)
+                       {
+                           return o - total_size;
+                       });
     }
 
     template <std::size_t dim>
