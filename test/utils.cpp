@@ -26,6 +26,8 @@ namespace scopi
             {
                 std::cerr << "reference file: " << filenameRef << std::endl;
                 std::cerr << "output file: " << filenameResult << std::endl;
+                std::cerr << jsonResult << std::endl;
+                std::cerr << diff << std::endl;
                 for (const auto& p : diff)
                 {
                     const std::string path_ = p["path"];
