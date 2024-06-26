@@ -7,6 +7,25 @@
                 -6.8567417870701775,
                 -40.37784940614346
             ],
+            "properties": {
+                "active": true,
+                "desired_omega": 0.0,
+                "desired_velocity": [
+                    0.0,
+                    0.0
+                ],
+                "force": [
+                    1.7,
+                    -1.3
+                ],
+                "mass": 1.0,
+                "moment_inertia": 1.0,
+                "omega": -4.764723538426645e-17,
+                "velocity": [
+                    2.498068593322216,
+                    -11.853119377536645
+                ]
+            },
             "quaternion": [
                 1.0,
                 0.0,
@@ -28,6 +47,25 @@
                 -21.53351332003981,
                 -38.45671360463534
             ],
+            "properties": {
+                "active": true,
+                "desired_omega": 0.0,
+                "desired_velocity": [
+                    0.0,
+                    0.0
+                ],
+                "force": [
+                    -0.5,
+                    -1.7
+                ],
+                "mass": 1.0,
+                "moment_inertia": 1.0,
+                "omega": -2.6212798394317093e-16,
+                "velocity": [
+                    -5.442425903902412,
+                    -11.46024106885052
+                ]
+            },
             "quaternion": [
                 1.0,
                 0.0,
@@ -49,6 +87,25 @@
                 -50.314744892890005,
                 -23.7204369892212
             ],
+            "properties": {
+                "active": true,
+                "desired_omega": 0.0,
+                "desired_velocity": [
+                    0.0,
+                    0.0
+                ],
+                "force": [
+                    -4.5,
+                    -1.3
+                ],
+                "mass": 1.0,
+                "moment_inertia": 1.0,
+                "omega": -4.2342101089895316e-17,
+                "velocity": [
+                    -20.155642689419786,
+                    -6.7866395536128445
+                ]
+            },
             "quaternion": [
                 1.0,
                 0.0,

@@ -522,12 +522,17 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
+        fs::path path        = "test_superellipsoid";
+        std::string filename = "two_ellipsoids_spheres_symmetrical";
+
         SolverType solver(particles);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = total_it - 1;
+        params.solver_params.output_frequency = total_it - 2;
+        params.solver_params.filename         = path;
+        params.solver_params.path             = filename;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0049.json", "../test/references/two_ellipsoids_spheres_symmetrical.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it - 1, tolerance));
     }
 
     TEST_CASE_TEMPLATE_DEFINE("two ellispsoids asymetrical", SolverType, two_ellispsoids_asymetrical)
@@ -562,12 +567,17 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
+        fs::path path        = "test_superellipsoid";
+        std::string filename = "two_ellipsoids_asymmetrical";
+
         SolverType solver(particles);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = total_it - 1;
+        params.solver_params.output_frequency = total_it - 2;
+        params.solver_params.filename         = path;
+        params.solver_params.path             = filename;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_asymmetrical.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it - 1, tolerance));
     }
 
     TEST_CASE_TEMPLATE_DEFINE("two ellispsoids spheres asymetrical", SolverType, two_ellispsoids_spheres_asymetrical)
@@ -604,12 +614,17 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
+        fs::path path        = "test_superellipsoid";
+        std::string filename = "two_ellipsoids_spheres_asymmetrical";
+
         SolverType solver(particles);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = total_it - 1;
+        params.solver_params.output_frequency = total_it - 2;
+        params.solver_params.filename         = path;
+        params.solver_params.path             = filename;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it - 1, tolerance));
     }
 
     TEST_CASE_TEMPLATE_DEFINE("critical 2d superellipsoids", SolverType, critical_2d_superellipsoids)
@@ -673,12 +688,17 @@ namespace scopi
             }
         }
 
+        fs::path path        = "test_superellipsoid";
+        std::string filename = "2d_case_superellipsoid";
+
         SolverType solver(particles);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = total_it - 1;
+        params.solver_params.output_frequency = total_it - 2;
+        params.solver_params.filename         = path;
+        params.solver_params.path             = filename;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_ellipsoids_spheres_asymmetrical.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it - 1, tolerance));
     }
 
     TEST_CASE_TEMPLATE_APPLY(two_ellispsoids_symetrical, solver_dry_without_friction_t<2>);

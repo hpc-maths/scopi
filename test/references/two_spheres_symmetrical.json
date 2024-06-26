@@ -1,27 +1,52 @@
 {
     "contacts": [
         {
-            "nij": [
+            "distance": -1.638529312231185e-10,
+            "i": 0,
+            "j": 1,
+            "normal": [
                 -1.0,
                 0.0
             ],
             "pi": [
-                4.759179161872851e-12,
+                8.192646561155925e-11,
                 0.0
             ],
             "pj": [
-                -4.759179161872851e-12,
+                -8.192646561155925e-11,
                 0.0
-            ]
+            ],
+            "property": {
+                "type": "no friction"
+            }
         }
     ],
     "objects": [
         {
             "id": 0,
             "position": [
-                -0.09999999999524083,
+                -0.09999999993013149,
                 0.0
             ],
+            "properties": {
+                "active": true,
+                "desired_omega": 0.0,
+                "desired_velocity": [
+                    0.25,
+                    0.0
+                ],
+                "force": [
+                    0.0,
+                    0.0
+                ],
+                "mass": 1.0,
+                "moment_inertia": 0.1,
+                "omega": 0.0,
+                "velocity": [
+                    -2.411591536119473e-09,
+                    0.0
+                ]
+            },
             "quaternion": [
                 1.0,
                 0.0,
@@ -40,9 +65,28 @@
         {
             "id": 1,
             "position": [
-                0.09999999999524083,
+                0.09999999993013149,
                 0.0
             ],
+            "properties": {
+                "active": true,
+                "desired_omega": 0.0,
+                "desired_velocity": [
+                    -0.25,
+                    0.0
+                ],
+                "force": [
+                    0.0,
+                    0.0
+                ],
+                "mass": 1.0,
+                "moment_inertia": 0.1,
+                "omega": 0.0,
+                "velocity": [
+                    2.411591536119473e-09,
+                    0.0
+                ]
+            },
             "quaternion": [
                 1.0,
                 0.0,

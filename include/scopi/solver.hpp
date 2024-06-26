@@ -294,7 +294,7 @@ namespace scopi
             update_velocity();
             move_active_particles();
 
-            if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
+            if ((nite + 1) % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
             {
                 write_output_files(contacts, nite + 1); // m_current_save++);
             }

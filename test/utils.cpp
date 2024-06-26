@@ -1,8 +1,17 @@
+#include <fmt/format.h>
+
 #include "utils.hpp"
 
 namespace scopi
 {
-    bool diffFile(const std::string& filenameRef, const std::string& filenameResult, double tol)
+    bool check_reference_file(const std::filesystem::path path, const std::string_view filename, std::size_t it, double tolerance)
+    {
+        std::filesystem::path ref_path = "../test/references";
+
+        return diffFile(path / fmt::format("{}_{:04d}.json", filename, it), ref_path / fmt::format("{}.json", filename), tolerance);
+    }
+
+    bool diffFile(const std::filesystem::path filenameResult, const std::filesystem::path filenameRef, double tol)
     {
         std::ifstream fileRef(filenameRef);
         std::ifstream fileResult(filenameResult);
@@ -20,6 +29,8 @@ namespace scopi
                     const std::string path_ = p["path"];
                     const nlohmann::json::json_pointer path(path_);
 
+                    std::cerr << "reference file: " << filenameRef << std::endl;
+                    std::cerr << "output file: " << filenameResult << std::endl;
                     if (jsonRef["objects"][path].is_number_float() && jsonResult["objects"][path].is_number_float())
                     {
                         const double error = std::abs(static_cast<double>(jsonRef["objects"][path])
