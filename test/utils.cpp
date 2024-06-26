@@ -24,10 +24,6 @@ namespace scopi
 
             if (!diff.empty())
             {
-                std::cerr << "reference file: " << filenameRef << std::endl;
-                std::cerr << "output file: " << filenameResult << std::endl;
-                std::cerr << jsonResult << std::endl;
-                std::cerr << diff << std::endl;
                 for (const auto& p : diff)
                 {
                     const std::string path_ = p["path"];
@@ -39,6 +35,10 @@ namespace scopi
                                                       - static_cast<double>(jsonResult["objects"][path]));
                         if (error > tol)
                         {
+                            std::cerr << "reference file: " << filenameRef << std::endl;
+                            std::cerr << "output file: " << filenameResult << std::endl;
+                            std::cerr << "differences: " << diff << std::endl;
+
                             std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
                             std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
                             std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;
@@ -49,6 +49,10 @@ namespace scopi
                     }
                     else
                     {
+                        std::cerr << "reference file: " << filenameRef << std::endl;
+                        std::cerr << "output file: " << filenameResult << std::endl;
+                        std::cerr << "differences: " << diff << std::endl;
+
                         std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
                         std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
                         std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;

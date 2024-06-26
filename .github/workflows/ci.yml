@@ -68,7 +68,7 @@ jobs:
     needs: [pre-commit, cppcheck]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - cpp-version: gcc-9
