@@ -294,7 +294,7 @@ namespace scopi
             update_velocity();
             move_active_particles();
 
-            if (nite % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
+            if ((nite + 1) % m_params.output_frequency == 0 && m_params.output_frequency != std::size_t(-1))
             {
                 write_output_files(contacts, nite + 1); // m_current_save++);
             }
@@ -383,16 +383,26 @@ namespace scopi
 
         for (std::size_t i = 0; i < m_particles.size(); ++i)
         {
-            json_output["objects"].push_back(write_objects_dispatcher<dim>::dispatch(*m_particles[i], i));
-        }
-
-        if (m_params.write_velocity)
-        {
-            for (std::size_t i = 0; i < m_particles.size(); ++i)
+            auto offset              = m_particles.offset(i);
+            nl::json object          = write_objects_dispatcher<dim>::dispatch(*m_particles[i], offset);
+            nl::json& prop           = object["properties"];
+            prop["velocity"]         = m_particles.v()(offset);
+            prop["desired_velocity"] = m_particles.vd()(offset);
+            prop["omega"]            = m_particles.omega()(offset);
+            prop["desired_omega"]    = m_particles.desired_omega()(offset);
+            prop["force"]            = m_particles.f()(offset);
+            prop["mass"]             = m_particles.m()(offset);
+            prop["moment_inertia"]   = m_particles.j()(offset);
+            if (offset < m_particles.nb_inactive())
             {
-                json_output["objects"][i]["velocity"]         = m_particles.v()(i);
-                json_output["objects"][i]["rotationvelocity"] = m_particles.omega()(i);
+                prop["active"] = false;
             }
+            else
+            {
+                prop["active"] = true;
+            }
+
+            json_output["objects"].push_back(object);
         }
 
         json_output["contacts"] = {};
@@ -431,24 +441,29 @@ namespace scopi
         for (std::size_t i = 0; i < m_particles.nb_active(); ++i)
         {
             xt::xtensor_fixed<double, xt::xshape<3>> w;
+            double normw;
+
             if constexpr (dim == 2)
             {
-                w = {0, 0, m_particles.omega()(i + active_offset)};
+                w     = {0, 0, m_particles.omega()(i + active_offset)};
+                normw = std::abs(m_particles.omega()(i + active_offset));
             }
             else
             {
-                w = m_particles.omega()(i + active_offset);
+                w     = m_particles.omega()(i + active_offset);
+                normw = xt::linalg::norm(w);
             }
 
-            double normw = xt::linalg::norm(w);
             if (normw == 0)
             {
                 normw = 1;
             }
+
             type::quaternion_t expw;
             auto expw_adapt                       = xt::adapt(expw);
             expw_adapt(0)                         = std::cos(0.5 * normw * m_dt);
             xt::view(expw_adapt, xt::range(1, _)) = std::sin(0.5 * normw * m_dt) / normw * w;
+
             for (std::size_t d = 0; d < dim; ++d)
             {
                 m_particles.pos()(i + active_offset)(d) += m_dt * m_particles.v()(i + active_offset)(d);

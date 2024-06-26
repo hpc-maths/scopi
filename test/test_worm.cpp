@@ -512,14 +512,19 @@ namespace scopi
         particles.push_back(w1, prop.desired_velocity({-1., 0.}));
         particles.push_back(w2, prop.desired_velocity({1., 0.}));
 
+        fs::path path        = "test_worm";
+        std::string filename = "two_worms";
+
         SolverType solver(particles);
         auto params = solver.get_params();
         set_params_test(params.optim_params);
-        params.contact_method_params.dmax = 1.;
-        // params.solver_params.output_frequency = total_it - 1;
+        params.contact_method_params.dmax     = 1.;
+        params.solver_params.output_frequency = total_it;
+        params.solver_params.filename         = filename;
+        params.solver_params.path             = path;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_worms.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it, tolerance));
     }
 
     TEST_CASE_TEMPLATE_APPLY(two_worms, solver_dry_without_friction_t<2>);

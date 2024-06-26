@@ -1,12 +1,10 @@
 {
     "contacts": [
         {
-            "dij": 0.04779107645199538,
-            "gamma": 0.0,
-            "gamma_min": -2.0,
+            "distance": 0.04779107645199538,
             "i": 0,
             "j": 1,
-            "nij": [
+            "normal": [
                 -0.5,
                 -0.8660254037844386
             ],
@@ -17,7 +15,11 @@
             "pj": [
                 69.85088692652799,
                 -40.27324398845621
-            ]
+            ],
+            "property": {
+                "mu": 0.1,
+                "type": "friction"
+            }
         }
     ],
     "objects": [
@@ -31,6 +33,25 @@
                 0.0,
                 0.0
             ],
+            "properties": {
+                "active": false,
+                "desired_omega": 0.0,
+                "desired_velocity": [
+                    0.0,
+                    0.0
+                ],
+                "force": [
+                    0.0,
+                    0.0
+                ],
+                "mass": 1.0,
+                "moment_inertia": 0.0,
+                "omega": 0.0,
+                "velocity": [
+                    0.0,
+                    0.0
+                ]
+            },
             "quaternion": [
                 0.8660254037844386,
                 0.0,
@@ -51,6 +72,25 @@
                 71.56701162523167,
                 -38.95437061818806
             ],
+            "properties": {
+                "active": true,
+                "desired_omega": 0.0,
+                "desired_velocity": [
+                    0.0,
+                    0.0
+                ],
+                "force": [
+                    0.0,
+                    -1.0
+                ],
+                "mass": 1.0,
+                "moment_inertia": 2.0,
+                "omega": -1.732290999947742,
+                "velocity": [
+                    7.161246987036821,
+                    -4.131774373007218
+                ]
+            },
             "quaternion": [
                 -0.7187308518193297,
                 0.0,

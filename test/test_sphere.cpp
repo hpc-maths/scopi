@@ -366,12 +366,17 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
+        fs::path path        = "two_spheres";
+        std::string filename = "two_spheres_asymmetrical";
+
         SolverType solver(particles);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = 1; // total_it-1;
+        params.solver_params.output_frequency = total_it;
+        params.solver_params.filename         = filename;
+        params.solver_params.path             = path;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_asymmetrical.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it, tolerance));
     }
 
     TEST_CASE_TEMPLATE_DEFINE("two spheres symetrical", SolverType, two_spheres_symetrical)
@@ -402,12 +407,17 @@ namespace scopi
                                 {-0.25, 0}
         }));
 
+        fs::path path        = "two_spheres";
+        std::string filename = "two_spheres_symmetrical";
+
         SolverType solver(particles);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = 1; // total_it-1;
+        params.solver_params.output_frequency = total_it;
+        params.solver_params.filename         = filename;
+        params.solver_params.path             = path;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0999.json", "../test/references/two_spheres_symmetrical.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it, tolerance));
     }
 
     TEST_CASE_TEMPLATE_DEFINE("critical 2d spheres", SolverType, two_spheres_critical)
@@ -459,13 +469,18 @@ namespace scopi
             }
         }
 
+        fs::path path        = "two_spheres";
+        std::string filename = "2d_case_spheres";
+
         SolverType solver(particles);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = 1; // total_it-1;
+        params.solver_params.output_frequency = total_it;
+        params.solver_params.filename         = filename;
+        params.solver_params.path             = path;
 
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0019.json", "../test/references/2d_case_spheres.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it, tolerance));
     }
 
     TEST_CASE_TEMPLATE_APPLY(two_spheres_asymetrical, solver_dry_without_friction_t<2>);

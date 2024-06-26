@@ -1,8 +1,17 @@
+#include <fmt/format.h>
+
 #include "utils.hpp"
 
 namespace scopi
 {
-    bool diffFile(const std::string& filenameRef, const std::string& filenameResult, double tol)
+    bool check_reference_file(const std::filesystem::path path, const std::string_view filename, std::size_t it, double tolerance)
+    {
+        std::filesystem::path ref_path = "../test/references";
+
+        return diffFile(path / fmt::format("{}_{:04d}.json", filename, it), ref_path / fmt::format("{}.json", filename), tolerance);
+    }
+
+    bool diffFile(const std::filesystem::path filenameResult, const std::filesystem::path filenameRef, double tol)
     {
         std::ifstream fileRef(filenameRef);
         std::ifstream fileResult(filenameResult);
@@ -26,6 +35,10 @@ namespace scopi
                                                       - static_cast<double>(jsonResult["objects"][path]));
                         if (error > tol)
                         {
+                            std::cerr << "reference file: " << filenameRef << std::endl;
+                            std::cerr << "output file: " << filenameResult << std::endl;
+                            std::cerr << "differences: " << diff << std::endl;
+
                             std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
                             std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
                             std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;
@@ -36,6 +49,10 @@ namespace scopi
                     }
                     else
                     {
+                        std::cerr << "reference file: " << filenameRef << std::endl;
+                        std::cerr << "output file: " << filenameResult << std::endl;
+                        std::cerr << "differences: " << diff << std::endl;
+
                         std::cerr << "The entry " << path << " in objects is not the same." << std::endl;
                         std::cerr << "\tExpected: " << jsonRef["objects"][path] << std::endl;
                         std::cerr << "\tObtained: " << jsonResult["objects"][path] << std::endl;

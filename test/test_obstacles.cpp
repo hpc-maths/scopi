@@ -37,7 +37,7 @@ namespace scopi
     void set_params(solver_t& solver, std::size_t total_it)
     {
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = total_it - 1;
+        params.solver_params.output_frequency = total_it;
     }
 
     TEST_CASE_TEMPLATE_DEFINE("sphere plane", SolverType, sphere_plane)
@@ -239,13 +239,18 @@ namespace scopi
                                 {0., -10.}
         }));
 
+        fs::path path        = "test_obstacles";
+        std::string filename = "obstacles_sphere_sphere_moving";
+
         SolverType solver(particles);
         set_params(solver, total_it);
         auto params                           = solver.get_params();
-        params.solver_params.output_frequency = 1;
+        params.solver_params.output_frequency = total_it;
+        params.solver_params.filename         = filename;
+        params.solver_params.path             = path;
         solver.run(dt, total_it);
 
-        CHECK(diffFile("./Results/scopi_objects_0099.json", "../test/references/obstacles_sphere_sphere_moving.json", tolerance));
+        CHECK(check_reference_file(path, filename, total_it, tolerance));
     }
 
     TEST_CASE_TEMPLATE_DEFINE("sphere inclined plane", SolverType, sphere_inclined_plane)
