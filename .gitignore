@@ -3,3 +3,8 @@ build
 node_modules
 package-lock.json
 xml
+.VSCodeCounter
+demos/proceeding
+.DS_Store
+dist
+*_old
