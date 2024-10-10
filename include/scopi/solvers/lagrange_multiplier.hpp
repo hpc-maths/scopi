@@ -53,10 +53,10 @@ namespace scopi
 
         LagrangeMultiplier(const Contacts& contacts, double)
             : base(contacts)
+            , m_local_work(xt::zeros<double>({size()}))
+            , m_global_work(xt::zeros<double>({3 * contacts.size()}))
+            , m_S_Vector(xt::zeros<double>({size()}))
         {
-            m_S_Vector    = xt::zeros<double>({size()});
-            m_local_work  = xt::zeros<double>({size()});
-            m_global_work = xt::zeros<double>({3 * contacts.size()});
         }
 
         const auto& global2local(const xt::xtensor<double, 1>& x) const
@@ -216,8 +216,8 @@ namespace scopi
 
         LagrangeMultiplier(const Contacts& contacts, double)
             : base(contacts)
+            , m_S_Vector(xt::zeros<double>({size()}))
         {
-            m_S_Vector = xt::zeros<double>({size()});
         }
 
         auto global2local(const xt::xtensor<double, 1>& x) const
@@ -284,8 +284,8 @@ namespace scopi
 
         LagrangeMultiplier(const Contacts& contacts, [[maybe_unused]] double dt)
             : base(contacts)
+            , m_S_Vector(xt::zeros<double>({size()}))
         {
-            m_S_Vector = xt::zeros<double>({size()});
             for (std::size_t i = 0, row = 0; i < this->m_contacts.size(); ++i, row += 3)
             {
                 xt::view(m_S_Vector, xt::range(row, row + dim)) = this->m_contacts[i].sij * this->m_contacts[i].nij;
