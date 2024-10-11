@@ -8,6 +8,7 @@ namespace scopi
         , path(std::filesystem::current_path() / "Results")
         , filename("scopi_objects")
         , write_velocity(false)
+        , write_lagrange_multiplier(false)
         , binary_output(false)
     {
     }
@@ -22,6 +23,7 @@ namespace scopi
             opt->add_option("--filename", filename, "Name of the outputs")->capture_default_str();
             opt->add_option("--freq", output_frequency, "Output frequency (in iterations)")->capture_default_str();
             opt->add_flag("--write-velocity", write_velocity, "Write the velocity of objects")->capture_default_str();
+            opt->add_flag("--write-lagrange-multiplier", write_lagrange_multiplier, "Write the Lagrange multiplier for each contact")->capture_default_str();
             opt->add_flag("--binary-output", binary_output, "Write bson output file instead of json")->capture_default_str();
         }
     }
