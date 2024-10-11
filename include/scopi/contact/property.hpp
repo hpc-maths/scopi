@@ -57,7 +57,7 @@ namespace scopi
             auto& sub = get_app();
             if (!check_option(sub, "--mu"))
             {
-                sub.add_option("--mu", mu, "Damping coefficient")->capture_default_str();
+                sub.add_option("--mu", mu, "Friction coefficient")->capture_default_str();
             }
         }
 
@@ -106,9 +106,9 @@ namespace scopi
             auto& sub = get_app();
             if (!check_option(sub, "--gamma"))
             {
-                sub.add_option("--gamma", gamma, "Damping coefficient")->capture_default_str();
-                sub.add_option("--gamma-min", gamma_min, "Damping coefficient")->capture_default_str();
-                sub.add_option("--gamma-tol", gamma_tol, "Damping coefficient")->capture_default_str();
+                sub.add_option("--gamma", gamma, "Adhesion potential")->capture_default_str();
+                sub.add_option("--gamma-min", gamma_min, "Adhesion potential threshold")->capture_default_str();
+                sub.add_option("--gamma-tol", gamma_tol, "Adhesion potential tolerance")->capture_default_str();
             }
         }
 
