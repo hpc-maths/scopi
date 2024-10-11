@@ -113,11 +113,17 @@ namespace scopi
          */
         std::string filename;
         /**
-         * @brief Whether to write the velocity and the rotation velocity of the particles in the output files.
+         * @brief Specifies if particle speed and rotation rate are to be written to output files.
          *
          * Default value is false.
          */
         bool write_velocity;
+        /**
+         * @brief Specifies if Lagrange multipliers are to be written to output files.
+         *
+         * Default value is false.
+         */
+        bool write_lagrange_multiplier;
         /**
          * @brief true for binary output files, false for text files.
          *
