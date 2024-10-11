@@ -124,11 +124,11 @@ namespace scopi
             {
                 if (box.is_periodic(d))
                 {
-                    if (neigh.pi(d) > box.upper_bound(d) && i >= particles.periodic_ptr())
+                    if (i >= particles.periodic_ptr())
                     {
                         neigh.pi(d) -= box.upper_bound(d) - box.lower_bound(d);
                     }
-                    if (neigh.pj(d) > box.upper_bound(d) && j >= particles.periodic_ptr())
+                    if (j >= particles.periodic_ptr())
                     {
                         neigh.pj(d) -= box.upper_bound(d) - box.lower_bound(d);
                     }
