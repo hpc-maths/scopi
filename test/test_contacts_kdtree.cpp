@@ -39,7 +39,7 @@ namespace scopi
         ContactsParams<contact_kdtree<NoFriction>> params;
         params.kd_tree_radius = 100.;
         contact_kdtree cont(params);
-        auto contacts = cont.run(particles, 0);
+        auto contacts = cont.run(particles);
 
         SUBCASE("nbContacts")
         {

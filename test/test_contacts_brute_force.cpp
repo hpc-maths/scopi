@@ -36,7 +36,7 @@ namespace scopi
 
         ContactsParams<contact_brute_force<NoFriction>> params;
         contact_brute_force cont(params);
-        auto contacts = cont.run(particles, 0);
+        auto contacts = cont.run(particles);
 
         SUBCASE("nbContacts")
         {
