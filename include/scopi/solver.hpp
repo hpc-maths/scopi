@@ -408,7 +408,7 @@ namespace scopi
         json_output["contacts"] = {};
 
         const auto& lambda = m_optim_solver.lagrange_multiplier();
-        std::size_t ic = 0;
+        std::size_t ic     = 0;
         for (const auto& c : contacts)
         {
             json_output["contacts"].push_back(c.to_json());
