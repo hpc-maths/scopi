@@ -357,7 +357,7 @@ namespace scopi
     template <std::size_t dim, class problem_t, class optim_solver_t, template <class> class contact_method_t, class vap_t>
     auto ScopiSolver<dim, problem_t, optim_solver_t, contact_method_t, vap_t>::compute_contacts() -> contact_container_t
     {
-        auto contacts = m_contact_method.run(m_box, m_particles, m_particles.nb_inactive());
+        auto contacts = m_contact_method.run(m_box, m_particles);
         for (std::size_t i = m_particles.object_index(m_particles.nb_inactive()); i < m_particles.size(); ++i)
         {
             add_contact_from_object_dispatcher<dim>::dispatch(*m_particles[i], m_particles.offset(i), contacts);
