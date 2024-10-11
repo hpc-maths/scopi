@@ -181,7 +181,7 @@ namespace scopi
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        auto run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
+        auto run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles);
 
         auto& default_contact_property()
         {
@@ -199,19 +199,17 @@ namespace scopi
 
     template <class problem_t>
     template <std::size_t dim>
-    auto contact_kdtree<problem_t>::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
+    auto contact_kdtree<problem_t>::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles)
     {
         // std::cout << "----> CONTACTS : run implementation contact_kdtree" << std::endl;
 
         std::vector<neighbor<dim, problem_t>> contacts;
 
-        add_objects_from_periodicity(box, particles, this->get_params().dmax);
-
         // utilisation de kdtree pour ne rechercher les contacts que pour les particules proches
         tic();
         using my_kd_tree_t = typename nanoflann::
             KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, KdTree<dim>>, KdTree<dim>, dim, std::size_t>;
-        KdTree<dim> kd(particles, active_ptr);
+        KdTree<dim> kd(particles, particles.nb_inactive());
         my_kd_tree_t index(dim, kd, nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
         auto duration = toc();
         PLOG_INFO << "----> CPUTIME : build kdtree index = " << duration << std::endl;
@@ -221,7 +219,7 @@ namespace scopi
         m_nMatches = 0;
 #pragma omp parallel for reduction(+ : m_nMatches) // num_threads(1)
 
-        for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
+        for (std::size_t i = particles.nb_inactive(); i < particles.pos().size() - 1; ++i)
         {
             std::array<double, dim> query_pt;
             for (std::size_t d = 0; d < dim; ++d)
@@ -239,7 +237,7 @@ namespace scopi
 
             for (std::size_t ic = 0; ic < nMatches_loc; ++ic)
             {
-                std::size_t j = ret_matches[ic].first + particles.offset(particles.object_index(active_ptr));
+                std::size_t j = ret_matches[ic].first + particles.offset(particles.object_index(particles.nb_inactive()));
                 if (i < j)
                 {
                     compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
@@ -249,9 +247,9 @@ namespace scopi
         }
 
         // obstacles
-        for (std::size_t i = 0; i < active_ptr; ++i)
+        for (std::size_t i = 0; i < particles.nb_inactive(); ++i)
         {
-            for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
+            for (std::size_t j = particles.nb_inactive(); j < particles.pos().size(); ++j)
             {
                 compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
             }
@@ -265,8 +263,6 @@ namespace scopi
         sort_contacts(contacts);
         duration = toc();
         PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration << std::endl;
-
-        particles.reset_periodic();
 
         return contacts;
     }
