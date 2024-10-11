@@ -87,7 +87,13 @@ namespace scopi
 
                 std::swap(lambda_n, lambda_np1);
             }
-            PLOG_INFO << fmt::format("pgd converged in {} iterations.", ite) << std::endl;
+            PLOG_INFO << fmt::format("PGD converged in {} iterations.", ite) << std::endl;
+
+            if (ite == m_params.max_ite)
+            {
+                std::cerr << "PGD didn't converge." << std::endl;
+            }
+
             return lambda_n;
         }
 
@@ -205,7 +211,13 @@ namespace scopi
                 std::swap(theta_n, theta_np1);
                 std::swap(y_n, y_np1);
             }
-            PLOG_INFO << fmt::format("apgd converged in {} iterations.", ite) << std::endl;
+            PLOG_INFO << fmt::format("APGD converged in {} iterations.", ite) << std::endl;
+
+            if (ite == m_params.max_ite)
+            {
+                std::cerr << "APGD didn't converge." << std::endl;
+            }
+
             return lambda_n;
         }
 
