@@ -42,24 +42,22 @@ namespace scopi
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
-         * @param active_ptr [in] Index of the first active particle.
          *
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        auto run(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
+        auto run(const BoxDomain<dim>& box, scopi_container<dim>& particles);
 
         /**
          * @brief Compute contacts between particles.
          *
          * @tparam dim Dimension (2 or 3).
          * @param particles [in] Array of particles.
-         * @param active_ptr [in] Index of the first active particle.
          *
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        auto run(scopi_container<dim>& particles, std::size_t active_ptr);
+        auto run(scopi_container<dim>& particles);
 
         params_t& get_params();
 
@@ -70,16 +68,19 @@ namespace scopi
 
     template <class D>
     template <std::size_t dim>
-    auto contact_base<D>::run(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
+    auto contact_base<D>::run(const BoxDomain<dim>& box, scopi_container<dim>& particles)
     {
-        return this->derived_cast().run_impl(box, particles, active_ptr);
+        add_objects_from_periodicity(box, particles, get_params().dmax);
+        auto contacts = this->derived_cast().run_impl(box, particles);
+        particles.reset_periodic();
+        return contacts;
     }
 
     template <class D>
     template <std::size_t dim>
-    auto contact_base<D>::run(scopi_container<dim>& particles, std::size_t active_ptr)
+    auto contact_base<D>::run(scopi_container<dim>& particles)
     {
-        return this->derived_cast().run_impl(BoxDomain<dim>(), particles, active_ptr);
+        return this->derived_cast().run_impl(BoxDomain<dim>(), particles);
     }
 
     template <class D>

@@ -89,7 +89,7 @@ namespace scopi
          * @return Array of neighbors.
          */
         template <std::size_t dim>
-        auto run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr);
+        auto run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles);
 
         contact_property<problem_t> m_default_contact_property;
 
@@ -101,15 +101,13 @@ namespace scopi
 
     template <class problem_t>
     template <std::size_t dim>
-    auto contact_brute_force<problem_t>::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles, std::size_t active_ptr)
+    auto contact_brute_force<problem_t>::run_impl(const BoxDomain<dim>& box, scopi_container<dim>& particles)
     {
         std::vector<neighbor<dim, problem_t>> contacts;
 
-        add_objects_from_periodicity(box, particles, this->get_params().dmax);
-
         tic();
 #pragma omp parallel for
-        for (std::size_t i = active_ptr; i < particles.pos().size() - 1; ++i)
+        for (std::size_t i = particles.nb_inactive(); i < particles.pos().size() - 1; ++i)
         {
             for (std::size_t j = i + 1; j < particles.pos().size(); ++j)
             {
@@ -118,9 +116,10 @@ namespace scopi
         }
 
         // obstacles
-        for (std::size_t i = 0; i < active_ptr; ++i)
+        // std::cout << "compute obstacles distances" << std::endl;
+        for (std::size_t i = 0; i < particles.nb_inactive(); ++i)
         {
-            for (std::size_t j = active_ptr; j < particles.pos().size(); ++j)
+            for (std::size_t j = particles.nb_inactive(); j < particles.pos().size(); ++j)
             {
                 compute_exact_distance<problem_t>(box, particles, contacts, this->get_params().dmax, i, j, m_default_contact_property);
             }
@@ -133,8 +132,6 @@ namespace scopi
         sort_contacts(contacts);
         duration = toc();
         PLOG_INFO << "----> CPUTIME : sort " << contacts.size() << " contacts = " << duration;
-
-        particles.reset_periodic();
 
         return contacts;
     }
