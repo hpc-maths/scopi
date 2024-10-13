@@ -1,9 +1,9 @@
 <html>
 
-<head>
-    <meta charset=utf-8>
-    <title>Visualization</title>
-    <style>
+    <head>
+        <meta charset=utf-8>
+        <title>Visualization</title>
+        <style>
         body {
             margin: 0;
         }
@@ -17,14 +17,21 @@
             height: auto;
         }
     </style>
-</head>
+    </head>
 
-<body>
-    <div>
-        <p> Sélectionner un dossier de résultats dans scopi/build/ </p>
-        <input type="file" id="uploadResult" name="fileList" accept=".json" webkitdirectory multiple />
-    </div>
+    <body>
+        <div>
+            <div>
+                <p> Sélectionner un dossier de résultats dans scopi/build/ </p>
+                <input type="file" id="uploadResult" name="fileList"
+                    accept=".json"
+                    webkitdirectory multiple />
+            </div>
+            <div>
+                <button id="download">Download Screenshot</button>
+            </div>
+        </div>
 
-    <div id="container"></div>
-    <script src="main.js"></script>
-</body>
+        <div id="container"></div>
+        <script src="main.js"></script>
+    </body>
