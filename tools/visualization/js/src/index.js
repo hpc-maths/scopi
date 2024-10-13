@@ -8,6 +8,7 @@ import * as math from "mathjs";
 import * as BSON from "bson";
 
 let camera, scene, renderer, lut;
+let objects_text = [];
 let container, controls, stats, gui, guiStatsEl;
 let params;
 params = {
@@ -17,6 +18,8 @@ params = {
 var oFiles = [];
 var guiFrame;
 var clock = new THREE.Clock();
+var camera_is_set = false;
+var boundingBox = new THREE.Box3();
 
 var options = {
     refresh: 0.01,
@@ -34,7 +37,7 @@ document
         oFiles = Array.from(document.getElementById("uploadResult").files).sort(
             (a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0)
         );
-
+        camera_is_set = false;
         guiFrame.max(oFiles.length - 1);
         options.current_frame = 0;
         drawObjects();
@@ -42,21 +45,34 @@ document
         clock.start();
     });
 
+document.getElementById("download").addEventListener("click", function (event) {
+    renderer.preserveDrawingBuffer = true;
+    renderer.render(scene, camera);
+    const image = renderer.domElement.toDataURL("image/png");
+    renderer.preserveDrawingBuffer = false;
+    const a = document.createElement("a");
+    a.setAttribute("download", "screenshot.png");
+    a.setAttribute("href", image);
+    a.click();
+});
+
 init();
 animate();
 
-function createText(number, position) {
-    const myText = new Text();
-
-    // Set properties to configure:
-    myText.text = number.toString();
-    myText.fontSize = 0.7;
-    myText.position.z = 2;
-    myText.color = 0x9966ff;
-    myText.position.x = position[0];
-    myText.position.y = position[1];
-    // console.log(myText);
-    scene.add(myText);
+function createText(objects) {
+    objects.forEach((obj, index) => {
+        if (obj.type === "sphere") {
+            const myText = new Text();
+            myText.text = obj.id.toString();
+            myText.fontSize = 0.7;
+            myText.position.z = 0.1;
+            myText.color = 0x9966ff;
+            myText.position.x = obj.position[0] - obj.radius / 2;
+            myText.position.y = obj.position[1] + obj.radius / 2;
+            objects_text.push(myText);
+            scene.add(myText);
+        }
+    });
 }
 
 /*
@@ -148,6 +164,57 @@ const sphereObject = (function () {
     };
 })();
 
+function udpateBoundingBox(objects) {
+    const points = [];
+    objects.forEach((obj, index) => {
+        if (obj.type === "sphere") {
+            points.push(new THREE.Vector3(...obj.position));
+        } else if (obj.type === "segment") {
+            points.push(
+                new THREE.Vector3(...obj.p1),
+                new THREE.Vector3(...obj.p2)
+            );
+        }
+    });
+    boundingBox = new THREE.Box3().setFromPoints(points);
+}
+
+function setCameraFromObjects() {
+    if (camera_is_set) {
+        return;
+    }
+
+    const offset = 1;
+
+    const center = new THREE.Vector3();
+    boundingBox.getCenter(center);
+
+    const size = new THREE.Vector3();
+    boundingBox.getSize(size);
+
+    // get the max side of the bounding box (fits to width OR height as needed )
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    let cameraZ = Math.abs((maxDim / 4) * Math.tan(fov * 2));
+
+    cameraZ *= offset; // zoom out a little so that objects don't fill the screen
+
+    camera.position.x = center.x;
+    camera.position.y = center.y;
+    camera.position.z = cameraZ;
+    camera.lookAt(center);
+
+    controls.target = center;
+
+    const minZ = boundingBox.min.z;
+    const cameraToFarEdge = minZ < 0 ? -minZ + cameraZ : cameraZ - minZ;
+
+    camera.far = cameraToFarEdge * 3;
+    camera.updateProjectionMatrix();
+    controls.update();
+    camera_is_set = true;
+}
+
 function drawObjects() {
     if (options.current_frame < oFiles.length) {
         const reader = new FileReader();
@@ -159,6 +226,9 @@ function drawObjects() {
 
             const objects = data.objects;
             const contacts = data.contacts;
+
+            udpateBoundingBox(objects);
+            setCameraFromObjects();
 
             lut = new Lut();
             clean(scene);
@@ -318,12 +388,9 @@ function drawObjects() {
             if (options.use_velocity) {
                 mesh.instanceColor.needsUpdate = true;
             }
-            // nbSpheres = 0;
-            // objects.forEach((obj, index) => {
-            //     if (obj.type === "sphere") {
-            //         createText(obj.id, obj.position);
-            //     }
-            // });
+
+            // createText(objects); //needs to be improved
+
             // radius of spheres
             if (options.radiuses) {
                 const line_geometry_rot =
@@ -340,45 +407,25 @@ function drawObjects() {
             }
 
             // contacts
-            if (options.contacts) {
+            if (options.contacts && contacts) {
                 const points = [];
-                if (contacts) {
-                    contacts.forEach((obj, index) => {
-                        if (obj.pi.length == 2) {
-                            points.push(
-                                new THREE.Vector3(obj.pi[0], obj.pi[1], 0)
-                            );
-                            points.push(
-                                new THREE.Vector3(obj.pj[0], obj.pj[1], 0)
-                            );
-                        } else {
-                            points.push(
-                                new THREE.Vector3(
-                                    obj.pi[0],
-                                    obj.pi[1],
-                                    obj.pi[2]
-                                )
-                            );
-                            points.push(
-                                new THREE.Vector3(
-                                    obj.pj[0],
-                                    obj.pj[1],
-                                    obj.pi[2]
-                                )
-                            );
-                        }
-                    });
-                    const line_geometry =
-                        new THREE.BufferGeometry().setFromPoints(points);
-                    const line_material = new THREE.LineBasicMaterial({
-                        color: "green",
-                    });
-                    var line_mesh = new THREE.LineSegments(
-                        line_geometry,
-                        line_material
+                contacts.forEach((obj, index) => {
+                    points.push(
+                        new THREE.Vector3(...obj.pi),
+                        new THREE.Vector3(...obj.pj)
                     );
-                    scene.add(line_mesh);
-                }
+                });
+                const line_geometry = new THREE.BufferGeometry().setFromPoints(
+                    points
+                );
+                const line_material = new THREE.LineBasicMaterial({
+                    color: "green",
+                });
+                var line_mesh = new THREE.LineSegments(
+                    line_geometry,
+                    line_material
+                );
+                scene.add(line_mesh);
             }
         });
 
@@ -430,17 +477,22 @@ function clean(obj) {
         });
         obj.material.dispose();
     }
+
+    if (objects_text) {
+        objects_text.forEach((obj) => {
+            obj.dispose();
+        });
+    }
 }
 
 function init() {
     clock.stop();
     camera = new THREE.PerspectiveCamera(
-        40,
+        50,
         window.innerWidth / window.innerHeight,
         0.1,
         10000
     );
-    camera.position.z = 100;
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xffffff);
@@ -495,7 +547,8 @@ function init() {
 
     var obj = {
         reset: function () {
-            controls.reset();
+            camera_is_set = false;
+            setCameraFromObjects();
         },
     };
     view.add(obj, "reset").name("Reset camera");
