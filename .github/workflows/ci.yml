@@ -68,7 +68,7 @@ jobs:
     needs: [pre-commit, cppcheck]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - cpp-version: gcc-9
@@ -92,11 +92,6 @@ jobs:
             package: "gcc-12 g++-12"
             cc: "gcc-12"
             cxx: "g++-12"
-          - cpp-version: clang-11
-            compiler: "clang"
-            package: "clang-11"
-            cc: "clang-11"
-            cxx: "clang++-11"
           - cpp-version: clang-12
             compiler: "clang"
             package: "clang-12"
@@ -176,9 +171,15 @@ jobs:
           cd build
           ./test/test_scopi
 
-  macos-mamba:
-    needs: [pre-commit, cppcheck]
-    runs-on: macos-14
+  mamba-build:
+    # needs: [pre-commit, cppcheck]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-14
+          # - windows-2022
     steps:
       - uses: actions/checkout@v4
       - name: Mamba and scopi env installation
@@ -188,11 +189,6 @@ jobs:
           environment-name: scopi-env
           cache-environment: true
 
-      - name: Installl cxx compiler
-        shell: bash -l {0}
-        run: |
-          micromamba install -y cxx-compiler
-
       - name: micromamba informations
         shell: bash -l {0}
         run: |
@@ -200,6 +196,7 @@ jobs:
           micromamba list
 
       - name: Configure
+        if: runner.os == 'Macos'
         shell: bash -l {0}
         run: |
           cmake \
@@ -210,10 +207,22 @@ jobs:
               -DBUILD_EXAMPLES=ON \
               -DBUILD_TESTS=ON
 
+      # - name: Configure
+      #   if: runner.os == 'Windows'
+      #   shell: bash -l {0}
+      #   run: |
+      #     cmake \
+      #         . \
+      #         -Bbuild \
+      #         -G "Visual Studio 17 2022" \
+      #         -DCMAKE_BUILD_TYPE=Release \
+      #         -DBUILD_EXAMPLES=ON \
+      #         -DBUILD_TESTS=ON
+
       - name: Build
         shell: bash -l {0}
         run: |
-          cmake --build ./build --config Release --parallel 3
+          cmake --build ./build --config Release
 
       - name: Run tests
         shell: bash -l {0}
