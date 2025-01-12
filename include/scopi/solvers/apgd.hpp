@@ -13,10 +13,6 @@
 
 namespace scopi
 {
-
-    template <class Problem, class Contacts, class Particles>
-    class minimization_problem;
-
     struct pgd_params
     {
         void init_options()
@@ -57,8 +53,8 @@ namespace scopi
             return m_params;
         }
 
-        template <class Problem, class Contacts, class Particles>
-        auto operator()(const minimization_problem<Problem, Contacts, Particles>& min_p)
+        template <class MinimizationProblem>
+        auto operator()(const MinimizationProblem& min_p)
         {
             std::size_t ite = 0;
 
@@ -144,8 +140,8 @@ namespace scopi
             return m_params;
         }
 
-        template <class Problem, class Contacts, class Particles>
-        auto operator()(const minimization_problem<Problem, Contacts, Particles>& min_p)
+        template <class MinimizationProblem>
+        auto operator()(const MinimizationProblem& min_p)
         {
             std::size_t ite = 0;
 

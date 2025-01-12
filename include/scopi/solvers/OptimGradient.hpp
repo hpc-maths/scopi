@@ -7,6 +7,7 @@
 #include "../utils.hpp"
 #include "lagrange_multiplier.hpp"
 #include "minimization_problem.hpp"
+#include "minimization_problem_rom.hpp"
 
 namespace scopi
 {
@@ -260,7 +261,7 @@ namespace scopi
 
             if (contacts.size() != 0)
             {
-                auto min_p = make_minimization_problem<problem_t>(m_dt, contacts, particles);
+                auto min_p = make_minimization_problem_rom<problem_t>(m_dt, contacts, particles);
 
                 m_lambda = m_method(min_p);
 
