@@ -155,22 +155,33 @@ namespace scopi
 
         static constexpr std::size_t dim = Particles::dim;
 
-        inline minimization_problem_rom(double dt, const Contacts& contacts, const Particles& particles)
+        inline minimization_problem_rom(double dt, const Contacts& contacts, const Particles& particles) // non restituisce un risultato
+                                                                                                         // direttamente, ma aggiorna i
+                                                                                                         // membri della classe tramite il
+                                                                                                         // costruttore
             : m_lagrange(make_lagrange_multplier<Particles::dim, Problem>(contacts, dt))
         {
+            // std::string npy_filename_Vr = "/Users/gsambata/scopi-ROM/files2SCoPI/RB_v.npy";
+            // std::string npy_filename_Wr = "/Users/gsambata/scopi-ROM/files2SCoPI/RB_lambda.npy";
             std::string npy_filename_Vr = "/Users/loic/Work/scopi/scopi/build/files2SCoPI/RB_v.npy";
             std::string npy_filename_Wr = "/Users/loic/Work/scopi/scopi/build/files2SCoPI/RB_lambda.npy";
 
-            auto t  = xt::load_npy<float>(npy_filename_Vr);
-            m_V     = xt::load_npy<float>(npy_filename_Vr);
+            auto t = xt::load_npy<float>(npy_filename_Vr);
+            m_V    = xt::load_npy<float>(npy_filename_Vr);
+
             auto VT = xt::eval(xt::transpose(m_V));
-            auto W  = xt::load_npy<float>(npy_filename_Wr);
-            auto WT = xt::eval(xt::transpose(W));
+            // auto W  = xt::load_npy<float>(npy_filename_Wr);
+            m_W     = xt::load_npy<float>(npy_filename_Wr);
+            auto WT = xt::eval(xt::transpose(m_W));
 
             auto [B, D] = compute_B_and_D(dt, contacts);
 
-            auto BV                       = B.mat_mult(m_V);
-            xt::xtensor<double, 2> m_Bhat = xt::linalg::dot(WT, BV);
+            auto BV = B.mat_mult(m_V);
+
+            m_Bhat = xt::linalg::dot(WT, BV);
+            std::cout << "Bhat shape: " << xt::adapt(m_Bhat.shape()) << std::endl;
+            std::cout << "Vhat shape: " << xt::adapt(m_V.shape()) << std::endl;
+            std::cout << "What shape: " << xt::adapt(m_W.shape()) << std::endl;
 
             using namespace xt::placeholders;
             auto U = xt::view(particles.vd(), xt::range(8, _));
@@ -182,12 +193,24 @@ namespace scopi
                 xt::view(m_Uc, xt::range(ii, ii + 2)) = u;
                 ii += 2;
             }
+
+            std::cout << "m_Uc shape: " << xt::adapt(m_Uc.shape()) << std::endl;
+
             m_Qhat = xt::linalg::dot(m_Bhat, xt::transpose(m_Bhat));
+            std::cout << "m_Qhat shape: " << xt::adapt(m_Qhat.shape()) << std::endl;
+
+            std::cout << "WT@Uc shape: " << xt::adapt(xt::linalg::dot(VT, m_Uc).shape()) << std::endl;
+            std::cout << "What@D shape: " << xt::adapt(xt::linalg::dot(WT, D).shape()) << std::endl;
+
             m_Chat = -(xt::linalg::dot(m_Bhat, xt::linalg::dot(VT, m_Uc)) - xt::linalg::dot(WT, D));
+            std::cout << "Chat shape: " << xt::adapt(m_Chat.shape()) << std::endl;
         }
 
         inline xt::xtensor<double, 1> gradient(const xt::xtensor<double, 1>& lambda) const
         {
+            std::cout << "lambda shape: " << xt::adapt(lambda.shape()) << std::endl;
+            std::cout << "m_Qhat shape: " << xt::adapt(m_Qhat.shape()) << std::endl;
+            std::cout << "m_Chat shape: " << xt::adapt(m_Chat.shape()) << std::endl;
             return xt::linalg::dot(m_Qhat, lambda) + m_Chat;
         }
 
@@ -198,7 +221,16 @@ namespace scopi
 
         inline auto velocities(const xt::xtensor<double, 1>& lambda) const
         {
-            return xt::linalg::dot(m_V, xt::linalg::dot(m_V, m_Uc) - xt::linalg::dot(xt::transpose(m_Bhat), lambda));
+            auto VT = xt::eval(xt::transpose(m_V)); // Ricalcolo di VT
+
+            std::cout << "B_hat shape: " << xt::adapt(m_Bhat.shape()) << std::endl;
+            std::cout << "B_hat: " << xt::adapt(m_Bhat) << std::endl;
+            std::cout << "B_hat transpose shape: " << xt::adapt(xt::transpose(m_Bhat).shape()) << std::endl;
+            std::cout << "Debugging VT@m_Uc shape: " << xt::adapt(xt::linalg::dot(VT, m_Uc).shape()) << std::endl;
+            auto vhat = xt::linalg::dot(VT, m_Uc) - xt::linalg::dot(xt::transpose(m_Bhat), lambda);
+            std::cout << "vhat shape: " << xt::adapt(vhat.shape()) << std::endl;
+            std::cout << "m_V@vhat shape: " << xt::adapt(xt::linalg::dot(m_V, vhat).shape()) << std::endl;
+            return xt::linalg::dot(m_V, vhat);
         }
 
         void projection(xt::xtensor<double, 1>& lambda) const
@@ -218,6 +250,7 @@ namespace scopi
         xt::xtensor<double, 1> m_Chat;
         xt::xtensor<double, 1> m_Uc;
         xt::xtensor<double, 2> m_V;
+        xt::xtensor<double, 2> m_W;
         const LagrangeMultiplier<Particles::dim, Problem, Contacts> m_lagrange;
     };
 
