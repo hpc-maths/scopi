@@ -25,6 +25,7 @@ namespace scopi
     inline auto& get_app()
     {
         static CLI::App app;
+        app.set_config("--config");
         app.set_help_all_flag("--help-all", "Expand all help");
         return app;
     }
