@@ -16,6 +16,17 @@ namespace scopi
     template <>
     struct VapParams<vap_fpd>
     {
+        void init_options()
+        {
+            auto& app = get_app();
+            auto* opt = app.add_option_group("VAP fpd");
+            if (!check_option(app, "--alpha"))
+            {
+                opt->add_option("--alpha", alpha, "drag coefficient")->capture_default_str();
+            }
+        }
+
+        double alpha = 0.;
     };
 
     /**
@@ -74,7 +85,7 @@ namespace scopi
 #pragma omp parallel for
         for (std::size_t i = active_ptr; i < active_ptr + nb_active; ++i)
         {
-            particles.v()(i) += dt * particles.f()(i) / particles.m()(i);
+            particles.v()(i) += dt * (particles.f()(i) / particles.m()(i) + this->m_params.alpha * particles.vd()(i));
             // check cross_product (division by J in the formula missing) and add a torque
             particles.omega()(i) += cross_product_vap_fpd(particles, i);
         }

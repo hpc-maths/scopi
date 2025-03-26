@@ -308,6 +308,7 @@ namespace scopi
         m_params.init_options();
         m_contact_method.init_options();
         m_optim_solver.init_options();
+        m_vap.init_options();
     }
 
     template <std::size_t dim, class problem_t, class optim_solver_t, template <class> class contact_method_t, class vap_t>

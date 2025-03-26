@@ -30,9 +30,14 @@ namespace scopi
         template <std::size_t dim, class Contacts>
         void set_a_priori_velocity(double dt, scopi_container<dim>& particles, const Contacts& contacts);
 
+        void init_options()
+        {
+            m_params.init_options();
+        }
+
         params_t& get_params();
 
-      private:
+      protected:
 
         params_t m_params;
     };
